@@ -2,6 +2,19 @@
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
-  modules: ["@nuxtjs/supabase", "@nuxt/ui"],
   css: ["~/assets/css/main.css"],
+  modules: ["@nuxtjs/supabase", "@nuxt/ui-pro"],
+  runtimeConfig: {
+    public: {
+      baseUrl: process.env.BASE_URL || "http://localhost:3000",
+    },
+  },
+  supabase: {
+    redirect: true,
+    redirectOptions: {
+      login: "/login",
+      callback: "/confirm",
+      exclude: ["/login", "/sign-up", "/confirm"],
+    },
+  },
 });
