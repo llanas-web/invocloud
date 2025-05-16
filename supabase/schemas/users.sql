@@ -24,3 +24,8 @@ BEGIN
 
   return new;
 end;$$;
+
+CREATE TRIGGER "on_new_user"
+AFTER INSERT ON auth.users
+FOR EACH ROW
+EXECUTE PROCEDURE "public"."handle_new_user"();
