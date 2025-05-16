@@ -26,6 +26,8 @@
         })
         toast.add({ title: 'Success', description: `New customer ${event.data.name} added`, color: 'success' })
         open.value = false
+        state.name = undefined
+        state.email = undefined
     }
 </script>
 

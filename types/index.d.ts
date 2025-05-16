@@ -1,8 +1,8 @@
 import type { AvatarProps } from "@nuxt/ui";
 import type { Database } from "./database.types";
 
-export type Stakeholders = Database["public"]["Tables"]["stakeholders"]["Row"];
-export type StakeholdersInsert =
+export type Stakeholder = Database["public"]["Tables"]["stakeholders"]["Row"];
+export type StakeholderInsert =
     Database["public"]["Tables"]["stakeholders"]["Insert"];
 
 export type UserStatus = "subscribed" | "unsubscribed" | "bounced";

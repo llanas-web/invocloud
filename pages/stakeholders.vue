@@ -2,7 +2,7 @@
     import type { TableColumn } from '@nuxt/ui'
     import { upperFirst } from 'scule'
     import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-    import type { User } from '~/types'
+    import type { Stakeholder, User } from '~/types'
 
     const UAvatar = resolveComponent('UAvatar')
     const UButton = resolveComponent('UButton')
@@ -12,6 +12,7 @@
 
     const toast = useToast()
     const table = useTemplateRef('table')
+    const { stakeholders, getStakeholders, deleteStakeholders } = useStakeholders()
 
     const columnFilters = ref([{
         id: 'email',
@@ -24,7 +25,10 @@
         lazy: true
     })
 
-    function getRowItems(row: Row<User>) {
+    await getStakeholders()
+
+
+    function getRowItems(row: Row<Stakeholder>) {
         return [
             {
                 type: 'label',
@@ -59,7 +63,8 @@
                 label: 'Delete customer',
                 icon: 'i-lucide-trash',
                 color: 'error',
-                onSelect() {
+                async onSelect() {
+                    await deleteStakeholders([row.original.id])
                     toast.add({
                         title: 'Customer deleted',
                         description: 'The customer has been deleted.'
@@ -69,7 +74,7 @@
         ]
     }
 
-    const columns: TableColumn<User>[] = [
+    const columns: TableColumn<Stakeholder>[] = [
         {
             id: 'select',
             header: ({ table }) =>
@@ -89,18 +94,10 @@
                 })
         },
         {
-            accessorKey: 'id',
-            header: 'ID'
-        },
-        {
             accessorKey: 'name',
             header: 'Name',
             cell: ({ row }) => {
                 return h('div', { class: 'flex items-center gap-3' }, [
-                    h(UAvatar, {
-                        ...row.original.avatar,
-                        size: 'lg'
-                    }),
                     h('div', undefined, [
                         h('p', { class: 'font-medium text-highlighted' }, row.original.name),
                         h('p', { class: '' }, `@${row.original.name}`)
@@ -125,27 +122,6 @@
                     class: '-mx-2.5',
                     onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
                 })
-            }
-        },
-        {
-            accessorKey: 'location',
-            header: 'Location',
-            cell: ({ row }) => row.original.location
-        },
-        {
-            accessorKey: 'status',
-            header: 'Status',
-            filterFn: 'equals',
-            cell: ({ row }) => {
-                const color = {
-                    subscribed: 'success' as const,
-                    unsubscribed: 'error' as const,
-                    bounced: 'warning' as const
-                }[row.original.status]
-
-                return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
-                    row.original.status
-                )
             }
         },
         {
@@ -219,7 +195,8 @@
                 <div class="flex flex-wrap items-center gap-1.5">
                     <CustomersDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
                         <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Delete"
-                            color="error" variant="subtle" icon="i-lucide-trash">
+                            color="error" variant="subtle" icon="i-lucide-trash"
+                            @click="() => deleteStakeholders(table!.tableApi!.getFilteredSelectedRowModel().rows.map((row) => row.original.id))">
                             <template #trailing>
                                 <UKbd>
                                     {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
@@ -259,7 +236,8 @@
             <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                 v-model:row-selection="rowSelection" v-model:pagination="pagination" :pagination-options="{
                     getPaginationRowModel: getPaginationRowModel()
-                }" class="shrink-0" :data="data ?? undefined" :columns="columns" :loading="status === 'pending'" :ui="{
+                }" class="shrink-0" :data="stakeholders ?? undefined" :columns="columns"
+                :loading="status === 'pending'" :ui="{
                     base: 'table-fixed border-separate border-spacing-0',
                     thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
                     tbody: '[&>tr]:last:[&>td]:border-b-0',
