@@ -115,6 +115,7 @@ export type Database = {
       };
       stakeholders: {
         Row: {
+<<<<<<< Updated upstream
           created_at: string;
           email: string | null;
           establishment_id: string | null;
@@ -141,6 +142,34 @@ export type Database = {
           phone?: string | null;
           updated_at?: string;
         };
+=======
+          created_at: string
+          email: string
+          establishment_id: string | null
+          id: string
+          name: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          establishment_id?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          establishment_id?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          updated_at?: string
+        }
+>>>>>>> Stashed changes
         Relationships: [
           {
             foreignKeyName: "stakeholders_establishment_id_fkey";
