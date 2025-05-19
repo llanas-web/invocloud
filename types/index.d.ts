@@ -8,6 +8,9 @@ export type StakeholderInsert =
 export type UserStatus = "subscribed" | "unsubscribed" | "bounced";
 export type SaleStatus = "paid" | "failed" | "refunded";
 
+export type Invoice = Database["public"]["Tables"]["invoices"]["Row"];
+export type InvoiceInsert = Database["public"]["Tables"]["invoices"]["Insert"];
+
 export interface User {
     id: number;
     name: string;
