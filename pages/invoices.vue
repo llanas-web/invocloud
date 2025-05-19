@@ -11,7 +11,7 @@
 
     const toast = useToast()
     const table = useTemplateRef('table')
-    const { invoices, invoicesLoading, getInvoices, deleteInvoices } = useInvoices()
+    const { invoices, invoicesLoading, getInvoices, updateInvoice, deleteInvoices } = useInvoices()
 
     const columnFilters = ref([{
         id: 'email',
@@ -30,7 +30,7 @@
                 label: 'Actions'
             },
             {
-                label: 'Copy customer ID',
+                label: 'Copy invoice ID',
                 icon: 'i-lucide-copy',
                 onSelect() {
                     navigator.clipboard.writeText(row.original.id.toString())
@@ -44,12 +44,21 @@
                 type: 'separator'
             },
             {
-                label: 'View customer details',
-                icon: 'i-lucide-list'
+                label: 'View invoice details',
+                icon: 'i-lucide-eye'
             },
             {
-                label: 'View customer payments',
-                icon: 'i-lucide-wallet'
+                type: 'separator'
+            },
+            {
+                label: 'Set as paid',
+                icon: 'i-lucide-check',
+                async onSelect() {
+                    await updateInvoice(row.original.id, {
+                        ...row.original,
+                        status: 'paid'
+                    })
+                }
             },
             {
                 type: 'separator'
@@ -204,8 +213,7 @@
                 <div class="flex flex-wrap items-center gap-1.5">
                     <InvoicesDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
                         <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Delete"
-                            color="error" variant="subtle" icon="i-lucide-trash"
-                            @click="() => deleteInvoices(table!.tableApi!.getFilteredSelectedRowModel().rows.map((row) => row.original.id))">
+                            color="error" variant="subtle" icon="i-lucide-trash">
                             <template #trailing>
                                 <UKbd>
                                     {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
@@ -219,8 +227,7 @@
                         { label: 'Subscribed', value: 'subscribed' },
                         { label: 'Unsubscribed', value: 'unsubscribed' },
                         { label: 'Bounced', value: 'bounced' }
-                    ]"
-                        :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
+                    ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
                         placeholder="Filter status" class="min-w-28" />
                     <UDropdownMenu :items="table?.tableApi
                         ?.getAllColumns()

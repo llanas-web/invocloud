@@ -10,6 +10,7 @@ export type SaleStatus = "paid" | "failed" | "refunded";
 
 export type Invoice = Database["public"]["Tables"]["invoices"]["Row"];
 export type InvoiceInsert = Database["public"]["Tables"]["invoices"]["Insert"];
+export type InvoiceStatus = Database["public"]["Enums"]["invoices_status"];
 
 export interface User {
     id: number;

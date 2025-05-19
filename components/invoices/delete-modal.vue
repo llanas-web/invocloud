@@ -1,20 +1,24 @@
 <script setup lang="ts">
-    withDefaults(defineProps<{
-        count?: number
+
+    const { deleteInvoices } = useInvoices()
+
+    const props = withDefaults(defineProps<{
+        listInvoicesId?: string[]
     }>(), {
-        count: 0
+        listInvoicesId: () => []
     })
 
     const open = ref(false)
 
     async function onSubmit() {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        open.value = false
+        const { listInvoicesId } = toRefs(props)
+        await deleteInvoices(listInvoicesId.value)
     }
 </script>
 
 <template>
-    <UModal v-model:open="open" :title="`Delete ${count} customer${count > 1 ? 's' : ''}`"
+    <UModal v-model:open="open"
+        :title="`Delete ${listInvoicesId.length} customer${listInvoicesId.length > 1 ? 's' : ''}`"
         :description="`Are you sure, this action cannot be undone.`">
         <slot />
 

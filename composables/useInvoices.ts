@@ -21,6 +21,31 @@ const _useInvoices = () => {
         invoicesLoading.value = false;
     };
 
+    const updateInvoice = async (invoiceId: string, invoice: InvoiceInsert) => {
+        if (!invoiceId || !invoice) {
+            console.error(
+                "Invoice ID and data are required to update an invoice.",
+            );
+            return null;
+        }
+        const { data, error } = await supabaseClient
+            .from("invoices")
+            .update(invoice)
+            .eq("id", invoiceId)
+            .select()
+            .single();
+        if (error) {
+            console.error("Error updating invoice:", error);
+            return null;
+        }
+        // Update the local invoices array
+        const index = invoices.value.findIndex((i) => i.id === invoiceId);
+        if (index !== -1) {
+            invoices.value[index] = data as Invoice;
+        }
+        return data;
+    };
+
     const createInvoice = async (invoice: InvoiceInsert, invoiceFile: File) => {
         if (!invoice) {
             console.error("Invoice data is required to create an invoice.");
@@ -59,6 +84,17 @@ const _useInvoices = () => {
             console.error("No invoice IDs provided for deletion.");
             return null;
         }
+        // Delete the invoice files from Supabase Storage
+        for (const invoiceId of invoiceIds) {
+            const { error: deleteError } = await supabaseClient
+                .storage
+                .from("invoices")
+                .remove([`${supabaseUser.value!.id}/${invoiceId}`]);
+            if (deleteError) {
+                console.error("Error deleting invoice file:", deleteError);
+                return null;
+            }
+        }
         const { data, error } = await supabaseClient
             .from("invoices")
             .delete()
@@ -79,6 +115,7 @@ const _useInvoices = () => {
         invoicesLoading,
         getInvoices,
         createInvoice,
+        updateInvoice,
         deleteInvoices,
     };
 };
