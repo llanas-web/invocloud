@@ -3,6 +3,7 @@ import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
 import type { Invoice } from '~/types'
+import { UBadge } from '#components'
 
 const UButton = resolveComponent('UButton')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
@@ -92,11 +93,47 @@ const columns: TableColumn<Invoice>[] = [
         header: 'Id',
         cell: ({ row }) => {
             return h('div', { class: 'flex items-center gap-3' }, [
-                h('div', undefined, [
-                    h('p', { class: 'font-medium text-highlighted' }, row.original.id),
-                    h('p', { class: '' }, `@${row.original.id}`)
-                ])
+                h('p', { class: 'font-medium text-highlighted' }, row.original.id),
             ])
+        }
+    },
+    {
+        accessorKey: 'name',
+        header: 'Name',
+        cell: ({ row }) => {
+            return h('div', { class: 'flex items-center gap-3' }, [
+                h('p', { class: 'font-medium text-highlighted' }, row.original.name),
+            ])
+        }
+    },
+    {
+        accessorKey: 'status',
+        header: 'Status',
+        filterFn: 'equals',
+        cell: ({ row }) => {
+            const color = {
+                paid: 'success' as const,
+                sent: 'error' as const,
+                pending: 'warning' as const
+            }[row.original.status]
+
+            return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
+                row.original.status
+            )
+        }
+    },
+    {
+        accessorKey: 'amount',
+        header: () => h('div', { class: 'text-right' }, 'Amount'),
+        cell: ({ row }) => {
+            const amount = Number.parseFloat(row.getValue('amount'))
+
+            const formatted = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'EUR'
+            }).format(amount)
+
+            return h('div', { class: 'text-right font-medium' }, formatted)
         }
     },
     {

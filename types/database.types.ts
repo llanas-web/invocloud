@@ -78,6 +78,7 @@ export type Database = {
           created_at: string;
           id: string;
           invoice_number: string | null;
+          name: string;
           stakeholder_id: string;
           status: Database["public"]["Enums"]["invoices_status"];
           updated_at: string;
@@ -88,6 +89,7 @@ export type Database = {
           created_at?: string;
           id?: string;
           invoice_number?: string | null;
+          name: string;
           stakeholder_id: string;
           status?: Database["public"]["Enums"]["invoices_status"];
           updated_at?: string;
@@ -98,6 +100,7 @@ export type Database = {
           created_at?: string;
           id?: string;
           invoice_number?: string | null;
+          name?: string;
           stakeholder_id?: string;
           status?: Database["public"]["Enums"]["invoices_status"];
           updated_at?: string;
@@ -287,8 +290,7 @@ export type CompositeTypes<
     | { schema: keyof Database },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof Database;
-  }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]][
+  } ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]][
       "CompositeTypes"
     ]
     : never = never,

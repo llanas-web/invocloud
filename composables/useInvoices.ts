@@ -3,6 +3,7 @@ import type { Invoice, InvoiceInsert } from "~/types";
 
 const _useInvoices = () => {
     const supabaseClient = useSupabaseClient();
+    const supabaseUser = useSupabaseUser();
     const invoices = ref<Invoice[]>([]);
     const invoicesLoading = ref(false);
 
@@ -20,9 +21,21 @@ const _useInvoices = () => {
         invoicesLoading.value = false;
     };
 
-    const createInvoice = async (invoice: InvoiceInsert) => {
+    const createInvoice = async (invoice: InvoiceInsert, invoiceFile: File) => {
         if (!invoice) {
             console.error("Invoice data is required to create an invoice.");
+            return null;
+        }
+        // generate id UUID
+        invoice.id = crypto.randomUUID();
+
+        // Upload the invoice file to Supabase Storage
+        const { data: uploadData, error: uploadError } = await supabaseClient
+            .storage
+            .from("invoices")
+            .upload(`${supabaseUser.value!.id}/${invoice.id}`, invoiceFile);
+        if (uploadError) {
+            console.error("Error uploading invoice file:", uploadError);
             return null;
         }
         const { data, error } = await supabaseClient
