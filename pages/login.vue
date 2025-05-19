@@ -1,47 +1,51 @@
 <script setup lang="ts">
-  import * as z from 'zod'
-  import type { FormSubmitEvent } from '@nuxt/ui'
+import * as z from 'zod'
+import type { FormSubmitEvent } from '@nuxt/ui'
 
-  const supabase = useSupabaseClient()
+definePageMeta({
+  layout: false,
+})
 
-  const toast = useToast()
+const supabase = useSupabaseClient()
 
-  const fields = [{
-    name: 'email',
-    type: 'text' as const,
-    label: 'Email',
-    placeholder: 'Enter your email',
-    required: true
-  }, {
-    name: 'password',
-    label: 'Password',
-    type: 'password' as const,
-    placeholder: 'Enter your password'
-  }, {
-    name: 'remember',
-    label: 'Remember me',
-    type: 'checkbox' as const
-  }]
+const toast = useToast()
 
-  const schema = z.object({
-    email: z.string().email('Invalid email'),
-    password: z.string().min(8, 'Must be at least 8 characters')
+const fields = [{
+  name: 'email',
+  type: 'text' as const,
+  label: 'Email',
+  placeholder: 'Enter your email',
+  required: true
+}, {
+  name: 'password',
+  label: 'Password',
+  type: 'password' as const,
+  placeholder: 'Enter your password'
+}, {
+  name: 'remember',
+  label: 'Remember me',
+  type: 'checkbox' as const
+}]
+
+const schema = z.object({
+  email: z.string().email('Invalid email'),
+  password: z.string().min(8, 'Must be at least 8 characters')
+})
+
+type Schema = z.output<typeof schema>
+
+async function onSubmit(payload: FormSubmitEvent<Schema>) {
+  const { error } = await supabase.auth.signInWithPassword({
+    email: payload.data.email,
+    password: payload.data.password,
   })
-
-  type Schema = z.output<typeof schema>
-
-  async function onSubmit(payload: FormSubmitEvent<Schema>) {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: payload.data.email,
-      password: payload.data.password,
-    })
-    if (error) toast.add({ title: 'Error while signIn', description: error.message, color: 'error' })
-    else {
-      toast.add({ title: 'Success', description: 'Logged in successfully', color: 'success' })
-      // Redirect to home page
-      navigateTo('/')
-    };
-  }
+  if (error) toast.add({ title: 'Error while signIn', description: error.message, color: 'error' })
+  else {
+    toast.add({ title: 'Success', description: 'Logged in successfully', color: 'success' })
+    // Redirect to home page
+    navigateTo('/')
+  };
+}
 </script>
 
 <template>

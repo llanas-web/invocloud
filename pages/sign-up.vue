@@ -1,51 +1,55 @@
 <script setup lang="ts">
-    import * as z from 'zod'
-    import type { FormSubmitEvent } from '@nuxt/ui'
+import * as z from 'zod'
+import type { FormSubmitEvent } from '@nuxt/ui'
 
-    const supabase = useSupabaseClient()
+definePageMeta({
+    layout: false,
+})
 
-    const toast = useToast()
-    const config = useRuntimeConfig()
-    const redirectTo = `${config.public.baseUrl}/auth/callback`
+const supabase = useSupabaseClient()
 
-    const fields = [{
-        name: 'email',
-        type: 'text' as const,
-        label: 'Email',
-        placeholder: 'Enter your email',
-        required: true
-    }, {
-        name: 'password',
-        label: 'Password',
-        type: 'password' as const,
-        placeholder: 'Enter your password'
-    }];
+const toast = useToast()
+const config = useRuntimeConfig()
+const redirectTo = `${config.public.baseUrl}/auth/callback`
 
-    const schema = z.object({
-        email: z.string().email('Invalid email'),
-        password: z.string().min(8, 'Must be at least 8 characters'),
+const fields = [{
+    name: 'email',
+    type: 'text' as const,
+    label: 'Email',
+    placeholder: 'Enter your email',
+    required: true
+}, {
+    name: 'password',
+    label: 'Password',
+    type: 'password' as const,
+    placeholder: 'Enter your password'
+}];
+
+const schema = z.object({
+    email: z.string().email('Invalid email'),
+    password: z.string().min(8, 'Must be at least 8 characters'),
+})
+
+type Schema = z.output<typeof schema>
+
+
+// Variable réactive pour suivre l'état de la soumission
+const isSignUpSuccessful = ref(false)
+
+async function onSubmit(payload: FormSubmitEvent<Schema>) {
+    const { error } = await supabase.auth.signUp({
+        email: payload.data.email,
+        password: payload.data.password,
+        options: {
+            emailRedirectTo: redirectTo
+        },
     })
-
-    type Schema = z.output<typeof schema>
-
-
-    // Variable réactive pour suivre l'état de la soumission
-    const isSignUpSuccessful = ref(false)
-
-    async function onSubmit(payload: FormSubmitEvent<Schema>) {
-        const { error } = await supabase.auth.signUp({
-            email: payload.data.email,
-            password: payload.data.password,
-            options: {
-                emailRedirectTo: redirectTo
-            },
-        })
-        if (error) toast.add({ title: 'Error while signIn', description: error.message, color: 'error' })
-        else {
-            toast.add({ title: 'Success', description: 'Logged in successfully', color: 'success' })
-            isSignUpSuccessful.value = true
-        };
-    }
+    if (error) toast.add({ title: 'Error while signIn', description: error.message, color: 'error' })
+    else {
+        toast.add({ title: 'Success', description: 'Logged in successfully', color: 'success' })
+        isSignUpSuccessful.value = true
+    };
+}
 </script>
 
 <template>

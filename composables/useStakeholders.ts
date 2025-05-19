@@ -76,6 +76,7 @@ const _useStakeholders = () => {
 
     return {
         stakeholders,
+        stakeholdersLoading,
         getStakeholders,
         createStakeholder,
         deleteStakeholders,
