@@ -1,187 +1,187 @@
 <script setup lang="ts">
-import type { TableColumn } from '@nuxt/ui'
-import { upperFirst } from 'scule'
-import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-import type { Invoice } from '~/types'
-import { UBadge } from '#components'
+    import type { TableColumn } from '@nuxt/ui'
+    import { upperFirst } from 'scule'
+    import { getPaginationRowModel, type Row } from '@tanstack/table-core'
+    import type { Invoice } from '~/types'
+    import { UBadge } from '#components'
 
-const UButton = resolveComponent('UButton')
-const UDropdownMenu = resolveComponent('UDropdownMenu')
-const UCheckbox = resolveComponent('UCheckbox')
+    const UButton = resolveComponent('UButton')
+    const UDropdownMenu = resolveComponent('UDropdownMenu')
+    const UCheckbox = resolveComponent('UCheckbox')
 
-const toast = useToast()
-const table = useTemplateRef('table')
-const { invoices, invoicesLoading, getInvoices, deleteInvoices } = useInvoices()
+    const toast = useToast()
+    const table = useTemplateRef('table')
+    const { invoices, invoicesLoading, getInvoices, deleteInvoices } = useInvoices()
 
-const columnFilters = ref([{
-    id: 'email',
-    value: ''
-}])
-const columnVisibility = ref()
-const rowSelection = ref({ 1: true })
+    const columnFilters = ref([{
+        id: 'email',
+        value: ''
+    }])
+    const columnVisibility = ref()
+    const rowSelection = ref({ 1: true })
 
-await getInvoices()
+    await getInvoices()
 
 
-function getRowItems(row: Row<Invoice>) {
-    return [
+    function getRowItems(row: Row<Invoice>) {
+        return [
+            {
+                type: 'label',
+                label: 'Actions'
+            },
+            {
+                label: 'Copy customer ID',
+                icon: 'i-lucide-copy',
+                onSelect() {
+                    navigator.clipboard.writeText(row.original.id.toString())
+                    toast.add({
+                        title: 'Copied to clipboard',
+                        description: 'Customer ID copied to clipboard'
+                    })
+                }
+            },
+            {
+                type: 'separator'
+            },
+            {
+                label: 'View customer details',
+                icon: 'i-lucide-list'
+            },
+            {
+                label: 'View customer payments',
+                icon: 'i-lucide-wallet'
+            },
+            {
+                type: 'separator'
+            },
+            {
+                label: 'Supprimer facture',
+                icon: 'i-lucide-trash',
+                color: 'error',
+                async onSelect() {
+                    await deleteInvoices([row.original.id])
+                    toast.add({
+                        title: 'Facture supprimée',
+                        description: 'La facture a été supprimée avec succès',
+                    })
+                }
+            }
+        ]
+    }
+
+    const columns: TableColumn<Invoice>[] = [
         {
-            type: 'label',
-            label: 'Actions'
+            id: 'select',
+            header: ({ table }) =>
+                h(UCheckbox, {
+                    'modelValue': table.getIsSomePageRowsSelected()
+                        ? 'indeterminate'
+                        : table.getIsAllPageRowsSelected(),
+                    'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
+                        table.toggleAllPageRowsSelected(!!value),
+                    'ariaLabel': 'Select all'
+                }),
+            cell: ({ row }) =>
+                h(UCheckbox, {
+                    'modelValue': row.getIsSelected(),
+                    'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
+                    'ariaLabel': 'Select row'
+                })
         },
         {
-            label: 'Copy customer ID',
-            icon: 'i-lucide-copy',
-            onSelect() {
-                navigator.clipboard.writeText(row.original.id.toString())
-                toast.add({
-                    title: 'Copied to clipboard',
-                    description: 'Customer ID copied to clipboard'
-                })
+            accessorKey: 'Id',
+            header: 'Id',
+            cell: ({ row }) => {
+                return h('div', { class: 'flex items-center gap-3' }, [
+                    h('p', { class: 'font-medium text-highlighted' }, row.original.id),
+                ])
             }
         },
         {
-            type: 'separator'
+            accessorKey: 'name',
+            header: 'Name',
+            cell: ({ row }) => {
+                return h('div', { class: 'flex items-center gap-3' }, [
+                    h('p', { class: 'font-medium text-highlighted' }, row.original.name),
+                ])
+            }
         },
         {
-            label: 'View customer details',
-            icon: 'i-lucide-list'
+            accessorKey: 'status',
+            header: 'Status',
+            filterFn: 'equals',
+            cell: ({ row }) => {
+                const color = {
+                    paid: 'success' as const,
+                    sent: 'error' as const,
+                    pending: 'warning' as const
+                }[row.original.status]
+
+                return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
+                    row.original.status
+                )
+            }
         },
         {
-            label: 'View customer payments',
-            icon: 'i-lucide-wallet'
+            accessorKey: 'amount',
+            header: () => h('div', { class: 'text-right' }, 'Amount'),
+            cell: ({ row }) => {
+                const amount = Number.parseFloat(row.getValue('amount'))
+
+                const formatted = new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'EUR'
+                }).format(amount)
+
+                return h('div', { class: 'text-right font-medium' }, formatted)
+            }
         },
         {
-            type: 'separator'
-        },
-        {
-            label: 'Supprimer facture',
-            icon: 'i-lucide-trash',
-            color: 'error',
-            async onSelect() {
-                await deleteInvoices([row.original.id])
-                toast.add({
-                    title: 'Facture supprimée',
-                    description: 'La facture a été supprimée avec succès',
-                })
+            id: 'actions',
+            cell: ({ row }) => {
+                return h(
+                    'div',
+                    { class: 'text-right' },
+                    h(
+                        UDropdownMenu,
+                        {
+                            content: {
+                                align: 'end'
+                            },
+                            items: getRowItems(row)
+                        },
+                        () =>
+                            h(UButton, {
+                                icon: 'i-lucide-ellipsis-vertical',
+                                color: 'neutral',
+                                variant: 'ghost',
+                                class: 'ml-auto'
+                            })
+                    )
+                )
             }
         }
     ]
-}
 
-const columns: TableColumn<Invoice>[] = [
-    {
-        id: 'select',
-        header: ({ table }) =>
-            h(UCheckbox, {
-                'modelValue': table.getIsSomePageRowsSelected()
-                    ? 'indeterminate'
-                    : table.getIsAllPageRowsSelected(),
-                'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
-                    table.toggleAllPageRowsSelected(!!value),
-                'ariaLabel': 'Select all'
-            }),
-        cell: ({ row }) =>
-            h(UCheckbox, {
-                'modelValue': row.getIsSelected(),
-                'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
-                'ariaLabel': 'Select row'
-            })
-    },
-    {
-        accessorKey: 'Id',
-        header: 'Id',
-        cell: ({ row }) => {
-            return h('div', { class: 'flex items-center gap-3' }, [
-                h('p', { class: 'font-medium text-highlighted' }, row.original.id),
-            ])
+    const statusFilter = ref('all')
+
+    watch(() => statusFilter.value, (newVal) => {
+        if (!table?.value?.tableApi) return
+
+        const statusColumn = table.value.tableApi.getColumn('status')
+        if (!statusColumn) return
+
+        if (newVal === 'all') {
+            statusColumn.setFilterValue(undefined)
+        } else {
+            statusColumn.setFilterValue(newVal)
         }
-    },
-    {
-        accessorKey: 'name',
-        header: 'Name',
-        cell: ({ row }) => {
-            return h('div', { class: 'flex items-center gap-3' }, [
-                h('p', { class: 'font-medium text-highlighted' }, row.original.name),
-            ])
-        }
-    },
-    {
-        accessorKey: 'status',
-        header: 'Status',
-        filterFn: 'equals',
-        cell: ({ row }) => {
-            const color = {
-                paid: 'success' as const,
-                sent: 'error' as const,
-                pending: 'warning' as const
-            }[row.original.status]
+    })
 
-            return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
-                row.original.status
-            )
-        }
-    },
-    {
-        accessorKey: 'amount',
-        header: () => h('div', { class: 'text-right' }, 'Amount'),
-        cell: ({ row }) => {
-            const amount = Number.parseFloat(row.getValue('amount'))
-
-            const formatted = new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'EUR'
-            }).format(amount)
-
-            return h('div', { class: 'text-right font-medium' }, formatted)
-        }
-    },
-    {
-        id: 'actions',
-        cell: ({ row }) => {
-            return h(
-                'div',
-                { class: 'text-right' },
-                h(
-                    UDropdownMenu,
-                    {
-                        content: {
-                            align: 'end'
-                        },
-                        items: getRowItems(row)
-                    },
-                    () =>
-                        h(UButton, {
-                            icon: 'i-lucide-ellipsis-vertical',
-                            color: 'neutral',
-                            variant: 'ghost',
-                            class: 'ml-auto'
-                        })
-                )
-            )
-        }
-    }
-]
-
-const statusFilter = ref('all')
-
-watch(() => statusFilter.value, (newVal) => {
-    if (!table?.value?.tableApi) return
-
-    const statusColumn = table.value.tableApi.getColumn('status')
-    if (!statusColumn) return
-
-    if (newVal === 'all') {
-        statusColumn.setFilterValue(undefined)
-    } else {
-        statusColumn.setFilterValue(newVal)
-    }
-})
-
-const pagination = ref({
-    pageIndex: 0,
-    pageSize: 10
-})
+    const pagination = ref({
+        pageIndex: 0,
+        pageSize: 10
+    })
 </script>
 
 <template>
@@ -202,7 +202,7 @@ const pagination = ref({
             <div class="flex flex-wrap items-center justify-between gap-1.5">
 
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <CustomersDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
+                    <InvoicesDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
                         <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Delete"
                             color="error" variant="subtle" icon="i-lucide-trash"
                             @click="() => deleteInvoices(table!.tableApi!.getFilteredSelectedRowModel().rows.map((row) => row.original.id))">
@@ -212,14 +212,15 @@ const pagination = ref({
                                 </UKbd>
                             </template>
                         </UButton>
-                    </CustomersDeleteModal>
+                    </InvoicesDeleteModal>
 
                     <USelect v-model="statusFilter" :items="[
                         { label: 'All', value: 'all' },
                         { label: 'Subscribed', value: 'subscribed' },
                         { label: 'Unsubscribed', value: 'unsubscribed' },
                         { label: 'Bounced', value: 'bounced' }
-                    ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
+                    ]"
+                        :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
                         placeholder="Filter status" class="min-w-28" />
                     <UDropdownMenu :items="table?.tableApi
                         ?.getAllColumns()

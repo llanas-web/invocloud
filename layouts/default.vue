@@ -1,114 +1,114 @@
 <script setup lang="ts">
-const route = useRoute()
-const toast = useToast()
+    const route = useRoute()
+    const toast = useToast()
 
-const open = ref(false)
+    const open = ref(false)
 
-const links = [[{
-    label: 'Home',
-    icon: 'i-lucide-house',
-    to: '/',
-    onSelect: () => {
-        open.value = false
-    }
-}, {
-    label: 'Invoces',
-    icon: 'i-lucide-files',
-    to: '/invoices',
-    badge: '4',
-    onSelect: () => {
-        open.value = false
-    }
-}, {
-    label: 'Clients',
-    icon: 'i-lucide-users',
-    to: '/stakeholders',
-    onSelect: () => {
-        open.value = false
-    }
-}, {
-    label: 'Settings',
-    to: '/settings',
-    icon: 'i-lucide-settings',
-    defaultOpen: false,
-    children: [{
-        label: 'General',
+    const links = [[{
+        label: 'Home',
+        icon: 'i-lucide-house',
+        to: '/',
+        onSelect: () => {
+            open.value = false
+        }
+    }, {
+        label: 'Invoces',
+        icon: 'i-lucide-files',
+        to: '/invoices',
+        badge: '4',
+        onSelect: () => {
+            open.value = false
+        }
+    }, {
+        label: 'Clients',
+        icon: 'i-lucide-users',
+        to: '/stakeholders',
+        onSelect: () => {
+            open.value = false
+        }
+    }, {
+        label: 'Settings',
         to: '/settings',
-        exact: true,
-        onSelect: () => {
-            open.value = false
-        }
-    }, {
-        label: 'Members',
-        to: '/settings/members',
-        onSelect: () => {
-            open.value = false
-        }
-    }, {
-        label: 'Notifications',
-        to: '/settings/notifications',
-        onSelect: () => {
-            open.value = false
-        }
-    }, {
-        label: 'Security',
-        to: '/settings/security',
-        onSelect: () => {
-            open.value = false
-        }
-    }]
-}], [{
-    label: 'Feedback',
-    icon: 'i-lucide-message-circle',
-    to: 'https://github.com/nuxt-ui-pro/dashboard',
-    target: '_blank'
-}, {
-    label: 'Help & Support',
-    icon: 'i-lucide-info',
-    to: 'https://github.com/nuxt/ui-pro',
-    target: '_blank'
-}]]
-
-const groups = computed(() => [{
-    id: 'links',
-    label: 'Go to',
-    items: links.flat()
-}, {
-    id: 'code',
-    label: 'Code',
-    items: [{
-        id: 'source',
-        label: 'View page source',
-        icon: 'i-simple-icons-github',
-        to: `https://github.com/nuxt-ui-pro/dashboard/blob/main/app/pages${route.path === '/' ? '/index' : route.path}.vue`,
-        target: '_blank'
-    }]
-}])
-
-onMounted(async () => {
-    const cookie = useCookie('cookie-consent')
-    if (cookie.value === 'accepted') {
-        return
-    }
-
-    toast.add({
-        title: 'We use first-party cookies to enhance your experience on our website.',
-        duration: 0,
-        close: false,
-        actions: [{
-            label: 'Accept',
-            color: 'neutral',
-            variant: 'outline',
-            onClick: () => {
-                cookie.value = 'accepted'
+        icon: 'i-lucide-settings',
+        defaultOpen: false,
+        children: [{
+            label: 'General',
+            to: '/settings',
+            exact: true,
+            onSelect: () => {
+                open.value = false
             }
         }, {
-            label: 'Opt out',
-            color: 'neutral',
-            variant: 'ghost'
+            label: 'Members',
+            to: '/settings/members',
+            onSelect: () => {
+                open.value = false
+            }
+        }, {
+            label: 'Notifications',
+            to: '/settings/notifications',
+            onSelect: () => {
+                open.value = false
+            }
+        }, {
+            label: 'Security',
+            to: '/settings/security',
+            onSelect: () => {
+                open.value = false
+            }
         }]
+    }], [{
+        label: 'Feedback',
+        icon: 'i-lucide-message-circle',
+        to: 'https://github.com/nuxt-ui-pro/dashboard',
+        target: '_blank'
+    }, {
+        label: 'Help & Support',
+        icon: 'i-lucide-info',
+        to: 'https://github.com/nuxt/ui-pro',
+        target: '_blank'
+    }]]
+
+    const groups = computed(() => [{
+        id: 'links',
+        label: 'Go to',
+        items: links.flat()
+    }, {
+        id: 'code',
+        label: 'Code',
+        items: [{
+            id: 'source',
+            label: 'View page source',
+            icon: 'i-simple-icons-github',
+            to: `https://github.com/nuxt-ui-pro/dashboard/blob/main/app/pages${route.path === '/' ? '/index' : route.path}.vue`,
+            target: '_blank'
+        }]
+    }])
+
+    onMounted(async () => {
+        const cookie = useCookie('cookie-consent')
+        if (cookie.value === 'accepted') {
+            return
+        }
+
+        toast.add({
+            title: 'We use first-party cookies to enhance your experience on our website.',
+            duration: 0,
+            close: false,
+            actions: [{
+                label: 'Accept',
+                color: 'neutral',
+                variant: 'outline',
+                onClick: () => {
+                    cookie.value = 'accepted'
+                }
+            }, {
+                label: 'Opt out',
+                color: 'neutral',
+                variant: 'ghost'
+            }]
+        })
     })
-})
 </script>
 
 <template>
@@ -116,7 +116,7 @@ onMounted(async () => {
         <UDashboardSidebar id="default" v-model:open="open" collapsible resizable class="bg-elevated/25"
             :ui="{ footer: 'lg:border-t lg:border-default' }">
             <template #header="{ collapsed }">
-                <TeamsMenu :collapsed="collapsed" />
+                <!-- <TeamsMenu :collapsed="collapsed" /> -->
             </template>
 
             <template #default="{ collapsed }">
@@ -128,7 +128,7 @@ onMounted(async () => {
             </template>
 
             <template #footer="{ collapsed }">
-                <UserMenu :collapsed="collapsed" />
+                <!-- <UserMenu :collapsed="collapsed" /> -->
             </template>
         </UDashboardSidebar>
 
@@ -136,6 +136,6 @@ onMounted(async () => {
 
         <slot />
 
-        <NotificationsSlideover />
+        <!-- <NotificationsSlideover /> -->
     </UDashboardGroup>
 </template>
