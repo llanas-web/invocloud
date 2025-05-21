@@ -1,13 +1,29 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { Invoice, InvoiceInsert } from "~/types";
+import type { Invoice, InvoiceInsert, PendingInvoices } from "~/types";
 import type { Database } from "~/types/database.types";
 
 const _useInvoices = () => {
     const supabaseClient = useSupabaseClient<Database>();
     const supabaseUser = useSupabaseUser();
     const invoices = ref<Invoice[]>([]);
-    const pendingInvoices = ref<Invoice[]>([]);
+    const pendingInvoices = ref<PendingInvoices[]>([]);
     const invoicesLoading = ref(false);
+
+    const getPendingInvoices = async () => {
+        invoicesLoading.value = true;
+        const { data, error } = await supabaseClient
+            .from("pending_invoices")
+            .select("*")
+            .eq("user_id", supabaseUser.value!.id)
+            .neq("status", "pending");
+
+        if (error) {
+            console.error("Error fetching pending invoices:", error);
+            return null;
+        }
+        pendingInvoices.value = data;
+        invoicesLoading.value = false;
+    };
 
     const getInvoices = async () => {
         invoicesLoading.value = true;
@@ -118,11 +134,13 @@ const _useInvoices = () => {
         recipientEmail: string,
         comment: string,
     ) => {
-    }
+    };
     return {
         invoices,
         invoicesLoading,
+        pendingInvoices,
         getInvoices,
+        getPendingInvoices,
         createInvoice,
         updateInvoice,
         deleteInvoices,

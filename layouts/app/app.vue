@@ -4,70 +4,85 @@ const toast = useToast()
 
 const open = ref(false)
 
-const links = [[{
-    label: 'Home',
-    icon: 'i-lucide-house',
-    to: '/app/',
-    onSelect: () => {
-        open.value = false
-    }
-}, {
-    label: 'Invoces',
-    icon: 'i-lucide-files',
-    to: '/app/invoices',
-    badge: '4',
-    onSelect: () => {
-        open.value = false
-    }
-}, {
-    label: 'Clients',
-    icon: 'i-lucide-users',
-    to: '/app/stakeholders',
-    onSelect: () => {
-        open.value = false
-    }
-}, {
-    label: 'Settings',
-    to: '/app/settings',
-    icon: 'i-lucide-settings',
-    defaultOpen: false,
-    children: [{
-        label: 'General',
-        to: '/settings',
-        exact: true,
-        onSelect: () => {
-            open.value = false
+const { pendingInvoices, getPendingInvoices } = useInvoices()
+
+onMounted(async () => {
+    await getPendingInvoices()
+})
+
+const links = [
+    [
+        {
+            label: 'Home',
+            icon: 'i-lucide-house',
+            to: '/app/',
+            onSelect: () => {
+                open.value = false
+            }
+        }, {
+            label: 'Invoces',
+            icon: 'i-lucide-files',
+            to: '/app/invoices',
+            slot: 'invoices',
+            onSelect: () => {
+                open.value = false
+            }
+        }, {
+            label: 'Clients',
+            icon: 'i-lucide-users',
+            to: '/app/stakeholders',
+            onSelect: () => {
+                open.value = false
+            }
+        }, {
+            label: 'Settings',
+            to: '/app/settings',
+            icon: 'i-lucide-settings',
+            defaultOpen: false,
+            children: [
+                {
+                    label: 'General',
+                    to: '/settings',
+                    exact: true,
+                    onSelect: () => {
+                        open.value = false
+                    }
+                }, {
+                    label: 'Members',
+                    to: '/settings/members',
+                    onSelect: () => {
+                        open.value = false
+                    }
+                }, {
+                    label: 'Notifications',
+                    to: '/settings/notifications',
+                    onSelect: () => {
+                        open.value = false
+                    }
+                }, {
+                    label: 'Security',
+                    to: '/settings/security',
+                    onSelect: () => {
+                        open.value = false
+                    }
+                }
+            ]
         }
-    }, {
-        label: 'Members',
-        to: '/settings/members',
-        onSelect: () => {
-            open.value = false
+    ],
+    [
+        {
+            label: 'Feedback',
+            icon: 'i-lucide-message-circle',
+            to: 'https://github.com/nuxt-ui-pro/dashboard',
+            target: '_blank'
+        }, {
+            label: 'Help & Support',
+            icon: 'i-lucide-info',
+            to: 'https://github.com/nuxt/ui-pro',
+            target: '_blank'
         }
-    }, {
-        label: 'Notifications',
-        to: '/settings/notifications',
-        onSelect: () => {
-            open.value = false
-        }
-    }, {
-        label: 'Security',
-        to: '/settings/security',
-        onSelect: () => {
-            open.value = false
-        }
-    }]
-}], [{
-    label: 'Feedback',
-    icon: 'i-lucide-message-circle',
-    to: 'https://github.com/nuxt-ui-pro/dashboard',
-    target: '_blank'
-}, {
-    label: 'Help & Support',
-    icon: 'i-lucide-info',
-    to: 'https://github.com/nuxt/ui-pro',
-    target: '_blank'
-}]]
+    ]
+]
 
 const groups = computed(() => [{
     id: 'links',
@@ -121,8 +136,13 @@ onMounted(async () => {
 
             <template #default="{ collapsed }">
                 <UDashboardSearchButton :collapsed="collapsed" class="bg-transparent ring-default" />
-
-                <UNavigationMenu :collapsed="collapsed" :items="links[0]" orientation="vertical" />
+                <UNavigationMenu :collapsed="collapsed" :items="links[0]" orientation="vertical">
+                    <template #invoices-trailing>
+                        <UTooltip :text="`You have ${pendingInvoices.length ?? 0} pending invoices`" placement="right">
+                            <UBadge :label="pendingInvoices.length ?? 0" size="sm" color="primary" />
+                        </UTooltip>
+                    </template>
+                </UNavigationMenu>
 
                 <UNavigationMenu :collapsed="collapsed" :items="links[1]" orientation="vertical" class="mt-auto" />
             </template>
