@@ -6,6 +6,7 @@ const _useInvoices = () => {
     const supabaseClient = useSupabaseClient<Database>();
     const supabaseUser = useSupabaseUser();
     const invoices = ref<Invoice[]>([]);
+    const pendingInvoices = ref<Invoice[]>([]);
     const invoicesLoading = ref(false);
 
     const getInvoices = async () => {

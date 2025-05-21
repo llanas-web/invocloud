@@ -34,7 +34,7 @@ definePageMeta({
                             Login
                         </UButton>
 
-                        <InvoicesSendStepModal />
+                        <InvoicesUploadStepModal />
                     </template>
                 </UPageHero>
 

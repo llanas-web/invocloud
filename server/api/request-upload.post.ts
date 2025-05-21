@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { z } from "zod";
+import { Database } from "~/types/database.types";
 import { generateCode, hashCode } from "~/utils/hash";
 
 const schema = z.object({
@@ -20,7 +21,7 @@ export default defineEventHandler(async (event) => {
     }
     const { sendorEmail, recipientEmail, comment } = parsed.data;
 
-    const supabase = await serverSupabaseClient(event);
+    const supabase = await serverSupabaseClient<Database>(event);
     // 1. Check if user is authenticated
     const { data, error: authError } = await supabase.auth
         .signInAnonymously();
@@ -55,14 +56,14 @@ export default defineEventHandler(async (event) => {
     const newInvoiceId = crypto.randomUUID();
 
     const { data: newInvoice, error: newInvoiceError } = await supabase
-        .from("shared_invoices")
+        .from("pending_invoices")
         .insert({
             id: newInvoiceId,
             user_id: recipientUser.id,
             stakeholder_id: stakeholder.id,
             comment: comment,
             token: hashedCode,
-            token_expires_at: expiresAt,
+            token_expires_at: expiresAt.toISOString(),
         })
         .select()
         .single();
@@ -77,13 +78,22 @@ export default defineEventHandler(async (event) => {
 
     const { emails } = useResend();
 
-    const result = await emails.send({
-        from: "InvoCloud <tech@llanas.dev>",
-        to: [sendorEmail],
-        subject: "Confirm your invoice upload",
-        text:
-            `Hello, please confirm your invoice upload with this code: ${code}. It will expire at ${expiresAt.toISOString()}.`,
-    });
+    try {
+        await emails.send({
+            from: "InvoCloud <tech@llanas.dev>",
+            to: [sendorEmail],
+            subject: "Confirm your invoice upload",
+            text:
+                `Hello, <br /> Please confirm your invoice upload with this code: <br /> ${code} <br /> It will expire at ${expiresAt.toISOString()}.`,
+        });
+    } catch (error) {
+        console.error("Error sending email:", error);
+        supabase.from("pending_invoices").delete().eq("id", newInvoiceId);
+        throw createError({
+            status: 500,
+            message: "Error sending confirmation email",
+        });
+    }
 
     const response = {
         success: true,

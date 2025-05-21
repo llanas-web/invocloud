@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     console.log("Hashed code:", hashedCode);
 
     const { data: file } = await supabase
-        .from("shared_invoices")
+        .from("pending_invoices")
         .select("*")
         .eq("id", invoiceId)
         .eq("token", hashedCode)
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
 
     const { data } = await supabase
         .storage
-        .from("shared-invoices")
+        .from("pending-invoices")
         .createSignedUploadUrl(`${file.user_id}/${file.id}`);
 
     if (!data) {
@@ -42,6 +42,14 @@ export default defineEventHandler(async (event) => {
             message: "Error creating signed URL",
         });
     }
+
+    await supabase.from("pending_invoices")
+        .update({
+            status: "confirmed",
+        })
+        .eq("id", file.id)
+        .select()
+        .single();
 
     const response = {
         url: data.signedUrl,
