@@ -12,6 +12,11 @@ export type Invoice = Database["public"]["Tables"]["invoices"]["Row"];
 export type InvoiceInsert = Database["public"]["Tables"]["invoices"]["Insert"];
 export type InvoiceStatus = Database["public"]["Enums"]["invoices_status"];
 
+export type SharedInvoice =
+    Database["public"]["Tables"]["shared_invoices"]["Row"];
+export type SharedInvoiceInsert =
+    Database["public"]["Tables"]["shared_invoices"]["Insert"];
+
 export interface User {
     id: number;
     name: string;

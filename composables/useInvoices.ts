@@ -1,8 +1,9 @@
 import { createSharedComposable } from "@vueuse/core";
 import type { Invoice, InvoiceInsert } from "~/types";
+import type { Database } from "~/types/database.types";
 
 const _useInvoices = () => {
-    const supabaseClient = useSupabaseClient();
+    const supabaseClient = useSupabaseClient<Database>();
     const supabaseUser = useSupabaseUser();
     const invoices = ref<Invoice[]>([]);
     const invoicesLoading = ref(false);
@@ -110,6 +111,13 @@ const _useInvoices = () => {
         return data;
     };
 
+    const sendInvoiceAnonymously = async (
+        invoice: File,
+        senderEmail: string,
+        recipientEmail: string,
+        comment: string,
+    ) => {
+    }
     return {
         invoices,
         invoicesLoading,
