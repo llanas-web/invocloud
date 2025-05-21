@@ -75,6 +75,16 @@ export default defineEventHandler(async (event) => {
         });
     }
 
+    const { emails } = useResend();
+
+    const result = await emails.send({
+        from: "InvoCloud <tech@llanas.dev>",
+        to: [sendorEmail],
+        subject: "Confirm your invoice upload",
+        text:
+            `Hello, please confirm your invoice upload with this code: ${code}. It will expire at ${expiresAt.toISOString()}.`,
+    });
+
     const response = {
         success: true,
         expires_at: expiresAt.toISOString(),

@@ -47,22 +47,24 @@ const fileFormState = reactive<Partial<FileFormSchema>>({
 
 async function submitFileForm() {
     const { sendorEmail, recipientEmail, comment } = fileFormState
-    const { data, error } = await useFetch('/api/request-upload', {
-        method: 'POST',
-        body: {
-            sendorEmail,
-            recipientEmail,
-            comment,
-        }
-    })
-    if (error.value || !data.value) {
+    try {
+        const { invoice_id } = await $fetch('/api/request-upload', {
+            method: 'POST',
+            body: {
+                sendorEmail,
+                recipientEmail,
+                comment,
+            }
+        })
+        sharedInvoiceId.value = invoice_id
+        stepper.value?.next()
+    } catch (error) {
+        console.error('Error requesting upload:', error)
         toast.add({ title: 'Error', description: 'Failed to request upload', color: 'error' })
-        isLoading.value = false
         return
+    } finally {
+        isLoading.value = false
     }
-    const { invoice_id } = data.value!
-    sharedInvoiceId.value = invoice_id
-    stepper.value?.next()
 }
 
 const confirmFormSchema = z.object({
@@ -77,19 +79,14 @@ const confirmFormState = reactive<Partial<ConfirmFormSchema>>({
 
 async function submitConfirmForm(event: FormSubmitEvent<ConfirmFormSchema>) {
     const { confirmToken } = event.data
-    const { data, error } = await useFetch('/api/upload-invoices', {
-        method: 'POST',
-        body: {
-            invoiceId: sharedInvoiceId.value,
-            token: confirmToken.join('')
-        }
-    })
-    if (error.value || !data.value) {
-        toast.add({ title: 'Error', description: 'Failed to confirm upload', color: 'error' })
-        return
-    }
-    const { fileName, url } = data.value!
     try {
+        const { fileName, url } = await $fetch('/api/upload-invoices', {
+            method: 'POST',
+            body: {
+                invoiceId: sharedInvoiceId.value,
+                token: confirmToken.join('')
+            }
+        })
         await $fetch(url, {
             method: 'PUT',
             body: fileFormState.invoiceFile!,
@@ -98,13 +95,13 @@ async function submitConfirmForm(event: FormSubmitEvent<ConfirmFormSchema>) {
             }
         })
         toast.add({ title: 'Success', description: `File ${fileName} uploaded successfully`, color: 'success' })
-        open.value = false
     } catch (error) {
-        console.error('Error uploading file:', error)
-        toast.add({ title: 'Error', description: 'Failed to upload file', color: 'error' })
+        console.error('Error confirming upload:', error)
+        toast.add({ title: 'Error', description: 'Failed to confirm upload', color: 'error' })
         return
     } finally {
         isLoading.value = false
+        open.value = false
     }
 }
 
