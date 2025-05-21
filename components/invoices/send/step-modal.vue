@@ -45,39 +45,24 @@ const fileFormState = reactive<Partial<FileFormSchema>>({
     invoiceFile: undefined
 })
 
-async function submitFileForm(event: FormSubmitEvent<FileFormSchema>) {
-    const { sendorEmail, recipientEmail, comment, invoiceFile } = fileFormState
-    await useSupabaseClient().auth.signInAnonymously({
-        options: {
-            data: {
-                email: sendorEmail
-            }
+async function submitFileForm() {
+    const { sendorEmail, recipientEmail, comment } = fileFormState
+    const { data, error } = await useFetch('/api/request-upload', {
+        method: 'POST',
+        body: {
+            sendorEmail,
+            recipientEmail,
+            comment,
         }
-    });
-    try {
-        const { invoice_id, code, expires_at, success } = await $fetch('/api/request-upload', {
-            method: 'POST',
-            body: {
-                sendorEmail,
-                recipientEmail,
-                comment,
-                invoiceFile
-            }
-        })
-        if (success !== true) {
-            toast.add({ title: 'Error', description: 'Failed to request upload', color: 'error' })
-            isLoading.value = false
-            return
-        }
-        console.dir({ invoice_id, code, expires_at });
-        sharedInvoiceId.value = invoice_id
-        stepper.value?.next()
-    } catch (error) {
-        console.error('Error uploading file:', error)
-        toast.add({ title: 'Error', description: 'Failed to upload file', color: 'error' })
+    })
+    if (error.value || !data.value) {
+        toast.add({ title: 'Error', description: 'Failed to request upload', color: 'error' })
         isLoading.value = false
         return
     }
+    const { invoice_id } = data.value!
+    sharedInvoiceId.value = invoice_id
+    stepper.value?.next()
 }
 
 const confirmFormSchema = z.object({
@@ -92,14 +77,19 @@ const confirmFormState = reactive<Partial<ConfirmFormSchema>>({
 
 async function submitConfirmForm(event: FormSubmitEvent<ConfirmFormSchema>) {
     const { confirmToken } = event.data
+    const { data, error } = await useFetch('/api/upload-invoices', {
+        method: 'POST',
+        body: {
+            invoiceId: sharedInvoiceId.value,
+            token: confirmToken.join('')
+        }
+    })
+    if (error.value || !data.value) {
+        toast.add({ title: 'Error', description: 'Failed to confirm upload', color: 'error' })
+        return
+    }
+    const { fileName, url } = data.value!
     try {
-        const { fileName, url } = await $fetch('/api/upload-invoices', {
-            method: 'POST',
-            body: {
-                invoiceId: sharedInvoiceId.value,
-                token: confirmToken.join('')
-            }
-        })
         await $fetch(url, {
             method: 'PUT',
             body: fileFormState.invoiceFile!,
@@ -110,8 +100,11 @@ async function submitConfirmForm(event: FormSubmitEvent<ConfirmFormSchema>) {
         toast.add({ title: 'Success', description: `File ${fileName} uploaded successfully`, color: 'success' })
         open.value = false
     } catch (error) {
-        console.error('Error confirming upload:', error.message)
-        toast.add({ title: 'Error', description: 'Failed to confirm upload', color: 'error' })
+        console.error('Error uploading file:', error)
+        toast.add({ title: 'Error', description: 'Failed to upload file', color: 'error' })
+        return
+    } finally {
+        isLoading.value = false
     }
 }
 
@@ -132,7 +125,6 @@ const onValidate = async () => {
             return
         }
         await stepFileForm.value.submit();
-        isLoading.value = true
     } else {
         const form = stepConfirmForm.value
         if (!form) return
@@ -143,7 +135,6 @@ const onValidate = async () => {
         }
         await stepConfirmForm.value.submit();
     }
-    isLoading.value = false
 }
 
 const onPrev = () => {
