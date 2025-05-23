@@ -1,36 +1,10 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 
-const supabaseClient = useSupabaseClient()
-const { updatePendingInvoiceStatus } = useInvoices()
+const { pendingInvoices, updatePendingInvoice } = usePendingInvoices()
 
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
-
-const { data: pendingInvoices } = useAsyncData('pendingInvoices', async () => {
-    const { data, error } = await supabaseClient
-        .from('pending_invoices')
-        .select(`
-            *,
-            stakeholder: stakeholders(
-                email,
-                name
-            )
-        `)
-        .neq('status', 'validated')
-        .neq('status', 'rejected')
-        .order('created_at', { ascending: false })
-
-
-    if (error) {
-        console.error(error)
-        return []
-    }
-
-    return data
-}, {
-    default: () => [],
-})
 
 // Use the type of the items inside the pendingInvoices ref's value
 type PendingInvoices = NonNullable<(typeof pendingInvoices)['value']>[number]
@@ -93,7 +67,7 @@ const columns: TableColumn<PendingInvoices>[] = [
                     size: 'sm',
                     class: 'cursor-pointer',
                     onClick: () => {
-                        updatePendingInvoiceStatus(row.original.id, 'validated')
+                        updatePendingInvoice(row.original.id, 'validated')
                     }
                 }),
                 h(UButton, {
@@ -102,7 +76,7 @@ const columns: TableColumn<PendingInvoices>[] = [
                     size: 'sm',
                     class: 'cursor-pointer',
                     onClick: () => {
-                        updatePendingInvoiceStatus(row.original.id, 'rejected')
+                        updatePendingInvoice(row.original.id, 'rejected')
                     }
                 })
             ])

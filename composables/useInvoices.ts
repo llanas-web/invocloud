@@ -10,38 +10,35 @@ import type { Database } from "~/types/database.types";
 const _useInvoices = () => {
     const supabaseClient = useSupabaseClient<Database>();
     const supabaseUser = useSupabaseUser();
-    const invoices = ref<Invoice[]>([]);
     const pendingInvoices = ref<PendingInvoices[]>([]);
     const invoicesLoading = ref(false);
 
-    const getPendingInvoices = async () => {
-        invoicesLoading.value = true;
-        const { data, error } = await supabaseClient
-            .from("pending_invoices")
-            .select("*")
-            .eq("user_id", supabaseUser.value!.id)
-            .neq("status", "pending");
-
-        if (error) {
-            console.error("Error fetching pending invoices:", error);
-            return null;
-        }
-        pendingInvoices.value = data;
-        invoicesLoading.value = false;
-    };
+    const { data: invoices, error: invoicesError, refresh, pending } =
+        useAsyncData(
+            "invoices",
+            async () => {
+                const { data, error } = await supabaseClient
+                    .from("invoices")
+                    .select(`
+                        *,
+                        stakeholder:stakeholders (*),
+                        user:users (*)
+                        `)
+                    .eq("user_id", supabaseUser.value!.id);
+                if (error) {
+                    console.error("Error fetching invoices:", error);
+                    return [];
+                }
+                return data;
+            },
+            {
+                immediate: true,
+                default: () => [],
+            },
+        );
 
     const getInvoices = async () => {
-        invoicesLoading.value = true;
-        const { data, error } = await supabaseClient
-            .from("invoices")
-            .select("*");
-
-        if (error) {
-            console.error("Error fetching invoices:", error);
-            return null;
-        }
-        invoices.value = data as Invoice[];
-        invoicesLoading.value = false;
+        await refresh();
     };
 
     const updateInvoice = async (invoiceId: string, invoice: InvoiceInsert) => {
@@ -61,11 +58,7 @@ const _useInvoices = () => {
             console.error("Error updating invoice:", error);
             return null;
         }
-        // Update the local invoices array
-        const index = invoices.value.findIndex((i) => i.id === invoiceId);
-        if (index !== -1) {
-            invoices.value[index] = data as Invoice;
-        }
+        await refresh();
         return data;
     };
 
@@ -96,9 +89,7 @@ const _useInvoices = () => {
             console.error("Error creating invoice:", error);
             return null;
         }
-        // Update the local invoices array
-        invoices.value.push(data as Invoice);
-
+        await refresh();
         return data;
     };
 
@@ -126,10 +117,7 @@ const _useInvoices = () => {
             console.error("Error deleting invoices:", error);
             return null;
         }
-        // Update the local invoices array
-        invoices.value = invoices.value.filter(
-            (invoice) => !invoiceIds.includes(invoice.id),
-        );
+        await refresh();
         return data;
     };
 
@@ -151,16 +139,16 @@ const _useInvoices = () => {
             console.error("Error validating pending invoice:", error);
             return null;
         }
-        await getInvoices();
+        await refresh();
         return data;
     };
 
     return {
         invoices,
+        refresh,
         invoicesLoading,
         pendingInvoices,
         getInvoices,
-        getPendingInvoices,
         createInvoice,
         updateInvoice,
         deleteInvoices,

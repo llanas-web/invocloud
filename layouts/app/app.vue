@@ -4,11 +4,7 @@ const toast = useToast()
 
 const open = ref(false)
 
-const { pendingInvoices, getPendingInvoices } = useInvoices()
-
-onMounted(async () => {
-    await getPendingInvoices()
-})
+const { pendingInvoices } = usePendingInvoices()
 
 const links = [
     [
@@ -139,7 +135,8 @@ onMounted(async () => {
                 <UNavigationMenu :collapsed="collapsed" :items="links[0]" orientation="vertical">
                     <template #invoices-trailing>
                         <UTooltip :text="`You have ${pendingInvoices.length ?? 0} pending invoices`" placement="right">
-                            <UBadge :label="pendingInvoices.length ?? 0" size="sm" color="primary" />
+                            <UBadge :label="`${pendingInvoices.length}`" size="sm"
+                                :color="pendingInvoices.length ? 'primary' : 'neutral'" />
                         </UTooltip>
                     </template>
                 </UNavigationMenu>

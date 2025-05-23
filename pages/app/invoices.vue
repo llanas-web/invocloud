@@ -2,7 +2,6 @@
 import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-import type { Invoice } from '~/types'
 import { UBadge } from '#components'
 
 definePageMeta({
@@ -15,7 +14,7 @@ const UCheckbox = resolveComponent('UCheckbox')
 
 const toast = useToast()
 const table = useTemplateRef('table')
-const { invoicesLoading, getInvoices, updateInvoice, deleteInvoices } = useInvoices()
+const { invoices, invoicesLoading, updateInvoice, deleteInvoices } = useInvoices()
 
 const columnFilters = ref([{
     id: 'email',
@@ -23,29 +22,6 @@ const columnFilters = ref([{
 }])
 const columnVisibility = ref()
 const rowSelection = ref({ 1: true })
-
-
-const { data: invoices } = useAsyncData('invoices', async () => {
-    const { data, error } = await useSupabaseClient()
-        .from('invoices')
-        .select(`
-            *,
-            stakeholder: stakeholders(
-                email,
-                name
-            )
-        `)
-        .order('created_at', { ascending: false })
-
-    if (error) {
-        console.error(error)
-        return []
-    }
-
-    return data
-}, {
-    default: () => [],
-})
 
 
 function getRowItems(row: Row<Invoice>) {
@@ -104,7 +80,7 @@ function getRowItems(row: Row<Invoice>) {
 }
 
 
-type PendingInvoices = NonNullable<(typeof invoices)['value']>[number]
+type Invoice = NonNullable<(typeof invoices)['value']>[number]
 
 const columns: TableColumn<Invoice>[] = [
     {
