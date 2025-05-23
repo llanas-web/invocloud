@@ -1,5 +1,10 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { Invoice, InvoiceInsert, PendingInvoices } from "~/types";
+import type {
+    Invoice,
+    InvoiceInsert,
+    PendingInvoices,
+    PendingInvoicesStatus,
+} from "~/types";
 import type { Database } from "~/types/database.types";
 
 const _useInvoices = () => {
@@ -128,13 +133,28 @@ const _useInvoices = () => {
         return data;
     };
 
-    const sendInvoiceAnonymously = async (
-        invoice: File,
-        senderEmail: string,
-        recipientEmail: string,
-        comment: string,
+    const updatePendingInvoiceStatus = async (
+        invoiceId: string,
+        status: PendingInvoicesStatus,
     ) => {
+        if (!invoiceId) {
+            console.error("Invoice ID is required to validate an invoice.");
+            return null;
+        }
+        const { data, error } = await supabaseClient
+            .from("pending_invoices")
+            .update({ status })
+            .eq("id", invoiceId)
+            .single();
+
+        if (error) {
+            console.error("Error validating pending invoice:", error);
+            return null;
+        }
+        await getInvoices();
+        return data;
     };
+
     return {
         invoices,
         invoicesLoading,
@@ -144,6 +164,7 @@ const _useInvoices = () => {
         createInvoice,
         updateInvoice,
         deleteInvoices,
+        updatePendingInvoiceStatus,
     };
 };
 

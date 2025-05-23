@@ -8,7 +8,7 @@ definePageMeta({
 watch(user, () => {
   if (user.value) {
     // Redirect to protected page
-    return navigateTo('/')
+    return navigateTo('/app')
   }
 }, { immediate: true })
 </script>

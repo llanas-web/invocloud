@@ -67,7 +67,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
                     description="Enter your credentials to create your account." icon="i-lucide-user" :fields="fields"
                     @submit="onSubmit">
                     <template #description>
-                        Already have an account? <ULink to="/login" class="text-primary font-medium">Login</ULink>.
+                        Already have an account? <ULink to="/auth/login" class="text-primary font-medium">Login</ULink>.
                     </template>
                     <template #footer>
                         By signing in, you agree to our <ULink to="#" class="text-primary font-medium">Terms of Service

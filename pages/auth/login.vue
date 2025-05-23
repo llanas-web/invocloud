@@ -55,7 +55,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         description="Enter your credentials to access your account." icon="i-lucide-user" :fields="fields"
         @submit="onSubmit">
         <template #description>
-          Don't have an account? <ULink to="/sign-up" class="text-primary font-medium">Sign up</ULink>.
+          Don't have an account? <ULink to="/auth/sign-up" class="text-primary font-medium">Sign up</ULink>.
         </template>
         <template #password-hint>
           <ULink to="#" class="text-primary font-medium" tabindex="-1">Forgot password?</ULink>

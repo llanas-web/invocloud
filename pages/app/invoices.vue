@@ -15,7 +15,7 @@ const UCheckbox = resolveComponent('UCheckbox')
 
 const toast = useToast()
 const table = useTemplateRef('table')
-const { invoices, invoicesLoading, getInvoices, updateInvoice, deleteInvoices } = useInvoices()
+const { invoicesLoading, getInvoices, updateInvoice, deleteInvoices } = useInvoices()
 
 const columnFilters = ref([{
     id: 'email',
@@ -24,7 +24,28 @@ const columnFilters = ref([{
 const columnVisibility = ref()
 const rowSelection = ref({ 1: true })
 
-await getInvoices()
+
+const { data: invoices } = useAsyncData('invoices', async () => {
+    const { data, error } = await useSupabaseClient()
+        .from('invoices')
+        .select(`
+            *,
+            stakeholder: stakeholders(
+                email,
+                name
+            )
+        `)
+        .order('created_at', { ascending: false })
+
+    if (error) {
+        console.error(error)
+        return []
+    }
+
+    return data
+}, {
+    default: () => [],
+})
 
 
 function getRowItems(row: Row<Invoice>) {
@@ -82,6 +103,9 @@ function getRowItems(row: Row<Invoice>) {
     ]
 }
 
+
+type PendingInvoices = NonNullable<(typeof invoices)['value']>[number]
+
 const columns: TableColumn<Invoice>[] = [
     {
         id: 'select',
@@ -102,20 +126,23 @@ const columns: TableColumn<Invoice>[] = [
             })
     },
     {
-        accessorKey: 'Id',
-        header: 'Id',
-        cell: ({ row }) => {
-            return h('div', { class: 'flex items-center gap-3' }, [
-                h('p', { class: 'font-medium text-highlighted' }, row.original.id),
-            ])
-        }
-    },
-    {
         accessorKey: 'name',
         header: 'Name',
         cell: ({ row }) => {
             return h('div', { class: 'flex items-center gap-3' }, [
                 h('p', { class: 'font-medium text-highlighted' }, row.original.name),
+            ])
+        }
+    },
+    {
+        accessorKey: 'stakeholder',
+        header: 'Sendor',
+        cell: ({ row, table }) => {
+            return h('div', { class: 'flex items-center gap-3' }, [
+                h('div', undefined, [
+                    h('p', { class: 'font-medium text-highlighted' }, row.original.stakeholder.name),
+                    h('p', { class: '' }, `@${row.original.stakeholder.email}`)
+                ])
             ])
         }
     },
@@ -213,8 +240,8 @@ const pagination = ref({
         </template>
 
         <template #body>
+            <InvoicesUploadTable />
             <div class="flex flex-wrap items-center justify-between gap-1.5">
-
                 <div class="flex flex-wrap items-center gap-1.5">
                     <InvoicesDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
                         <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Delete"

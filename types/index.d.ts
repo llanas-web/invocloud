@@ -16,6 +16,8 @@ export type PendingInvoices =
     Database["public"]["Tables"]["pending_invoices"]["Row"];
 export type PendingInvoicesInsert =
     Database["public"]["Tables"]["pending_invoices"]["Insert"];
+export type PendingInvoicesStatus =
+    Database["public"]["Enums"]["pending_invoices_status"];
 
 export interface User {
     id: number;
