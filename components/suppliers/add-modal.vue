@@ -32,20 +32,20 @@
 </script>
 
 <template>
-    <UModal v-model:open="open" title="New Supplier" description="Add a new supplier to the database">
-        <UButton label="New supplier" icon="i-lucide-plus" />
+    <UModal v-model:open="open" title="Nouveau fournisseur" description="Ajouter un nouveau fournisseur">
+        <UButton label="Nouveau fournisseur" icon="i-lucide-plus" />
 
         <template #body>
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-                <UFormField label="Name" placeholder="John Doe" name="name">
+                <UFormField label="Nom" placeholder="John Doe" name="name">
                     <UInput v-model="state.name" class="w-full" />
                 </UFormField>
                 <UFormField label="Email" placeholder="john.doe@example.com" name="email">
                     <UInput v-model="state.email" class="w-full" />
                 </UFormField>
                 <div class="flex justify-end gap-2">
-                    <UButton label="Cancel" color="neutral" variant="subtle" @click="open = false" />
-                    <UButton label="Create" color="primary" variant="solid" type="submit" />
+                    <UButton label="Annuler" color="neutral" variant="subtle" @click="open = false" />
+                    <UButton label="Créer" color="primary" variant="solid" type="submit" />
                 </div>
             </UForm>
         </template>

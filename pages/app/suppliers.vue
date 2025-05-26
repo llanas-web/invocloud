@@ -91,8 +91,8 @@ const columns: TableColumn<Supplier>[] = [
             })
     },
     {
-        accessorKey: 'name',
-        header: 'Name',
+        accessorKey: 'Fournisseur',
+        header: 'Fournisseur',
         cell: ({ row }) => {
             return h('div', { class: 'flex items-center gap-3' }, [
                 h('div', undefined, [
@@ -202,13 +202,6 @@ const pagination = ref({
                         </UButton>
                     </SuppliersDeleteModal>
 
-                    <USelect v-model="statusFilter" :items="[
-                        { label: 'All', value: 'all' },
-                        { label: 'Subscribed', value: 'subscribed' },
-                        { label: 'Unsubscribed', value: 'unsubscribed' },
-                        { label: 'Bounced', value: 'bounced' }
-                    ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
-                        placeholder="Filter status" class="min-w-28" />
                     <UDropdownMenu :items="table?.tableApi
                         ?.getAllColumns()
                         .filter((column) => column.getCanHide())
@@ -224,7 +217,7 @@ const pagination = ref({
                             }
                         }))
                         " :content="{ align: 'end' }">
-                        <UButton label="Display" color="neutral" variant="outline"
+                        <UButton label="Colonnes" color="neutral" variant="outline"
                             trailing-icon="i-lucide-settings-2" />
                     </UDropdownMenu>
                 </div>
@@ -233,8 +226,7 @@ const pagination = ref({
             <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                 v-model:row-selection="rowSelection" v-model:pagination="pagination" :pagination-options="{
                     getPaginationRowModel: getPaginationRowModel()
-                }" class="shrink-0" :data="suppliers ?? undefined" :columns="columns" :loading="pending"
-                :ui="{
+                }" class="shrink-0" :data="suppliers ?? undefined" :columns="columns" :loading="pending" :ui="{
                     base: 'table-fixed border-separate border-spacing-0',
                     thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
                     tbody: '[&>tr]:last:[&>td]:border-b-0',

@@ -17,8 +17,12 @@ const table = useTemplateRef('table')
 const { invoices, pending, updateInvoice, deleteInvoices } = useInvoices()
 declare type Invoice = NonNullable<(typeof invoices)['value']>[number];
 
+const acceptedStatus = ['validated', 'paid', 'error']
+const acceptedInvoices = computed(() => invoices.value?.filter(i => acceptedStatus.includes(i.status)) || [])
+
+
 const columnFilters = ref([{
-    id: 'email',
+    id: 'supplier',
     value: ''
 }])
 const columnVisibility = ref()
@@ -57,7 +61,6 @@ function getRowItems(row: Row<Invoice>) {
             icon: 'i-lucide-check',
             async onSelect() {
                 await updateInvoice(row.original.id, {
-                    ...row.original,
                     status: 'paid'
                 })
             }
@@ -110,13 +113,13 @@ const columns: TableColumn<Invoice>[] = [
         }
     },
     {
-        accessorKey: 'Suppliers',
+        accessorKey: 'supplier',
         header: 'Fournisseur',
         cell: ({ row, table }) => {
             return h('div', { class: 'flex items-center gap-3' }, [
                 h('div', undefined, [
                     h('p', { class: 'font-medium text-highlighted' }, row.original.supplier.name),
-                    h('p', { class: '' }, `@${row.original.supplier.email}`)
+                    h('p', { class: '' }, `${row.original.supplier.email}`)
                 ])
             ])
         }
@@ -129,7 +132,7 @@ const columns: TableColumn<Invoice>[] = [
             const color = {
                 pending: 'warning' as const,
                 sent: 'error' as const,
-                validated: 'error' as const,
+                validated: 'warning' as const,
                 paid: 'success' as const,
                 error: 'error' as const,
             }[row.original.status]
@@ -137,6 +140,18 @@ const columns: TableColumn<Invoice>[] = [
             return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
                 row.original.status
             )
+        }
+    },
+    {
+        accessorKey: 'created_at',
+        header: 'Date de création',
+        cell: ({ row }) => {
+            const date = new Date(row.getValue('created_at'))
+            return h('div', { class: 'text-muted' }, date.toLocaleDateString('fr-FR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }))
         }
     },
     {
@@ -258,10 +273,10 @@ const pagination = ref({
                 </div>
             </div>
 
-            <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
-                v-model:row-selection="rowSelection" v-model:pagination="pagination" :pagination-options="{
+            <UTable ref="table" v-model:column-visibility="columnVisibility" v-model:row-selection="rowSelection"
+                v-model:pagination="pagination" :pagination-options="{
                     getPaginationRowModel: getPaginationRowModel()
-                }" class="shrink-0" :data="invoices" :columns="columns" :loading="pending" :ui="{
+                }" class="shrink-0" :data="acceptedInvoices" :columns="columns" :loading="pending" :ui="{
                     base: 'table-fixed border-separate border-spacing-0',
                     thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
                     tbody: '[&>tr]:last:[&>td]:border-b-0',

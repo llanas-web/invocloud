@@ -1,5 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { InvoiceInsert } from "~/types";
+import type { InvoiceInsert, InvoiceUpdate } from "~/types";
 import type { Database } from "~/types/database.types";
 
 const _useInvoices = () => {
@@ -38,7 +38,7 @@ const _useInvoices = () => {
         await refresh();
     };
 
-    const updateInvoice = async (invoiceId: string, invoice: InvoiceInsert) => {
+    const updateInvoice = async (invoiceId: string, invoice: InvoiceUpdate) => {
         if (!invoiceId || !invoice) {
             console.error(
                 "Invoice ID and data are required to update an invoice.",
