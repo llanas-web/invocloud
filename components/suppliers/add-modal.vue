@@ -2,7 +2,7 @@
     import * as z from 'zod'
     import type { FormSubmitEvent } from '@nuxt/ui'
 
-    const { createStakeholder } = useStakeholders()
+    const { createSupplier } = useSuppliers()
 
     const schema = z.object({
         name: z.string().min(2, 'Too short'),
@@ -20,11 +20,11 @@
     const toast = useToast()
     async function onSubmit(event: FormSubmitEvent<Schema>) {
         const { name, email } = event.data
-        const newStakeholder = await createStakeholder({
+        const newSupplier = await createSupplier({
             name,
             email
         })
-        toast.add({ title: 'Success', description: `New customer ${event.data.name} added`, color: 'success' })
+        toast.add({ title: 'Success', description: `New supplier ${event.data.name} added`, color: 'success' })
         open.value = false
         state.name = undefined
         state.email = undefined
@@ -32,8 +32,8 @@
 </script>
 
 <template>
-    <UModal v-model:open="open" title="New Customer" description="Add a new customer to the database">
-        <UButton label="New customer" icon="i-lucide-plus" />
+    <UModal v-model:open="open" title="New Supplier" description="Add a new supplier to the database">
+        <UButton label="New supplier" icon="i-lucide-plus" />
 
         <template #body>
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">

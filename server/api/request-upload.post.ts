@@ -36,13 +36,13 @@ export default defineEventHandler(async (event) => {
             message: "Not allowed to upload invoices to this email",
         });
     }
-    const { data: stakeholder, error: stakeholderError } = await supabase
-        .from("stakeholders").select().eq("email", sendorEmail).eq(
+    const { data: supplier, error: supplierError } = await supabase
+        .from("suppliers").select().eq("email", sendorEmail).eq(
             "user_id",
             recipientUser.id,
         ).single();
-    if (stakeholderError) {
-        console.error("Error fetching stakeholder:", stakeholderError);
+    if (supplierError) {
+        console.error("Error fetching supplier:", supplierError);
         throw createError({
             status: 403,
             message: "Not allowed to upload invoices to this email",
@@ -56,11 +56,11 @@ export default defineEventHandler(async (event) => {
     const newInvoiceId = crypto.randomUUID();
 
     const { data: newInvoice, error: newInvoiceError } = await supabase
-        .from("pending_invoices")
+        .from("invoices")
         .insert({
             id: newInvoiceId,
             user_id: recipientUser.id,
-            stakeholder_id: stakeholder.id,
+            supplier_id: supplier.id,
             comment: comment,
             token: hashedCode,
             token_expires_at: expiresAt.toISOString(),
@@ -88,7 +88,6 @@ export default defineEventHandler(async (event) => {
         });
     } catch (error) {
         console.error("Error sending email:", error);
-        supabase.from("pending_invoices").delete().eq("id", newInvoiceId);
         throw createError({
             status: 500,
             message: "Error sending confirmation email",

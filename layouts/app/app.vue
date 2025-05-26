@@ -4,21 +4,20 @@ const toast = useToast()
 
 const open = ref(false)
 
-const { pendingInvoices } = usePendingInvoices()
+const { pendingInvoices } = useInvoices()
 const user = useSupabaseUser()
-
 
 const links = [
     [
         {
-            label: 'Home',
+            label: 'Accueil',
             icon: 'i-lucide-house',
             to: '/app/',
             onSelect: () => {
                 open.value = false
             }
         }, {
-            label: 'Invoces',
+            label: 'Factures',
             icon: 'i-lucide-files',
             to: '/app/invoices',
             slot: 'invoices',
@@ -26,9 +25,9 @@ const links = [
                 open.value = false
             }
         }, {
-            label: 'Clients',
+            label: 'Fournisseurs',
             icon: 'i-lucide-users',
-            to: '/app/stakeholders',
+            to: '/app/suppliers',
             onSelect: () => {
                 open.value = false
             }

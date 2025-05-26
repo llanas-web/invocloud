@@ -1,17 +1,10 @@
 import { createSharedComposable } from "@vueuse/core";
-import type {
-    Invoice,
-    InvoiceInsert,
-    PendingInvoices,
-    PendingInvoicesStatus,
-} from "~/types";
+import type { InvoiceInsert } from "~/types";
 import type { Database } from "~/types/database.types";
 
 const _useInvoices = () => {
     const supabaseClient = useSupabaseClient<Database>();
     const supabaseUser = useSupabaseUser();
-    const pendingInvoices = ref<PendingInvoices[]>([]);
-    const invoicesLoading = ref(false);
 
     const { data: invoices, error: invoicesError, refresh, pending } =
         useAsyncData(
@@ -21,7 +14,7 @@ const _useInvoices = () => {
                     .from("invoices")
                     .select(`
                         *,
-                        stakeholder:stakeholders (*),
+                        supplier:suppliers (*),
                         user:users (*)
                         `)
                     .eq("user_id", supabaseUser.value!.id);
@@ -36,6 +29,10 @@ const _useInvoices = () => {
                 default: () => [],
             },
         );
+
+    const pendingInvoices = computed(() =>
+        invoices.value.filter((invoice) => invoice.status === "pending")
+    );
 
     const getInvoices = async () => {
         await refresh();
@@ -121,38 +118,16 @@ const _useInvoices = () => {
         return data;
     };
 
-    const updatePendingInvoiceStatus = async (
-        invoiceId: string,
-        status: PendingInvoicesStatus,
-    ) => {
-        if (!invoiceId) {
-            console.error("Invoice ID is required to validate an invoice.");
-            return null;
-        }
-        const { data, error } = await supabaseClient
-            .from("pending_invoices")
-            .update({ status })
-            .eq("id", invoiceId)
-            .single();
-
-        if (error) {
-            console.error("Error validating pending invoice:", error);
-            return null;
-        }
-        await refresh();
-        return data;
-    };
-
     return {
         invoices,
         refresh,
-        invoicesLoading,
+        pending,
+        invoicesError,
         pendingInvoices,
         getInvoices,
         createInvoice,
         updateInvoice,
         deleteInvoices,
-        updatePendingInvoiceStatus,
     };
 };
 

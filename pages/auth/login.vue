@@ -43,7 +43,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   else {
     toast.add({ title: 'Success', description: 'Logged in successfully', color: 'success' })
     // Redirect to home page
-    navigateTo('/')
+    navigateTo('/app')
   };
 }
 </script>

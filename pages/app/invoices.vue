@@ -14,14 +14,14 @@ const UCheckbox = resolveComponent('UCheckbox')
 
 const toast = useToast()
 const table = useTemplateRef('table')
-const { invoices, invoicesLoading, updateInvoice, deleteInvoices } = useInvoices()
+const { invoices, pending, updateInvoice, deleteInvoices } = useInvoices()
 
 const columnFilters = ref([{
     id: 'email',
     value: ''
 }])
 const columnVisibility = ref()
-const rowSelection = ref({ 1: true })
+const rowSelection = ref({})
 
 
 function getRowItems(row: Row<Invoice>) {
@@ -106,18 +106,18 @@ const columns: TableColumn<Invoice>[] = [
         header: 'Name',
         cell: ({ row }) => {
             return h('div', { class: 'flex items-center gap-3' }, [
-                h('p', { class: 'font-medium text-highlighted' }, row.original.name),
+                h('p', { class: 'font-medium text-highlighted' }, row.original.name ?? ''),
             ])
         }
     },
     {
-        accessorKey: 'stakeholder',
-        header: 'Sendor',
+        accessorKey: 'Suppliers',
+        header: 'Supplier',
         cell: ({ row, table }) => {
             return h('div', { class: 'flex items-center gap-3' }, [
                 h('div', undefined, [
-                    h('p', { class: 'font-medium text-highlighted' }, row.original.stakeholder.name),
-                    h('p', { class: '' }, `@${row.original.stakeholder.email}`)
+                    h('p', { class: 'font-medium text-highlighted' }, row.original.supplier.name),
+                    h('p', { class: '' }, `@${row.original.supplier.email}`)
                 ])
             ])
         }
@@ -128,10 +128,11 @@ const columns: TableColumn<Invoice>[] = [
         filterFn: 'equals',
         cell: ({ row }) => {
             const color = {
+                pending: 'warning' as const,
+                sent: 'error' as const,
                 validated: 'error' as const,
                 paid: 'success' as const,
-                sent: 'error' as const,
-                pending: 'warning' as const
+                error: 'error' as const,
             }[row.original.status]
 
             return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
@@ -261,7 +262,7 @@ const pagination = ref({
             <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                 v-model:row-selection="rowSelection" v-model:pagination="pagination" :pagination-options="{
                     getPaginationRowModel: getPaginationRowModel()
-                }" class="shrink-0" :data="invoices" :columns="columns" :loading="invoicesLoading" :ui="{
+                }" class="shrink-0" :data="invoices" :columns="columns" :loading="pending" :ui="{
                     base: 'table-fixed border-separate border-spacing-0',
                     thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
                     tbody: '[&>tr]:last:[&>td]:border-b-0',

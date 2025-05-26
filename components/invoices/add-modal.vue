@@ -4,16 +4,14 @@ import type { FormSubmitEvent } from '@nuxt/ui'
 
 const supabaseUser = useSupabaseUser();
 const { createInvoice } = useInvoices()
-const { stakeholders, getStakeholders } = useStakeholders()
-
-await getStakeholders()
+const { suppliers } = useSuppliers()
 
 const schema = z.object({
     stakeholderId: z.string().refine((value) => {
         if (!value) return false
-        const stakeholder = stakeholders.value.find((s) => s.id === value)
-        return !!stakeholder
-    }, 'Please select a customer'),
+        const supplier = suppliers.value.find((s) => s.id === value)
+        return !!supplier
+    }, 'Please select a supplier'),
     amount: z.number().min(0, 'Must be greater than 0'),
     name: z.string(),
     invoiceFile: z.instanceof(File)
@@ -23,7 +21,7 @@ const open = ref(false)
 type Schema = z.output<typeof schema>
 
 const state = reactive<Partial<Schema>>({
-    stakeholderId: undefined,
+    supplierId: undefined,
     amount: undefined,
     name: undefined,
     invoiceFile: undefined
@@ -31,9 +29,9 @@ const state = reactive<Partial<Schema>>({
 
 const toast = useToast()
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-    const { stakeholderId, amount, invoiceFile, name } = event.data
+    const { supplierId, amount, invoiceFile, name } = event.data
     const newInvoice = await createInvoice({
-        stakeholder_id: stakeholderId,
+        supplier_id: supplierId,
         amount: amount,
         name: name,
         user_id: supabaseUser.value!.id
@@ -43,7 +41,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         toast.add({ title: 'Error', description: 'Failed to create invoice', color: 'error' })
         return
     }
-    toast.add({ title: 'Success', description: `New customer ${newInvoice.id} added`, color: 'success' })
+    toast.add({ title: 'Success', description: `New supplier ${newInvoice.id} added`, color: 'success' })
     open.value = false
     state.stakeholderId = undefined
     state.amount = undefined
@@ -59,13 +57,13 @@ const onFileChange = (e: Event) => {
 </script>
 
 <template>
-    <UModal v-model:open="open" title="New Customer" description="Add a new customer to the database">
-        <UButton label="New customer" icon="i-lucide-plus" />
+    <UModal v-model:open="open" title="Nouvelle facture" description="Add a new customer to the database">
+        <UButton label="Nouvelle facture" icon="i-lucide-plus" />
 
         <template #body>
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-                <UFormField label="Customer" placeholder="John Doe" name="name">
-                    <UInputMenu v-model="state.stakeholderId" :items="stakeholders" class="w-full" value-key="id"
+                <UFormField label="Client" placeholder="John Doe" name="name">
+                    <UInputMenu v-model="state.supplierId" :items="suppliers" class="w-full" value-key="id"
                         label-key="name">
                     </UInputMenu>
                 </UFormField>

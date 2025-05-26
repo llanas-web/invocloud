@@ -2,7 +2,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-import type { Stakeholder, User } from '~/types'
+import type { Supplier, User } from '~/types'
 
 definePageMeta({
     layout: 'app'
@@ -16,32 +16,29 @@ const UCheckbox = resolveComponent('UCheckbox')
 
 const toast = useToast()
 const table = useTemplateRef('table')
-const { stakeholders, stakeholdersLoading, getStakeholders, deleteStakeholders } = useStakeholders()
+const { suppliers, refresh, pending, deleteSuppliers } = useSuppliers()
 
 const columnFilters = ref([{
     id: 'email',
     value: ''
 }])
 const columnVisibility = ref()
-const rowSelection = ref({ 1: true })
+const rowSelection = ref()
 
-await getStakeholders()
-
-
-function getRowItems(row: Row<Stakeholder>) {
+function getRowItems(row: Row<Supplier>) {
     return [
         {
             type: 'label',
             label: 'Actions'
         },
         {
-            label: 'Copy customer ID',
+            label: 'Copy supplier ID',
             icon: 'i-lucide-copy',
             onSelect() {
                 navigator.clipboard.writeText(row.original.id.toString())
                 toast.add({
                     title: 'Copied to clipboard',
-                    description: 'Customer ID copied to clipboard'
+                    description: 'Supplier ID copied to clipboard'
                 })
             }
         },
@@ -49,32 +46,32 @@ function getRowItems(row: Row<Stakeholder>) {
             type: 'separator'
         },
         {
-            label: 'View customer details',
+            label: 'View supplier details',
             icon: 'i-lucide-list'
         },
         {
-            label: 'View customer payments',
+            label: 'View supplier payments',
             icon: 'i-lucide-wallet'
         },
         {
             type: 'separator'
         },
         {
-            label: 'Delete customer',
+            label: 'Delete supplier',
             icon: 'i-lucide-trash',
             color: 'error',
             async onSelect() {
-                await deleteStakeholders([row.original.id])
+                await deleteSuppliers([row.original.id])
                 toast.add({
-                    title: 'Customer deleted',
-                    description: 'The customer has been deleted.'
+                    title: 'Supplier deleted',
+                    description: 'The supplier has been deleted.'
                 })
             }
         }
     ]
 }
 
-const columns: TableColumn<Stakeholder>[] = [
+const columns: TableColumn<Supplier>[] = [
     {
         id: 'select',
         header: ({ table }) =>
@@ -181,7 +178,7 @@ const pagination = ref({
                 </template>
 
                 <template #right>
-                    <StakeholdersAddModal />
+                    <SuppliersAddModal />
                 </template>
             </UDashboardNavbar>
         </template>
@@ -193,17 +190,17 @@ const pagination = ref({
                     @update:model-value="table?.tableApi?.getColumn('email')?.setFilterValue($event)" />
 
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <StakeholdersDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
+                    <SuppliersDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
                         <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Delete"
                             color="error" variant="subtle" icon="i-lucide-trash"
-                            @click="() => deleteStakeholders(table!.tableApi!.getFilteredSelectedRowModel().rows.map((row) => row.original.id))">
+                            @click="() => deleteSuppliers(table!.tableApi!.getFilteredSelectedRowModel().rows.map((row) => row.original.id))">
                             <template #trailing>
                                 <UKbd>
                                     {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
                                 </UKbd>
                             </template>
                         </UButton>
-                    </StakeholdersDeleteModal>
+                    </SuppliersDeleteModal>
 
                     <USelect v-model="statusFilter" :items="[
                         { label: 'All', value: 'all' },
@@ -236,7 +233,7 @@ const pagination = ref({
             <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                 v-model:row-selection="rowSelection" v-model:pagination="pagination" :pagination-options="{
                     getPaginationRowModel: getPaginationRowModel()
-                }" class="shrink-0" :data="stakeholders ?? undefined" :columns="columns" :loading="stakeholdersLoading"
+                }" class="shrink-0" :data="suppliers ?? undefined" :columns="columns" :loading="pending"
                 :ui="{
                     base: 'table-fixed border-separate border-spacing-0',
                     thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',

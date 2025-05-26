@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 
-const { pendingInvoices, updatePendingInvoice } = usePendingInvoices()
+const { pendingInvoices, updateInvoice } = useInvoices()
 
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
@@ -44,13 +44,13 @@ const columns: TableColumn<PendingInvoices>[] = [
         }
     },
     {
-        accessorKey: 'stakeholder',
-        header: 'Sendor',
+        accessorKey: 'supplier',
+        header: 'Supplier',
         cell: ({ row, table }) => {
             return h('div', { class: 'flex items-center gap-3' }, [
                 h('div', undefined, [
-                    h('p', { class: 'font-medium text-highlighted' }, row.original.stakeholder.name),
-                    h('p', { class: '' }, `@${row.original.stakeholder.email}`)
+                    h('p', { class: 'font-medium text-highlighted' }, row.original.supplier.name),
+                    h('p', { class: '' }, `@${row.original.supplier.email}`)
                 ])
             ])
         }
@@ -67,18 +67,12 @@ const columns: TableColumn<PendingInvoices>[] = [
                     size: 'sm',
                     class: 'cursor-pointer',
                     onClick: () => {
-                        updatePendingInvoice(row.original.id, 'validated')
+                        updateInvoice(row.original.id, {
+                            ...row.original,
+                            status: 'validated',
+                        })
                     }
                 }),
-                h(UButton, {
-                    color: 'error',
-                    icon: 'i-lucide-x',
-                    size: 'sm',
-                    class: 'cursor-pointer',
-                    onClick: () => {
-                        updatePendingInvoice(row.original.id, 'rejected')
-                    }
-                })
             ])
         }
     },

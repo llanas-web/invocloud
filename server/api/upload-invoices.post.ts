@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     console.log("Hashed code:", hashedCode);
 
     const { data: file } = await supabase
-        .from("pending_invoices")
+        .from("invoices")
         .select("*")
         .eq("id", invoiceId)
         .eq("token", hashedCode)
@@ -43,9 +43,9 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    await supabase.from("pending_invoices")
+    await supabase.from("invoices")
         .update({
-            status: "confirmed",
+            status: "sent",
         })
         .eq("id", file.id)
         .select()

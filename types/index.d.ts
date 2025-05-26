@@ -1,9 +1,9 @@
 import type { AvatarProps } from "@nuxt/ui";
 import type { Database } from "./database.types";
 
-export type Stakeholder = Database["public"]["Tables"]["stakeholders"]["Row"];
-export type StakeholderInsert =
-    Database["public"]["Tables"]["stakeholders"]["Insert"];
+export type Supplier = Database["public"]["Tables"]["suppliers"]["Row"];
+export type SupplierInsert =
+    Database["public"]["Tables"]["suppliers"]["Insert"];
 
 export type UserStatus = "subscribed" | "unsubscribed" | "bounced";
 export type SaleStatus = "paid" | "failed" | "refunded";
@@ -11,13 +11,6 @@ export type SaleStatus = "paid" | "failed" | "refunded";
 export type Invoice = Database["public"]["Tables"]["invoices"]["Row"];
 export type InvoiceInsert = Database["public"]["Tables"]["invoices"]["Insert"];
 export type InvoiceStatus = Database["public"]["Enums"]["invoices_status"];
-
-export type PendingInvoices =
-    Database["public"]["Tables"]["pending_invoices"]["Row"];
-export type PendingInvoicesInsert =
-    Database["public"]["Tables"]["pending_invoices"]["Insert"];
-export type PendingInvoicesStatus =
-    Database["public"]["Enums"]["pending_invoices_status"];
 
 export interface User {
     id: number;
