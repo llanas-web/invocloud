@@ -5,7 +5,7 @@ const toast = useToast()
 const open = ref(false)
 
 const { pendingInvoices } = useInvoices()
-const user = useSupabaseUser()
+// const user = useSupabaseUser()
 
 const links = [
     [
@@ -31,40 +31,7 @@ const links = [
             onSelect: () => {
                 open.value = false
             }
-        }, {
-            label: 'Settings',
-            to: '/app/settings',
-            icon: 'i-lucide-settings',
-            defaultOpen: false,
-            children: [
-                {
-                    label: 'General',
-                    to: '/settings',
-                    exact: true,
-                    onSelect: () => {
-                        open.value = false
-                    }
-                }, {
-                    label: 'Members',
-                    to: '/settings/members',
-                    onSelect: () => {
-                        open.value = false
-                    }
-                }, {
-                    label: 'Notifications',
-                    to: '/settings/notifications',
-                    onSelect: () => {
-                        open.value = false
-                    }
-                }, {
-                    label: 'Security',
-                    to: '/settings/security',
-                    onSelect: () => {
-                        open.value = false
-                    }
-                }
-            ]
-        }
+        },
     ],
     [
         {
@@ -127,19 +94,19 @@ onMounted(async () => {
         <UDashboardSidebar id="default" v-model:open="open" collapsible resizable class="bg-elevated/25"
             :ui="{ footer: 'lg:border-t lg:border-default' }">
             <template #header="{ collapsed }">
-                <span>{{ user?.email }}</span>
+                <!-- <span>{{ user?.email }}</span> -->
                 <!-- <TeamsMenu :collapsed="collapsed" /> -->
             </template>
 
             <template #default="{ collapsed }">
                 <UDashboardSearchButton :collapsed="collapsed" class="bg-transparent ring-default" />
                 <UNavigationMenu :collapsed="collapsed" :items="links[0]" orientation="vertical">
-                    <template #invoices-trailing>
+                    <!-- <template #invoices-trailing>
                         <UTooltip :text="`You have ${pendingInvoices.length ?? 0} pending invoices`" placement="right">
                             <UBadge :label="`${pendingInvoices.length}`" size="sm"
                                 :color="pendingInvoices.length ? 'primary' : 'neutral'" />
                         </UTooltip>
-                    </template>
+                    </template> -->
                 </UNavigationMenu>
 
                 <UNavigationMenu :collapsed="collapsed" :items="links[1]" orientation="vertical" class="mt-auto" />

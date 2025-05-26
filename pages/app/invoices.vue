@@ -15,6 +15,7 @@ const UCheckbox = resolveComponent('UCheckbox')
 const toast = useToast()
 const table = useTemplateRef('table')
 const { invoices, pending, updateInvoice, deleteInvoices } = useInvoices()
+declare type Invoice = NonNullable<(typeof invoices)['value']>[number];
 
 const columnFilters = ref([{
     id: 'email',
@@ -80,8 +81,6 @@ function getRowItems(row: Row<Invoice>) {
 }
 
 
-type Invoice = NonNullable<(typeof invoices)['value']>[number]
-
 const columns: TableColumn<Invoice>[] = [
     {
         id: 'select',
@@ -103,7 +102,7 @@ const columns: TableColumn<Invoice>[] = [
     },
     {
         accessorKey: 'name',
-        header: 'Name',
+        header: 'Nom',
         cell: ({ row }) => {
             return h('div', { class: 'flex items-center gap-3' }, [
                 h('p', { class: 'font-medium text-highlighted' }, row.original.name ?? ''),
@@ -112,7 +111,7 @@ const columns: TableColumn<Invoice>[] = [
     },
     {
         accessorKey: 'Suppliers',
-        header: 'Supplier',
+        header: 'Fournisseur',
         cell: ({ row, table }) => {
             return h('div', { class: 'flex items-center gap-3' }, [
                 h('div', undefined, [
@@ -142,7 +141,7 @@ const columns: TableColumn<Invoice>[] = [
     },
     {
         accessorKey: 'amount',
-        header: () => h('div', { class: 'text-right' }, 'Amount'),
+        header: () => h('div', { class: 'text-right' }, 'Montant'),
         cell: ({ row }) => {
             const amount = Number.parseFloat(row.getValue('amount'))
 
@@ -232,10 +231,10 @@ const pagination = ref({
                     </InvoicesDeleteModal>
 
                     <USelect v-model="statusFilter" :items="[
-                        { label: 'All', value: 'all' },
-                        { label: 'Subscribed', value: 'subscribed' },
-                        { label: 'Unsubscribed', value: 'unsubscribed' },
-                        { label: 'Bounced', value: 'bounced' }
+                        { label: 'Tout', value: 'all' },
+                        { label: 'En attente', value: 'validated' },
+                        { label: 'Payé', value: 'paid' },
+                        { label: 'En erreur', value: 'error' }
                     ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
                         placeholder="Filter status" class="min-w-28" />
                     <UDropdownMenu :items="table?.tableApi
@@ -253,7 +252,7 @@ const pagination = ref({
                             }
                         }))
                         " :content="{ align: 'end' }">
-                        <UButton label="Display" color="neutral" variant="outline"
+                        <UButton label="Colonnes" color="neutral" variant="outline"
                             trailing-icon="i-lucide-settings-2" />
                     </UDropdownMenu>
                 </div>

@@ -7,7 +7,7 @@ const { createInvoice } = useInvoices()
 const { suppliers } = useSuppliers()
 
 const schema = z.object({
-    stakeholderId: z.string().refine((value) => {
+    supplierId: z.string().refine((value) => {
         if (!value) return false
         const supplier = suppliers.value.find((s) => s.id === value)
         return !!supplier
@@ -43,7 +43,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     }
     toast.add({ title: 'Success', description: `New supplier ${newInvoice.id} added`, color: 'success' })
     open.value = false
-    state.stakeholderId = undefined
+    state.supplierId = undefined
     state.amount = undefined
 }
 
