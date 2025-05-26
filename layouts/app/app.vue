@@ -5,6 +5,8 @@ const toast = useToast()
 const open = ref(false)
 
 const { pendingInvoices } = usePendingInvoices()
+const user = useSupabaseUser()
+
 
 const links = [
     [
@@ -67,16 +69,15 @@ const links = [
     ],
     [
         {
-            label: 'Feedback',
-            icon: 'i-lucide-message-circle',
-            to: 'https://github.com/nuxt-ui-pro/dashboard',
-            target: '_blank'
-        }, {
-            label: 'Help & Support',
-            icon: 'i-lucide-info',
-            to: 'https://github.com/nuxt/ui-pro',
-            target: '_blank'
-        }
+            label: 'Deconnexion',
+            icon: 'i-lucide-log-out',
+            onSelect: async () => {
+                const supabaseClient = useSupabaseClient()
+                supabaseClient.auth.signOut()
+                open.value = false
+                navigateTo('/auth/login')
+            },
+        },
     ]
 ]
 
@@ -127,6 +128,7 @@ onMounted(async () => {
         <UDashboardSidebar id="default" v-model:open="open" collapsible resizable class="bg-elevated/25"
             :ui="{ footer: 'lg:border-t lg:border-default' }">
             <template #header="{ collapsed }">
+                <span>{{ user?.email }}</span>
                 <!-- <TeamsMenu :collapsed="collapsed" /> -->
             </template>
 
