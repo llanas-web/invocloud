@@ -2,7 +2,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-import { UBadge } from '#components'
+import { InvoicesSendModal, LazyInvoicesSendModal, UBadge } from '#components'
 
 definePageMeta({
     layout: 'app'
@@ -20,11 +20,6 @@ declare type Invoice = NonNullable<(typeof invoices)['value']>[number];
 const acceptedStatus = ['validated', 'paid', 'error']
 const acceptedInvoices = computed(() => invoices.value?.filter(i => acceptedStatus.includes(i.status)) || [])
 
-
-const columnFilters = ref([{
-    id: 'supplier',
-    value: ''
-}])
 const columnVisibility = ref()
 const rowSelection = ref({})
 
@@ -36,14 +31,9 @@ function getRowItems(row: Row<Invoice>) {
             label: 'Actions'
         },
         {
-            label: 'Copy invoice ID',
-            icon: 'i-lucide-copy',
+            label: 'Envoyer par e-mail',
+            icon: 'i-lucide-mail',
             onSelect() {
-                navigator.clipboard.writeText(row.original.id.toString())
-                toast.add({
-                    title: 'Copied to clipboard',
-                    description: 'Customer ID copied to clipboard'
-                })
             }
         },
         {
@@ -244,6 +234,18 @@ const pagination = ref({
                             </template>
                         </UButton>
                     </InvoicesDeleteModal>
+
+                    <InvoicesSendModal ref="sendModal"
+                        :invoices="table?.tableApi?.getFilteredSelectedRowModel().rows.map(r => r.original.id) ?? []">
+                        <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Envoyer"
+                            color="primary" variant="subtle" icon="i-lucide-send">
+                            <template #trailing>
+                                <UKbd>
+                                    {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
+                                </UKbd>
+                            </template>
+                        </UButton>
+                    </InvoicesSendModal>
 
                     <USelect v-model="statusFilter" :items="[
                         { label: 'Tout', value: 'all' },

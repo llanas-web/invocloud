@@ -78,7 +78,10 @@ const _useInvoices = () => {
         }
         const { data, error } = await supabaseClient
             .from("invoices")
-            .insert([invoice])
+            .insert([{
+                ...invoice,
+                file_path: uploadData.path, // Store the file path
+            }])
             .select()
             .single();
 
@@ -118,6 +121,28 @@ const _useInvoices = () => {
         return data;
     };
 
+    const sendInvoice = async (invoices: string[], email: string) => {
+        if (!invoices || invoices.length === 0) {
+            console.error("Invoice IDDs are required to send invoices.");
+            return null;
+        }
+        const { data, message, success } = await $fetch(
+            `/api/send-invoices/`,
+            {
+                method: "POST",
+                body: {
+                    invoices: [invoices],
+                    email,
+                },
+            },
+        );
+        if (!success) {
+            console.error("Error sending invoices:", message);
+            return null;
+        }
+        return data;
+    };
+
     return {
         invoices,
         refresh,
@@ -128,6 +153,7 @@ const _useInvoices = () => {
         createInvoice,
         updateInvoice,
         deleteInvoices,
+        sendInvoice,
     };
 };
 
