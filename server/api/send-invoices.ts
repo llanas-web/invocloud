@@ -45,6 +45,13 @@ export default defineEventHandler(async (event) => {
             message: "Error creating signed URLs",
         });
     }
+    const populatedInvoicesWithSignedUrl = invoicesData.map((
+        invoice,
+        index,
+    ) => ({
+        signedUrl: data[index].signedUrl,
+        ...invoice,
+    }));
     const signedUrls = data.map((item) => item.signedUrl);
     const { data: emailData, error: emailError } = await emails.send({
         from: "InvoCloud <tech@llanas.dev>",
@@ -53,7 +60,9 @@ export default defineEventHandler(async (event) => {
         html: `<p>Dear user,</p>
                <p>Here are your invoices:</p>
                <ul>${
-            signedUrls.map((url) => `<li><a href="${url}">${name}</a></li>`)
+            populatedInvoicesWithSignedUrl.map((invoice) =>
+                `<li><a href="${invoice.signedUrl}">${invoice.name}</a></li>`
+            )
                 .join("")
         }</ul>
                <p>Best regards,</p>
