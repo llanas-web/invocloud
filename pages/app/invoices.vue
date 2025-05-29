@@ -2,7 +2,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-import { InvoicesSendModal, LazyInvoicesSendModal, UBadge } from '#components'
+import { InvoicesSendModal, LazyInvoicesViewerModal, UBadge } from '#components'
 
 definePageMeta({
     layout: 'app'
@@ -14,7 +14,9 @@ const UCheckbox = resolveComponent('UCheckbox')
 
 const toast = useToast()
 const table = useTemplateRef('table')
-const { invoices, pending, updateInvoice, deleteInvoices } = useInvoices()
+const viewerModal = useTemplateRef<typeof LazyInvoicesViewerModal>('viewerModal')
+
+const { invoices, pending, updateInvoice, deleteInvoices, getInvoliceUrl } = useInvoices()
 declare type Invoice = NonNullable<(typeof invoices)['value']>[number];
 
 const acceptedStatus = ['validated', 'paid', 'error']
@@ -40,20 +42,49 @@ function getRowItems(row: Row<Invoice>) {
             type: 'separator'
         },
         {
-            label: 'View invoice details',
-            icon: 'i-lucide-eye'
+            label: 'Voir la facture',
+            onSelect() {
+                viewerModal.value?.showFile(row.original)
+            },
+            icon: 'i-lucide-eye',
+
         },
         {
             type: 'separator'
         },
         {
-            label: 'Set as paid',
-            icon: 'i-lucide-check',
-            async onSelect() {
-                await updateInvoice(row.original.id, {
-                    status: 'paid'
-                })
-            }
+            label: 'Changer le statut',
+            icon: 'i-lucide-pencil',
+            children: [
+                {
+                    label: 'Marquer comme en attente',
+                    icon: 'i-lucide-clock',
+                    onSelect() {
+                        updateInvoice(row.original.id, {
+                            status: 'validated'
+                        })
+                    }
+                },
+                {
+                    label: 'Marquer comme payé',
+                    icon: 'i-lucide-check',
+                    iconColor: 'success',
+                    onSelect() {
+                        updateInvoice(row.original.id, {
+                            status: 'paid'
+                        })
+                    }
+                },
+                {
+                    label: 'Marquer comme en erreur',
+                    icon: 'i-lucide-x',
+                    onSelect() {
+                        updateInvoice(row.original.id, {
+                            status: 'error'
+                        })
+                    }
+                }
+            ]
         },
         {
             type: 'separator'
@@ -221,6 +252,7 @@ const pagination = ref({
         </template>
 
         <template #body>
+            <LazyInvoicesViewerModal ref="viewerModal" />
             <InvoicesUploadTable />
             <div class="flex flex-wrap items-center justify-between gap-1.5">
                 <div class="flex flex-wrap items-center gap-1.5">

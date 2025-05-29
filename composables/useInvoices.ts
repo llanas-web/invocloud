@@ -143,6 +143,21 @@ const _useInvoices = () => {
         return data;
     };
 
+    const getInvoliceUrl = async (invoiceId: string) => {
+        if (!invoiceId) {
+            console.error("Invoice ID is required to get the invoice URL.");
+            return null;
+        }
+        const { data, error } = await supabaseClient.storage
+            .from("invoices")
+            .createSignedUrl(`${supabaseUser.value!.id}/${invoiceId}`, 60);
+        if (error) {
+            console.error("Error creating signed URL for invoice:", error);
+            return null;
+        }
+        return data.signedUrl;
+    };
+
     return {
         invoices,
         refresh,
@@ -154,6 +169,7 @@ const _useInvoices = () => {
         updateInvoice,
         deleteInvoices,
         sendInvoice,
+        getInvoliceUrl,
     };
 };
 
