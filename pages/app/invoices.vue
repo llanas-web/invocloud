@@ -224,16 +224,6 @@ const pagination = ref({
             <InvoicesUploadTable />
             <div class="flex flex-wrap items-center justify-between gap-1.5">
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <InvoicesDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
-                        <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Delete"
-                            color="error" variant="subtle" icon="i-lucide-trash">
-                            <template #trailing>
-                                <UKbd>
-                                    {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
-                                </UKbd>
-                            </template>
-                        </UButton>
-                    </InvoicesDeleteModal>
 
                     <InvoicesSendModal ref="sendModal"
                         :invoices="table?.tableApi?.getFilteredSelectedRowModel().rows.map(r => r.original.id) ?? []">
@@ -246,6 +236,18 @@ const pagination = ref({
                             </template>
                         </UButton>
                     </InvoicesSendModal>
+                    <InvoicesDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
+                        <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Supprimer"
+                            color="error" variant="subtle" icon="i-lucide-trash">
+                            <template #trailing>
+                                <UKbd>
+                                    {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
+                                </UKbd>
+                            </template>
+                        </UButton>
+                    </InvoicesDeleteModal>
+                </div>
+                <div class="flex flex-wrap items-center gap-1.5">
 
                     <USelect v-model="statusFilter" :items="[
                         { label: 'Tout', value: 'all' },

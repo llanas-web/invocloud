@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import * as z from 'zod'
-import type { FormSubmitEvent } from '@nuxt/ui'
+import type { FormError, FormSubmitEvent } from '@nuxt/ui'
 
 const supabaseUser = useSupabaseUser();
 const { createInvoice } = useInvoices()
 const { suppliers } = useSuppliers()
+const form = useTemplateRef('form')
 
 const schema = z.object({
     supplierId: z.string().refine((value) => {
@@ -17,12 +18,13 @@ const schema = z.object({
     invoiceFile: z.instanceof(File)
 })
 const open = ref(false)
+const isMenuOpen = ref(false)
 
 type Schema = z.output<typeof schema>
 
 const state = reactive<Partial<Schema>>({
     supplierId: undefined,
-    amount: undefined,
+    amount: 0,
     name: undefined,
     invoiceFile: undefined
 })
@@ -38,10 +40,10 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     },
         invoiceFile)
     if (!newInvoice) {
-        toast.add({ title: 'Error', description: 'Failed to create invoice', color: 'error' })
+        toast.add({ title: 'Error', description: 'Erreurs lors de l\'ajout de la facture', color: 'error' })
         return
     }
-    toast.add({ title: 'Success', description: `New supplier ${newInvoice.id} added`, color: 'success' })
+    toast.add({ title: 'Success', description: `La facture a été ajoutée avec succès`, color: 'success' })
     open.value = false
     state.supplierId = undefined
     state.amount = undefined
@@ -57,33 +59,29 @@ const onFileChange = (e: Event) => {
 </script>
 
 <template>
-    <UModal v-model:open="open" title="Nouvelle facture" description="Add a new customer to the database">
+    <UModal v-model:open="open" title="Nouvelle facture" description="Uploader une nouvelle facture">
         <UButton label="Nouvelle facture" icon="i-lucide-plus" />
 
         <template #body>
-            <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-                <UFormField label="Client" placeholder="John Doe" name="name">
+            <UForm ref="form" :schema="schema" :state="state" class="space-y-4" @submit="onSubmit"
+                @error="(e) => console.error(e)">
+                <UFormField label="Client" placeholder="John Doe" name="supplierId">
                     <UInputMenu v-model="state.supplierId" :items="suppliers" class="w-full" value-key="id"
-                        label-key="name">
+                        label-key="name" v-model:open="isMenuOpen" @focus="isMenuOpen = true">
                     </UInputMenu>
                 </UFormField>
                 <UFormField label="Montant" placeholder="Montant TTC" name="amount">
-                    <UInputNumber v-model="state.amount" :stepSnapping="false" :format-options="{
-                        style: 'currency',
-                        currency: 'EUR',
-                        currencyDisplay: 'code',
-                        currencySign: 'accounting'
-                    }" class="w-full" />
+                    <UInputNumber v-model="state.amount" :stepSnapping="false" class="w-full" />
                 </UFormField>
-                <UFormField label="File" name="invoiceFile">
+                <UFormField label="Fichier facture" name="invoiceFile">
                     <UInput type="file" @change="onFileChange" class="w-full" />
                 </UFormField>
-                <UFormField label="File name" name="name">
+                <UFormField label="Nom de la facture" name="name">
                     <UInput v-model="state.name" placeholder="File name" class="w-full" />
                 </UFormField>
                 <div class="flex justify-end gap-2 mt-8">
-                    <UButton label="Cancel" color="neutral" variant="subtle" @click="open = false" />
-                    <UButton label="Create" color="primary" variant="solid" type="submit" />
+                    <UButton label="Annuler" color="neutral" variant="subtle" @click="open = false" />
+                    <UButton label="Ajouter" color="primary" variant="solid" type="submit" />
                 </div>
             </UForm>
         </template>
