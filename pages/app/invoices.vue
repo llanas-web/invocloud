@@ -165,7 +165,22 @@ const columns: TableColumn<Invoice>[] = [
     },
     {
         accessorKey: 'created_at',
-        header: 'Date de création',
+        header: ({ column }) => {
+            const isSorted = column.getIsSorted()
+
+            return h(UButton, {
+                color: 'neutral',
+                variant: 'ghost',
+                label: 'Date de création',
+                icon: isSorted
+                    ? isSorted === 'asc'
+                        ? 'i-lucide-arrow-up-narrow-wide'
+                        : 'i-lucide-arrow-down-wide-narrow'
+                    : 'i-lucide-arrow-up-down',
+                class: '-mx-2.5',
+                onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+            })
+        },
         cell: ({ row }) => {
             const date = new Date(row.getValue('created_at'))
             return h('div', { class: 'text-muted' }, date.toLocaleDateString('fr-FR', {
