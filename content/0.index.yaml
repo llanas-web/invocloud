@@ -1,0 +1,51 @@
+title: InvoCloud - La facturation simple et sécurisée
+description: InvoCloud est une application de facturation en ligne qui vous permet de créer et gérer vos factures, devis et paiements de manière simple et sécurisée.
+keywords: facturation, devis, paiements, en ligne, sécurité, gestion financière
+hero:
+  title: InvoCloud - La facturation simple et sécurisée
+  description: Connectez vous pour gérer vos factures en ligne ou envoyez vos factures facilement et de manière sécurisée.
+
+sections:
+  - title: Toutes les factures dans une seule application
+    description: InvoCloud vous permet de gérer toutes vos factures en un seul endroit. Importez, créez et suivez vos factures facilement.
+    features:
+      - title: Dématérialisation
+        description: Finalisez en avec les factures papier en envoyant et recevant vos factures en ligne.
+        icon: i-lucide-file-text
+      - title: Sécurité
+        description: Transmettez vos factures grace à un lien unique garantissant la sécurité de vos données.
+        icon: i-lucide-shield-check
+      - title: Efficacité
+        description: Accedez à vos factures et à leurs statuts à tout moment grace à un tableau de bord complet.
+        icon: i-lucide-clock
+
+pricing:
+  title: Tarification
+  description: Choisissez le plan qui vous convient le mieux pour gérer vos factures en ligne.
+  plans:
+    - title: Gratuit
+      description: Idéal pour les utilisateurs occasionnels qui souhaitent essayer InvoCloud.
+      price: "0.00€"
+      billing-cycle: "/mois"
+      features:
+        - Créez et gérez jusqu'à 5 factures par mois
+        - Accès aux fonctionnalités de base
+        - Support par email
+      button:
+        label: Commencer gratuitement
+        variant: outline
+        color: neutral
+        to: "/auth/login"
+    - title: Pro
+      description: Pour les utilisateurs réguliers qui ont besoin de fonctionnalités avancées.
+      price: "9.99€"
+      billing-cycle: "/mois"
+      features:
+        - Créez et gérez un nombre illimité de factures
+        - Accès à toutes les fonctionnalités avancées
+        - Support prioritaire
+      button:
+        label: Passer à Pro
+        to: "/auth/login"
+      scale: true
+      highlight: true

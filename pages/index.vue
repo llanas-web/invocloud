@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { CommonLogoPro } from '#components';
+const { data: page } = await useAsyncData(() => queryCollection('index').first())
+const user = useSupabaseUser()
+console.dir(page.value)
 definePageMeta({
     layout: false,
 })
@@ -11,66 +14,52 @@ definePageMeta({
         <UHeader>
             <template #left>
                 <NuxtLink to="/">
-                    <CommonLogoPro class="w-auto h-6 shrink-0" />
+                    <h2 class="font-bold text-2xl">InvoCloud</h2>
                 </NuxtLink>
 
                 <!-- <TemplateMenu /> -->
             </template>
 
             <template #right>
-                <!-- <UColorModeButton /> -->
+                <template v-if="user != null">
+                    <UButton to="/app" trailingIcon="i-lucide-home" size="md">Dashboard</UButton>
+                </template>
+                <template v-else>
+                    <UButton to="/auth/login" trailingIcon="i-lucide-log-in" size="md">
+                        S'authentifier
+                    </UButton>
+                </template>
 
-                <UButton to="https://github.com/nuxt-ui-pro/starter" target="_blank" icon="i-simple-icons-github"
-                    aria-label="GitHub" color="neutral" variant="ghost" />
+                <InvoicesUploadStepModal size="md" />
             </template>
         </UHeader>
 
         <UMain>
-            <div>
-                <UPageHero title="InvoCloud - Simple Invoices Managment"
-                    description="A simple and powerful invoices management system built with Nuxt UI Pro.">
+            <div v-if="page">
+                <UPageHero :title="page.title" :description="page.description">
                     <template #links>
                         <UButton to="/auth/login" trailingIcon="i-lucide-log-in" size="xl">
-                            Login
+                            S'authentifier
                         </UButton>
 
                         <InvoicesUploadStepModal />
                     </template>
                 </UPageHero>
 
-                <UPageSection id="features" title="The freedom to build anything"
-                    description="Nuxt UI Pro ships with an extensive set of advanced components that cover a wide range of use-cases. Carefully crafted to reduce boilerplate code without sacrificing flexibility."
-                    :features="[{
-                        icon: 'i-lucide-wrench',
-                        title: 'Fully customizable',
-                        description: 'Customize any component through the App Config or fine-tune specific instances with the ui prop, just like Nuxt UI.'
-                    }, {
-                        icon: 'i-lucide-square-stack',
-                        title: 'Powerful slot system',
-                        description: 'Take full control of component layouts and content with Vue\'s comprehensive slot system for maximum flexibility.'
-                    }, {
-                        icon: 'i-lucide-smartphone',
-                        title: 'Mobile-first & responsive',
-                        description: 'Built with a mobile-first approach, all components automatically adapt to any screen size while maintaining a polished look.'
-                    }]" />
+                <UPageSection :title="page?.sections[0].title" :description="page?.sections[0].description">
+                    <UPageGrid>
+                        <UPageCard v-for="(item, index) in page?.sections[0].features" :key="index" v-bind="item"
+                            spotlight />
+                    </UPageGrid>
+                </UPageSection>
 
-                <UPageSection>
-                    <UPageCTA title="Start with Nuxt UI Pro today!"
-                        description="Nuxt UI Pro is free in development, but you need a license to use it in production."
-                        variant="subtle" :links="[{
-                            label: 'Buy now',
-                            to: 'https://ui.nuxt.com/pro/purchase',
-                            target: '_blank',
-                            icon: 'i-lucide-shopping-cart',
-                            color: 'neutral'
-                        }, {
-                            label: 'License',
-                            to: 'https://ui.nuxt.com/getting-started/license',
-                            target: '_blank',
-                            trailingIcon: 'i-lucide-circle-help',
-                            color: 'neutral',
-                            variant: 'subtle'
-                        }]" />
+
+                <UPageSection :title="page.pricing.title" :description="page.pricing.description">
+                    <UContainer>
+                        <UPricingPlans scale>
+                            <UPricingPlan v-for="(plan, index) in page.pricing.plans" :key="index" v-bind="plan" />
+                        </UPricingPlans>
+                    </UContainer>
                 </UPageSection>
             </div>
         </UMain>

@@ -11,6 +11,9 @@ const open = ref(false)
 const stepIndex = ref(0)
 const isLoading = ref(false)
 const sharedInvoiceId = ref<string | null>(null)
+const props = defineProps<{
+    size?: 'sm' | 'md' | 'lg' | 'xl'
+}>()
 
 const stepItems = ref([
     {
@@ -147,7 +150,7 @@ const onPrev = () => {
     <UModal v-model:open="open" title="Envoyer des factures"
         description="Envoyez des fichiers de factures en toute sécurité aux parties prenantes"
         :ui="{ footer: 'justify-end' }">
-        <UButton label="Envoyer des factures" trailing-icon="i-lucide-send" size="xl" color="neutral"
+        <UButton label="Envoyer des factures" trailing-icon="i-lucide-send" :size="props.size ?? 'xl'" color="neutral"
             variant="subtle" />
 
         <template #body>
