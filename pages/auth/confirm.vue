@@ -14,5 +14,5 @@ watch(user, () => {
 </script>
 
 <template>
-  <div>Waiting for login...</div>
+  <div>En attente de validation d'email...</div>
 </template>

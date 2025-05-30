@@ -13,23 +13,23 @@ const toast = useToast()
 const fields = [{
   name: 'email',
   type: 'text' as const,
-  label: 'Email',
-  placeholder: 'Enter your email',
+  label: 'E-mail',
+  placeholder: 'Entrez votre e-mail',
   required: true
 }, {
   name: 'password',
-  label: 'Password',
+  label: 'Mot de passe',
   type: 'password' as const,
-  placeholder: 'Enter your password'
+  placeholder: 'Entrez votre mot de passe'
 }, {
   name: 'remember',
-  label: 'Remember me',
+  label: 'Se souvenir de moi',
   type: 'checkbox' as const
 }]
 
 const schema = z.object({
-  email: z.string().email('Invalid email'),
-  password: z.string().min(8, 'Must be at least 8 characters')
+  email: z.string().email('E-mail invalide'),
+  password: z.string().min(8, 'Doit contenir au moins 8 caractères')
 })
 
 type Schema = z.output<typeof schema>
@@ -39,9 +39,9 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     email: payload.data.email,
     password: payload.data.password,
   })
-  if (error) toast.add({ title: 'Error while signIn', description: error.message, color: 'error' })
+  if (error) toast.add({ title: 'Erreur lors de la connexion', description: error.message, color: 'error' })
   else {
-    toast.add({ title: 'Success', description: 'Logged in successfully', color: 'success' })
+    toast.add({ title: 'Succès', description: 'Connexion réussie', color: 'success' })
     // Redirect to home page
     navigateTo('/app')
   };
@@ -51,17 +51,18 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 <template>
   <div class="flex flex-col items-center justify-center gap-4 p-4 h-screen">
     <UPageCard class="w-full max-w-md">
-      <UAuthForm :schema="schema" title="Login to InvoCloud"
-        description="Enter your credentials to access your account." icon="i-lucide-user" :fields="fields"
+      <UAuthForm :schema="schema" title="Connexion à InvoCloud"
+        description="Entrez vos identifiants pour accéder à votre compte." icon="i-lucide-user" :fields="fields"
         @submit="onSubmit">
         <template #description>
-          Don't have an account? <ULink to="/auth/sign-up" class="text-primary font-medium">Sign up</ULink>.
+          Vous n'avez pas de compte ? <ULink to="/auth/sign-up" class="text-primary font-medium">Inscrivez-vous</ULink>.
         </template>
         <template #password-hint>
-          <ULink to="#" class="text-primary font-medium" tabindex="-1">Forgot password?</ULink>
+          <ULink to="#" class="text-primary font-medium" tabindex="-1">Mot de passe oublié ?</ULink>
         </template>
         <template #footer>
-          By signing in, you agree to our <ULink to="#" class="text-primary font-medium">Terms of Service</ULink>.
+          En vous connectant, vous acceptez nos <ULink to="#" class="text-primary font-medium">Conditions d'utilisation
+          </ULink>.
         </template>
       </UAuthForm>
     </UPageCard>
