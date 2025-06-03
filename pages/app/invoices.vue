@@ -2,7 +2,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-import { InvoicesSendModal, LazyInvoicesViewerModal, UBadge } from '#components'
+import { InvoicesSendModal, LazyInvoicesSendModal, LazyInvoicesViewerModal, UBadge } from '#components'
 
 definePageMeta({
     layout: 'app'
@@ -15,6 +15,7 @@ const UCheckbox = resolveComponent('UCheckbox')
 const toast = useToast()
 const table = useTemplateRef('table')
 const viewerModal = useTemplateRef<typeof LazyInvoicesViewerModal>('viewerModal')
+const sendModal = useTemplateRef<typeof LazyInvoicesSendModal>('sendModal')
 
 const { invoices, pending, updateInvoice, deleteInvoices } = useInvoices()
 declare type Invoice = NonNullable<(typeof invoices)['value']>[number];
@@ -36,6 +37,7 @@ function getRowItems(row: Row<Invoice>) {
             label: 'Envoyer par e-mail',
             icon: 'i-lucide-mail',
             onSelect() {
+                sendModal.value?.showSendInvoiceModal([row.original.id])
             }
         },
         {

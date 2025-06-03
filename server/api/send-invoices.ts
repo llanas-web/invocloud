@@ -26,8 +26,7 @@ export default defineEventHandler(async (event) => {
     const { data: invoicesData, error: invoicesError } = await supabase
         .from("invoices")
         .select("name, file_path")
-        .in("id", invoices)
-        .eq("user_id", user.id);
+        .in("id", invoices);
     if (invoicesError) {
         throw createError({
             status: 500,
