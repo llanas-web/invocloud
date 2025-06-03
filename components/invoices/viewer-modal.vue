@@ -17,6 +17,7 @@ async function showFile(invoice: Invoice) {
     }
     const url = URL.createObjectURL(blob)
     fileType.value = blob.type
+    console.log("File type:", fileType.value)
     fileUrl.value = url
     fileName.value = invoice.name ?? 'File'
     open.value = true
@@ -32,7 +33,7 @@ defineExpose({ showFile })
                 <template v-if="fileType.includes('pdf')">
                     <iframe :src="fileUrl!" class="w-full h-[60vh] rounded" frameborder="0" />
                 </template>
-                <template v-else-if="fileType?.match(/\.(png|jpe?g|gif|webp)$/)">
+                <template v-else-if="fileType?.match(/^(application|image|audio|video|text)\/[a-z0-9.+-]+$/i)">
                     <img :src="fileUrl!" :alt="fileName" class="max-w-full max-h-[60vh] mx-auto rounded" />
                 </template>
                 <template v-else>
