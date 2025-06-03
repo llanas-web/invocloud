@@ -1,7 +1,10 @@
 import { createSharedComposable } from "@vueuse/core";
+import type { Establishment } from "~/types";
 
 const _useEstablishments = () => {
     const supabaseClient = useSupabaseClient();
+    const user = useSupabaseUser();
+    const selectedEstablishment = ref<Establishment | null>(null);
 
     const { data: establishments, pending, refresh } = useAsyncData(
         "establishments",
@@ -14,6 +17,9 @@ const _useEstablishments = () => {
                 console.error("Error fetching establishments:", error);
                 return [];
             }
+            if (data.length === 1) {
+                selectedEstablishment.value = data[0] || null;
+            }
             return data;
         },
         {
@@ -22,15 +28,29 @@ const _useEstablishments = () => {
         },
     );
 
-    const selectedEstablishment = computed(() => {
-        return establishments.value[0] || null;
-    });
+    const createEstablishment = async (name: string) => {
+        const { data: newEstablishment, error } = await supabaseClient
+            .from("establishments")
+            .insert([{
+                name,
+                creator_id: user.value!.id,
+            }])
+            .select().single();
+
+        if (error) {
+            console.error("Error creating establishment:", error);
+            return null;
+        }
+
+        return newEstablishment;
+    };
 
     return {
         establishments,
         selectedEstablishment,
         pending,
         refresh,
+        createEstablishment,
     };
 };
 

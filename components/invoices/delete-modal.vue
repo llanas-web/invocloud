@@ -1,19 +1,18 @@
 <script setup lang="ts">
+const { deleteInvoices } = useInvoices()
 
-    const { deleteInvoices } = useInvoices()
+const props = withDefaults(defineProps<{
+    listInvoicesId?: string[]
+}>(), {
+    listInvoicesId: () => []
+})
 
-    const props = withDefaults(defineProps<{
-        listInvoicesId?: string[]
-    }>(), {
-        listInvoicesId: () => []
-    })
+const open = ref(false)
 
-    const open = ref(false)
-
-    async function onSubmit() {
-        const { listInvoicesId } = toRefs(props)
-        await deleteInvoices(listInvoicesId.value)
-    }
+async function onSubmit() {
+    const { listInvoicesId } = toRefs(props)
+    await deleteInvoices(listInvoicesId.value)
+}
 </script>
 
 <template>

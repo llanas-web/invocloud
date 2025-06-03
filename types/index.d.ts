@@ -3,6 +3,11 @@ import type { Database } from "./database.types";
 
 export type User = Database["public"]["Tables"]["users"]["Row"];
 
+export type Establishment =
+    Database["public"]["Tables"]["establishments"]["Row"];
+export type EstablishmentInsert =
+    Database["public"]["Tables"]["establishments"]["Insert"];
+
 export type Supplier = Database["public"]["Tables"]["suppliers"]["Row"];
 export type SupplierInsert =
     Database["public"]["Tables"]["suppliers"]["Insert"];

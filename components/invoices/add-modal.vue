@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import * as z from 'zod'
-import type { FormError, FormSubmitEvent } from '@nuxt/ui'
+import type { FormSubmitEvent } from '@nuxt/ui'
 
 const supabaseUser = useSupabaseUser();
 const { createInvoice } = useInvoices()
 const { suppliers } = useSuppliers()
-const form = useTemplateRef('form')
 
 const schema = z.object({
     supplierId: z.string().refine((value) => {
@@ -36,7 +35,6 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         supplier_id: supplierId,
         amount: amount,
         name: name,
-        user_id: supabaseUser.value!.id
     },
         invoiceFile)
     if (!newInvoice) {

@@ -94,8 +94,7 @@ onMounted(async () => {
         <UDashboardSidebar id="default" v-model:open="open" collapsible resizable class="bg-elevated/25"
             :ui="{ footer: 'lg:border-t lg:border-default' }">
             <template #header="{ collapsed }">
-                <!-- <span>{{ user?.email }}</span> -->
-                <!-- <TeamsMenu :collapsed="collapsed" /> -->
+                <EstablishmentsMenuSelector :collapsed="collapsed" />
             </template>
 
             <template #default="{ collapsed }">

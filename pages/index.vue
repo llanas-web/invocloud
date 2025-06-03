@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { CommonLogoPro } from '#components';
 const { data: page } = await useAsyncData(() => queryCollection('index').first())
 const user = useSupabaseUser()
 definePageMeta({
