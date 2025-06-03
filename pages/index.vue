@@ -2,7 +2,6 @@
 import { CommonLogoPro } from '#components';
 const { data: page } = await useAsyncData(() => queryCollection('index').first())
 const user = useSupabaseUser()
-console.dir(page.value)
 definePageMeta({
     layout: false,
 })

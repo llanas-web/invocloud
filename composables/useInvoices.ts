@@ -5,6 +5,7 @@ import type { Database } from "~/types/database.types";
 const _useInvoices = () => {
     const supabaseClient = useSupabaseClient<Database>();
     const supabaseUser = useSupabaseUser();
+    const { selectedEstablishment } = useEstablishments();
 
     const { data: invoices, error: invoicesError, refresh, pending } =
         useAsyncData(
@@ -14,10 +15,18 @@ const _useInvoices = () => {
                     .from("invoices")
                     .select(`
                         *,
-                        supplier:suppliers (*),
-                        user:users (*)
+                        supplier:suppliers (
+                            id,
+                            name,
+                            establishment:establishments (
+                                id
+                            )
+                        )
                         `)
-                    .eq("user_id", supabaseUser.value!.id);
+                    .eq(
+                        "supplier.establishment.id",
+                        selectedEstablishment.value!.id,
+                    );
                 if (error) {
                     console.error("Error fetching invoices:", error);
                     return [];

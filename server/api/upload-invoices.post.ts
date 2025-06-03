@@ -3,57 +3,64 @@ import { hashCode } from "~/utils/hash";
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event);
-    const { invoiceId, token } = body;
+    const { uploadValidationId, token } = body;
 
-    if (!invoiceId || !token) {
+    if (!uploadValidationId || !token) {
         throw createError({
             status: 400,
-            message: "Missing invoice ID or token",
+            message: "Missing upload validation ID or token",
         });
     }
 
     const supabase = serverSupabaseServiceRole(event);
 
     const hashedCode = hashCode(token);
-    console.log("Hashed code:", hashedCode);
 
-    const { data: file } = await supabase
-        .from("invoices")
-        .select("*")
-        .eq("id", invoiceId)
-        .eq("token", hashedCode)
+    const { data: uploadValidation } = await supabase
+        .from("upload_validations")
+        .select(`
+            id,
+            filePath:file_path,
+            supplier:suppliers (
+                id,
+                establishment:establishments (
+                    id,
+                    name
+                )
+            )
+        `)
+        .eq("id", uploadValidationId)
+        .eq("token_hash", hashedCode)
         .maybeSingle();
 
-    if (!file) {
+    if (!uploadValidation) {
         throw createError({
             status: 404,
             message: "File not found or token expired",
         });
     }
 
-    const { data } = await supabase
+    const { data: uploadUrl } = await supabase
         .storage
-        .from("pending-invoices")
-        .createSignedUploadUrl(`${file.user_id}/${file.id}`);
+        .from("invoices")
+        .createSignedUploadUrl(
+            uploadValidation.filePath,
+        );
 
-    if (!data) {
+    if (!uploadUrl) {
         throw createError({
             status: 500,
             message: "Error creating signed URL",
         });
     }
 
-    await supabase.from("invoices")
-        .update({
-            status: "sent",
-        })
-        .eq("id", file.id)
-        .select()
-        .single();
+    await supabase.from("upload_validations").update({
+        status: "uploaded",
+    }).eq("id", uploadValidationId);
 
     const response = {
-        url: data.signedUrl,
-        fileName: file.id,
+        url: uploadUrl.signedUrl,
+        fileName: uploadValidation.id,
         toJSON() {
             return {
                 url: this.url,

@@ -140,7 +140,6 @@ const columns: TableColumn<Invoice>[] = [
             return h('div', { class: 'flex items-center gap-3' }, [
                 h('div', undefined, [
                     h('p', { class: 'font-medium text-highlighted' }, row.original.supplier.name),
-                    h('p', { class: '' }, `${row.original.supplier.email}`)
                 ])
             ])
         }

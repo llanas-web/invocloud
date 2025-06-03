@@ -11,6 +11,7 @@ const supabase = useSupabaseClient()
 const toast = useToast()
 const config = useRuntimeConfig()
 const redirectTo = `${config.public.baseUrl}/auth/callback`
+const loading = ref(false)
 
 const fields = [{
     name: 'email',
@@ -37,6 +38,7 @@ type Schema = z.output<typeof schema>
 const isSignUpSuccessful = ref(false)
 
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
+    loading.value = true
     const { error } = await supabase.auth.signUp({
         email: payload.data.email,
         password: payload.data.password,
@@ -49,6 +51,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         toast.add({ title: 'Succès', description: 'Inscription réussie', color: 'success' })
         isSignUpSuccessful.value = true
     };
+    loading.value = false
 }
 </script>
 
@@ -64,8 +67,11 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
             </template>
             <template v-else>
                 <UAuthForm :schema="schema" title="Inscription à InvoCloud"
-                    description="Entrez vos informations pour créer votre compte." icon="i-lucide-user" :fields="fields"
-                    @submit="onSubmit">
+                    description="Entrez vos informations pour créer votre compte." icon="i-lucide-send" :fields="fields"
+                    :disabled="loading" @submit="onSubmit" :submit="{
+                        label: 'S’inscrire',
+                        loading: loading,
+                    }">
                     <template #description>
                         Vous avez déjà un compte ? <ULink to="/auth/login" class="text-primary font-medium">
                             Connectez-vous</ULink>.

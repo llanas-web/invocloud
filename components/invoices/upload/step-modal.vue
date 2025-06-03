@@ -10,7 +10,7 @@ const toast = useToast()
 const open = ref(false)
 const stepIndex = ref(0)
 const isLoading = ref(false)
-const sharedInvoiceId = ref<string | null>(null)
+const sharedUploadValidationId = ref<string | null>(null)
 const props = defineProps<{
     size?: 'sm' | 'md' | 'lg' | 'xl'
 }>()
@@ -51,7 +51,7 @@ const fileFormState = reactive<Partial<FileFormSchema>>({
 async function submitFileForm() {
     const { sendorEmail, recipientEmail, comment } = fileFormState
     try {
-        const { invoice_id } = await $fetch('/api/request-upload', {
+        const { upload_validation_id } = await $fetch('/api/request-upload', {
             method: 'POST',
             body: {
                 sendorEmail,
@@ -59,7 +59,7 @@ async function submitFileForm() {
                 comment,
             }
         })
-        sharedInvoiceId.value = invoice_id
+        sharedUploadValidationId.value = upload_validation_id
         stepper.value?.next()
     } catch (error) {
         console.error('Error requesting upload:', error)
@@ -86,7 +86,7 @@ async function submitConfirmForm(event: FormSubmitEvent<ConfirmFormSchema>) {
         const { fileName, url } = await $fetch('/api/upload-invoices', {
             method: 'POST',
             body: {
-                invoiceId: sharedInvoiceId.value,
+                uploadValidationId: sharedUploadValidationId.value,
                 token: confirmToken.join('')
             }
         })

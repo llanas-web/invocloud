@@ -1,21 +1,37 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { Supplier, SupplierInsert } from "~/types";
+import type {
+    Supplier,
+    SupplierInsert,
+    SupplierMember,
+    SupplierMemberInsert,
+} from "~/types";
 
 const _useSuppliers = () => {
     const supabaseClient = useSupabaseClient();
+    const { selectedEstablishment } = useEstablishments();
 
     const { data: suppliers, error: suppliersError, refresh, pending } =
-        useAsyncData<Supplier[]>(
+        useAsyncData(
             "suppliers",
             async () => {
                 const { data, error } = await supabaseClient
                     .from("suppliers")
-                    .select("*");
-
+                    .select(`
+                        *,
+                        members:supplier_members (*),
+                        establishment:establishments (
+                            id,
+                            name
+                        )
+                    `).eq(
+                        "establishment_id",
+                        selectedEstablishment.value!.id,
+                    );
                 if (error) {
                     console.error("Error fetching suppliers:", error);
                     return [];
                 }
+                console.log("Fetched suppliers:", data[0].members);
                 return data;
             },
             {
@@ -24,22 +40,38 @@ const _useSuppliers = () => {
             },
         );
 
-    const createSupplier = async ({ email, name }: SupplierInsert) => {
-        if (!email || !name) {
+    const createSupplier = async (
+        name: string,
+        emails: string[],
+    ) => {
+        if (!name || emails.length === 0) {
             console.error(
-                "Email and name are required to create a supplier.",
+                "Name and supplier members are required to create a supplier.",
             );
             return null;
         }
         const { data, error } = await supabaseClient
             .from("suppliers")
             .insert([{
-                email,
                 name,
+                establishment_id: selectedEstablishment.value!.id,
             }]).select().single();
 
         if (error) {
             console.error("Error creating supplier:", error);
+            return null;
+        }
+
+        const { error: membersError } = await supabaseClient
+            .from("supplier_members")
+            .insert(
+                emails.map((email) => ({
+                    email,
+                    supplier_id: data.id,
+                })),
+            );
+        if (membersError) {
+            console.error("Error creating supplier members:", membersError);
             return null;
         }
         await refresh();

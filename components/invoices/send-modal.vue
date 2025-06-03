@@ -22,8 +22,6 @@ const state = reactive<Partial<Schema>>({
 const toast = useToast()
 async function onSubmit(event: FormSubmitEvent<Schema>) {
     const { email } = event.data
-    console.log('Sending invoice to:', email)
-    console.log('Invoices:', invoices)
     const response = await sendInvoice(invoices, email)
     if (!response) {
         toast.add({ title: 'Error', description: 'Failed to send invoice', color: 'error' })

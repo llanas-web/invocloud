@@ -10,6 +10,8 @@ const supabase = useSupabaseClient()
 
 const toast = useToast()
 
+const loading = ref(false)
+
 const fields = [{
   name: 'email',
   type: 'text' as const,
@@ -35,6 +37,7 @@ const schema = z.object({
 type Schema = z.output<typeof schema>
 
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
+  loading.value = true
   const { error } = await supabase.auth.signInWithPassword({
     email: payload.data.email,
     password: payload.data.password,
@@ -44,7 +47,9 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     toast.add({ title: 'Succès', description: 'Connexion réussie', color: 'success' })
     // Redirect to home page
     navigateTo('/app')
+
   };
+  loading.value = false
 }
 </script>
 
@@ -52,8 +57,13 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   <div class="flex flex-col items-center justify-center gap-4 p-4 h-screen">
     <UPageCard class="w-full max-w-md">
       <UAuthForm :schema="schema" title="Connexion à InvoCloud"
-        description="Entrez vos identifiants pour accéder à votre compte." icon="i-lucide-user" :fields="fields"
-        @submit="onSubmit">
+        description="Entrez vos identifiants pour accéder à votre compte." icon="i-lucide-send" :fields="fields"
+        :disabled="loading" @submit="onSubmit" :submit="{
+          label: 'Se connecter',
+          loading: loading,
+          color: 'primary',
+          variant: 'solid'
+        }">
         <template #description>
           Vous n'avez pas de compte ? <ULink to="/auth/sign-up" class="text-primary font-medium">Inscrivez-vous</ULink>.
         </template>

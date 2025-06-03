@@ -113,7 +113,7 @@ onMounted(async () => {
             </template>
 
             <template #footer="{ collapsed }">
-                <!-- <UserMenu :collapsed="collapsed" /> -->
+                <UserMenu :collapsed="collapsed" />
             </template>
         </UDashboardSidebar>
 
