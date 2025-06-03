@@ -4,8 +4,7 @@ const toast = useToast()
 
 const open = ref(false)
 
-const { pendingInvoices } = useInvoices()
-// const user = useSupabaseUser()
+const { pending } = useEstablishments()
 
 const links = [
     [
@@ -118,7 +117,9 @@ onMounted(async () => {
 
         <UDashboardSearch :groups="groups" />
 
-        <slot />
+        <template v-if="!pending">
+            <slot />
+        </template>
 
         <!-- <NotificationsSlideover /> -->
     </UDashboardGroup>

@@ -80,7 +80,10 @@ const _useInvoices = () => {
         const { data: uploadData, error: uploadError } = await supabaseClient
             .storage
             .from("invoices")
-            .upload(`${supabaseUser.value!.id}/${invoice.id}`, invoiceFile);
+            .upload(
+                `${selectedEstablishment.value!.id}/${invoice.id}`,
+                invoiceFile,
+            );
         if (uploadError) {
             console.error("Error uploading invoice file:", uploadError);
             return null;

@@ -17,7 +17,6 @@ async function showFile(invoice: Invoice) {
     }
     const url = URL.createObjectURL(blob)
     fileType.value = blob.type
-    console.log("File type:", fileType.value)
     fileUrl.value = url
     fileName.value = invoice.name ?? 'File'
     open.value = true

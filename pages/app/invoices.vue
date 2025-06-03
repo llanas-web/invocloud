@@ -16,7 +16,7 @@ const toast = useToast()
 const table = useTemplateRef('table')
 const viewerModal = useTemplateRef<typeof LazyInvoicesViewerModal>('viewerModal')
 
-const { invoices, pending, updateInvoice, deleteInvoices, getInvoliceUrl } = useInvoices()
+const { invoices, pending, updateInvoice, deleteInvoices } = useInvoices()
 declare type Invoice = NonNullable<(typeof invoices)['value']>[number];
 
 const acceptedStatus = ['validated', 'paid', 'error']
