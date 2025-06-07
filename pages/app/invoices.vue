@@ -1,254 +1,254 @@
 <script setup lang="ts">
-    import type { TableColumn } from '@nuxt/ui'
-    import { upperFirst } from 'scule'
-    import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-    import { InvoicesSendModal, LazyInvoicesDeleteModal, LazyInvoicesSendModal, LazyInvoicesViewerModal, UBadge } from '#components'
+import type { TableColumn } from '@nuxt/ui'
+import { upperFirst } from 'scule'
+import { getPaginationRowModel, type Row } from '@tanstack/table-core'
+import { InvoicesSendModal, LazyInvoicesDeleteModal, LazyInvoicesSendModal, LazyInvoicesViewerModal, UBadge } from '#components'
 
-    definePageMeta({
-        layout: 'app'
-    })
+definePageMeta({
+    layout: 'app'
+})
 
-    const UButton = resolveComponent('UButton')
-    const UDropdownMenu = resolveComponent('UDropdownMenu')
-    const UCheckbox = resolveComponent('UCheckbox')
+const UButton = resolveComponent('UButton')
+const UDropdownMenu = resolveComponent('UDropdownMenu')
+const UCheckbox = resolveComponent('UCheckbox')
 
-    const toast = useToast()
-    const table = useTemplateRef('table')
-    const viewerModal = useTemplateRef<typeof LazyInvoicesViewerModal>('viewerModal')
-    const sendModal = useTemplateRef<typeof LazyInvoicesSendModal>('sendModal')
-    const deleteModel = useTemplateRef<typeof LazyInvoicesDeleteModal>('deleteModal')
+const toast = useToast()
+const table = useTemplateRef('table')
+const viewerModal = useTemplateRef<typeof LazyInvoicesViewerModal>('viewerModal')
+const sendModal = useTemplateRef<typeof LazyInvoicesSendModal>('sendModal')
+const deleteModel = useTemplateRef<typeof LazyInvoicesDeleteModal>('deleteModal')
 
-    const { invoices, pending, updateInvoice, deleteInvoices } = useInvoices()
-    declare type Invoice = NonNullable<(typeof invoices)['value']>[number];
+const { invoices, pending, updateInvoice, deleteInvoices } = useInvoices()
+declare type Invoice = NonNullable<(typeof invoices)['value']>[number];
 
-    const acceptedStatus = ['validated', 'paid', 'error']
-    const acceptedInvoices = computed(() => invoices.value?.filter(i => acceptedStatus.includes(i.status)) || [])
+const acceptedStatus = ['validated', 'paid', 'error']
+const acceptedInvoices = computed(() => invoices.value?.filter(i => acceptedStatus.includes(i.status)) || [])
 
-    const columnVisibility = ref()
-    const rowSelection = ref({})
+const columnVisibility = ref()
+const rowSelection = ref({})
 
 
-    function getRowItems(row: Row<Invoice>) {
-        return [
-            {
-                type: 'label',
-                label: 'Actions'
+function getRowItems(row: Row<Invoice>) {
+    return [
+        {
+            type: 'label',
+            label: 'Actions'
+        },
+        {
+            label: 'Envoyer par e-mail',
+            icon: 'i-lucide-mail',
+            onSelect() {
+                sendModal.value?.showSendInvoiceModal([row.original.id])
+            }
+        },
+        {
+            type: 'separator'
+        },
+        {
+            label: 'Voir la facture',
+            onSelect() {
+                viewerModal.value?.showFile(row.original)
             },
-            {
-                label: 'Envoyer par e-mail',
-                icon: 'i-lucide-mail',
-                onSelect() {
-                    sendModal.value?.showSendInvoiceModal([row.original.id])
-                }
-            },
-            {
-                type: 'separator'
-            },
-            {
-                label: 'Voir la facture',
-                onSelect() {
-                    viewerModal.value?.showFile(row.original)
-                },
-                icon: 'i-lucide-eye',
+            icon: 'i-lucide-eye',
 
-            },
-            {
-                type: 'separator'
-            },
-            {
-                label: 'Changer le statut',
-                icon: 'i-lucide-pencil',
-                children: [
-                    {
-                        label: 'Marquer comme en attente',
-                        icon: 'i-lucide-clock',
-                        onSelect() {
-                            updateInvoice(row.original.id, {
-                                status: 'validated'
-                            })
-                        }
-                    },
-                    {
-                        label: 'Marquer comme payé',
-                        icon: 'i-lucide-check',
-                        iconColor: 'success',
-                        onSelect() {
-                            updateInvoice(row.original.id, {
-                                status: 'paid'
-                            })
-                        }
-                    },
-                    {
-                        label: 'Marquer comme en erreur',
-                        icon: 'i-lucide-x',
-                        onSelect() {
-                            updateInvoice(row.original.id, {
-                                status: 'error'
-                            })
-                        }
+        },
+        {
+            type: 'separator'
+        },
+        {
+            label: 'Changer le statut',
+            icon: 'i-lucide-pencil',
+            children: [
+                {
+                    label: 'Marquer comme en attente',
+                    icon: 'i-lucide-clock',
+                    onSelect() {
+                        updateInvoice(row.original.id, {
+                            status: 'validated'
+                        })
                     }
-                ]
-            },
-            {
-                type: 'separator'
-            },
-            {
-                label: 'Supprimer facture',
-                icon: 'i-lucide-trash',
-                color: 'error',
-                async onSelect() {
-                    deleteModel.value?.showDeleteModal([row.original.id])
+                },
+                {
+                    label: 'Marquer comme payé',
+                    icon: 'i-lucide-check',
+                    iconColor: 'success',
+                    onSelect() {
+                        updateInvoice(row.original.id, {
+                            status: 'paid'
+                        })
+                    }
+                },
+                {
+                    label: 'Marquer comme en erreur',
+                    icon: 'i-lucide-x',
+                    onSelect() {
+                        updateInvoice(row.original.id, {
+                            status: 'error'
+                        })
+                    }
                 }
-            }
-        ]
-    }
-
-
-    const columns: TableColumn<Invoice>[] = [
-        {
-            id: 'select',
-            header: ({ table }) =>
-                h(UCheckbox, {
-                    'modelValue': table.getIsSomePageRowsSelected()
-                        ? 'indeterminate'
-                        : table.getIsAllPageRowsSelected(),
-                    'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
-                        table.toggleAllPageRowsSelected(!!value),
-                    'ariaLabel': 'Select all'
-                }),
-            cell: ({ row }) =>
-                h(UCheckbox, {
-                    'modelValue': row.getIsSelected(),
-                    'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
-                    'ariaLabel': 'Select row'
-                })
+            ]
         },
         {
-            accessorKey: 'name',
-            header: 'Nom',
-            cell: ({ row }) => {
-                return h('div', { class: 'flex items-center gap-3' }, [
-                    h('p', { class: 'font-medium text-highlighted' }, row.original.name ?? ''),
-                ])
-            }
+            type: 'separator'
         },
         {
-            accessorKey: 'supplier',
-            header: 'Fournisseur',
-            cell: ({ row, table }) => {
-                return h('div', { class: 'flex items-center gap-3' }, [
-                    h('div', undefined, [
-                        h('p', { class: 'font-medium text-highlighted' }, row.original.supplier.name),
-                    ])
-                ])
-            }
-        },
-        {
-            accessorKey: 'status',
-            header: 'Status',
-            filterFn: 'equals',
-            cell: ({ row }) => {
-                const statusColors = {
-                    pending: 'warning' as const,
-                    sent: 'error' as const,
-                    validated: 'warning' as const,
-                    paid: 'success' as const,
-                    error: 'error' as const,
-                }
-                const color = statusColors[row.original.status as keyof typeof statusColors]
-
-                return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
-                    row.original.status
-                )
-            }
-        },
-        {
-            accessorKey: 'created_at',
-            header: ({ column }) => {
-                const isSorted = column.getIsSorted()
-
-                return h(UButton, {
-                    color: 'neutral',
-                    variant: 'ghost',
-                    label: 'Date de création',
-                    icon: isSorted
-                        ? isSorted === 'asc'
-                            ? 'i-lucide-arrow-up-narrow-wide'
-                            : 'i-lucide-arrow-down-wide-narrow'
-                        : 'i-lucide-arrow-up-down',
-                    class: '-mx-2.5',
-                    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
-                })
-            },
-            cell: ({ row }) => {
-                const date = new Date(row.getValue('created_at'))
-                return h('div', { class: 'text-muted' }, date.toLocaleDateString('fr-FR', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
-                }))
-            }
-        },
-        {
-            accessorKey: 'amount',
-            header: () => h('div', { class: 'text-right' }, 'Montant'),
-            cell: ({ row }) => {
-                const amount = Number.parseFloat(row.getValue('amount'))
-
-                const formatted = new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'EUR'
-                }).format(amount)
-
-                return h('div', { class: 'text-right font-medium' }, formatted)
-            }
-        },
-        {
-            id: 'actions',
-            cell: ({ row }) => {
-                return h(
-                    'div',
-                    { class: 'text-right' },
-                    h(
-                        UDropdownMenu,
-                        {
-                            content: {
-                                align: 'end'
-                            },
-                            items: getRowItems(row)
-                        },
-                        () =>
-                            h(UButton, {
-                                icon: 'i-lucide-ellipsis-vertical',
-                                color: 'neutral',
-                                variant: 'ghost',
-                                class: 'ml-auto'
-                            })
-                    )
-                )
+            label: 'Supprimer facture',
+            icon: 'i-lucide-trash',
+            color: 'error',
+            onSelect() {
+                deleteModel.value?.showDeleteModal([row.original.id])
             }
         }
     ]
+}
 
-    const statusFilter = ref('all')
 
-    watch(() => statusFilter.value, (newVal) => {
-        if (!table?.value?.tableApi) return
-
-        const statusColumn = table.value.tableApi.getColumn('status')
-        if (!statusColumn) return
-
-        if (newVal === 'all') {
-            statusColumn.setFilterValue(undefined)
-        } else {
-            statusColumn.setFilterValue(newVal)
+const columns: TableColumn<Invoice>[] = [
+    {
+        id: 'select',
+        header: ({ table }) =>
+            h(UCheckbox, {
+                'modelValue': table.getIsSomePageRowsSelected()
+                    ? 'indeterminate'
+                    : table.getIsAllPageRowsSelected(),
+                'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
+                    table.toggleAllPageRowsSelected(!!value),
+                'ariaLabel': 'Select all'
+            }),
+        cell: ({ row }) =>
+            h(UCheckbox, {
+                'modelValue': row.getIsSelected(),
+                'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
+                'ariaLabel': 'Select row'
+            })
+    },
+    {
+        accessorKey: 'name',
+        header: 'Nom',
+        cell: ({ row }) => {
+            return h('div', { class: 'flex items-center gap-3' }, [
+                h('p', { class: 'font-medium text-highlighted' }, row.original.name ?? ''),
+            ])
         }
-    })
+    },
+    {
+        accessorKey: 'supplier',
+        header: 'Fournisseur',
+        cell: ({ row, table }) => {
+            return h('div', { class: 'flex items-center gap-3' }, [
+                h('div', undefined, [
+                    h('p', { class: 'font-medium text-highlighted' }, row.original.supplier.name),
+                ])
+            ])
+        }
+    },
+    {
+        accessorKey: 'status',
+        header: 'Status',
+        filterFn: 'equals',
+        cell: ({ row }) => {
+            const statusColors = {
+                pending: 'warning' as const,
+                sent: 'error' as const,
+                validated: 'warning' as const,
+                paid: 'success' as const,
+                error: 'error' as const,
+            }
+            const color = statusColors[row.original.status as keyof typeof statusColors]
 
-    const pagination = ref({
-        pageIndex: 0,
-        pageSize: 10
-    })
+            return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
+                row.original.status
+            )
+        }
+    },
+    {
+        accessorKey: 'created_at',
+        header: ({ column }) => {
+            const isSorted = column.getIsSorted()
+
+            return h(UButton, {
+                color: 'neutral',
+                variant: 'ghost',
+                label: 'Date de création',
+                icon: isSorted
+                    ? isSorted === 'asc'
+                        ? 'i-lucide-arrow-up-narrow-wide'
+                        : 'i-lucide-arrow-down-wide-narrow'
+                    : 'i-lucide-arrow-up-down',
+                class: '-mx-2.5',
+                onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+            })
+        },
+        cell: ({ row }) => {
+            const date = new Date(row.getValue('created_at'))
+            return h('div', { class: 'text-muted' }, date.toLocaleDateString('fr-FR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }))
+        }
+    },
+    {
+        accessorKey: 'amount',
+        header: () => h('div', { class: 'text-right' }, 'Montant'),
+        cell: ({ row }) => {
+            const amount = Number.parseFloat(row.getValue('amount'))
+
+            const formatted = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'EUR'
+            }).format(amount)
+
+            return h('div', { class: 'text-right font-medium' }, formatted)
+        }
+    },
+    {
+        id: 'actions',
+        cell: ({ row }) => {
+            return h(
+                'div',
+                { class: 'text-right' },
+                h(
+                    UDropdownMenu,
+                    {
+                        content: {
+                            align: 'end'
+                        },
+                        items: getRowItems(row)
+                    },
+                    () =>
+                        h(UButton, {
+                            icon: 'i-lucide-ellipsis-vertical',
+                            color: 'neutral',
+                            variant: 'ghost',
+                            class: 'ml-auto'
+                        })
+                )
+            )
+        }
+    }
+]
+
+const statusFilter = ref('all')
+
+watch(() => statusFilter.value, (newVal) => {
+    if (!table?.value?.tableApi) return
+
+    const statusColumn = table.value.tableApi.getColumn('status')
+    if (!statusColumn) return
+
+    if (newVal === 'all') {
+        statusColumn.setFilterValue(undefined)
+    } else {
+        statusColumn.setFilterValue(newVal)
+    }
+})
+
+const pagination = ref({
+    pageIndex: 0,
+    pageSize: 10
+})
 </script>
 
 <template>
@@ -282,7 +282,7 @@
                             </template>
                         </UButton>
                     </InvoicesSendModal>
-                    <InvoicesDeleteModal
+                    <InvoicesDeleteModal ref="deleteModal"
                         :invoicesId="table?.tableApi?.getFilteredSelectedRowModel().rows.map(r => r.original.id) ?? []">
                         <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Supprimer"
                             color="error" variant="subtle" icon="i-lucide-trash">

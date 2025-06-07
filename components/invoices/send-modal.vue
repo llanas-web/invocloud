@@ -1,56 +1,57 @@
 <script setup lang="ts">
-    import * as z from 'zod'
-    import type { FormSubmitEvent } from '@nuxt/ui'
+import * as z from 'zod'
+import type { FormSubmitEvent } from '@nuxt/ui'
 
-    const { sendInvoice } = useInvoices()
-    const toast = useToast()
+const { sendInvoice } = useInvoices()
+const toast = useToast()
 
-    const props = withDefaults(defineProps<{
-        invoicesId?: string[]
-    }>(), {
-        invoicesId: () => []
-    })
+const props = withDefaults(defineProps<{
+    invoicesId?: string[]
+}>(), {
+    invoicesId: () => []
+})
 
-    const _invoicesId = ref<string[]>(props.invoicesId)
+const _invoicesId = ref<string[]>(props.invoicesId)
 
-    const open = ref(false)
+const open = ref(false)
 
-    const schema = z.object({
-        email: z.string().email()
-    })
+const schema = z.object({
+    email: z.string().email()
+})
 
-    type Schema = z.output<typeof schema>
+type Schema = z.output<typeof schema>
 
-    const state = reactive<Partial<Schema>>({
-        email: undefined
-    })
+const state = reactive<Partial<Schema>>({
+    email: undefined
+})
 
-    async function onSubmit(event: FormSubmitEvent<Schema>) {
-        const { email } = event.data
-        const response = await sendInvoice(_invoicesId.value, email)
-        if (!response) {
-            toast.add({ title: 'Error', description: 'Failed to send invoice', color: 'error' })
-            return
-        }
-        toast.add({ title: 'Success', description: `Invoice sent to ${email}`, color: 'success' })
-        state.email = undefined
-        open.value = false
+async function onSubmit(event: FormSubmitEvent<Schema>) {
+    const { email } = event.data
+    const response = await sendInvoice(_invoicesId.value, email)
+    if (!response) {
+        toast.add({ title: 'Error', description: 'Failed to send invoice', color: 'error' })
+        return
     }
+    toast.add({ title: 'Success', description: `Invoice sent to ${email}`, color: 'success' })
+    state.email = undefined
+    open.value = false
+}
 
 
-    function showSendInvoiceModal(_listInvoicesIdToSend: string[]) {
-        _invoicesId.value = _listInvoicesIdToSend
-        state.email = undefined
-        open.value = true
-    }
+function showSendInvoiceModal(_listInvoicesIdToSend: string[]) {
+    _invoicesId.value = _listInvoicesIdToSend
+    state.email = undefined
+    open.value = true
+}
 
-    defineExpose({
-        showSendInvoiceModal
-    })
+defineExpose({
+    showSendInvoiceModal
+})
 </script>
 
 <template>
-    <UModal v-model:open="open" title="Nouvelle facture" description="Add a new customer to the database">
+    <UModal v-model:open="open" :title="`Envoyer ${isPlural(_invoicesId.length, 'factures', 'facture')}`"
+        :description="`Envoyer un lien sécurisé de ${isPlural(_invoicesId.length, 'vos', 'votre')} ${isPlural(_invoicesId.length, 'factures', 'facture')} par email`">
         <slot />
         <template #body>
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">

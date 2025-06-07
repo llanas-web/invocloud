@@ -34,7 +34,6 @@ const _useInvoices = () => {
                 return data;
             },
             {
-                immediate: true,
                 default: () => [],
             },
         );

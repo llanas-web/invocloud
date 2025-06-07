@@ -35,7 +35,6 @@ const _useSuppliers = () => {
                 return data;
             },
             {
-                immediate: true,
                 default: () => [],
             },
         );

@@ -1,40 +1,40 @@
 <script setup lang="ts">
-    const { deleteInvoices } = useInvoices()
-    const toast = useToast()
+const { deleteInvoices } = useInvoices()
+const toast = useToast()
 
-    const props = withDefaults(defineProps<{
-        invoicesId?: string[]
-    }>(), {
-        invoicesId: () => []
+const props = withDefaults(defineProps<{
+    invoicesId?: string[]
+}>(), {
+    invoicesId: () => []
+})
+
+const open = ref(false)
+const _invoicesId = ref<string[]>(props.invoicesId)
+
+async function onSubmit() {
+    await deleteInvoices(_invoicesId.value)
+    toast.add({
+        title: 'Factures supprimées',
+        description: _invoicesId.value.length > 1 ?
+            'Les factures ont été supprimées.' : 'La facture a été supprimée.',
+        color: 'success'
     })
+}
 
-    const open = ref(false)
-    const _invoicesId = ref<string[]>(props.invoicesId)
+function showDeleteModal(listInvoicesIdToDelete: string[]) {
+    _invoicesId.value = listInvoicesIdToDelete
+    open.value = true
+}
 
-    async function onSubmit() {
-        await deleteInvoices(_invoicesId.value)
-        toast.add({
-            title: 'Factures supprimées',
-            description: _invoicesId.value.length > 1 ?
-                'Les factures ont été supprimées.' : 'La facture a été supprimée.',
-            color: 'success'
-        })
-    }
-
-    function showDeleteModal(listInvoicesIdToDelete: string[]) {
-        _invoicesId.value = listInvoicesIdToDelete
-        open.value = true
-    }
-
-    defineExpose({
-        showDeleteModal
-    })
+defineExpose({
+    showDeleteModal
+})
 </script>
 
 <template>
     <UModal v-model:open="open"
-        :title="`Suppression de ${_invoicesId.length} facture${_invoicesId.length > 1 ? 's' : ''}`"
-        description="Êtes-vous sûr de vouloir supprimer ces factures ?">
+        :title="`Suppression de ${_invoicesId.length} ${isPlural(_invoicesId.length, 'factures', 'facture')}`"
+        :description="`Êtes-vous sûr de vouloir supprimer ${isPlural(_invoicesId.length, 'ces', 'cette')} ${isPlural(_invoicesId.length, 'factures', 'facture')} ?`">
         <slot />
 
         <template #body>

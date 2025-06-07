@@ -42,7 +42,7 @@ defineExpose({ showFile })
         </template>
 
         <template #footer>
-            <div class="flex justify-end">
+            <div class="w-full flex justify-end">
                 <UButton label="Fermer" @click="open = false" />
             </div>
         </template>

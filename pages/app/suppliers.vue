@@ -16,7 +16,7 @@ const UCheckbox = resolveComponent('UCheckbox')
 
 const toast = useToast()
 const table = useTemplateRef('table')
-const { suppliers, refresh, pending, deleteSuppliers } = useSuppliers()
+const { suppliers, pending, deleteSuppliers } = useSuppliers()
 
 const columnFilters = ref([{
     id: 'email',
