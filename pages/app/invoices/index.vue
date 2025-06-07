@@ -47,7 +47,7 @@ function getRowItems(row: Row<Invoice>) {
         {
             label: 'Voir la facture',
             onSelect() {
-                viewerModal.value?.showFile(row.original)
+                return navigateTo(`/app/invoices/${row.original.id}`)
             },
             icon: 'i-lucide-eye',
 

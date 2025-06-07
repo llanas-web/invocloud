@@ -91,6 +91,7 @@ const _useInvoices = () => {
             .from("invoices")
             .insert([{
                 ...invoice,
+                status: "validated",
                 file_path: uploadData.path, // Store the file path
             }])
             .select()
@@ -169,6 +170,15 @@ const _useInvoices = () => {
         return data.signedUrl;
     };
 
+    const downloadInvoiceFile = async (filePath: string) => {
+        const { data: blob, error } = await supabaseClient.storage
+            .from("invoices")
+            .download(filePath);
+
+        if (error || !blob) throw error || new Error("No blob found");
+        return blob;
+    };
+
     return {
         invoices,
         refresh,
@@ -181,6 +191,7 @@ const _useInvoices = () => {
         deleteInvoices,
         sendInvoice,
         getInvoliceUrl,
+        downloadInvoiceFile,
     };
 };
 
