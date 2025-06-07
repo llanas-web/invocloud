@@ -32,18 +32,6 @@ const links = [
             }
         },
     ],
-    [
-        {
-            label: 'Deconnexion',
-            icon: 'i-lucide-log-out',
-            onSelect: async () => {
-                const supabaseClient = useSupabaseClient()
-                supabaseClient.auth.signOut()
-                open.value = false
-                navigateTo('/auth/login')
-            },
-        },
-    ]
 ]
 
 const groups = computed(() => [{

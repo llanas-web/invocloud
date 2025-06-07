@@ -7,22 +7,18 @@ defineProps<{
 
 const colorMode = useColorMode()
 const appConfig = useAppConfig()
+const supabaseUser = useSupabaseUser()
 
 const colors = ['red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose']
 const neutrals = ['slate', 'gray', 'zinc', 'neutral', 'stone']
 
 const user = ref({
-  name: 'Benjamin Canac',
-  avatar: {
-    src: 'https://github.com/benjamincanac.png',
-    alt: 'Benjamin Canac'
-  }
+  name: supabaseUser.value?.email,
 })
 
 const items = computed<DropdownMenuItem[][]>(() => ([[{
   type: 'label',
   label: user.value.name,
-  avatar: user.value.avatar
 }], [{
   label: 'Profile',
   icon: 'i-lucide-user'
@@ -106,41 +102,6 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   }]
 }],
 [{
-  label: 'Templates',
-  icon: 'i-lucide-layout-template',
-  children: [{
-    label: 'Starter',
-    to: 'https://ui-pro-starter.nuxt.dev/'
-  }, {
-    label: 'Landing',
-    to: 'https://landing-template.nuxt.dev/'
-  }, {
-    label: 'Docs',
-    to: 'https://docs-template.nuxt.dev/'
-  }, {
-    label: 'SaaS',
-    to: 'https://saas-template.nuxt.dev/'
-  }, {
-    label: 'Dashboard',
-    to: 'https://dashboard-template.nuxt.dev/',
-    checked: true,
-    type: 'checkbox'
-  }, {
-    label: 'Chat',
-    to: 'https://chat-template.nuxt.dev/'
-  }]
-}],
-[{
-  label: 'Documentation',
-  icon: 'i-lucide-book-open',
-  to: 'https://ui.nuxt.com/getting-started/installation/pro/nuxt',
-  target: '_blank'
-}, {
-  label: 'GitHub repository',
-  icon: 'i-simple-icons-github',
-  to: 'https://github.com/nuxt-ui-pro/dashboard',
-  target: '_blank'
-}, {
   label: 'Upgrade to Pro',
   icon: 'i-lucide-rocket',
   to: 'https://ui.nuxt.com/pro/purchase',
@@ -153,7 +114,8 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     const supabase = useSupabaseClient()
     supabase.auth.signOut()
   }
-}],]))
+}],
+]))
 </script>
 
 <template>
