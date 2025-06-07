@@ -11,7 +11,6 @@ const { invoices, updateInvoice } = useInvoices()
 
 const invoiceStatus = ref<{ label: string, value: InvoiceStatus, icon: string, class: string }[]>([
     { label: 'Payée', value: 'paid', icon: 'i-lucide-check-circle', class: 'text-green-500' },
-    { label: 'En attente', value: 'pending', icon: 'i-lucide-clock', class: 'text-yellow-500' },
     { label: 'Validée', value: 'validated', icon: 'i-lucide-check', class: 'text-blue-500' }
 ])
 const items = ref<BreadcrumbItem[]>([
@@ -119,7 +118,7 @@ const isDirty = computed(() => {
                 </UForm>
             </div>
             <div class="flex justify-end p-4 mt-auto space-x-4">
-                <UButton label="Annuler" color="neutral" variant="subtle" @click="$emit('cancel')" />
+                <UButton label="Annuler" color="neutral" variant="subtle" @click="navigateTo('/app/invoices')" />
                 <UButton label="Sauvegarder" color="success" @click="handleSave" :disabled="!isDisabled && !isDirty" />
             </div>
         </template>

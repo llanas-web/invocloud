@@ -60,15 +60,6 @@ function getRowItems(row: Row<Invoice>) {
             icon: 'i-lucide-pencil',
             children: [
                 {
-                    label: 'Marquer comme en attente',
-                    icon: 'i-lucide-clock',
-                    onSelect() {
-                        updateInvoice(row.original.id, {
-                            status: 'validated'
-                        })
-                    }
-                },
-                {
                     label: 'Marquer comme payé',
                     icon: 'i-lucide-check',
                     iconColor: 'success',
