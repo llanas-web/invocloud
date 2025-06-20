@@ -12,7 +12,8 @@ const _useEstablishments = () => {
         async () => {
             const { data, error } = await supabaseClient
                 .from("establishments")
-                .select(`*, suppliers (*)`);
+                .select("*")
+                .eq("creator_id", user.value!.id);
 
             if (error) {
                 console.error("Error fetching establishments:", error);
