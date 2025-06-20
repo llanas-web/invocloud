@@ -166,9 +166,9 @@ const pagination = ref({
 
         <template #body>
             <div class="flex flex-wrap items-center justify-between gap-1.5">
-                <UInput :model-value="(table?.tableApi?.getColumn('email')?.getFilterValue() as string)"
+                <!-- <UInput :model-value="(table?.tableApi?.getColumn('email')?.getFilterValue() as string)"
                     class="max-w-sm" icon="i-lucide-search" placeholder="Filter emails..."
-                    @update:model-value="table?.tableApi?.getColumn('email')?.setFilterValue($event)" />
+                    @update:model-value="table?.tableApi?.getColumn('email')?.setFilterValue($event)" /> -->
 
                 <div class="flex flex-wrap items-center gap-1.5">
                     <SuppliersDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">

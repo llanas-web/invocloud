@@ -31,6 +31,7 @@ const _useSuppliers = () => {
             {
                 default: () => [],
                 lazy: true,
+                watch: [selectedEstablishment],
             },
         );
 
