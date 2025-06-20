@@ -29,7 +29,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
 }, {
   label: 'Settings',
   icon: 'i-lucide-settings',
-  to: '/settings'
+  to: '/app/settings'
 }], [{
   label: 'Theme',
   icon: 'i-lucide-palette',
@@ -101,12 +101,6 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
       e.preventDefault()
     }
   }]
-}],
-[{
-  label: 'Upgrade to Pro',
-  icon: 'i-lucide-rocket',
-  to: 'https://ui.nuxt.com/pro/purchase',
-  target: '_blank'
 }],
 [{
   label: 'Déconnexion',
