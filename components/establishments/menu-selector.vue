@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { LazyEstablishmentsAddModal } from '#components';
 import type { DropdownMenuItem } from '@nuxt/ui'
 
 defineProps<{
@@ -6,6 +7,8 @@ defineProps<{
 }>()
 
 const { establishments, selectedEstablishment, pending } = useEstablishments()
+
+const addModel = useTemplateRef<typeof LazyEstablishmentsAddModal>('addModal')
 
 const items = computed<DropdownMenuItem[][]>(() => {
     return [
@@ -17,7 +20,10 @@ const items = computed<DropdownMenuItem[][]>(() => {
         }),
         ), [{
             label: 'Créer une structure',
-            icon: 'i-lucide-circle-plus'
+            icon: 'i-lucide-circle-plus',
+            onSelect() {
+                addModel.value?.showModal();
+            }
         }, {
             label: 'Gérer la structure',
             icon: 'i-lucide-cog'
@@ -40,4 +46,5 @@ const items = computed<DropdownMenuItem[][]>(() => {
                 trailingIcon: 'text-dimmed'
             }" />
     </UDropdownMenu>
+    <LazyEstablishmentsAddModal ref="addModal" />
 </template>

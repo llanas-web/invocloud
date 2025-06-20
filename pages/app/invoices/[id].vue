@@ -27,10 +27,10 @@ const items = ref<BreadcrumbItem[]>([
 ])
 
 const formInvoice = reactive<{
-    status: '' | InvoiceStatus,
+    status: InvoiceStatus,
     amount: number | null
 }>({
-    status: '',
+    status: 'pending',
     amount: null
 })
 const invoice = computed(() => invoices.value.find(i => i.id === route.params.id))
@@ -48,7 +48,7 @@ const handleSave = async () => {
 
     isLoading.value = true
     const updatedInvoice = await updateInvoice(invoice.value.id, {
-        status: formInvoice.status !== '' ? formInvoice.status : invoice.value.status,
+        status: formInvoice.status ? formInvoice.status : invoice.value.status,
         amount: formInvoice.amount !== null ? formInvoice.amount : invoice.value.amount
     })
     isLoading.value = false
@@ -93,7 +93,7 @@ const isDirty = computed(() => {
                 <UForm class="space-y-4" :state="formInvoice ?? {}" :disabled="isDisabled" :loading="isLoading">
                     <UFormField label="Fournisseur">
                         <USkeleton v-if="!invoice" class="w-full" />
-                        <UInput v-else :model-value="invoice.supplier?.name" icon="i-lucide-user" class="w-full"
+                        <UInput v-else :model-value="invoice.supplier_name" icon="i-lucide-user" class="w-full"
                             disabled />
                     </UFormField>
                     <UFormField label="Commentaire">

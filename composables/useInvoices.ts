@@ -1,6 +1,14 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { InvoiceInsert, InvoiceUpdate } from "~/types";
+import type {
+    InvoiceInsert,
+    InvoiceUpdate,
+    InvoiceWithEstablishment,
+} from "~/types";
 import type { Database } from "~/types/database.types";
+import {
+    acceptedStatus,
+    InvoiceWithEstablishmentSchema,
+} from "~/types/schemas/invoices";
 
 const _useInvoices = () => {
     const supabaseClient = useSupabaseClient<Database>();
@@ -12,31 +20,49 @@ const _useInvoices = () => {
             "invoices",
             async () => {
                 const { data, error } = await supabaseClient
-                    .from("invoices")
-                    .select(`
-                        *,
-                        supplier:suppliers (
-                            id,
-                            name,
-                            establishment:establishments (
-                                id
-                            )
-                        )
-                        `)
+                    .from("invoices_with_establishment")
+                    .select("*")
                     .eq(
-                        "supplier.establishment.id",
+                        "establishment_id",
                         selectedEstablishment.value!.id,
                     );
-                if (error) {
+                if (error || !data) {
                     console.error("Error fetching invoices:", error);
                     return [];
                 }
-                return data;
+                const parsedData = InvoiceWithEstablishmentSchema.array()
+                    .safeParse(
+                        data,
+                    );
+                if (!parsedData.success) {
+                    console.error(
+                        "Error parsing invoices data:",
+                        parsedData.error,
+                    );
+                    return [];
+                }
+                // If the establishment is not selected, return an empty array
+                return parsedData.data;
             },
             {
                 default: () => [],
             },
         );
+
+    const acceptedInvoices = computed(() =>
+        invoices.value?.filter((i) => acceptedStatus.includes(i.status!)) || []
+    );
+
+    watch(selectedEstablishment, (newEstablishment) => {
+        if (!newEstablishment) {
+            console.warn(
+                "No establishment selected. Invoices will not be fetched.",
+            );
+            return;
+        }
+        // Refresh invoices when the selected establishment changes
+        if (refresh) refresh();
+    }, { immediate: true });
 
     const pendingInvoices = computed(() =>
         invoices.value.filter((invoice) => invoice.status === "pending")
@@ -181,6 +207,7 @@ const _useInvoices = () => {
 
     return {
         invoices,
+        acceptedInvoices,
         refresh,
         pending,
         invoicesError,

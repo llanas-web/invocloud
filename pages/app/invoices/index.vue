@@ -18,11 +18,9 @@ const viewerModal = useTemplateRef<typeof LazyInvoicesViewerModal>('viewerModal'
 const sendModal = useTemplateRef<typeof LazyInvoicesSendModal>('sendModal')
 const deleteModel = useTemplateRef<typeof LazyInvoicesDeleteModal>('deleteModal')
 
-const { invoices, pending, updateInvoice, deleteInvoices } = useInvoices()
-declare type Invoice = NonNullable<(typeof invoices)['value']>[number];
+const { acceptedInvoices, pending, updateInvoice, deleteInvoices } = useInvoices()
+declare type Invoice = NonNullable<(typeof acceptedInvoices)['value']>[number];
 
-const acceptedStatus = ['validated', 'paid', 'error']
-const acceptedInvoices = computed(() => invoices.value?.filter(i => acceptedStatus.includes(i.status)) || [])
 
 const columnVisibility = ref()
 const rowSelection = ref({})
@@ -129,7 +127,7 @@ const columns: TableColumn<Invoice>[] = [
         cell: ({ row, table }) => {
             return h('div', { class: 'flex items-center gap-3' }, [
                 h('div', undefined, [
-                    h('p', { class: 'font-medium text-highlighted' }, row.original.supplier.name),
+                    h('p', { class: 'font-medium text-highlighted' }, row.original.supplier_name),
                 ])
             ])
         }
@@ -314,7 +312,6 @@ const pagination = ref({
                     </UDropdownMenu>
                 </div>
             </div>
-
             <UTable ref="table" v-model:column-visibility="columnVisibility" v-model:row-selection="rowSelection"
                 v-model:pagination="pagination" :pagination-options="{
                     getPaginationRowModel: getPaginationRowModel()

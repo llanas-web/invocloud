@@ -27,12 +27,19 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     open.value = false
     state.name = undefined
 }
+
+const showModal = () => {
+    open.value = true
+}
+
+defineExpose({
+    showModal
+})
 </script>
 
 <template>
     <UModal v-model:open="open" title="Créer une structure"
         description="Créer une nouvelle structure pour gérer vos factures et fournisseurs.">
-        <UButton label="Nouvelle structure" icon="i-lucide-plus" />
 
         <template #body>
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">

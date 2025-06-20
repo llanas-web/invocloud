@@ -25,6 +25,9 @@ export type InvoiceInsert = Database["public"]["Tables"]["invoices"]["Insert"];
 export type InvoiceUpdate = Database["public"]["Tables"]["invoices"]["Update"];
 export type InvoiceStatus = Database["public"]["Enums"]["invoices_status"];
 
+export type InvoiceWithEstablishment =
+    Database["public"]["Views"]["invoices_with_establishment"]["Row"];
+
 export interface Mail {
     id: number;
     unread?: boolean;

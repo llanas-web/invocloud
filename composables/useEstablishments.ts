@@ -41,6 +41,7 @@ const _useEstablishments = () => {
             console.error("Error creating establishment:", error);
             return null;
         }
+        refresh();
 
         return newEstablishment;
     };
