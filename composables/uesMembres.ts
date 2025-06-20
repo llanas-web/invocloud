@@ -2,6 +2,7 @@ import { createSharedComposable } from "@vueuse/core";
 
 const _useMembers = () => {
     const supabaseClient = useSupabaseClient();
+    const user = useSupabaseUser();
     const { selectedEstablishment } = useEstablishments();
 
     const { data: members, error, refresh } = useAsyncData(
@@ -24,10 +25,34 @@ const _useMembers = () => {
         },
     );
 
+    const inviteMember = async (email: string) => {
+        if (!email) {
+            console.error("Email is required to invite a member.");
+            return null;
+        }
+        const { data, error } = await useFetch(
+            "/api/members/invite",
+            {
+                method: "POST",
+                body: {
+                    email,
+                    establishmentId: selectedEstablishment.value!.id,
+                    invitorId: user.value!.id,
+                },
+            },
+        );
+        if (error.value) {
+            console.error("Error inviting member:", error.value);
+            return null;
+        }
+        return data.value;
+    };
+
     return {
         members,
         error,
         refresh,
+        inviteMember,
     };
 };
 
