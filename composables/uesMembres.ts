@@ -10,7 +10,7 @@ const _useMembers = () => {
         async () => {
             const { data, error } = await supabaseClient
                 .from("establishment_members")
-                .select("*")
+                .select("*, user:users(*)")
                 .eq("establishment_id", selectedEstablishment.value!.id);
 
             if (error) {
@@ -22,6 +22,7 @@ const _useMembers = () => {
         {
             default: () => [],
             watch: [selectedEstablishment],
+            lazy: true,
         },
     );
 
