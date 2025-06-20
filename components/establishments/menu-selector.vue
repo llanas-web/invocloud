@@ -2,23 +2,25 @@
 import type { LazyEstablishmentsAddModal } from '#components';
 import type { DropdownMenuItem } from '@nuxt/ui'
 
-defineProps<{
+const props = defineProps<{
     collapsed?: boolean
 }>()
 
 const { establishments, selectedEstablishment, pending } = useEstablishments()
+const { userSettings, toggleFavorite } = useUserSettings()
 
 const addModel = useTemplateRef<typeof LazyEstablishmentsAddModal>('addModal')
 
 const items = computed<DropdownMenuItem[][]>(() => {
     return [
         establishments.value.map(establishment => ({
+            id: establishment.id,
             label: establishment.name,
             onSelect() {
-                selectedEstablishment.value = establishment
-            }
-        }),
-        ), [{
+                selectedEstablishment.value = establishment;
+            },
+            isFavorite: userSettings.value.favorite_establishment_id === establishment.id,
+        })), [{
             label: 'Créer une structure',
             icon: 'i-lucide-circle-plus',
             onSelect() {
@@ -37,14 +39,23 @@ const items = computed<DropdownMenuItem[][]>(() => {
     </template>
     <UDropdownMenu v-else :items="items" :content="{ align: 'center', collisionPadding: 12 }"
         :ui="{ content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)' }">
+        <template #item="{ item }">
+            <div class="flex items-center justify-between w-full" @click="item.onSelect">
+                <span>{{ item.label }}</span>
+                <UButton v-if="item.id" :class="item.isFavorite ? '' : 'text-gray-400 dark:text-gray-600'"
+                    color="warning" variant="ghost" size="xs"
+                    :icon="item.isFavorite ? 'i-lucide-star' : 'i-lucide-star'" @click.stop="toggleFavorite(item.id)">
+                </UButton>
+            </div>
+        </template>
+
         <UButton v-bind="{
             ...selectedEstablishment,
             label: collapsed ? undefined : selectedEstablishment?.name,
-            trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down'
+            trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down',
         }" color="neutral" variant="ghost" block :square="collapsed" class="data-[state=open]:bg-elevated"
-            :class="[!collapsed && 'py-2']" :ui="{
-                trailingIcon: 'text-dimmed'
-            }" />
+            :class="[!collapsed && 'py-2']" :ui="{ trailingIcon: 'text-dimmed' }" />
     </UDropdownMenu>
+
     <LazyEstablishmentsAddModal ref="addModal" />
 </template>

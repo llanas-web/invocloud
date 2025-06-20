@@ -5,6 +5,7 @@ const _useEstablishments = () => {
     const supabaseClient = useSupabaseClient();
     const user = useSupabaseUser();
     const selectedEstablishment = ref<Establishment | null>(null);
+    const { userSettings } = useUserSettings();
 
     const { data: establishments, pending, refresh } = useAsyncData(
         "establishments",
@@ -17,8 +18,10 @@ const _useEstablishments = () => {
                 console.error("Error fetching establishments:", error);
                 return [];
             }
-            if (data.length === 1) {
-                selectedEstablishment.value = data[0] || null;
+            if (userSettings.value?.favorite_establishment_id) {
+                selectedEstablishment.value = data.find((est) =>
+                    est.id === userSettings.value.favorite_establishment_id
+                ) || null;
             }
             return data;
         },
