@@ -4,6 +4,7 @@ import type { UserUpdate } from "~/types";
 const _useUser = () => {
     const supabaseClient = useSupabaseClient();
     const user = useSupabaseUser();
+    const { logout } = useAuth();
 
     const { data: currentUser, error, refresh } = useAsyncData(async () => {
         const { data } = await supabaseClient
@@ -28,11 +29,25 @@ const _useUser = () => {
         return data;
     };
 
+    const deleteAccount = async () => {
+        const { data, error } = await useFetch("/api/user/delete-account", {
+            method: "POST",
+        });
+        if (error.value) {
+            console.error("Error deleting account:", error.value);
+            return false;
+        }
+        console.log("Account deleted successfully:", data.value);
+        await logout();
+        return true;
+    };
+
     return {
         currentUser,
         error,
         refresh,
         updateUser,
+        deleteAccount,
     };
 };
 

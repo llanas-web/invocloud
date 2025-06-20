@@ -53,6 +53,27 @@ const _useAuth = () => {
         return data;
     };
 
+    const resetPassword = async (newPassword: string) => {
+        const { data, error } = await useFetch("/api/user/reset-password", {
+            method: "POST",
+            body: {
+                password: newPassword,
+            },
+        });
+        if (error.value) {
+            toast.add({
+                title: "Erreur lors de la réinitialisation du mot de passe",
+                color: "error",
+            });
+            return null;
+        }
+        toast.add({
+            title: "Mot de passe réinitialisé",
+            color: "success",
+        });
+        return true;
+    };
+
     const logout = async () => {
         const { error } = await supabase.auth.signOut();
         if (!error) navigateTo("/auth/login");
@@ -64,6 +85,7 @@ const _useAuth = () => {
         session,
         login,
         signup,
+        resetPassword,
         logout,
     };
 };
