@@ -8,6 +8,7 @@ defineProps<{
 const colorMode = useColorMode()
 const appConfig = useAppConfig()
 const supabaseUser = useSupabaseUser()
+const { logout } = useAuth()
 
 const colors = ['red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose']
 const neutrals = ['slate', 'gray', 'zinc', 'neutral', 'stone']
@@ -110,10 +111,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
 [{
   label: 'Déconnexion',
   icon: 'i-lucide-log-out',
-  onSelect: () => {
-    const supabase = useSupabaseClient()
-    supabase.auth.signOut()
-  }
+  onSelect: logout
 }],
 ]))
 </script>

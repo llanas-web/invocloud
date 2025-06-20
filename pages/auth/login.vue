@@ -6,10 +6,7 @@ definePageMeta({
   layout: false,
 })
 
-const supabase = useSupabaseClient()
-
-const toast = useToast()
-
+const { login } = useAuth()
 const loading = ref(false)
 
 const fields = [{
@@ -38,17 +35,7 @@ type Schema = z.output<typeof schema>
 
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
   loading.value = true
-  const { error } = await supabase.auth.signInWithPassword({
-    email: payload.data.email,
-    password: payload.data.password,
-  })
-  if (error) toast.add({ title: 'Erreur lors de la connexion', description: error.message, color: 'error' })
-  else {
-    toast.add({ title: 'Succès', description: 'Connexion réussie', color: 'success' })
-    // Redirect to home page
-    navigateTo('/app')
-
-  };
+  await login(payload.data.email, payload.data.password)
   loading.value = false
 }
 </script>
