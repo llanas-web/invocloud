@@ -26,8 +26,8 @@ const _useAuth = () => {
     const signup = async (
         email: string,
         password: string,
-        full_name: string,
         establishment_name: string,
+        full_name: string,
     ) => {
         const { data, error } = await supabase.auth.signUp({
             email: email,
