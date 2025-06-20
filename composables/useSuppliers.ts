@@ -1,10 +1,4 @@
 import { createSharedComposable } from "@vueuse/core";
-import type {
-    Supplier,
-    SupplierInsert,
-    SupplierMember,
-    SupplierMemberInsert,
-} from "~/types";
 
 const _useSuppliers = () => {
     const supabaseClient = useSupabaseClient();
@@ -36,6 +30,7 @@ const _useSuppliers = () => {
             },
             {
                 default: () => [],
+                lazy: true,
             },
         );
 

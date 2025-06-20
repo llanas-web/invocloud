@@ -46,23 +46,14 @@ const _useInvoices = () => {
             },
             {
                 default: () => [],
+                watch: [selectedEstablishment],
+                lazy: true,
             },
         );
 
     const acceptedInvoices = computed(() =>
         invoices.value?.filter((i) => acceptedStatus.includes(i.status!)) || []
     );
-
-    watch(selectedEstablishment, (newEstablishment) => {
-        if (!newEstablishment) {
-            console.warn(
-                "No establishment selected. Invoices will not be fetched.",
-            );
-            return;
-        }
-        // Refresh invoices when the selected establishment changes
-        if (refresh) refresh();
-    }, { immediate: true });
 
     const pendingInvoices = computed(() =>
         invoices.value.filter((invoice) => invoice.status === "pending")

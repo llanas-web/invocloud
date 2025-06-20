@@ -1,5 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { Establishment } from "~/types";
+import type { Establishment, EstablishmentUpdate } from "~/types";
 
 const _useEstablishments = () => {
     const supabaseClient = useSupabaseClient();
@@ -19,15 +19,23 @@ const _useEstablishments = () => {
                 console.error("Error fetching establishments:", error);
                 return [];
             }
-            if (userSettings.value?.favorite_establishment_id) {
+            if (
+                !selectedEstablishment.value &&
+                userSettings.value?.favorite_establishment_id
+            ) {
                 selectedEstablishment.value = data.find((est) =>
                     est.id === userSettings.value.favorite_establishment_id
+                ) || null;
+            } else if (selectedEstablishment.value != null) {
+                selectedEstablishment.value = data.find((est) =>
+                    est.id === selectedEstablishment.value!.id
                 ) || null;
             }
             return data;
         },
         {
             immediate: true,
+            server: true,
             default: () => [],
         },
     );
@@ -50,12 +58,27 @@ const _useEstablishments = () => {
         return newEstablishment;
     };
 
+    const updateEstablishment = async (
+        establishment: Partial<EstablishmentUpdate>,
+    ) => {
+        const { data, error } = await supabaseClient.from("establishments")
+            .update(establishment)
+            .eq("id", selectedEstablishment.value!.id)
+            .select()
+            .single();
+        if (!error && data) {
+            await refresh();
+        }
+        return { data, error };
+    };
+
     return {
         establishments,
         selectedEstablishment,
         pending,
         refresh,
         createEstablishment,
+        updateEstablishment,
     };
 };
 

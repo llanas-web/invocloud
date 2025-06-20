@@ -9,6 +9,8 @@ export type Establishment =
     Database["public"]["Tables"]["establishments"]["Row"];
 export type EstablishmentInsert =
     Database["public"]["Tables"]["establishments"]["Insert"];
+export type EstablishmentUpdate =
+    Database["public"]["Tables"]["establishments"]["Update"];
 
 export type Supplier = Database["public"]["Tables"]["suppliers"]["Row"];
 export type SupplierInsert =

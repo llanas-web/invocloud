@@ -19,14 +19,12 @@ const _useUser = () => {
         const { data, error: updateError } = await supabaseClient
             .from("users")
             .update(updates)
-            .eq("id", user.value!.id)
-            .select()
-            .single();
+            .eq("id", user.value!.id);
         if (updateError) {
             console.error("Error updating user:", updateError);
             return null;
         }
-        currentUser.value = data;
+        await refresh();
         return data;
     };
 

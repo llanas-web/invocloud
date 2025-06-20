@@ -8,14 +8,14 @@ definePageMeta({
 })
 
 const links = [[{
-  label: 'General',
+  label: 'Generale',
   icon: 'i-lucide-user',
   to: '/app/settings',
   exact: true
 }, {
-  label: 'Members',
+  label: 'Établissements',
   icon: 'i-lucide-users',
-  to: '/app/settings/members'
+  to: '/app/settings/establishments'
 }, {
   label: 'Notifications',
   icon: 'i-lucide-bell',
