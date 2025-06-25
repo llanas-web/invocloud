@@ -14,7 +14,7 @@ const links = [[{
   exact: true
 }, {
   label: 'Établissements',
-  icon: 'i-lucide-users',
+  icon: 'i-lucide-building',
   to: '/app/settings/establishments'
 }, {
   label: 'Notifications',

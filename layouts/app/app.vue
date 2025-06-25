@@ -2,7 +2,32 @@
 import type { NavigationMenuItem } from '@nuxt/ui'
 
 const route = useRoute()
+
+// get the subscription_success from the query params
+const subscriptionSuccess = route.query.subscription_success === 'true'
 const toast = useToast()
+
+onMounted(() => {
+    if (subscriptionSuccess) {
+        toast.add({
+            icon: 'i-lucide-check-circle',
+            title: 'Abonnement activé! 🎉',
+            description: 'Votre abonnement a été activé avec succès.',
+            color: 'success',
+            duration: 5000,
+            actions: [{
+                label: 'Gérer les abonnements',
+                color: 'neutral',
+                variant: 'outline',
+                icon: 'i-lucide-settings',
+                size: 'sm',
+                onClick: () => {
+                    navigateTo('/app/settings/establishments#subscriptions')
+                }
+            }]
+        })
+    }
+})
 
 const open = ref(false)
 
@@ -46,8 +71,8 @@ const links = ref<NavigationMenuItem[]>([
                 open.value = false
             }
         }, {
-            label: 'Members',
-            to: '/app/settings/members',
+            label: 'Établissements',
+            to: '/app/settings/establishments',
             onSelect: () => {
                 open.value = false
             }

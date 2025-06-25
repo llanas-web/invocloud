@@ -72,6 +72,63 @@ const _useEstablishments = () => {
         return { data, error };
     };
 
+    const subscribeToStripe = async () => {
+        const { url }: { url: string } = await $fetch(
+            "/api/stripe/subscription/create",
+            {
+                method: "POST",
+                body: {
+                    establishmentId: selectedEstablishment.value?.id,
+                },
+            },
+        );
+        if (!url) {
+            console.error(
+                "Error creating Stripe subscription:",
+            );
+            return null;
+        }
+        window.location.href = url;
+        return null;
+    };
+
+    const cancelStripeTrial = async () => {
+        const { success, message }: { success: boolean; message: string } =
+            await $fetch(
+                "/api/stripe/trial/cancel",
+                {
+                    method: "POST",
+                    body: {
+                        establishmentId: selectedEstablishment.value?.id,
+                    },
+                },
+            );
+        if (!success) {
+            console.error("Error canceling Stripe trial:", message);
+        }
+        return { success, message };
+    };
+
+    const cancelStripeSubscription = async () => {
+        const { success, message }: { success: boolean; message: string } =
+            await $fetch(
+                "/api/stripe/subscription/cancel",
+                {
+                    method: "POST",
+                    body: {
+                        establishmentId: selectedEstablishment.value?.id,
+                    },
+                },
+            );
+        if (!success) {
+            console.error(
+                "Error canceling Stripe subscription:",
+                message,
+            );
+        }
+        return { success, message };
+    };
+
     return {
         establishments,
         selectedEstablishment,
@@ -79,6 +136,9 @@ const _useEstablishments = () => {
         refresh,
         createEstablishment,
         updateEstablishment,
+        subscribeToStripe,
+        cancelStripeTrial,
+        cancelStripeSubscription,
     };
 };
 

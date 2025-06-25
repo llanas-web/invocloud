@@ -8,6 +8,8 @@ import { EstablishmentsMembersInviteForm } from '#components'
   <div class="flex flex-col gap-8">
     <EstablishmentsInfosForm />
     <USeparator />
+    <EstablishmentsBillingSubscription />
+    <USeparator />
     <EstablishmentsMembersInviteForm />
     <EstablishmentsMembersList />
   </div>
