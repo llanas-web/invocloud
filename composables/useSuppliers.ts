@@ -12,7 +12,6 @@ const _useSuppliers = () => {
                     .from("suppliers")
                     .select(`
                         *,
-                        members:supplier_members (*),
                         establishment:establishments (
                             id,
                             name
@@ -25,7 +24,7 @@ const _useSuppliers = () => {
                     console.error("Error fetching suppliers:", error);
                     return [];
                 }
-                console.log("Fetched suppliers:", data[0].members);
+                console.log("Fetched suppliers:", data);
                 return data;
             },
             {
@@ -50,23 +49,11 @@ const _useSuppliers = () => {
             .insert([{
                 name,
                 establishment_id: selectedEstablishment.value!.id,
+                emails: emails,
             }]).select().single();
 
         if (error) {
             console.error("Error creating supplier:", error);
-            return null;
-        }
-
-        const { error: membersError } = await supabaseClient
-            .from("supplier_members")
-            .insert(
-                emails.map((email) => ({
-                    email,
-                    supplier_id: data.id,
-                })),
-            );
-        if (membersError) {
-            console.error("Error creating supplier members:", membersError);
             return null;
         }
         await refresh();

@@ -16,35 +16,27 @@ export default defineEventHandler(async (event) => {
 
     const hashedCode = hashCode(token);
 
-    const { data: uploadValidation } = await supabase
-        .from("upload_validations")
-        .select(`
-            id,
-            filePath:file_path,
-            supplier:suppliers (
-                id,
-                establishment:establishments (
-                    id,
-                    name
-                )
-            )
-        `)
-        .eq("id", uploadValidationId)
-        .eq("token_hash", hashedCode)
-        .maybeSingle();
+    const { data: uploadValidation, error: uploadValidationError } =
+        await supabase
+            .from("upload_validations")
+            .select("*")
+            .eq("id", uploadValidationId)
+            .eq("token_hash", hashedCode)
+            .maybeSingle();
 
-    if (!uploadValidation) {
+    if (uploadValidationError || !uploadValidation) {
         throw createError({
             status: 404,
-            message: "File not found or token expired",
+            message: uploadValidationError?.message ||
+                "File not found or token expired",
         });
     }
 
     const { data: uploadUrl } = await supabase
         .storage
-        .from("invoices")
+        .from("pending-invoices")
         .createSignedUploadUrl(
-            uploadValidation.filePath,
+            uploadValidation.file_path,
         );
 
     if (!uploadUrl) {

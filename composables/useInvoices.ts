@@ -55,10 +55,41 @@ const _useInvoices = () => {
         invoices.value?.filter((i) => acceptedStatus.includes(i.status!)) || []
     );
 
-    const pendingInvoices = computed(() =>
-        invoices.value.filter((invoice) => invoice.status === "pending")
-    );
-
+const { data: pendingInvoices, error: pendingInvoicesError } =
+        useAsyncData(
+            "pending-invoices",
+            async () => {
+                const { data, error } = await supabaseClient
+                    .from("upload_validations")
+                    .select("*")
+                    .eq(
+                        "establishment_id",
+                        selectedEstablishment.value!.id,
+                    );
+                if (error || !data) {
+                    console.error("Error fetching invoices:", error);
+                    return [];
+                }
+                const parsedData = InvoiceWithEstablishmentSchema.array()
+                    .safeParse(
+                        data,
+                    );
+                if (!parsedData.success) {
+                    console.error(
+                        "Error parsing invoices data:",
+                        parsedData.error,
+                    );
+                    return [];
+                }
+                // If the establishment is not selected, return an empty array
+                return parsedData.data;
+            },
+            {
+                default: () => [],
+                watch: [selectedEstablishment],
+                lazy: true,
+            },
+        );
     const getInvoices = async () => {
         await refresh();
     };

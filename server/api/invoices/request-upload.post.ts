@@ -1,6 +1,9 @@
-import { serverSupabaseClient } from "#supabase/server";
+import {
+    serverSupabaseClient,
+    serverSupabaseServiceRole,
+} from "#supabase/server";
 import { z } from "zod";
-import { Supplier, SupplierMember, User } from "~/types";
+import { User } from "~/types";
 import { Database } from "~/types/database.types";
 import { generateCode, hashCode } from "~/utils/hash";
 
@@ -14,7 +17,7 @@ type SupabaseClient = Awaited<
     ReturnType<typeof serverSupabaseClient<Database>>
 >;
 
-export default defineEventHandler(async (event) => {
+const parseBody = async (event: any) => {
     const body = await readBody<typeof schema>(event);
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
@@ -24,9 +27,15 @@ export default defineEventHandler(async (event) => {
             message: "Invalid request data",
         });
     }
-    const { sendorEmail, recipientEmail, comment } = parsed.data;
+    return parsed.data;
+};
 
+export default defineEventHandler(async (event) => {
+    const { sendorEmail, recipientEmail, comment } = await parseBody(event);
     const supabase = await serverSupabaseClient<Database>(event);
+    const supabaseServiceRole = serverSupabaseServiceRole<Database>(
+        event,
+    );
 
     // 1. Check if user is authenticated
     const { data: anonymousUser, error: authError } = await supabase.auth
@@ -40,8 +49,9 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    const { data: recipientUser, error: recipientError } = await supabase
-        .from("users").select().eq("email", recipientEmail).single();
+    const { data: recipientUser, error: recipientError } =
+        await supabaseServiceRole
+            .from("users").select().eq("email", recipientEmail).single();
 
     if (recipientError || !recipientUser) {
         console.error("Recipient user retrieval error:", recipientError);
@@ -51,34 +61,23 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    // 2. Check if recipient has an establishment
-    const { data: establishment, error: recipientSupplierError } =
-        await supabase
-            .from("establishments").select().eq("creator_id", recipientUser?.id)
-            .single();
-
-    if (recipientSupplierError || !establishment) {
-        console.error(
-            "Authentication or user retrieval error:",
-            authError || recipientError || recipientSupplierError,
-        );
-        throw createError({
-            status: 401,
-            message: "Unauthorized or user not found",
-        });
-    }
-
     // 1. Check permission
-    const allowedSupplier = await isSendorEmailDomainAllowed(
-        supabase,
-        sendorEmail,
-        establishment.id,
-    );
-    if (!allowedSupplier) {
-        console.error("Sender's email domain is not allowed.");
+    const { data: establishments, error: establishmentsError } =
+        await supabaseServiceRole
+            .rpc(
+                "check_sender_authorized",
+                {
+                    sender_email: sendorEmail,
+                    recipient_email: recipientUser.email,
+                },
+            );
+
+    if (establishmentsError || !establishments || establishments.length === 0) {
+        console.error("Permission check error:", establishmentsError);
         throw createError({
             status: 403,
-            message: "Forbidden: Sender's email domain is not allowed",
+            message:
+                "You are not authorized to upload invoices for this recipient",
         });
     }
 
@@ -97,9 +96,14 @@ export default defineEventHandler(async (event) => {
                 token_hash: hashedCode,
                 token_expires_at: expiresAt.toISOString(),
                 comment: comment || null,
-                supplier_id: allowedSupplier.supplier.id,
-                file_path:
-                    `${allowedSupplier.supplier.establishment.id}/${newInvoiceId}`,
+                suppliers: establishments.map((establishments) =>
+                    establishments.supplier_id
+                ),
+                file_path: `${newInvoiceId}`,
+                establishments: establishments.map(
+                    (establishment) => establishment.establishment_id,
+                ),
+                recipient_email: recipientEmail,
             })
             .select()
             .single();
@@ -147,35 +151,3 @@ export default defineEventHandler(async (event) => {
     };
     return response;
 });
-
-async function isSendorEmailDomainAllowed(
-    supabaseClient: SupabaseClient,
-    sendorEmail: string,
-    establishmentId: string,
-) {
-    // Check if the sender's email domain matches the supplier's email domain
-    const sendorDomain = sendorEmail.split("@")[1];
-    const { data: supplier, error: supplierError } = await supabaseClient
-        .from("supplier_members")
-        .select(`
-            *,
-            supplier:suppliers(
-                id,
-                establishment:establishments(
-                    id,
-                    name
-                )
-            )
-        `)
-        .eq("supplier.establishment.id", establishmentId)
-        .or(
-            `email.eq.${sendorEmail},email.eq.*${sendorDomain}`,
-        )
-        .single();
-    if (supplierError) {
-        console.error("Error fetching supplier:", supplierError);
-        return null;
-    }
-    console.log("Supplier found:", supplier);
-    return supplier;
-}

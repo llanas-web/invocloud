@@ -51,7 +51,7 @@ const fileFormState = reactive<Partial<FileFormSchema>>({
 async function submitFileForm() {
     const { sendorEmail, recipientEmail, comment } = fileFormState
     try {
-        const { upload_validation_id } = await $fetch('/api/request-upload', {
+        const { upload_validation_id, expires_at, success } = await $fetch<ReturnType<typeof import('~/server/api/invoices/request-upload.post').default>>('/api/invoices/request-upload', {
             method: 'POST',
             body: {
                 sendorEmail,
@@ -83,7 +83,7 @@ const confirmFormState = reactive<Partial<ConfirmFormSchema>>({
 async function submitConfirmForm(event: FormSubmitEvent<ConfirmFormSchema>) {
     const { confirmToken } = event.data
     try {
-        const { fileName, url } = await $fetch('/api/upload-invoices', {
+        const { fileName, url } = await $fetch<ReturnType<typeof import('~/server/api/invoices/upload.post').default>>('/api/invoices/upload', {
             method: 'POST',
             body: {
                 uploadValidationId: sharedUploadValidationId.value,

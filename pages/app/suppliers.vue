@@ -18,10 +18,10 @@ const toast = useToast()
 const table = useTemplateRef('table')
 const { suppliers, pending, deleteSuppliers } = useSuppliers()
 
-const columnFilters = ref([{
-    id: 'email',
-    value: ''
-}])
+// const columnFilters = ref([{
+//     id: 'emails',
+//     value: ''
+// }])
 const columnVisibility = ref()
 const rowSelection = ref()
 
@@ -103,6 +103,13 @@ const columns: TableColumn<Supplier>[] = [
         }
     },
     {
+        accessorKey: 'emails',
+        header: 'Emails',
+        cell: ({ row }) => {
+            return h('span', { class: 'text-muted' }, row.original.emails.join(', '))
+        }
+    },
+    {
         id: 'actions',
         cell: ({ row }) => {
             return h(
@@ -166,9 +173,9 @@ const pagination = ref({
 
         <template #body>
             <div class="flex flex-wrap items-center justify-between gap-1.5">
-                <!-- <UInput :model-value="(table?.tableApi?.getColumn('email')?.getFilterValue() as string)"
+                <!-- <UInput :model-value="(table?.tableApi?.getColumn('emails')?.getFilterValue() as string)"
                     class="max-w-sm" icon="i-lucide-search" placeholder="Filter emails..."
-                    @update:model-value="table?.tableApi?.getColumn('email')?.setFilterValue($event)" /> -->
+                    @update:model-value="table?.tableApi?.getColumn('emails')?.setFilterValue($event)" /> -->
 
                 <div class="flex flex-wrap items-center gap-1.5">
                     <SuppliersDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
@@ -204,8 +211,8 @@ const pagination = ref({
                 </div>
             </div>
 
-            <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
-                v-model:row-selection="rowSelection" v-model:pagination="pagination" :pagination-options="{
+            <UTable ref="table" v-model:column-visibility="columnVisibility" v-model:row-selection="rowSelection"
+                v-model:pagination="pagination" :pagination-options="{
                     getPaginationRowModel: getPaginationRowModel()
                 }" class="shrink-0" :data="suppliers ?? undefined" :columns="columns" :loading="pending" :ui="{
                     base: 'table-fixed border-separate border-spacing-0',
