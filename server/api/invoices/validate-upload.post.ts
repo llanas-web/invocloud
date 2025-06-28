@@ -37,11 +37,13 @@ export default defineEventHandler(async (event) => {
         });
     }
 
+    const filePath = `${selectedEstablishmentId}/${uploadValidation.id}`;
+
     const { data: uploadUrl } = await supabase
         .storage
-        .from("pending-invoices")
+        .from("invoices")
         .createSignedUploadUrl(
-            uploadValidation.file_path,
+            filePath,
         );
 
     if (!uploadUrl) {
@@ -54,6 +56,7 @@ export default defineEventHandler(async (event) => {
     await supabase.from("upload_validations").update({
         status: "uploaded",
         selected_establishment: selectedEstablishmentId,
+        file_path: filePath,
     }).eq("id", uploadValidationId);
 
     const response = {

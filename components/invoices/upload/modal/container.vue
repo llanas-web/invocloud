@@ -1,7 +1,6 @@
 <script setup lang="ts">
-const { stepIndex, isLoading, onPrev, onValidate } = useUploadInvoice()
+const { open, stepIndex, isLoading, onPrev, onValidate } = useInvoiceUpload()
 
-const open = ref(false)
 const props = defineProps<{
     size?: 'sm' | 'md' | 'lg' | 'xl'
 }>()
@@ -54,7 +53,7 @@ const stepItems = ref([
             </UStepper>
         </template>
         <template #footer>
-            <UButton label="Annuler" color="neutral" variant="subtle" @click="onPrev" :loading="isLoading" />
+            <UButton label="Annuler" color="neutral" variant="subtle" @click="onPrev" :disabled="isLoading" />
             <UButton label="Envoyer" color="primary" variant="solid" @click="onValidate" :loading="isLoading" />
         </template>
     </UModal>

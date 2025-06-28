@@ -5,8 +5,7 @@ definePageMeta({
     layout: 'app'
 })
 
-const { invoice, isLoading, invoiceId } = useInvoiceDetails()
-const { isDirty, onSubmit, isDisabled } = useInvoiceUpdate()
+const { formState, invoiceFile, isLoading, isDirty, onSubmit } = useInvoiceCreate()
 
 const items = ref<BreadcrumbItem[]>([
     {
@@ -15,14 +14,37 @@ const items = ref<BreadcrumbItem[]>([
         to: '/app/invoices'
     },
     {
-        label: `Détails Facture`,
+        label: `Nouvelle Facture`,
         icon: 'i-lucide-file-text',
-        to: `/app/invoices/${invoice.value?.id}`
     }
 ])
+
+const fileUrl = computed(() => invoiceFile.value ? URL.createObjectURL(invoiceFile.value) : '')
+const fileType = computed(() => invoiceFile.value ? invoiceFile.value.type : '')
+const fileName = computed(() => invoiceFile.value ? invoiceFile.value.name : 'example.pdf')
+
+const onFileChange = (event: Event) => {
+    const target = event.target as HTMLInputElement
+    const file = target.files ? target.files[0] : null
+
+    if (file) {
+        invoiceFile.value = file
+        formState.name = file.name
+    } else {
+        invoiceFile.value = null
+        formState.name = ''
+    }
+}
+
+const triggerFilePicker = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.onchange = onFileChange
+    input.click()
+}
 </script>
 <template>
-    <UDashboardPanel :id="`invoices-${invoiceId}`" :default-size="25" :min-size="20" :max-size="100" resizable>
+    <UDashboardPanel id="invoices-new" :default-size="25" :min-size="20" :max-size="100" resizable>
         <template #header>
             <UDashboardNavbar :ui="{ right: 'gap-3' }">
                 <template #leading>
@@ -40,18 +62,20 @@ const items = ref<BreadcrumbItem[]>([
                 <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
                     <UIcon name="i-lucide-file-text" class="text-primary" /> Détails de la facture
                 </h2>
-                <InvoicesDetailsUpdateForm />
+                <InvoicesDetailsCreateForm />
             </div>
             <div class="flex justify-end p-4 mt-auto space-x-4">
                 <UButton label="Annuler" color="neutral" variant="subtle" :disabled="isLoading"
                     @click="navigateTo('/app/invoices')" />
                 <UButton label="Sauvegarder" color="success" :loading="isLoading" @click="onSubmit"
-                    :disabled="!isDisabled && !isDirty" />
+                    :disabled="!isDirty" />
             </div>
         </template>
     </UDashboardPanel>
-    <template v-if="invoice">
-        <InvoicesDetailsInvoiceViewer :invoice="invoice" />
-    </template>
-
+    <div v-if="fileUrl" class="bg-white shadow w-full ">
+        <CommonFileViewer :fileUrl="fileUrl" :fileType="fileType" :fileName="fileName" />
+    </div>
+    <div v-else class="bg-white shadow w-full flex items-center justify-center p-4">
+        <UButton icon="i-lucide-plus" class="rounded-full" size="lg" @click="triggerFilePicker" />
+    </div>
 </template>

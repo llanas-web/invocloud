@@ -1,9 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import type {
-    InvoiceInsert,
-    InvoiceUpdate,
-    InvoiceWithEstablishment,
-} from "~/types";
+import type { InvoiceInsert, InvoiceUpdate } from "~/types";
 import type { Database } from "~/types/database.types";
 import {
     acceptedStatus,
@@ -55,41 +51,10 @@ const _useInvoices = () => {
         invoices.value?.filter((i) => acceptedStatus.includes(i.status!)) || []
     );
 
-const { data: pendingInvoices, error: pendingInvoicesError } =
-        useAsyncData(
-            "pending-invoices",
-            async () => {
-                const { data, error } = await supabaseClient
-                    .from("upload_validations")
-                    .select("*")
-                    .eq(
-                        "establishment_id",
-                        selectedEstablishment.value!.id,
-                    );
-                if (error || !data) {
-                    console.error("Error fetching invoices:", error);
-                    return [];
-                }
-                const parsedData = InvoiceWithEstablishmentSchema.array()
-                    .safeParse(
-                        data,
-                    );
-                if (!parsedData.success) {
-                    console.error(
-                        "Error parsing invoices data:",
-                        parsedData.error,
-                    );
-                    return [];
-                }
-                // If the establishment is not selected, return an empty array
-                return parsedData.data;
-            },
-            {
-                default: () => [],
-                watch: [selectedEstablishment],
-                lazy: true,
-            },
-        );
+    const pendingInvoices = computed(() =>
+        invoices.value?.filter((i) => i.status === "pending") || []
+    );
+
     const getInvoices = async () => {
         await refresh();
     };
@@ -186,7 +151,9 @@ const { data: pendingInvoices, error: pendingInvoicesError } =
             console.error("Invoice IDDs are required to send invoices.");
             return null;
         }
-        const { data, message, success } = await $fetch(
+        const { data, message, success } = await $fetch<
+            ReturnType<typeof import("~/server/api/invoices/send.post").default>
+        >(
             `/api/send-invoices/`,
             {
                 method: "POST",

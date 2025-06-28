@@ -100,7 +100,6 @@ export default defineEventHandler(async (event) => {
                 suppliers: establishments.map((establishments) =>
                     establishments.supplier_id
                 ),
-                file_path: `${newInvoiceId}`,
                 establishments: establishments.map(
                     (establishment) => establishment.establishment_id,
                 ),

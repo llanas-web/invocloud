@@ -2,7 +2,7 @@ import { createSharedComposable } from "@vueuse/core";
 import type { Establishment } from "~/types";
 import { FetchError } from "ofetch";
 
-const _useUploadInvoice = () => {
+const _useInvoiceUpload = () => {
     const toast = useToast();
     const open = ref(false);
     const stepIndex = ref(0);
@@ -25,6 +25,7 @@ const _useUploadInvoice = () => {
     });
 
     const submitFormStep = async () => {
+        isLoading.value = true;
         try {
             const { upload_validation_id, expires_at, success } = await $fetch<
                 ReturnType<
@@ -56,6 +57,7 @@ const _useUploadInvoice = () => {
     };
 
     const submitTokenStep = async () => {
+        isLoading.value = true;
         try {
             const { uploadValidation, establishments } = await $fetch<
                 ReturnType<
@@ -89,11 +91,11 @@ const _useUploadInvoice = () => {
             return;
         } finally {
             isLoading.value = false;
-            open.value = false;
         }
     };
 
     const confirmUpload = async () => {
+        isLoading.value = true;
         if (!confirmState.establishmentId) {
             toast.add({
                 title: "Error",
@@ -145,6 +147,8 @@ const _useUploadInvoice = () => {
                     : "Failed to request upload",
                 color: "error",
             });
+        } finally {
+            isLoading.value = false;
         }
     };
 
@@ -195,6 +199,6 @@ const _useUploadInvoice = () => {
     };
 };
 
-export const useUploadInvoice = createSharedComposable(
-    _useUploadInvoice,
+export const useInvoiceUpload = createSharedComposable(
+    _useInvoiceUpload,
 );

@@ -23,6 +23,7 @@ export const InvoiceWithEstablishmentSchema = z.object({
     supplier_id: z.string().uuid(),
     supplier_name: z.string(),
     establishment_id: z.string().uuid(),
+    taxe_amount: z.number(),
 });
 
 export type InvoiceWithEstablishment = z.infer<
