@@ -45,17 +45,6 @@ function getRowItems(row: Row<Supplier>) {
             type: 'separator'
         },
         {
-            label: 'View supplier details',
-            icon: 'i-lucide-list'
-        },
-        {
-            label: 'View supplier payments',
-            icon: 'i-lucide-wallet'
-        },
-        {
-            type: 'separator'
-        },
-        {
             label: 'Delete supplier',
             icon: 'i-lucide-trash',
             color: 'error',
