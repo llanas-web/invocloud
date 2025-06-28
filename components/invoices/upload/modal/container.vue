@@ -36,7 +36,9 @@ const stepItems = ref([
         description="Envoyez des fichiers de factures en toute sécurité aux parties prenantes"
         :ui="{ footer: 'justify-end' }">
         <UButton label="Envoyer des factures" trailing-icon="i-lucide-send" :size="props.size ?? 'xl'" color="neutral"
-            variant="subtle" />
+            variant="subtle" :ui="{
+                label: 'hidden md:block'
+            }" />
 
         <template #body>
             <UStepper v-model="stepIndex" ref="stepper" :items="stepItems" size="sm">

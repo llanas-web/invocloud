@@ -11,25 +11,20 @@ definePageMeta({
 
 <template>
     <UApp>
-        <UHeader>
+        <UHeader :toggle="false">
             <template #left>
                 <NuxtLink to="/">
                     <h2 class="font-bold text-2xl">InvoCloud</h2>
                 </NuxtLink>
-
-                <!-- <TemplateMenu /> -->
             </template>
-
             <template #right>
-                <template v-if="user != null">
-                    <UButton to="/app" trailingIcon="i-lucide-home" size="md">Dashboard</UButton>
-                </template>
-                <template v-else>
-                    <UButton to="/auth/login" trailingIcon="i-lucide-log-in" size="md">
-                        S'authentifier
-                    </UButton>
-                </template>
-
+                <UButton v-if="user != null && user.is_anonymous === false" to="/app" trailingIcon="i-lucide-home"
+                    label="Dashboard" size="md" :ui="{
+                        label: 'hidden md:block'
+                    }" />
+                <UButton v-else label="S'authentifier" :ui="{
+                    label: 'hidden md:block'
+                }" to="/auth/login" trailingIcon="i-lucide-log-in" size="md" />
                 <InvoicesUploadModalContainer size="md" />
             </template>
         </UHeader>
@@ -38,7 +33,9 @@ definePageMeta({
             <div v-if="page">
                 <UPageHero :title="page.title" :description="page.description">
                     <template #links>
-                        <UButton to="/auth/login" trailingIcon="i-lucide-log-in" size="xl">
+                        <UButton v-if="user != null && user.is_anonymous === false" to="/app"
+                            trailingIcon="i-lucide-home" size="xl">Dashboard</UButton>
+                        <UButton v-else to="/auth/login" trailingIcon="i-lucide-log-in" size="xl">
                             S'authentifier
                         </UButton>
 
