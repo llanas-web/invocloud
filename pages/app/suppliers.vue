@@ -8,6 +8,8 @@ definePageMeta({
     layout: 'app'
 })
 
+const { supplier, openModal } = useSupplierEdit();
+
 const UAvatar = resolveComponent('UAvatar')
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
@@ -35,11 +37,8 @@ function getRowItems(row: Row<Supplier>) {
             label: 'Modifier le fournisseur',
             icon: 'i-lucide-edit',
             onSelect() {
-                navigator.clipboard.writeText(row.original.id.toString())
-                toast.add({
-                    title: 'Copied to clipboard',
-                    description: 'Supplier ID copied to clipboard'
-                })
+                supplier.value = row.original
+                openModal.value = true
             }
         },
         {
@@ -189,6 +188,7 @@ const pagination = ref({
                             </template>
                         </UButton>
                     </SuppliersDeleteModal>
+                    <SuppliersEditModal />
 
                     <UDropdownMenu :items="table?.tableApi
                         ?.getAllColumns()

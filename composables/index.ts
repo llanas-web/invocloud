@@ -5,3 +5,5 @@ export { useInvoiceUpdate } from "./invoices/update";
 export { useInvoiceCreate } from "./invoices/create";
 
 export { useSuppliers } from "./suppliers/list";
+export { useSupplierCreate } from "./suppliers/create";
+export { useSupplierEdit } from "./suppliers/edit";

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import { UButton } from '#components'
-import { useSupplierCreate } from '~/composables/suppliers/create';
 
 const { openModal: open, formState, isLoading, emailField, addEmail, onSubmit } = useSupplierCreate();
 

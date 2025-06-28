@@ -1,4 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
+import type { SupplierInsert, SupplierUpdate } from "~/types";
 
 const _useSuppliers = () => {
     const supabaseClient = useSupabaseClient();
@@ -64,6 +65,33 @@ const _useSuppliers = () => {
         return data;
     };
 
+    const updateSupplier = async (
+        supplierId: string,
+        updatedSupplier: SupplierUpdate,
+    ) => {
+        if (!selectedEstablishment.value) {
+            console.error("No establishment selected.");
+            return null;
+        }
+        if (!supplierId || !updatedSupplier) {
+            console.error("Supplier ID and updated data are required.");
+            return null;
+        }
+        const { data, error } = await supabaseClient
+            .from("suppliers")
+            .update(updatedSupplier)
+            .eq("id", supplierId)
+            .select()
+            .single();
+
+        if (error) {
+            console.error("Error updating supplier:", error);
+            return null;
+        }
+        await refresh();
+        return data;
+    };
+
     const deleteSuppliers = async (supplierIds: string[]) => {
         if (!supplierIds || supplierIds.length === 0) {
             console.error("No supplier IDs provided for deletion.");
@@ -88,6 +116,7 @@ const _useSuppliers = () => {
         pending,
         suppliersError,
         createSupplier,
+        updateSupplier,
         deleteSuppliers,
     };
 };

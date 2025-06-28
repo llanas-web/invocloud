@@ -15,6 +15,8 @@ export type EstablishmentUpdate =
 export type Supplier = Database["public"]["Tables"]["suppliers"]["Row"];
 export type SupplierInsert =
     Database["public"]["Tables"]["suppliers"]["Insert"];
+export type SupplierUpdate =
+    Database["public"]["Tables"]["suppliers"]["Update"];
 
 export type SupplierMember =
     Database["public"]["Tables"]["supplier_members"]["Row"];
