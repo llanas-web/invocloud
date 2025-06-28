@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { formState, possibleEstablishments, confirmState } = useUploadInvoice()
+const { formState, possibleEstablishments, confirmState } = useInvoiceUpload()
 </script>
 
 <template>

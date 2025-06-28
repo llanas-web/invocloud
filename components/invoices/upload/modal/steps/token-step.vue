@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as z from 'zod'
 
-const { tokenState } = useUploadInvoice()
+const { tokenState } = useInvoiceUpload()
 
 const confirmFormSchema = z.object({
     confirmToken: z.string().array().length(6, 'Invalid token'),

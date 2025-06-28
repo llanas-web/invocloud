@@ -2,7 +2,7 @@
 import * as z from 'zod'
 
 const toast = useToast()
-const { isLoading, formState } = useUploadInvoice()
+const { isLoading, formState } = useInvoiceUpload()
 
 const fileFormSchema = z.object({
     sendorEmail: z.string().email('Invalid email address'),
