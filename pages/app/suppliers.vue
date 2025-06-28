@@ -32,8 +32,8 @@ function getRowItems(row: Row<Supplier>) {
             label: 'Actions'
         },
         {
-            label: 'Copy supplier ID',
-            icon: 'i-lucide-copy',
+            label: 'Modifier le fournisseur',
+            icon: 'i-lucide-edit',
             onSelect() {
                 navigator.clipboard.writeText(row.original.id.toString())
                 toast.add({

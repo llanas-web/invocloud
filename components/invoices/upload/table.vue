@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import type { LazyInvoicesUploadAcceptSideover } from '#components'
 import type { TableColumn } from '@nuxt/ui'
 
 const { pendingInvoices, updateInvoice } = useInvoices()
 
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
-
-const acceptSideover = useTemplateRef<typeof LazyInvoicesUploadAcceptSideover>('acceptSideover')
 
 // Use the type of the items inside the pendingInvoices ref's value
 type PendingInvoices = NonNullable<(typeof pendingInvoices)['value']>[number]
@@ -85,7 +82,6 @@ const columns: TableColumn<PendingInvoices>[] = [
 </script>
 
 <template>
-    <InvoicesUploadAcceptSideover ref="acceptSideover" />
     <UTable v-if="pendingInvoices.length > 0" ref="table" class="shrink-0" :data="pendingInvoices" :columns="columns"
         :ui="{
             base: 'table-fixed border-separate border-spacing-0',

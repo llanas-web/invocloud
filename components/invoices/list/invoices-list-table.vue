@@ -188,6 +188,18 @@ const columns: TableColumn<Invoice>[] = [
         }
     },
     {
+        accessorKey: 'TVA',
+        header: () => h('div', { class: 'text-right' }, 'TVA'),
+        cell: ({ row }) => {
+            const formatted = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'EUR'
+            }).format(row.original.taxe_amount)
+
+            return h('div', { class: 'text-right font-medium' }, formatted)
+        }
+    },
+    {
         id: 'actions',
         cell: ({ row }) => {
             return h(
