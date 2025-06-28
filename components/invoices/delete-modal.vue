@@ -19,6 +19,8 @@ async function onSubmit() {
             'Les factures ont été supprimées.' : 'La facture a été supprimée.',
         color: 'success'
     })
+    open.value = false
+    _invoicesId.value = []
 }
 
 function showDeleteModal(listInvoicesIdToDelete: string[]) {
