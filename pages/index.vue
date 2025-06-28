@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { InvoicesUploadModalContainer } from '#components';
+
 const { data: page } = await useAsyncData(() => queryCollection('index').first())
 const user = useSupabaseUser()
 definePageMeta({
@@ -28,7 +30,7 @@ definePageMeta({
                     </UButton>
                 </template>
 
-                <InvoicesUploadStepModal size="md" />
+                <InvoicesUploadModalContainer size="md" />
             </template>
         </UHeader>
 
@@ -40,7 +42,7 @@ definePageMeta({
                             S'authentifier
                         </UButton>
 
-                        <InvoicesUploadStepModal />
+                        <InvoicesUploadModalContainer />
                     </template>
                 </UPageHero>
 

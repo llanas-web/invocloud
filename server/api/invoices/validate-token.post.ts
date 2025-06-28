@@ -1,4 +1,7 @@
-import { serverSupabaseServiceRole } from "#supabase/server";
+import {
+    serverSupabaseServiceRole,
+    serverSupabaseUser,
+} from "#supabase/server";
 import { hashCode } from "~/utils/hash";
 
 export default defineEventHandler(async (event) => {
@@ -13,6 +16,13 @@ export default defineEventHandler(async (event) => {
     }
 
     const supabase = serverSupabaseServiceRole(event);
+    const supabaseUser = await serverSupabaseUser(event);
+    if (!supabaseUser) {
+        throw createError({
+            status: 401,
+            message: "Unauthorized",
+        });
+    }
 
     const hashedCode = hashCode(token);
 
@@ -21,6 +31,7 @@ export default defineEventHandler(async (event) => {
             .from("upload_validations")
             .select("*")
             .eq("id", uploadValidationId)
+            .eq("uploader_id", supabaseUser.id)
             .eq("token_hash", hashedCode)
             .maybeSingle();
 
@@ -32,33 +43,22 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    const { data: uploadUrl } = await supabase
-        .storage
-        .from("pending-invoices")
-        .createSignedUploadUrl(
-            uploadValidation.file_path,
-        );
+    const { data: possibleEstablishments, error: establishmentsError } =
+        await supabase
+            .from("establishments")
+            .select("id, name")
+            .in("id", uploadValidation.establishments);
 
-    if (!uploadUrl) {
+    if (establishmentsError || !possibleEstablishments) {
         throw createError({
-            status: 500,
-            message: "Error creating signed URL",
+            status: 404,
+            message: establishmentsError?.message ||
+                "Establishments not found",
         });
     }
 
-    await supabase.from("upload_validations").update({
-        status: "uploaded",
-    }).eq("id", uploadValidationId);
-
-    const response = {
-        url: uploadUrl.signedUrl,
-        fileName: uploadValidation.id,
-        toJSON() {
-            return {
-                url: this.url,
-                fileName: this.fileName,
-            };
-        },
+    return {
+        uploadValidation,
+        establishments: possibleEstablishments,
     };
-    return response;
 });

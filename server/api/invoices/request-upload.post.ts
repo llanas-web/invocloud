@@ -83,6 +83,7 @@ export default defineEventHandler(async (event) => {
 
     // 2. Generate and hash code
     const code = generateCode();
+    console.log("Generated code:", code);
     const hashedCode = hashCode(code);
     const expiresAt = new Date(Date.now() + 1000 * 60 * 10); // 10 minutes
     const newInvoiceId = crypto.randomUUID();
