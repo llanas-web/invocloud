@@ -38,6 +38,10 @@ const _useSuppliers = () => {
         name: string,
         emails: string[],
     ) => {
+        if (!selectedEstablishment.value) {
+            console.error("No establishment selected.");
+            return null;
+        }
         if (!name || emails.length === 0) {
             console.error(
                 "Name and supplier members are required to create a supplier.",
