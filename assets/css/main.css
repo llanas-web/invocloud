@@ -3,6 +3,19 @@
 
 :root {
     --ui-primary: #5374FA;
+    --ui-color-primary-50: #edf4ff;
+    --ui-color-primary-100: #deecff;
+    --ui-color-primary-200: #c3dbff;
+    --ui-color-primary-300: #9fc1ff;
+    --ui-color-primary-400: #799eff;
+    --ui-color-primary-500: #5374fa;
+    --ui-color-primary-600: #3c52ef;
+    --ui-color-primary-700: #2f40d3;
+    --ui-color-primary-800: #2939aa;
+    --ui-color-primary-900: #293686;
+    --ui-color-primary-950: #181f4e;
+
+
     --ui-text-highlighted: var(--ui-primary);
     --ui-text-muted: #00086A;
     --ui-bg-elevated: #E7EAFE;
@@ -13,6 +26,8 @@
 
     --ui-header-height: --spacing(28);
     --ui-bg: white;
+
+    --ui-container: 92rem;
 
     h1 {
         font-family: var(--font-title);
