@@ -44,6 +44,15 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: num
 
 
 <template>
+    <div class="absolute z-1">
+        <div class="relative w-screen min-h-screen">
+            <!-- Your page content here -->
+
+            <!-- Blur Disc 1 -->
+            <div class="absolute w-96 h-96 rounded-full bg-[#5E73F7] opacity-80 blur-3xl"
+                style="top: -30%; left: 50%; transform: translateX(-50%);"></div>
+        </div>
+    </div>
     <UApp>
         <UHeader :toggle="false">
             <template #left>
@@ -122,15 +131,17 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: num
                             <UIcon name="i-custom-invocloud-logo"
                                 class="absolute  text-white size-24 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
                         </div>
-
-
                     </div>
                 </UPageHero>
 
-                <UPageSection :title="page?.sections[0].title" :description="page?.sections[0].description">
+                <UPageSection :title="page?.sections[0].title" :description="page?.sections[0].description" :ui="{
+                    root: 'bg-muted text-muted',
+                    title: 'max-w-xl mx-auto text-muted',
+                    description: 'max-w-xl mx-auto text-muted',
+                }">
                     <UPageGrid>
                         <UPageCard v-for="(item, index) in page?.sections[0].features" :key="index" v-bind="item"
-                            spotlight />
+                            spotlight variant="outline" />
                     </UPageGrid>
                 </UPageSection>
 
@@ -161,6 +172,10 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: num
         </UFooter>
     </UApp>
 </template>
+
+<style>
+body {}
+</style>
 
 <style scoped>
 @keyframes rotate {
