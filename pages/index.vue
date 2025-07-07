@@ -85,7 +85,7 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: num
                     label="Dashboard" size="md" variant="ghost" :ui="{
                         label: 'hidden md:block'
                     }" />
-                <UButton v-else label="S'authentifier" variant="ghost" :ui="{
+                <UButton v-else label="Connexion" variant="ghost" :ui="{
                     label: 'hidden md:block'
                 }" to="/auth/login" trailingIcon="i-lucide-log-in" size="md" />
                 <InvoicesUploadModalContainer size="md" variant="ghost" />
@@ -111,7 +111,7 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: num
                         <UButton v-if="user != null && user.is_anonymous === false" to="/app"
                             trailingIcon="i-lucide-home" size="xl">Dashboard</UButton>
                         <UButton v-else to="/auth/login" trailingIcon="i-lucide-log-in" size="xl">
-                            S'authentifier
+                            Connexion
                         </UButton>
                         <InvoicesUploadModalContainer />
                     </template>
@@ -157,7 +157,13 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: num
                 }">
                     <UPageGrid>
                         <UPageCard v-for="(item, index) in page?.sections[0].features" :key="index" v-bind="item"
-                            spotlight variant="outline" />
+                            spotlight variant="outline" :ui="{
+                                root: 'rounded-2xl',
+                                container: 'sm:px-12 sm:py-8',
+                                title: 'sm:text-xl',
+                                description: 'sm:text-lg',
+                                leadingIcon: 'sm:size-8'
+                            }" />
                     </UPageGrid>
                 </UPageSection>
 
