@@ -33,8 +33,8 @@ pricing:
         - Support par email
       button:
         label: Commencer gratuitement
-        variant: outline
-        color: neutral
+        variant: subtle
+        color: primary
         to: "/auth/login"
     - title: Pro
       description: Pour les utilisateurs réguliers qui ont besoin de fonctionnalités avancées.
@@ -47,5 +47,5 @@ pricing:
       button:
         label: Passer à Pro
         to: "/auth/login"
-      scale: true
+        trailingIcon: i-custom-invocloud-logo
       highlight: true

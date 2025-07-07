@@ -1,5 +1,22 @@
 <script setup lang="ts">
 import { InvoicesUploadModalContainer } from '#components';
+import { z } from 'zod';
+import type { FormSubmitEvent } from '@nuxt/ui'
+
+const schema = z.object({
+    email: z.string().email('Veuillez entrer un email valide'),
+});
+const state = reactive({
+    email: ''
+});
+
+type Schema = z.output<typeof schema>
+
+const onSubmit = async (event: FormSubmitEvent<Schema>) => {
+    // Handle form submission logic here
+    console.log('Form submitted with:', event);
+};
+
 
 const { data: page } = await useAsyncData(() => queryCollection('index').first())
 const user = useSupabaseUser()
@@ -44,7 +61,7 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: num
 
 
 <template>
-    <div class="absolute z-1">
+    <div class="absolute">
         <div class="relative w-screen min-h-screen">
             <!-- Your page content here -->
 
@@ -126,8 +143,7 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: num
                         <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
                             rounded-full border-2 border-primary size-40 bg-linear-150 from-white  to-80% to-primary/80
                             drop-shadow-xl drop-shadow-primary-800
-                            hover:scale-110 bounce
-                            ">
+                            bounce cursor-pointer">
                             <UIcon name="i-custom-invocloud-logo"
                                 class="absolute  text-white size-24 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
                         </div>
@@ -146,36 +162,72 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: num
                 </UPageSection>
 
 
-                <UPageSection :title="page.pricing.title" :description="page.pricing.description">
+                <UPageSection :title="page.pricing.title" :description="page.pricing.description" :ui="{
+                    root: 'text-muted',
+                    title: 'max-w-xl mx-auto text-muted',
+                }">
                     <UContainer>
                         <UPricingPlans scale>
-                            <UPricingPlan v-for="(plan, index) in page.pricing.plans" :key="index" v-bind="plan" />
+                            <UPricingPlan v-for="(plan, index) in page.pricing.plans" :key="index" v-bind="plan"
+                                variant="subtle" :ui="{
+                                    root: 'bg-primary-100/15 text-muted',
+                                    title: 'text-muted',
+                                    description: 'text-muted',
+                                    price: 'text-muted',
+                                    footer: 'items-start',
+                                    button: 'w-auto'
+                                }">
+                            </UPricingPlan>
                         </UPricingPlans>
                     </UContainer>
+                </UPageSection>
+                <UPageSection>
+                    <template #title>
+                        <ul class="font-normal uppercase">
+                            <li>FAQ</li>
+                            <li>Contact</li>
+                            <li>Politique de confidentialité</li>
+                            <li>Newsletter</li>
+                        </ul>
+                    </template>
+                    <template #description>
+                        <p>Inscrivez-vous à notre newsletter pour découvrir toutes nos nouvelles fonctionnalités en
+                            temps réel!</p>
+                    </template>
+                    <div class="max-w-md mx-auto">
+                        <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
+                            <UInput label="Email" type="email" placeholder="Entrez votre email" class="mr-4" />
+                            <UButton type="submit">S'inscrire</UButton>
+                        </UForm>
+                        <ul class="flex flex-row justify-center items-center gap-6 mt-12 text-primary">
+                            <li>
+                                <UButton icon="i-simple-icons-linkedin" variant="ghost" color="primary" size="lg" />
+                            </li>
+                            <li>
+                                <UButton icon="i-simple-icons-x" variant="ghost" color="primary" size="lg" />
+                            </li>
+                            <li>
+                                <UButton icon="i-simple-icons-facebook" variant="ghost" color="primary" size="lg" />
+                            </li>
+                            <li>
+                                <UButton icon="i-simple-icons-instagram" variant="ghost" color="primary" size="lg" />
+                            </li>
+                        </ul>
+                    </div>
                 </UPageSection>
             </div>
         </UMain>
 
-        <USeparator icon="i-simple-icons-nuxtdotjs" />
+        <USeparator icon="i-custom-invocloud-logo" class="text-primary-100/15" />
 
         <UFooter>
-            <template #left>
-                <p class="text-sm text-muted">
-                    Copyright © {{ new Date().getFullYear() }}
-                </p>
-            </template>
-
-            <template #right>
-                <UButton to="https://github.com/nuxt-ui-pro/starter" target="_blank" icon="i-simple-icons-github"
-                    aria-label="GitHub" color="neutral" variant="ghost" />
-            </template>
+            <p class="text-primary">Politique de confidentialité l Conditions générales d’utilisation © 2025 Invocloud.
+                Tous
+                droits réservés.
+            </p>
         </UFooter>
     </UApp>
 </template>
-
-<style>
-body {}
-</style>
 
 <style scoped>
 @keyframes rotate {
