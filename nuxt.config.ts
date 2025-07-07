@@ -20,4 +20,7 @@ export default defineNuxtConfig({
       exclude: ["/", "/auth/*"],
     },
   },
+  ui: {
+    colorMode: false,
+  },
 });

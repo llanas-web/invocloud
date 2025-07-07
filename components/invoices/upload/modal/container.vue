@@ -36,7 +36,7 @@ const stepItems = ref([
         :ui="{ footer: 'justify-end' }">
         <UButton label="Envoyer des factures" trailing-icon="i-lucide-send" :size="props.size ?? 'xl'" color="neutral"
             variant="subtle" :ui="{
-                label: 'hidden md:block'
+                label: 'hidden md:block',
             }" />
 
         <template #body>

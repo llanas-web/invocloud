@@ -1,2 +1,18 @@
 @import "tailwindcss";
 @import "@nuxt/ui-pro";
+
+:root {
+    --ui-primary: #5374FA;
+    --ui-text-highlighted: var(--ui-primary);
+    --ui-text-muted: #00086A;
+    --ui-bg-elevated: #E7EAFE;
+    --ui-bg-accented: #F3F4F6;
+
+    --font-sans: "Manrope";
+    --font-title: "Kumbh Sans";
+
+    h1 {
+        font-family: var(--font-title);
+        font-weight: var(--font-weight-medium);
+    }
+}
