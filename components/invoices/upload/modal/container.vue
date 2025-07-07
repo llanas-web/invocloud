@@ -2,7 +2,8 @@
 const { open, stepIndex, isLoading, onPrev, onValidate } = useInvoiceUpload()
 
 const props = defineProps<{
-    size?: 'sm' | 'md' | 'lg' | 'xl'
+    size?: 'sm' | 'md' | 'lg' | 'xl',
+    variant?: 'solid' | 'ghost' | 'subtle' | 'link'
 }>()
 
 const stepItems = ref([
@@ -34,8 +35,8 @@ const stepItems = ref([
     <UModal v-model:open="open" title="Envoyer des factures"
         description="Envoyez des fichiers de factures en toute sécurité aux parties prenantes"
         :ui="{ footer: 'justify-end' }">
-        <UButton label="Envoyer des factures" trailing-icon="i-lucide-send" :size="props.size ?? 'xl'" color="neutral"
-            variant="subtle" :ui="{
+        <UButton label="Envoyer des factures" trailing-icon="i-lucide-send" :size="props.size ?? 'xl'"
+            :variant="props.variant ?? 'subtle'" :ui="{
                 label: 'hidden md:block',
             }" />
 

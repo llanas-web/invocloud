@@ -20,6 +20,12 @@ export default defineNuxtConfig({
       exclude: ["/", "/auth/*"],
     },
   },
+  icon: {
+    customCollections: [{
+      prefix: "custom",
+      dir: "./assets/icons",
+    }],
+  },
   ui: {
     colorMode: false,
   },

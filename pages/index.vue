@@ -14,18 +14,21 @@ definePageMeta({
         <UHeader :toggle="false">
             <template #left>
                 <NuxtLink to="/">
-                    <h2 class="font-bold text-2xl">InvoCloud</h2>
+                    <div class="flex gap-4 h-8">
+                        <UIcon name="i-custom-invocloud-logo" class="text-primary size-10" />
+                        <UIcon name="i-custom-invocloud" class="text-primary h-10" />
+                    </div>
                 </NuxtLink>
             </template>
             <template #right>
                 <UButton v-if="user != null && user.is_anonymous === false" to="/app" trailingIcon="i-lucide-home"
-                    label="Dashboard" size="md" :ui="{
+                    label="Dashboard" size="md" variant="ghost" :ui="{
                         label: 'hidden md:block'
                     }" />
-                <UButton v-else label="S'authentifier" :ui="{
+                <UButton v-else label="S'authentifier" variant="ghost" :ui="{
                     label: 'hidden md:block'
                 }" to="/auth/login" trailingIcon="i-lucide-log-in" size="md" />
-                <InvoicesUploadModalContainer size="md" />
+                <InvoicesUploadModalContainer size="md" variant="ghost" />
             </template>
         </UHeader>
 

@@ -11,6 +11,9 @@
     --font-sans: "Manrope";
     --font-title: "Kumbh Sans";
 
+    --ui-header-height: --spacing(28);
+    --ui-bg: white;
+
     h1 {
         font-family: var(--font-title);
         font-weight: var(--font-weight-medium);

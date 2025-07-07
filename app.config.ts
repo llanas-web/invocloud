@@ -2,7 +2,7 @@ export default defineAppConfig({
     ui: {
         button: {
             slots: {
-                base: "font-bold",
+                base: "font-bold text-primary",
             },
             variants: {
                 size: {
@@ -13,7 +13,7 @@ export default defineAppConfig({
             },
             compoundVariants: [
                 {
-                    color: "neutral",
+                    color: "primary",
                     variant: "subtle",
                     class: "text-primary ring-0",
                 },
