@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { BreadcrumbItem } from '@nuxt/ui'
+import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 
 definePageMeta({
     layout: 'app'
@@ -42,6 +43,10 @@ const triggerFilePicker = () => {
     input.onchange = onFileChange
     input.click()
 }
+
+
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const isMobile = breakpoints.smaller('lg')
 </script>
 <template>
     <UDashboardPanel id="invoices-new" :default-size="25" :min-size="20" :max-size="100" resizable>
@@ -57,7 +62,7 @@ const triggerFilePicker = () => {
                 </template>
             </UDashboardNavbar>
         </template>
-        <template #body>
+        <template v-if="!isMobile" #body>
             <div class="p-2">
                 <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
                     <UIcon name="i-lucide-file-text" class="text-primary" /> Détails de la facture
@@ -69,6 +74,14 @@ const triggerFilePicker = () => {
                     @click="navigateTo('/app/invoices')" />
                 <UButton label="Sauvegarder" color="success" :loading="isLoading" @click="onSubmit"
                     :disabled="!isDirty" />
+            </div>
+        </template>
+        <template v-else #body>
+            <div v-if="fileUrl" class="bg-white shadow w-full h-full">
+                <CommonFileViewer :fileUrl="fileUrl" :fileType="fileType" :fileName="fileName" />
+            </div>
+            <div v-else class="bg-white shadow w-full h-full flex items-center justify-center p-4">
+                <UButton icon="i-lucide-plus" class="rounded-full" size="lg" @click="triggerFilePicker" />
             </div>
         </template>
     </UDashboardPanel>

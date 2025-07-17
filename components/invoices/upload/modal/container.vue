@@ -35,11 +35,6 @@ const stepItems = ref([
     <UModal v-model:open="open" title="Envoyer des factures"
         description="Envoyez des fichiers de factures en toute sécurité aux parties prenantes"
         :ui="{ footer: 'justify-end' }">
-        <UButton label="Envoyer des factures" trailing-icon="i-lucide-send" :size="props.size ?? 'xl'"
-            :variant="props.variant ?? 'subtle'" :ui="{
-                label: 'hidden md:block',
-            }" />
-
         <template #body>
             <UStepper v-model="stepIndex" ref="stepper" :items="stepItems" size="sm">
                 <template #form>

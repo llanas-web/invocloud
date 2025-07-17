@@ -3,6 +3,8 @@ import { InvoicesUploadModalContainer } from '#components';
 import { z } from 'zod';
 import type { FormSubmitEvent } from '@nuxt/ui'
 
+const { openModal } = useInvoiceUpload()
+
 const schema = z.object({
     email: z.string().email('Veuillez entrer un email valide'),
 });
@@ -61,15 +63,8 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: num
 
 
 <template>
-    <div class="absolute">
-        <div class="relative w-screen min-h-screen">
-            <!-- Your page content here -->
-
-            <!-- Blur Disc 1 -->
-            <div class="absolute w-96 h-96 rounded-full bg-[#5E73F7] opacity-80 blur-3xl"
-                style="top: -30%; left: 50%; transform: translateX(-50%);"></div>
-        </div>
-    </div>
+    <div class="absolute w-96 h-96 rounded-full bg-[#5E73F7] opacity-80 blur-3xl"
+        style="top: -30%; left: 50%; transform: translateX(-50%);"></div>
     <UApp>
         <UHeader :toggle="false">
             <template #left>
@@ -88,12 +83,16 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: num
                 <UButton v-else label="Connexion" variant="ghost" :ui="{
                     label: 'hidden md:block'
                 }" to="/auth/login" trailingIcon="i-lucide-log-in" size="md" />
-                <InvoicesUploadModalContainer size="md" variant="ghost" />
+
+                <UButton label="Envoyer des factures" trailing-icon="i-lucide-send" size="md" variant="ghost" :ui="{
+                    label: 'hidden md:block',
+                }" @click="openModal" />
             </template>
         </UHeader>
 
         <UMain>
             <div v-if="page">
+                <InvoicesUploadModalContainer size="md" variant="ghost" />
                 <UPageHero orientation="horizontal">
                     <template #title>
                         <h1 class="text-muted">
@@ -113,7 +112,10 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: num
                         <UButton v-else to="/auth/login" trailingIcon="i-lucide-log-in" size="xl">
                             Connexion
                         </UButton>
-                        <InvoicesUploadModalContainer />
+                        <UButton label="Envoyer des factures" trailing-icon="i-lucide-send" size="xl" variant="subtle"
+                            @click="openModal" :ui="{
+                                label: 'hidden md:block',
+                            }" />
                     </template>
                     <div class="relative min-h-80">
                         <!-- <img src="~/assets/images/big-btn-2.png"
@@ -145,7 +147,8 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: num
                             drop-shadow-xl drop-shadow-primary-800
                             bounce cursor-pointer">
                             <UIcon name="i-custom-invocloud-logo"
-                                class="absolute  text-white size-24 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                                class="absolute  text-white size-24 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                                @click="openModal" />
                         </div>
                     </div>
                 </UPageHero>
