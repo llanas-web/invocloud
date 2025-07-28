@@ -3,8 +3,9 @@ import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
 definePageMeta({
-  layout: false,
+  layout: 'auth',
 })
+
 
 const { login } = useAuth()
 const loading = ref(false)
@@ -41,27 +42,38 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center gap-4 p-4 h-screen">
-    <UPageCard class="w-full max-w-md">
-      <UAuthForm :schema="schema" title="Connexion à InvoCloud"
-        description="Entrez vos identifiants pour accéder à votre compte." icon="i-lucide-send" :fields="fields"
-        :disabled="loading" @submit="onSubmit" :submit="{
-          label: 'Se connecter',
+  <div class="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-32 min-h-full mb-12">
+    <div class="flex-1 flex justify-end items-center mx-auto">
+      <div class="flex flex-col items-center justify-center gap-4 p-4 max-w-lg">
+        <UAuthForm :schema="schema" :fields="fields" :ui="{
+          title: 'text-left text-4xl font-bold text-muted',
+          description: 'text-left text-muted mb-4 font-sans',
+        }" :disabled="loading" @submit="onSubmit" :submit="{
+          label: 'Connexion',
           loading: loading,
           color: 'primary',
           variant: 'solid'
         }">
-        <template #description>
-          Vous n'avez pas de compte ? <ULink to="/auth/sign-up" class="text-primary font-medium">Inscrivez-vous</ULink>.
-        </template>
-        <template #password-hint>
-          <ULink to="#" class="text-primary font-medium" tabindex="-1">Mot de passe oublié ?</ULink>
-        </template>
-        <template #footer>
-          En vous connectant, vous acceptez nos <ULink to="#" class="text-primary font-medium">Conditions d'utilisation
-          </ULink>.
-        </template>
-      </UAuthForm>
-    </UPageCard>
+          <template #title>
+            Connexion à <span class="text-primary">InvoCloud</span>
+          </template>
+          <template #description>
+            Vous n'avez pas de compte ? <ULink to="/auth/sign-up" class="text-primary font-medium">Inscrivez-vous
+            </ULink>.
+          </template>
+          <template #password-hint>
+            <ULink to="#" class="text-primary font-medium" tabindex="-1">Mot de passe oublié ?</ULink>
+          </template>
+          <template #footer>
+            En vous connectant, vous acceptez nos <ULink to="#" class="text-primary font-medium">Conditions
+              d'utilisation
+            </ULink>.
+          </template>
+        </UAuthForm>
+      </div>
+    </div>
+    <div class="flex-1 flex justify-start items-center mx-auto">
+      <CommonInvocloudLogo />
+    </div>
   </div>
 </template>
