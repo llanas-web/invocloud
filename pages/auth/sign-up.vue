@@ -9,6 +9,7 @@ definePageMeta({
 
 const loading = ref(false)
 const { signup } = useAuth()
+const { selectedEstablishment, subscribeToStripe, refresh } = useEstablishments()
 
 const fields: Array<{
     name: keyof Schema
@@ -75,6 +76,10 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         establishment_name,
         full_name,
     )
+    if (data) {
+        await refresh()
+        await subscribeToStripe()
+    }
     loading.value = false
 }
 </script>
@@ -132,7 +137,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
                     sera
                     facturé par
                     mois à
-                    compter du 31 juillet 2025</span>
+                    compter du {{ new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString() }}</span>
             </div>
         </div>
     </div>

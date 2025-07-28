@@ -19,13 +19,12 @@ const _useEstablishments = () => {
                 console.error("Error fetching establishments:", error);
                 return [];
             }
-            if (
-                !selectedEstablishment.value &&
-                userSettings.value?.favorite_establishment_id
-            ) {
-                selectedEstablishment.value = data.find((est) =>
-                    est.id === userSettings.value.favorite_establishment_id
-                ) || null;
+            if (!selectedEstablishment.value) {
+                if (userSettings.value?.favorite_establishment_id) {
+                    selectedEstablishment.value = data.find((est) =>
+                        est.id === userSettings.value.favorite_establishment_id
+                    ) || null;
+                } else selectedEstablishment.value = data[0] || null;
             } else if (selectedEstablishment.value != null) {
                 selectedEstablishment.value = data.find((est) =>
                     est.id === selectedEstablishment.value!.id

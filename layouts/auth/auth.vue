@@ -40,7 +40,7 @@ const redirectTo = computed(() => {
 
         <UMain>
             <UContainer>
-                <div class="h-[calc(100vh-var(--ui-header-height))] mb-12">
+                <div class="h-[calc(100vh-var(--ui-header-height))] pb-12">
                     <slot />
                 </div>
             </UContainer>
