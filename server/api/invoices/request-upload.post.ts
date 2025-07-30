@@ -1,9 +1,9 @@
 import {
     serverSupabaseClient,
     serverSupabaseServiceRole,
+    serverSupabaseUser,
 } from "#supabase/server";
 import { z } from "zod";
-import { User } from "~/types";
 import { Database } from "~/types/database.types";
 import { generateCode, hashCode } from "~/utils/hash";
 
@@ -32,24 +32,30 @@ const parseBody = async (event: any) => {
 };
 
 export default defineEventHandler(async (event) => {
+    let userId = "";
     const { senderEmail, recipientEmail, comment, name } = await parseBody(
         event,
     );
     const supabase = await serverSupabaseClient<Database>(event);
+    const user = await serverSupabaseUser(event);
     const supabaseServiceRole = serverSupabaseServiceRole<Database>(
         event,
     );
 
     // 1. Check if user is authenticated
-    const { data: anonymousUser, error: authError } = await supabase.auth
-        .signInAnonymously();
-
-    if (authError || !anonymousUser) {
-        console.error("Authentication error:", authError);
-        throw createError({
-            status: 401,
-            message: "Unauthorized",
-        });
+    if (!user) {
+        const { data: anonymousUser, error: authError } = await supabase.auth
+            .signInAnonymously();
+        if (authError || !anonymousUser) {
+            console.error("Authentication error:", authError);
+            throw createError({
+                status: 401,
+                message: "Unauthorized",
+            });
+        }
+        userId = anonymousUser.user!.id;
+    } else {
+        userId = user.id;
     }
 
     const { data: recipientUser, error: recipientError } =
@@ -96,7 +102,7 @@ export default defineEventHandler(async (event) => {
             .from("upload_validations")
             .insert({
                 id: newInvoiceId,
-                uploader_id: anonymousUser.user!.id,
+                uploader_id: userId,
                 token_hash: hashedCode,
                 token_expires_at: expiresAt.toISOString(),
                 comment: comment || null,
