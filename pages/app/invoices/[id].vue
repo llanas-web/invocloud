@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { BreadcrumbItem } from '@nuxt/ui'
+import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 
 definePageMeta({
     layout: 'app'
@@ -20,6 +21,10 @@ const items = ref<BreadcrumbItem[]>([
         to: `/app/invoices/${invoice.value?.id}`
     }
 ])
+
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const isMobile = breakpoints.smaller('lg')
+const isFormOpen = ref(false)
 </script>
 <template>
     <UDashboardPanel :id="`invoices-${invoiceId}`" :default-size="25" :min-size="20" :max-size="100" resizable>
@@ -32,6 +37,8 @@ const items = ref<BreadcrumbItem[]>([
                 <template #left>
                 </template>
                 <template #right>
+                    <UButton v-if="isMobile" label="Voir la facture" variant="ghost" size="md"
+                        trailingIcon="i-lucide-eye" @click="isFormOpen = true" />
                 </template>
             </UDashboardNavbar>
         </template>
@@ -51,7 +58,14 @@ const items = ref<BreadcrumbItem[]>([
         </template>
     </UDashboardPanel>
     <template v-if="invoice">
-        <InvoicesDetailsInvoiceViewer :invoice="invoice" />
+        <USlideover v-if="isMobile" v-model:open="isFormOpen">
+            <template #body>
+                <InvoicesDetailsInvoiceViewer :invoice="invoice" />
+            </template>
+        </USlideover>
+        <InvoicesDetailsInvoiceViewer v-else :invoice="invoice" />
     </template>
+
+
 
 </template>

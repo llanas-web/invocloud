@@ -37,7 +37,7 @@ watch(() => props.invoice, loadInvoiceFile, { immediate: true })
 </script>
 
 <template>
-    <div class="bg-white shadow w-full">
+    <div class="bg-white shadow h-full w-full">
         <div v-if="loading" class="text-center text-gray-500">Chargement du fichier…</div>
         <div v-else-if="errorMessage" class="text-red-600 text-center">{{ errorMessage }}</div>
         <template v-else-if="fileUrl">
