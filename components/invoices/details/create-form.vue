@@ -20,6 +20,12 @@ const invoiceStatus = ref<{ label: string, value: InvoiceStatus, icon: string, c
         <UFormField label="Commentaire">
             <UInput v-model="formState.comment" placeholder="Ajouter un commentaire..." class="w-full" />
         </UFormField>
+        <UFormField label="Nom de la facture">
+            <UInput v-model="formState.name" class="w-full" />
+        </UFormField>
+        <UFormField label="Date d'échéance">
+            <UInput v-model="formState.due_date" type="date" class="w-full" />
+        </UFormField>
         <UFormField label="Statut">
             <USelect v-model="formState.status" :items="invoiceStatus" placeholder="Status de la facture"
                 class="w-full" />

@@ -1,4 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
+import { format } from "date-fns";
 import type { InvoiceUpdate } from "~/types";
 
 const _useInvoiceUpdate = () => {
@@ -9,6 +10,10 @@ const _useInvoiceUpdate = () => {
         status: invoice.value?.status ?? "pending",
         amount: invoice.value?.amount ?? 0,
         taxe_amount: invoice.value?.taxe_amount ?? 0,
+        name: invoice.value?.name ?? "",
+        due_date: invoice.value?.due_date
+            ? format(invoice.value?.due_date, "yyyy-MM-dd")
+            : "",
     });
 
     watch(
@@ -18,6 +23,13 @@ const _useInvoiceUpdate = () => {
                 formState.status = newInvoice.status;
                 formState.amount = newInvoice.amount;
                 formState.taxe_amount = newInvoice.taxe_amount;
+                formState.name = newInvoice.name;
+                formState.due_date = newInvoice.due_date
+                    ? format(
+                        newInvoice.due_date,
+                        "yyyy-MM-dd",
+                    )
+                    : "";
             }
         },
         { immediate: true },
@@ -28,7 +40,9 @@ const _useInvoiceUpdate = () => {
         return (
             formState.status !== invoice.value.status ||
             formState.amount !== invoice.value.amount ||
-            formState.taxe_amount !== invoice.value.taxe_amount
+            formState.taxe_amount !== invoice.value.taxe_amount ||
+            formState.name !== invoice.value.name ||
+            formState.due_date !== invoice.value.due_date
         );
     });
 

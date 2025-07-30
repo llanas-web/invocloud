@@ -13,6 +13,8 @@ const _useInvoiceCreate = () => {
         amount: 0,
         taxe_amount: 0,
         comment: "",
+        name: "",
+        due_date: "",
     });
 
     const invoiceFile = ref<File | null>(null);
@@ -23,7 +25,9 @@ const _useInvoiceCreate = () => {
             formState.supplier_id !== "" ||
             formState.amount !== 0 ||
             formState.taxe_amount !== 0 ||
-            formState.comment !== ""
+            formState.comment !== "" ||
+            formState.name !== "" ||
+            formState.due_date !== ""
         );
     });
 

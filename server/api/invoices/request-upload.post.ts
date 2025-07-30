@@ -11,6 +11,7 @@ const schema = z.object({
     sendorEmail: z.string().email(),
     recipientEmail: z.string().email(),
     comment: z.string().optional(),
+    name: z.string().min(1, "File name is required"),
 });
 
 type SupabaseClient = Awaited<
@@ -31,7 +32,9 @@ const parseBody = async (event: any) => {
 };
 
 export default defineEventHandler(async (event) => {
-    const { sendorEmail, recipientEmail, comment } = await parseBody(event);
+    const { sendorEmail, recipientEmail, comment, name } = await parseBody(
+        event,
+    );
     const supabase = await serverSupabaseClient<Database>(event);
     const supabaseServiceRole = serverSupabaseServiceRole<Database>(
         event,
@@ -104,6 +107,7 @@ export default defineEventHandler(async (event) => {
                     (establishment) => establishment.establishment_id,
                 ),
                 recipient_email: recipientEmail,
+                file_name: name,
             })
             .select()
             .single();

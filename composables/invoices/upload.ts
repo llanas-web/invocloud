@@ -37,6 +37,7 @@ const _useInvoiceUpload = () => {
                     sendorEmail: formState.senderEmail,
                     recipientEmail: formState.recipientEmail,
                     comment: formState.comment,
+                    name: formState.invoiceFile!.name,
                 },
             });
             validationUploadId.value = upload_validation_id;

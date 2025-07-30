@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { upperFirst } from 'scule'
 import type { TableColumn } from '@nuxt/ui'
-import { InvoicesSendModal, LazyInvoicesDeleteModal, LazyInvoicesSendModal, UBadge } from '#components'
+import { InvoicesSendModal, LazyInvoicesDeleteModal, LazyInvoicesSendModal, UBadge, NuxtLink } from '#components'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
 
 
@@ -112,7 +112,7 @@ const columns: TableColumn<Invoice>[] = [
         header: 'Nom',
         cell: ({ row }) => {
             return h('div', { class: 'flex items-center gap-3' }, [
-                h('p', { class: 'font-medium text-highlighted' }, row.original.name ?? ''),
+                h(NuxtLink, { class: 'font-medium text-highlighted hover:underline', to: `/app/invoices/${row.original.id}` }, row.original.name ?? ''),
             ])
         }
     },
@@ -130,7 +130,11 @@ const columns: TableColumn<Invoice>[] = [
     {
         accessorKey: 'status',
         header: 'Status',
-        filterFn: 'equals',
+        filterFn: (row, columnId, value) => {
+            if (value === 'all') return true
+            if (value === 'error' && row.original.overdue) return true
+            return row.original.status === value
+        },
         cell: ({ row }) => {
             const statusColors = {
                 pending: 'warning' as const,
@@ -140,21 +144,24 @@ const columns: TableColumn<Invoice>[] = [
                 error: 'error' as const,
             }
             const color = statusColors[row.original.status as keyof typeof statusColors]
-
+            if (row.original.overdue) {
+                return h(UBadge, { class: 'capitalize', variant: 'subtle', color: 'error' }, () =>
+                    'En retard'
+                )
+            }
             return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
                 row.original.status
             )
         }
     },
     {
-        accessorKey: 'created_at',
+        accessorKey: 'due_date',
         header: ({ column }) => {
             const isSorted = column.getIsSorted()
 
             return h(UButton, {
-                color: 'neutral',
                 variant: 'ghost',
-                label: 'Date de création',
+                label: 'Date d\'échéance',
                 icon: isSorted
                     ? isSorted === 'asc'
                         ? 'i-lucide-arrow-up-narrow-wide'
@@ -165,7 +172,8 @@ const columns: TableColumn<Invoice>[] = [
             })
         },
         cell: ({ row }) => {
-            const date = new Date(row.getValue('created_at'))
+            const date = new Date(row.getValue('due_date'))
+            console.log(date)
             return h('div', { class: 'text-muted' }, date.toLocaleDateString('fr-FR', {
                 year: 'numeric',
                 month: '2-digit',
@@ -229,6 +237,7 @@ const columns: TableColumn<Invoice>[] = [
 const statusFilter = ref('all')
 
 watch(() => statusFilter.value, (newVal) => {
+    console.log('Status filter changed:', newVal)
     if (!table?.value?.tableApi) return
 
     const statusColumn = table.value.tableApi.getColumn('status')
