@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
+import { LazyInvoicesUploadModalContainer } from '#components'
 
 const route = useRoute()
 
@@ -136,7 +137,7 @@ onMounted(async () => {
                     <!-- <template #invoices-trailing>
                         <UTooltip :text="`You have ${pendingInvoices.length ?? 0} pending invoices`" placement="right">
                             <UBadge :label="`${pendingInvoices.length}`" size="sm"
-                                :color="pendingInvoices.length ? 'primary' : 'neutral'" />
+                            :color="pendingInvoices.length ? 'primary' : 'neutral'" />
                         </UTooltip>
                     </template> -->
                 </UNavigationMenu>
@@ -147,6 +148,7 @@ onMounted(async () => {
         </UDashboardSidebar>
 
         <template v-if="!pending">
+            <LazyInvoicesUploadModalContainer size="md" variant="ghost" />
             <slot />
         </template>
 

@@ -1,5 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { SupplierInsert, SupplierUpdate } from "~/types";
+import type { SupplierUpdate } from "~/types";
 
 const _useSuppliers = () => {
     const supabaseClient = useSupabaseClient();

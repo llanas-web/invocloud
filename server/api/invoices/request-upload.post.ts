@@ -8,7 +8,7 @@ import { Database } from "~/types/database.types";
 import { generateCode, hashCode } from "~/utils/hash";
 
 const schema = z.object({
-    sendorEmail: z.string().email(),
+    senderEmail: z.string().email(),
     recipientEmail: z.string().email(),
     comment: z.string().optional(),
     name: z.string().min(1, "File name is required"),
@@ -32,7 +32,7 @@ const parseBody = async (event: any) => {
 };
 
 export default defineEventHandler(async (event) => {
-    const { sendorEmail, recipientEmail, comment, name } = await parseBody(
+    const { senderEmail, recipientEmail, comment, name } = await parseBody(
         event,
     );
     const supabase = await serverSupabaseClient<Database>(event);
@@ -70,7 +70,7 @@ export default defineEventHandler(async (event) => {
             .rpc(
                 "check_sender_authorized",
                 {
-                    sender_email: sendorEmail,
+                    sender_email: senderEmail,
                     recipient_email: recipientUser.email,
                 },
             );
@@ -128,7 +128,7 @@ export default defineEventHandler(async (event) => {
     try {
         await emails.send({
             from: "InvoCloud <tech@llanas.dev>",
-            to: [sendorEmail],
+            to: [senderEmail],
             subject: "Confirm your invoice upload",
             html:
                 `Hello, <br /> Please confirm your invoice upload with this code: <br /> ${code} <br /> It will expire at ${expiresAt.toISOString()}.`,

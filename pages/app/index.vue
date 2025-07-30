@@ -3,6 +3,7 @@ import { sub } from 'date-fns'
 import type { Period, Range } from '~/types'
 
 const { isNotificationsSlideoverOpen } = useDashboard()
+const { openModal } = useInvoiceUpload()
 
 definePageMeta({
     layout: 'app'
@@ -39,6 +40,7 @@ const period = ref<Period>('daily')
                 </template>
 
                 <template #right>
+
                     <!-- <UTooltip text="Notifications" :shortcuts="['N']">
                         <UButton color="neutral" variant="ghost" square @click="isNotificationsSlideoverOpen = true">
                             <UChip color="error" inset>
@@ -50,6 +52,9 @@ const period = ref<Period>('daily')
                     <!-- <UDropdownMenu :items="items">
                         <UButton icon="i-lucide-plus" size="md" class="rounded-full" />
                     </UDropdownMenu> -->
+                    <UButton label="Envoyer des factures" trailing-icon="i-lucide-send" @click="openModal" :ui="{
+                        label: 'hidden md:block',
+                    }" />
                 </template>
             </UDashboardNavbar>
 

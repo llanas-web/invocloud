@@ -7,7 +7,7 @@ const _useInvoiceUpdate = () => {
     const isDisabled = computed(() => invoice.value?.status === "paid");
 
     const formState = reactive<InvoiceUpdate>({
-        status: invoice.value?.status ?? "pending",
+        status: invoice.value?.status ?? "validated",
         amount: invoice.value?.amount ?? 0,
         taxe_amount: invoice.value?.taxe_amount ?? 0,
         name: invoice.value?.name ?? "",
@@ -20,7 +20,7 @@ const _useInvoiceUpdate = () => {
         () => invoice.value,
         (newInvoice) => {
             if (newInvoice) {
-                formState.status = newInvoice.status;
+                formState.status = newInvoice.status ?? "validated";
                 formState.amount = newInvoice.amount;
                 formState.taxe_amount = newInvoice.taxe_amount;
                 formState.name = newInvoice.name;

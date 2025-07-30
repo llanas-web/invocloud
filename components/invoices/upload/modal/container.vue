@@ -6,29 +6,33 @@ const props = defineProps<{
     variant?: 'solid' | 'ghost' | 'subtle' | 'link'
 }>()
 
-const stepItems = ref([
-    {
-        slot: 'form' as const,
-        label: 'Send Invoices',
-        title: 'Envoyer des factures',
-        description: 'Envoyez des fichiers de factures en toute sécurité aux parties prenantes',
-        icon: 'i-lucide-send'
-    },
-    {
-        slot: 'token' as const,
-        label: 'Confirmer l\'email',
-        title: 'Confirmer l\'email',
-        description: 'Confirmez votre adresse e-mail',
-        icon: 'i-lucide-check'
-    },
-    {
-        slot: 'confirm' as const,
-        label: 'Confirmer l\'envoie',
-        title: 'Confirmer l\'envoie',
-        description: 'Confirmez l\'envoie du fichier',
-        icon: 'i-lucide-file-check'
-    }
-])
+const { currentUser } = useUser();
+
+const formStep = {
+    slot: 'form' as const,
+    label: 'Send Invoices',
+    title: 'Envoyer des factures',
+    description: 'Envoyez des fichiers de factures en toute sécurité aux parties prenantes',
+    icon: 'i-lucide-send'
+};
+
+const tokenStep = {
+    slot: 'token' as const,
+    label: 'Confirmer l\'email',
+    title: 'Confirmer l\'email',
+    description: 'Confirmez votre adresse e-mail',
+    icon: 'i-lucide-check'
+};
+
+const confirmStep = {
+    slot: 'confirm' as const,
+    label: 'Confirmer l\'envoie',
+    title: 'Confirmer l\'envoie',
+    description: 'Confirmez l\'envoie du fichier',
+    icon: 'i-lucide-file-check'
+};
+
+const stepItems = ref(!currentUser ? [formStep, tokenStep, confirmStep] : [formStep, confirmStep])
 </script>
 
 <template>

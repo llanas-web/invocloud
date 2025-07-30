@@ -4,11 +4,12 @@ import { FetchError } from "ofetch";
 
 const _useInvoiceUpload = () => {
     const toast = useToast();
+    const { currentUser } = useUser();
     const open = ref(false);
     const stepIndex = ref(0);
     const isLoading = ref(false);
     const formState = reactive({
-        senderEmail: "",
+        senderEmail: currentUser.value?.email ?? "",
         recipientEmail: "",
         comment: "",
         invoiceFile: undefined as File | undefined,
@@ -24,6 +25,16 @@ const _useInvoiceUpload = () => {
         supplierId: "",
     });
 
+    watch(
+        () => currentUser.value,
+        (newUser) => {
+            if (newUser) {
+                formState.senderEmail = newUser.email;
+            }
+        },
+        { immediate: true },
+    );
+
     const submitFormStep = async () => {
         isLoading.value = true;
         try {
@@ -34,7 +45,7 @@ const _useInvoiceUpload = () => {
             >("/api/invoices/request-upload", {
                 method: "POST",
                 body: {
-                    sendorEmail: formState.senderEmail,
+                    senderEmail: formState.senderEmail,
                     recipientEmail: formState.recipientEmail,
                     comment: formState.comment,
                     name: formState.invoiceFile!.name,

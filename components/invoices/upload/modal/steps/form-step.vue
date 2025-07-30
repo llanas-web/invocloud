@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import * as z from 'zod'
 
-const toast = useToast()
 const { isLoading, formState } = useInvoiceUpload()
+const { currentUser } = useUser()
 
 const fileFormSchema = z.object({
-    sendorEmail: z.string().email('Invalid email address'),
+    senderEmail: z.string().email('Invalid email address'),
     recipientEmail: z.string().email('Invalid email address'),
     comment: z.string().optional(),
     invoiceFile: z.instanceof(File)
