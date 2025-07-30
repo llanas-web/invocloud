@@ -72,7 +72,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         </UAuthForm>
       </div>
     </div>
-    <div class="flex-1 flex justify-start items-center mx-auto">
+    <div class="hidden lg:flex flex-1 justify-start items-center mx-auto">
       <CommonInvocloudLogo />
     </div>
   </div>

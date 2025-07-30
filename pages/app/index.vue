@@ -9,13 +9,18 @@ definePageMeta({
 })
 
 const items = [[{
-    label: 'New mail',
+    label: 'Envoyer une facture',
     icon: 'i-lucide-send',
     to: '/inbox'
 }, {
-    label: 'New customer',
-    icon: 'i-lucide-user-plus',
+    label: 'Ajouter une facture',
+    icon: 'i-lucide-file-plus',
     to: '/customers'
+},
+{
+    label: 'Ajouter un fournisseur',
+    icon: 'i-lucide-user-plus',
+    to: '/suppliers'
 }]]
 
 const range = shallowRef<Range>({
@@ -34,17 +39,17 @@ const period = ref<Period>('daily')
                 </template>
 
                 <template #right>
-                    <UTooltip text="Notifications" :shortcuts="['N']">
+                    <!-- <UTooltip text="Notifications" :shortcuts="['N']">
                         <UButton color="neutral" variant="ghost" square @click="isNotificationsSlideoverOpen = true">
                             <UChip color="error" inset>
                                 <UIcon name="i-lucide-bell" class="size-5 shrink-0" />
                             </UChip>
                         </UButton>
-                    </UTooltip>
+                    </UTooltip> -->
 
-                    <UDropdownMenu :items="items">
+                    <!-- <UDropdownMenu :items="items">
                         <UButton icon="i-lucide-plus" size="md" class="rounded-full" />
-                    </UDropdownMenu>
+                    </UDropdownMenu> -->
                 </template>
             </UDashboardNavbar>
 
