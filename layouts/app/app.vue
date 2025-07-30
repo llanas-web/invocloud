@@ -58,7 +58,7 @@ const links = ref<NavigationMenuItem[]>([
         }
     },
     {
-        label: 'Settings',
+        label: 'Paramètres',
         to: '/app/settings',
         icon: 'i-lucide-settings',
         defaultOpen: false,
@@ -83,7 +83,7 @@ const links = ref<NavigationMenuItem[]>([
                 open.value = false
             }
         }, {
-            label: 'Security',
+            label: 'Securité',
             to: '/app/settings/security',
             onSelect: () => {
                 open.value = false
