@@ -121,9 +121,12 @@ onMounted(async () => {
 <template>
     <UDashboardGroup unit="rem">
         <UDashboardSidebar id="default" v-model:open="open" collapsible resizable class="bg-elevated/25"
-            :ui="{ footer: 'lg:border-t lg:border-default' }">
+            :ui="{ footer: 'lg:border-t lg:border-default', header: 'flex flex-col gap-4 justify-center items-center' }">
             <template #header="{ collapsed }">
-                <EstablishmentsMenuSelector :collapsed="collapsed" />
+                <div class="w-full px-4 gap-4 flex md:flex-col justify-between">
+                    <CommonInvocloudBrand :collapsed="collapsed" />
+                    <EstablishmentsMenuSelector :collapsed="collapsed" />
+                </div>
             </template>
 
             <template #default="{ collapsed }">

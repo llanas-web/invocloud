@@ -49,13 +49,10 @@ const items = computed<DropdownMenuItem[][]>(() => {
             </div>
         </template>
 
-        <UButton v-bind="{
-            ...selectedEstablishment,
-            trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down',
-        }" color="neutral" variant="soft" block :square="collapsed" class="data-[state=open]:bg-elevated"
-            :class="[!collapsed && 'py-2']" :ui="{ trailingIcon: 'text-dimmed' }"
+        <UButton v-bind="selectedEstablishment" color="neutral" variant="soft" block :square="collapsed"
+            class="data-[state=open]:bg-elevated" :class="[!collapsed && 'py-2']" :ui="{ trailingIcon: 'text-dimmed' }"
             :label="selectedEstablishment?.name || 'Sélectionner une structure'"
-            trailing-icon="i-lucide-chevrons-up-down" />
+            trailing-icon="i-lucide-chevrons-up-down" leading-icon="i-lucide-building" />
     </UDropdownMenu>
 
     <LazyEstablishmentsAddModal ref="addModal" />
