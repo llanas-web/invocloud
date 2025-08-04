@@ -30,10 +30,10 @@ const onFileChange = (event: Event) => {
 
     if (file) {
         invoiceFile.value = file
-        formState.name = file.name
+        formState.name = formState.name ?? file.name
     } else {
         invoiceFile.value = null
-        formState.name = ''
+        formState.name = formState.name ?? ''
     }
 }
 

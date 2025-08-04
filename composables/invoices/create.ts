@@ -13,7 +13,7 @@ const _useInvoiceCreate = () => {
         amount: 0,
         taxe_amount: 0,
         comment: "",
-        name: "",
+        name: null,
         due_date: "",
     });
 
@@ -26,7 +26,7 @@ const _useInvoiceCreate = () => {
             formState.amount !== 0 ||
             formState.taxe_amount !== 0 ||
             formState.comment !== "" ||
-            formState.name !== "" ||
+            formState.name !== null ||
             formState.due_date !== ""
         );
     });
@@ -35,6 +35,12 @@ const _useInvoiceCreate = () => {
         isLoading.value = true;
         if (!formState || !invoiceFile.value) {
             console.error("Form state or invoice file is missing.");
+            toast.add({
+                title: "Erreur",
+                description: "Veuillez remplir tous les champs requis.",
+                color: "error",
+            });
+            isLoading.value = false;
             return;
         }
         const newInvoice = await createInvoice(formState, invoiceFile.value);
