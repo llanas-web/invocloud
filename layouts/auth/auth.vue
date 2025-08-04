@@ -2,7 +2,6 @@
 
 const router = useRouter();
 const currentRoute = router.currentRoute;
-console.log('Current route:', currentRoute.value.name);
 
 const buttonLabel = computed(() => {
     return currentRoute.value.name === 'auth-login' ? 'S\'inscrire' : 'Connexion';

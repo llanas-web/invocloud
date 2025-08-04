@@ -22,6 +22,7 @@ export default defineEventHandler(async (event) => {
             message: "Unauthorized",
         });
     }
+    console.log("Authenticated user:", supabaseUser.id);
 
     const { data: uploadValidation, error: uploadValidationError } =
         await supabase

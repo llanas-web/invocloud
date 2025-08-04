@@ -40,8 +40,6 @@ const _useAuth = () => {
                 },
             },
         });
-        console.log("Signup data:", data);
-        console.log("Signup error:", error);
         if (error) {
             toast.add({
                 title: "Erreur lors de l'inscription",

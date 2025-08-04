@@ -7,7 +7,6 @@ defineProps<{
 
 const router = useRouter();
 const currentRoute = router.currentRoute;
-console.log('Current route:', currentRoute.value.name);
 
 const colorMode = useColorMode()
 const appConfig = useAppConfig()

@@ -1,48 +1,22 @@
 <script setup lang="ts">
-const { deleteInvoices } = useInvoices()
-const toast = useToast()
+import { useInvoicesDelete } from '~/composables/invoices/delete';
 
-const props = withDefaults(defineProps<{
-    invoicesId?: string[]
-}>(), {
-    invoicesId: () => []
-})
+const { open, loading, onSubmit, selectedInvoices } = useInvoicesDelete()
 
-const open = ref(false)
-const _invoicesId = ref<string[]>(props.invoicesId)
-
-async function onSubmit() {
-    await deleteInvoices(_invoicesId.value)
-    toast.add({
-        title: 'Factures supprimées',
-        description: _invoicesId.value.length > 1 ?
-            'Les factures ont été supprimées.' : 'La facture a été supprimée.',
-        color: 'success'
-    })
+const cancel = () => {
     open.value = false
-    _invoicesId.value = []
 }
-
-function showDeleteModal(listInvoicesIdToDelete: string[]) {
-    _invoicesId.value = listInvoicesIdToDelete
-    open.value = true
-}
-
-defineExpose({
-    showDeleteModal
-})
 </script>
 
 <template>
     <UModal v-model:open="open"
-        :title="`Suppression de ${_invoicesId.length} ${isPlural(_invoicesId.length, 'factures', 'facture')}`"
-        :description="`Êtes-vous sûr de vouloir supprimer ${isPlural(_invoicesId.length, 'ces', 'cette')} ${isPlural(_invoicesId.length, 'factures', 'facture')} ?`">
-        <slot />
-
+        :title="`Suppression de ${selectedInvoices.length} ${isPlural(selectedInvoices.length, 'factures', 'facture')}`"
+        :description="`Êtes-vous sûr de vouloir supprimer ${isPlural(selectedInvoices.length, 'ces', 'cette')} ${isPlural(selectedInvoices.length, 'factures', 'facture')} ?`">
         <template #body>
             <div class="flex justify-end gap-2">
-                <UButton label="Annuler" color="neutral" variant="subtle" @click="open = false" />
-                <UButton label="Supprimer" color="error" variant="solid" loading-auto @click="onSubmit" />
+                <UButton label="Annuler" color="neutral" variant="subtle" @click="cancel" :disabled="loading" />
+                <UButton label="Supprimer" color="error" variant="solid" loading-auto @click="onSubmit"
+                    :loading="loading" />
             </div>
         </template>
     </UModal>

@@ -37,13 +37,22 @@ export default defineEventHandler(async (event) => {
         event,
     );
     const supabase = await serverSupabaseClient<Database>(event);
-    const user = await serverSupabaseUser(event);
     const supabaseServiceRole = serverSupabaseServiceRole<Database>(
         event,
     );
+    try {
+        const user = await serverSupabaseUser(event);
+        if (!user) {
+            throw new Error("User not found");
+        }
+        console.log("Authenticated user:", user.id);
+        userId = user.id;
+    } catch (error) {
+        console.error("Error retrieving user:", error);
+    }
 
     // 1. Check if user is authenticated
-    if (!user) {
+    if (!userId) {
         const { data: anonymousUser, error: authError } = await supabase.auth
             .signInAnonymously();
         if (authError || !anonymousUser) {
@@ -54,8 +63,6 @@ export default defineEventHandler(async (event) => {
             });
         }
         userId = anonymousUser.user!.id;
-    } else {
-        userId = user.id;
     }
 
     const { data: recipientUser, error: recipientError } =
@@ -92,7 +99,6 @@ export default defineEventHandler(async (event) => {
 
     // 2. Generate and hash code
     const code = generateCode();
-    console.log("Generated code:", code);
     const hashedCode = hashCode(code);
     const expiresAt = new Date(Date.now() + 1000 * 60 * 10); // 10 minutes
     const newInvoiceId = crypto.randomUUID();

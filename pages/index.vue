@@ -16,7 +16,6 @@ type Schema = z.output<typeof schema>
 
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     // Handle form submission logic here
-    console.log('Form submitted with:', event);
 };
 
 

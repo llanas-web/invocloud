@@ -143,22 +143,22 @@ const _useInvoices = () => {
             return null;
         }
         await refresh();
-        return data;
+        return true;
     };
 
-    const sendInvoice = async (invoices: string[], email: string) => {
-        if (!invoices || invoices.length === 0) {
+    const sendInvoice = async (invoicesId: string[], email: string) => {
+        if (!invoicesId || invoicesId.length === 0) {
             console.error("Invoice IDDs are required to send invoices.");
             return null;
         }
         const { data, message, success } = await $fetch<
             ReturnType<typeof import("~/server/api/invoices/send.post").default>
         >(
-            `/api/send-invoices/`,
+            `/api/invoices/send`,
             {
                 method: "POST",
                 body: {
-                    invoices: [invoices],
+                    invoices: [invoicesId],
                     email,
                 },
             },

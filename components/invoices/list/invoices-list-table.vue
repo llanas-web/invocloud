@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { upperFirst } from 'scule'
 import type { TableColumn } from '@nuxt/ui'
-import { InvoicesSendModal, LazyInvoicesDeleteModal, LazyInvoicesSendModal, UBadge, NuxtLink } from '#components'
+import { LazyInvoicesDeleteModal, LazyInvoicesSendModal, UBadge, NuxtLink } from '#components'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
+import { useInvoicesSend } from '~/composables/invoices/send'
+import { useInvoicesDelete } from '~/composables/invoices/delete'
 
 
 const UButton = resolveComponent('UButton')
@@ -10,16 +12,15 @@ const UDropdownMenu = resolveComponent('UDropdownMenu')
 const UCheckbox = resolveComponent('UCheckbox')
 
 const table = useTemplateRef('table')
-const sendModal = useTemplateRef<typeof LazyInvoicesSendModal>('sendModal')
-const deleteModel = useTemplateRef<typeof LazyInvoicesDeleteModal>('deleteModal')
 
 const { acceptedInvoices, pending } = useInvoices()
 const { updateInvoice } = useInvoices()
+const { open: isSendModalOpen, selectedInvoices: listInvoicesToSend } = useInvoicesSend()
+const { open: isDeleteModalOpen, selectedInvoices: listInvoicesToDelete } = useInvoicesDelete()
 declare type Invoice = NonNullable<(typeof acceptedInvoices)['value']>[number];
 
 const columnVisibility = ref()
 const rowSelection = ref({})
-
 
 function getRowItems(row: Row<Invoice>) {
     return [
@@ -31,7 +32,8 @@ function getRowItems(row: Row<Invoice>) {
             label: 'Envoyer par e-mail',
             icon: 'i-lucide-mail',
             onSelect() {
-                sendModal.value?.showSendInvoiceModal([row.original.id])
+                listInvoicesToSend.value = [row.original.id]
+                isSendModalOpen.value = true
             }
         },
         {
@@ -81,7 +83,8 @@ function getRowItems(row: Row<Invoice>) {
             icon: 'i-lucide-trash',
             color: 'error',
             onSelect() {
-                deleteModel.value?.showDeleteModal([row.original.id])
+                listInvoicesToDelete.value = [row.original.id]
+                isDeleteModalOpen.value = true
             }
         }
     ]
@@ -173,7 +176,6 @@ const columns: TableColumn<Invoice>[] = [
         },
         cell: ({ row }) => {
             const date = new Date(row.getValue('due_date'))
-            console.log(date)
             return h('div', { class: 'text-muted' }, date.toLocaleDateString('fr-FR', {
                 year: 'numeric',
                 month: '2-digit',
@@ -237,7 +239,6 @@ const columns: TableColumn<Invoice>[] = [
 const statusFilter = ref('all')
 
 watch(() => statusFilter.value, (newVal) => {
-    console.log('Status filter changed:', newVal)
     if (!table?.value?.tableApi) return
 
     const statusColumn = table.value.tableApi.getColumn('status')
@@ -254,34 +255,40 @@ const pagination = ref({
     pageIndex: 0,
     pageSize: 10
 })
+
+const openSendModal = () => {
+    listInvoicesToSend.value = table.value!.tableApi?.getFilteredSelectedRowModel().rows.map(r => r.original.id) ?? []
+    isSendModalOpen.value = true
+}
+
+const openDeleteModal = () => {
+    listInvoicesToDelete.value = table.value!.tableApi?.getFilteredSelectedRowModel().rows.map(r => r.original.id) ?? []
+    isDeleteModalOpen.value = true
+}
 </script>
 
 <template>
+    <LazyInvoicesSendModal />
+    <LazyInvoicesDeleteModal />
     <div class="flex flex-wrap items-center justify-between gap-1.5">
         <div class="flex flex-wrap items-center gap-1.5">
 
-            <InvoicesSendModal ref="sendModal"
-                :invoices="table?.tableApi?.getFilteredSelectedRowModel().rows.map(r => r.original.id) ?? []">
-                <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Envoyer"
-                    color="primary" variant="subtle" icon="i-lucide-send">
-                    <template #trailing>
-                        <UKbd>
-                            {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
-                        </UKbd>
-                    </template>
-                </UButton>
-            </InvoicesSendModal>
-            <InvoicesDeleteModal ref="deleteModal"
-                :invoicesId="table?.tableApi?.getFilteredSelectedRowModel().rows.map(r => r.original.id) ?? []">
-                <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Supprimer"
-                    color="error" variant="subtle" icon="i-lucide-trash">
-                    <template #trailing>
-                        <UKbd>
-                            {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
-                        </UKbd>
-                    </template>
-                </UButton>
-            </InvoicesDeleteModal>
+            <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Envoyer" color="primary"
+                variant="subtle" icon="i-lucide-send" @click="openSendModal">
+                <template #trailing>
+                    <UKbd>
+                        {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
+                    </UKbd>
+                </template>
+            </UButton>
+            <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Supprimer" color="error"
+                variant="subtle" icon="i-lucide-trash" @click="openDeleteModal">
+                <template #trailing>
+                    <UKbd>
+                        {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
+                    </UKbd>
+                </template>
+            </UButton>
         </div>
         <div class="flex flex-wrap items-center gap-1.5">
 

@@ -25,7 +25,6 @@ const _useSuppliers = () => {
                     console.error("Error fetching suppliers:", error);
                     return [];
                 }
-                console.log("Fetched suppliers:", data);
                 return data;
             },
             {
