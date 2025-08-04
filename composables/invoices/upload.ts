@@ -114,6 +114,7 @@ const _useInvoiceUpload = () => {
                 description: "Please select an establishment and supplier",
                 color: "error",
             });
+            isLoading.value = false;
             return;
         }
 
