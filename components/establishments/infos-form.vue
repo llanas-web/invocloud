@@ -40,23 +40,23 @@ const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof establishmentSch
 
 <template>
     <UForm id="settings" :schema="establishmentSchema" :state="establishmentState" @submit="onSubmit">
-        <UPageCard :title="`Informations de la structure: ${selectedEstablishment?.name}`"
+        <UPageCard :title="`Informations de la structure`"
             description="Renseignez les informations de votre structure qui se retrouverons dans les emails et les documents générés par InvoCloud"
             variant="naked" orientation="horizontal" class="mb-4">
-            <UButton form="settings" label="Save changes" color="primary" type="submit" class="w-fit lg:ms-auto" />
+            <UButton form="settings" label="Sauvegarder" color="primary" type="submit" class="w-fit lg:ms-auto" />
         </UPageCard>
 
         <UPageCard variant="subtle">
-            <UFormField name="name" label="Name"
-                description="Will appear on receipts, invoices, and other communication." required
+            <UFormField name="name" label="Nom"
+                description="Apparaîtra sur les reçus, factures et autres communications." required
                 class="flex max-sm:flex-col justify-between items-start gap-4">
                 <UInput v-model="establishmentState.name" autocomplete="off" />
             </UFormField>
-            <UFormField name="address" label="Address" description="Physical address of the establishment."
+            <UFormField name="address" label="Adresse" description="Adresse physique de la structure."
                 class="flex max-sm:flex-col justify-between items-start gap-4">
                 <UInput v-model="establishmentState.address" autocomplete="off" />
             </UFormField>
-            <UFormField name="phone" label="Phone" description="Contact phone number for the establishment."
+            <UFormField name="phone" label="Téléphone" description="Numéro de téléphone de contact pour la structure."
                 class="flex max-sm:flex-col justify-between items-start gap-4">
                 <UInput v-model="establishmentState.phone" type="tel" autocomplete="off" />
             </UFormField>

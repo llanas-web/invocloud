@@ -27,20 +27,20 @@ const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof userSchema>>) =>
 
 <template>
     <UForm id="settings" :schema="userSchema" :state="userInformations" @submit="onSubmit">
-        <UPageCard title="Profile" description="These informations will be displayed publicly." variant="naked"
+        <UPageCard title="Votre Profil" description="Vos informations personnelles" variant="naked"
             orientation="horizontal" class="mb-4">
-            <UButton form="settings" label="Save changes" color="primary" type="submit" class="w-fit lg:ms-auto" />
+            <UButton form="settings" label="Sauvegarder" color="primary" type="submit" class="w-fit lg:ms-auto" />
         </UPageCard>
 
         <UPageCard variant="subtle">
-            <UFormField name="name" label="Name"
-                description="Will appear on receipts, invoices, and other communication." required
-                class="flex max-sm:flex-col justify-between items-start gap-4">
+            <UFormField name="name" label="Nom"
+                description="Votre nom complet qui pourra apparaitre dans les informations envoyés à vos clients / fournisseurs"
+                required class="flex max-sm:flex-col justify-between items-start gap-4">
                 <UInput v-model="userInformations.fullname" autocomplete="off" />
             </UFormField>
             <USeparator />
             <UFormField name="email" label="Email"
-                description="Used to sign in, for email receipts and product updates."
+                description="Utilisé pour se connecter, pour les reçus par e-mail et les mises à jour de produits."
                 class="flex max-sm:flex-col justify-between items-start gap-4">
                 <UInput v-model="userInformations.email" type="email" autocomplete="off" disabled />
             </UFormField>
