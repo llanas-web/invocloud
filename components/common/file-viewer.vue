@@ -1,16 +1,18 @@
 <script setup lang="ts">
+import { VPdfViewer } from '@vue-pdf-viewer/viewer'
+
 const props = defineProps<{
     fileUrl: string;
     fileType: string;
     fileName: string;
-}>();
+}>()
 
-const { fileUrl, fileType, fileName } = toRefs(props);
+const { fileUrl, fileType, fileName } = toRefs(props)
 </script>
 <template>
     <template v-if="fileUrl">
         <div v-if="fileType.includes('pdf')" class="relative h-full">
-            <iframe :src="fileUrl" class="w-full h-full" frameborder="0" toolbar="0" title="Invoice PDF Preview" />
+            <VPdfViewer :src="fileUrl" />
         </div>
 
         <div v-else-if="fileType.match(/^(image|audio|video|text|application)\/[a-z0-9.+-]+$/i)" class="text-center">
