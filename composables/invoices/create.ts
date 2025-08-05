@@ -46,7 +46,12 @@ const _useInvoiceCreate = () => {
         const newInvoice = await createInvoice(formState, invoiceFile.value);
         if (!newInvoice) {
             console.error("Failed to create invoice");
-            // Optional: show error toast
+            toast.add({
+                title: "Erreur",
+                description: "La création de la facture a échoué.",
+                color: "error",
+            });
+            isLoading.value = false;
             return;
         }
         isLoading.value = false;
