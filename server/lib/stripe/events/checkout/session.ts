@@ -85,7 +85,7 @@ export async function handleCheckoutSessionCompleted(
         console.error("❌ Failed to update establishment:", error);
     } else {
         console.log(
-            `✅ Subscription stored for ${establishmentId} (${subscriptionStatus})`,
+            `✅ Checkout session completed for ${establishmentId}. Checkout status: ${subscriptionStatus}`,
         );
     }
 }

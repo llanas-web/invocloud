@@ -24,7 +24,6 @@ export async function handleInvoicePaymentSucceeded(
     const { error } = await ctx.supabase
         .from("establishments")
         .update({
-            subscription_status: "active",
             subscription_end: fromUnix(invoice.period_end),
         })
         .eq("stripe_customer_id", customerId);
@@ -36,7 +35,7 @@ export async function handleInvoicePaymentSucceeded(
         );
     } else {
         console.log(
-            `✅ Subscription updated: status=active, customer=${customerId}`,
+            `✅ Invoice payment succeeded for customer=${customerId} and payment=${invoice.id}`,
         );
     }
 }
