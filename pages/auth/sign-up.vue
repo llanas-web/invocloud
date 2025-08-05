@@ -1,87 +1,87 @@
 <script setup lang="ts">
-import * as z from 'zod'
-import type { FormSubmitEvent } from '@nuxt/ui'
-import type { UForm } from '#components'
+    import * as z from 'zod'
+    import type { FormSubmitEvent } from '@nuxt/ui'
+    import type { UForm } from '#components'
 
-definePageMeta({
-    layout: 'auth',
-})
+    definePageMeta({
+        layout: 'auth',
+    })
 
-const loading = ref(false)
-const { signup } = useAuth()
-const { selectedEstablishment, subscribeToStripe, refresh } = useEstablishments()
+    const loading = ref(false)
+    const { signup } = useAuth()
+    const { selectedEstablishment, subscribeToStripe, refresh } = useEstablishments()
 
-const fields: Array<{
-    name: keyof Schema
-    type: 'text' | 'email' | 'password'
-    label: string
-    placeholder: string
-    required?: boolean
-}> = [
-        {
-            name: 'email',
-            type: 'text' as const,
-            label: 'E-mail',
-            placeholder: 'Entrez votre e-mail',
-            required: true,
-        },
-        {
-            name: 'password',
-            label: 'Mot de passe',
-            type: 'password' as const,
-            placeholder: 'Entrez votre mot de passe',
-            required: true,
-        },
-        {
-            name: 'full_name',
-            type: 'text' as const,
-            label: 'Nom complet',
-            placeholder: 'Entrez votre nom complet',
-            required: true,
-        },
-        {
-            name: 'establishment_name',
-            type: 'text' as const,
-            label: 'Nom de la structure',
-            placeholder: 'Entrez le nom de la structure',
-            required: true,
-        },
-    ];
+    const fields: Array<{
+        name: keyof Schema
+        type: 'text' | 'email' | 'password'
+        label: string
+        placeholder: string
+        required?: boolean
+    }> = [
+            {
+                name: 'email',
+                type: 'text' as const,
+                label: 'E-mail',
+                placeholder: 'Entrez votre e-mail',
+                required: true,
+            },
+            {
+                name: 'password',
+                label: 'Mot de passe',
+                type: 'password' as const,
+                placeholder: 'Entrez votre mot de passe',
+                required: true,
+            },
+            {
+                name: 'full_name',
+                type: 'text' as const,
+                label: 'Nom complet',
+                placeholder: 'Entrez votre nom complet',
+                required: true,
+            },
+            {
+                name: 'establishment_name',
+                type: 'text' as const,
+                label: 'Nom de la structure',
+                placeholder: 'Entrez le nom de la structure',
+                required: true,
+            },
+        ];
 
-const schema = z.object({
-    full_name: z.string().min(2, 'Nom trop court'),
-    establishment_name: z.string().min(2, 'Nom de structure requis'),
-    email: z.string().email('E-mail invalide'),
-    password: z.string().min(8, 'Doit contenir au moins 8 caractères'),
-})
+    const schema = z.object({
+        full_name: z.string().min(2, 'Nom trop court'),
+        establishment_name: z.string().min(2, 'Nom de structure requis'),
+        email: z.string().email('E-mail invalide'),
+        password: z.string().min(8, 'Doit contenir au moins 8 caractères'),
+    })
 
-type Schema = z.output<typeof schema>
+    type Schema = z.output<typeof schema>
 
-const state = reactive<Schema>({
-    full_name: '',
-    establishment_name: '',
-    email: '',
-    password: '',
-});
+    const state = reactive<Schema>({
+        full_name: '',
+        establishment_name: '',
+        email: '',
+        password: '',
+    });
 
-const show = ref(false)
-const signUpForm = useTemplateRef('signUpForm')
+    const show = ref(false)
+    const signUpForm = useTemplateRef('signUpForm')
 
-async function onSubmit(payload: FormSubmitEvent<Schema>) {
-    loading.value = true
-    const { email, password, full_name, establishment_name } = payload.data
-    const data = await signup(
-        email,
-        password,
-        establishment_name,
-        full_name,
-    )
-    if (data) {
-        await refresh()
-        await subscribeToStripe()
+    async function onSubmit(payload: FormSubmitEvent<Schema>) {
+        loading.value = true
+        const { email, password, full_name, establishment_name } = payload.data
+        const data = await signup(
+            email,
+            password,
+            establishment_name,
+            full_name,
+        )
+        if (data) {
+            await refresh()
+            await subscribeToStripe()
+        }
+        loading.value = false
     }
-    loading.value = false
-}
 </script>
 
 <template>
@@ -130,7 +130,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
                 </UCard>
                 <USeparator />
                 <UButton class="w-full justify-center py-3 cursor-pointer" label="Démarrer la période d'essai"
-                    @click="() => signUpForm?.submit()" />
+                    @click="() => signUpForm?.submit()" :loading="loading" />
                 <span class="text-center text-sm text-muted">Si vous n’annulez pas votre essai avant les 7 jours, un
                     montant de
                     29,99€ vous
