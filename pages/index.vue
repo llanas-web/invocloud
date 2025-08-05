@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import { LazyInvoicesUploadModalContainer } from '#components';
-import { z } from 'zod';
-import type { FormSubmitEvent } from '@nuxt/ui'
+    import { LazyInvoicesUploadModalContainer } from '#components';
+    import { z } from 'zod';
+    import type { FormSubmitEvent } from '@nuxt/ui'
 
-const { openModal } = useInvoiceUpload()
+    const { openModal } = useInvoiceUpload()
 
-const schema = z.object({
-    email: z.string().email('Veuillez entrer un email valide'),
-});
-const state = reactive({
-    email: ''
-});
+    const schema = z.object({
+        email: z.string().email('Veuillez entrer un email valide'),
+    });
+    const state = reactive({
+        email: ''
+    });
 
-type Schema = z.output<typeof schema>
+    type Schema = z.output<typeof schema>
 
-const onSubmit = async (event: FormSubmitEvent<Schema>) => {
-    // Handle form submission logic here
-};
+    const onSubmit = async (event: FormSubmitEvent<Schema>) => {
+        // Handle form submission logic here
+    };
 
 
-const { data: page } = await useAsyncData(() => queryCollection('index').first())
-const user = useSupabaseUser()
-definePageMeta({
-    layout: false,
-})
+    const { data: page } = await useAsyncData(() => queryCollection('index').first())
+    const user = useSupabaseUser()
+    definePageMeta({
+        layout: false,
+    })
 </script>
 
 
@@ -82,7 +82,7 @@ definePageMeta({
                                 label: 'hidden md:block',
                             }" />
                     </template>
-                    <CommonInvocloudLogo />
+                    <CommonInvocloudLogo @click="openModal" />
                 </UPageHero>
 
                 <UPageSection :title="page?.sections[0].title" :description="page?.sections[0].description" :ui="{
