@@ -1,5 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { SupplierUpdate } from "~/types";
+import type { Range, SupplierUpdate } from "~/types";
 
 const _useSuppliers = () => {
     const supabaseClient = useSupabaseClient();
@@ -33,6 +33,20 @@ const _useSuppliers = () => {
                 watch: [selectedEstablishment],
             },
         );
+
+    const getSuppliersStats = (range: Range) => {
+        const filteredSuppliers = suppliers.value.filter((supplier) => {
+            const createdAt = new Date(supplier.created_at);
+            return (
+                createdAt >= range.start &&
+                createdAt <= range.end
+            );
+        });
+
+        return {
+            count: filteredSuppliers.length,
+        };
+    };
 
     const createSupplier = async (
         name: string,
@@ -114,6 +128,7 @@ const _useSuppliers = () => {
         refresh,
         pending,
         suppliersError,
+        getSuppliersStats,
         createSupplier,
         updateSupplier,
         deleteSuppliers,

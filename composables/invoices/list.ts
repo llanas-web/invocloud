@@ -1,5 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { InvoiceInsert, InvoiceUpdate } from "~/types";
+import type { InvoiceInsert, InvoiceUpdate, Period, Range } from "~/types";
 import type { Database } from "~/types/database.types";
 import {
     acceptedStatus,
@@ -54,6 +54,24 @@ const _useInvoices = () => {
     const pendingInvoices = computed(() =>
         invoices.value?.filter((i) => i.status === "pending") || []
     );
+
+    const getInvoicesStats = (range: Range) => {
+        const filteredInvoices = invoices.value.filter((invoice) => {
+            const invoiceDate = new Date(invoice.created_at);
+            return (
+                invoiceDate >= range.start &&
+                invoiceDate <= range.end
+            );
+        });
+        const total = filteredInvoices.reduce(
+            (sum, invoice) => sum + (invoice.amount ?? 0),
+            0,
+        );
+        return {
+            total,
+            count: filteredInvoices.length,
+        };
+    };
 
     const getInvoices = async () => {
         await refresh();
@@ -202,6 +220,7 @@ const _useInvoices = () => {
         invoicesError,
         pendingInvoices,
         getInvoices,
+        getInvoicesStats,
         createInvoice,
         updateInvoice,
         deleteInvoices,
