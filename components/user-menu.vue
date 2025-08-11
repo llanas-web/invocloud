@@ -24,15 +24,15 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   type: 'label',
   label: user.value.name,
 }], [{
-  label: 'Profile',
+  label: 'Profil',
   icon: 'i-lucide-user'
 }, {
-  label: 'Billing',
+  label: 'Paiements',
   icon: 'i-lucide-credit-card',
   to: '/app/settings/establishments#billing',
   active: currentRoute.value.name === 'app-settings-establishments'
 }, {
-  label: 'Settings',
+  label: 'Paramètres',
   icon: 'i-lucide-settings',
   to: '/app/settings',
   active: currentRoute.value.name === 'app-settings'
