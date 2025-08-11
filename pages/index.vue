@@ -1,29 +1,29 @@
 <script setup lang="ts">
-    import { LazyInvoicesUploadModalContainer } from '#components';
-    import { z } from 'zod';
-    import type { FormSubmitEvent } from '@nuxt/ui'
+import { LazyInvoicesUploadModalContainer } from '#components';
+import { z } from 'zod';
+import type { FormSubmitEvent } from '@nuxt/ui'
 
-    const { openModal } = useInvoiceUpload()
+const { openModal } = useInvoiceUpload()
 
-    const schema = z.object({
-        email: z.string().email('Veuillez entrer un email valide'),
-    });
-    const state = reactive({
-        email: ''
-    });
+const schema = z.object({
+    email: z.string().email('Veuillez entrer un email valide'),
+});
+const state = reactive({
+    email: ''
+});
 
-    type Schema = z.output<typeof schema>
+type Schema = z.output<typeof schema>
 
-    const onSubmit = async (event: FormSubmitEvent<Schema>) => {
-        // Handle form submission logic here
-    };
+const onSubmit = async (event: FormSubmitEvent<Schema>) => {
+    // Handle form submission logic here
+};
 
 
-    const { data: page } = await useAsyncData(() => queryCollection('index').first())
-    const user = useSupabaseUser()
-    definePageMeta({
-        layout: false,
-    })
+const { data: page } = await useAsyncData(() => queryCollection('index').first())
+const user = useSupabaseUser()
+definePageMeta({
+    layout: false,
+})
 </script>
 
 
@@ -41,8 +41,16 @@
                 </NuxtLink>
             </template>
             <template #right>
+                <UButton label="Fonctionnalités" :to="{ path: '/', hash: '#features' }" size="md" variant="ghost"
+                    trailing-icon="i-lucide-star" :ui="{
+                        label: 'hidden md:block'
+                    }" />
+                <UButton label="Tarifs" :to="{ path: '/', hash: '#pricing' }" size="md" variant="ghost"
+                    trailing-icon="i-lucide-wallet" :ui="{
+                        label: 'hidden md:block'
+                    }" />
                 <UButton v-if="user != null && user.is_anonymous === false" to="/app" trailingIcon="i-lucide-home"
-                    label="Dashboard" size="md" variant="ghost" :ui="{
+                    label="Tableau de bord" size="md" variant="ghost" :ui="{
                         label: 'hidden md:block'
                     }" />
                 <UButton v-else label="Connexion" variant="ghost" :ui="{
@@ -73,7 +81,7 @@
                     </template>
                     <template #links>
                         <UButton v-if="user != null && user.is_anonymous === false" to="/app"
-                            trailingIcon="i-lucide-home" size="xl">Dashboard</UButton>
+                            trailingIcon="i-lucide-home" size="xl">Tableau de bord</UButton>
                         <UButton v-else to="/auth/login" trailingIcon="i-lucide-log-in" size="xl">
                             Connexion
                         </UButton>
@@ -85,11 +93,12 @@
                     <CommonInvocloudLogo @click="openModal" />
                 </UPageHero>
 
-                <UPageSection :title="page?.sections[0].title" :description="page?.sections[0].description" :ui="{
-                    root: 'bg-muted text-muted',
-                    title: 'max-w-xl mx-auto text-muted',
-                    description: 'max-w-xl mx-auto text-muted',
-                }">
+                <UPageSection id="features" :title="page?.sections[0].title"
+                    :description="page?.sections[0].description" :ui="{
+                        root: 'bg-muted text-muted pt-[var(--ui-header-height)]',
+                        title: 'max-w-xl mx-auto text-muted',
+                        description: 'max-w-xl mx-auto text-muted',
+                    }">
                     <UPageGrid>
                         <UPageCard v-for="(item, index) in page?.sections[0].features" :key="index" v-bind="item"
                             spotlight variant="outline" :ui="{
@@ -103,8 +112,8 @@
                 </UPageSection>
 
 
-                <UPageSection :title="page.pricing.title" :description="page.pricing.description" :ui="{
-                    root: 'text-muted',
+                <UPageSection id="pricing" :title="page.pricing.title" :description="page.pricing.description" :ui="{
+                    root: 'text-muted pt-[var(--ui-header-height)]',
                     title: 'max-w-xl mx-auto text-muted',
                 }">
                     <UContainer>

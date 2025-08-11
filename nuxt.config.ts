@@ -9,6 +9,11 @@ export default defineNuxtConfig({
       baseUrl: process.env.BASE_URL || "http://localhost:3000",
     },
   },
+  router: {
+    options: {
+      scrollBehaviorType: "smooth",
+    },
+  },
   supabase: {
     redirect: true,
     key: process.env.SUPABASE_ANON_KEY || "",
