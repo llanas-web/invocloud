@@ -27,8 +27,6 @@ const columns: TableColumn<{ email: string }>[] = [
 
 <template>
     <UModal v-model:open="open" title="Nouveau fournisseur" description="Ajouter un nouveau fournisseur">
-        <UButton label="Nouveau fournisseur" icon="i-lucide-plus" />
-
         <template #body>
             <UForm :state="formState" class="space-y-4" @submit="onSubmit">
                 <UFormField label="Nom" placeholder="John Doe" name="name">

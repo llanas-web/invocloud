@@ -3,18 +3,26 @@ import type { InvoiceStatus } from '~/types';
 
 const { formState, isLoading } = useInvoiceCreate()
 const { suppliers } = useSuppliers()
+const { openModal: openCreateModal, formState: createFormState } = useSupplierCreate()
 
 const invoiceStatus = ref<{ label: string, value: InvoiceStatus, icon: string, class: string }[]>([
     { label: 'Payée', value: 'paid', icon: 'i-lucide-check-circle', class: 'text-green-500' },
     { label: 'Validée', value: 'validated', icon: 'i-lucide-check', class: 'text-blue-500' }
 ])
+
+const onCreateSupplier = (newSupplierName: string) => {
+    console.log('Creating new supplier:', newSupplierName)
+    createFormState.name = newSupplierName || ''
+    openCreateModal.value = true
+}
 </script>
 
 <template>
+    <LazySuppliersAddModal />
     <UForm class="space-y-4" :state="formState" :disabled="isLoading" :loading="isLoading">
         <UFormField label="Fournisseur">
-            <UInputMenu v-model="formState.supplier_id" :items="suppliers" class="w-full" value-key="id"
-                label-key="name">
+            <UInputMenu v-model="formState.supplier_id" :items="suppliers" class="w-full" value-key="id" create-item
+                label-key="name" @create="onCreateSupplier" placeholder="Sélectionner un fournisseur">
             </UInputMenu>
         </UFormField>
         <UFormField label="Commentaire">

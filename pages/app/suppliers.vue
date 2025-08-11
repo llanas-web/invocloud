@@ -19,6 +19,7 @@ const UCheckbox = resolveComponent('UCheckbox')
 const toast = useToast()
 const table = useTemplateRef('table')
 const { suppliers, pending, deleteSuppliers } = useSuppliers()
+const { openModal: openCreateModal } = useSupplierCreate()
 
 // const columnFilters = ref([{
 //     id: 'emails',
@@ -143,6 +144,10 @@ const pagination = ref({
     pageIndex: 0,
     pageSize: 10
 })
+
+const onNewSupplier = () => {
+    openCreateModal.value = true
+}
 </script>
 
 <template>
@@ -154,12 +159,13 @@ const pagination = ref({
                 </template>
 
                 <template #right>
-                    <SuppliersAddModal />
+                    <UButton label="Nouveau fournisseur" icon="i-lucide-plus" @click="onNewSupplier" />
                 </template>
             </UDashboardNavbar>
         </template>
 
         <template #body>
+            <LazySuppliersAddModal />
             <div class="flex flex-wrap items-center justify-between gap-1.5">
                 <!-- <UInput :model-value="(table?.tableApi?.getColumn('emails')?.getFilterValue() as string)"
                     class="max-w-sm" icon="i-lucide-search" placeholder="Filter emails..."

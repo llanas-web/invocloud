@@ -29,6 +29,9 @@ const range = shallowRef<Range>({
     end: new Date()
 })
 const period = ref<Period>('journalier')
+const onNewInvoice = () => {
+    navigateTo('/app/invoices/new')
+}
 </script>
 
 <template>
@@ -52,6 +55,7 @@ const period = ref<Period>('journalier')
                     <!-- <UDropdownMenu :items="items">
                         <UButton icon="i-lucide-plus" size="md" class="rounded-full" />
                     </UDropdownMenu> -->
+                    <UButton label="Nouvelle facture" variant="subtle" icon="i-lucide-plus" @click="onNewInvoice" />
                     <UButton label="Envoyer des factures" trailing-icon="i-lucide-send" @click="openModal" :ui="{
                         label: 'hidden md:block',
                     }" />
