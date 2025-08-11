@@ -2,7 +2,6 @@
 import { LazyInvoicesUploadModalContainer } from '#components';
 import { z } from 'zod';
 import type { FormSubmitEvent } from '@nuxt/ui'
-import { fr } from '@nuxt/ui-pro/locale'
 
 const { openModal } = useInvoiceUpload()
 
@@ -31,7 +30,7 @@ definePageMeta({
 <template>
     <div class="absolute w-96 h-96 rounded-full bg-[#5E73F7] opacity-80 blur-3xl"
         style="top: -30%; left: 50%; transform: translateX(-50%);"></div>
-    <UApp :locale="fr">
+    <UApp>
         <UHeader :toggle="false">
             <template #left>
                 <NuxtLink to="/">
@@ -41,14 +40,12 @@ definePageMeta({
                     </div>
                 </NuxtLink>
             </template>
-            <UButton label="Fonctionnalités" :to="{ path: '/', hash: '#features' }" size="md" variant="ghost"
-                trailing-icon="i-lucide-star" :ui="{
-                    label: 'hidden md:block'
-                }" />
-            <UButton label="Tarifs" :to="{ path: '/', hash: '#pricing' }" size="md" variant="ghost"
-                trailing-icon="i-lucide-wallet" :ui="{
-                    label: 'hidden md:block'
-                }" />
+            <UButton label="Fonctionnalités" :to="{ path: '/', hash: '#features' }" size="md" variant="ghost" :ui="{
+                label: 'hidden md:block'
+            }" />
+            <UButton label="Tarifs" :to="{ path: '/', hash: '#pricing' }" size="md" variant="ghost" :ui="{
+                label: 'hidden md:block'
+            }" />
             <template #right>
                 <UButton label="Envoyer des factures" trailing-icon="i-lucide-send" size="md" variant="soft" :ui="{
                     label: 'hidden md:block',
@@ -57,7 +54,7 @@ definePageMeta({
                     trailingIcon="i-lucide-home" size="md" variant="solid" :ui="{
                         label: 'hidden md:block'
                     }" />
-                <UButton v-else label="Connexion" variant="ghost" :ui="{
+                <UButton v-else label="Connexion" variant="solid" :ui="{
                     label: 'hidden md:block'
                 }" to="/auth/login" trailingIcon="i-lucide-log-in" size="md" />
             </template>

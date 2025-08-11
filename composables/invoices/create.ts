@@ -60,7 +60,7 @@ const _useInvoiceCreate = () => {
             description: "La facture a été créée avec succès.",
             color: "success",
         });
-        navigateTo("/app/invoices");
+        navigateTo("/app");
     };
 
     return {

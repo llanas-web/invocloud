@@ -12,7 +12,7 @@ const items = ref<BreadcrumbItem[]>([
     {
         label: 'Factures',
         icon: 'i-lucide-files',
-        to: '/app/invoices'
+        to: '/app'
     },
     {
         label: `Nouvelle Facture`,
@@ -71,7 +71,7 @@ const isMobile = breakpoints.smaller('lg')
             </div>
             <div class="flex justify-end p-4 mt-auto space-x-4">
                 <UButton label="Annuler" color="neutral" variant="subtle" :disabled="isLoading"
-                    @click="navigateTo('/app/invoices')" />
+                    @click="navigateTo('/app')" />
                 <UButton label="Sauvegarder" color="success" :loading="isLoading" @click="onSubmit"
                     :disabled="!isDirty" />
             </div>

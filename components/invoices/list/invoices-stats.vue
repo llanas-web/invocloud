@@ -11,7 +11,8 @@ const { pending: supplierPending, suppliers, getSuppliersStats } = useSuppliers(
 
 const invoicesStats = ref({
     total: 0,
-    count: 0
+    count: 0,
+    pendingCount: 0
 })
 
 const suppliersStats = ref({
@@ -81,12 +82,12 @@ function formatCurrency(value: number): string {
         }" class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1 cursor-pointer"
             :onClick="() => console.log('Pending invoices clicked')">
             <div class="flex items-center gap-2">
-                <template v-if="supplierPending">
+                <template v-if="invoicePending">
                     <USkeleton class="w-24 h-8" />
                 </template>
                 <template v-else>
                     <span class="text-2xl font-semibold text-highlighted">
-                        {{ suppliersStats.count }}
+                        {{ invoicesStats.pendingCount }}
                     </span>
                 </template>
             </div>

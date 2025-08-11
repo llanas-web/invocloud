@@ -25,6 +25,7 @@ export const InvoiceWithEstablishmentSchema = z.object({
     establishment_id: z.string().uuid(),
     taxe_amount: z.number(),
     due_date: z.string().nullable(),
+    paid_at: z.string().nullable(),
     overdue: z.boolean(),
 });
 

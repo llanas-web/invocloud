@@ -111,11 +111,11 @@ const columns: TableColumn<Invoice>[] = [
             })
     },
     {
-        accessorKey: 'name',
-        header: 'Nom',
+        accessorKey: 'number',
+        header: 'Numéro de facture',
         cell: ({ row }) => {
             return h('div', { class: 'flex items-center gap-3' }, [
-                h(NuxtLink, { class: 'font-medium text-highlighted hover:underline', to: `/app/invoices/${row.original.id}` }, row.original.name ?? ''),
+                h(NuxtLink, { class: 'font-medium text-highlighted hover:underline', to: `/app/invoices/${row.original.id}` }, row.original.invoice_number ?? ''),
             ])
         }
     },
@@ -128,6 +128,20 @@ const columns: TableColumn<Invoice>[] = [
                     h('p', { class: 'font-medium text-highlighted' }, row.original.supplier_name),
                 ])
             ])
+        }
+    },
+    {
+        accessorKey: 'amount',
+        header: () => h('div', { class: 'text-right' }, 'Montant'),
+        cell: ({ row }) => {
+            const amount = Number.parseFloat(row.getValue('amount'))
+
+            const formatted = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'EUR'
+            }).format(amount)
+
+            return h('div', { class: 'text-right font-medium' }, formatted)
         }
     },
     {
@@ -152,9 +166,46 @@ const columns: TableColumn<Invoice>[] = [
                     'En retard'
                 )
             }
-            return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
-                row.original.status
-            )
+            return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () => {
+                switch (row.original.status) {
+                    case 'pending':
+                        return 'En attente'
+                    case 'sent':
+                        return 'Envoyé'
+                    case 'validated':
+                        return 'En cours'
+                    case 'paid':
+                        return 'Payée'
+                    case 'error':
+                        return 'Erreur'
+                }
+            })
+        }
+    },
+    {
+        accessorKey: 'created_at',
+        header: ({ column }) => {
+            const isSorted = column.getIsSorted()
+
+            return h(UButton, {
+                variant: 'ghost',
+                label: 'Date de réception',
+                icon: isSorted
+                    ? isSorted === 'asc'
+                        ? 'i-lucide-arrow-up-narrow-wide'
+                        : 'i-lucide-arrow-down-wide-narrow'
+                    : 'i-lucide-arrow-up-down',
+                class: '-mx-2.5',
+                onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+            })
+        },
+        cell: ({ row }) => {
+            const date = new Date(row.getValue('created_at'))
+            return h('div', { class: 'text-muted' }, date.toLocaleDateString('fr-FR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }))
         }
     },
     {
@@ -175,6 +226,9 @@ const columns: TableColumn<Invoice>[] = [
             })
         },
         cell: ({ row }) => {
+            if (row.getValue('due_date') === null || row.getValue('due_date') === '') {
+                return h('div', { class: 'text-muted' }, '')
+            }
             const date = new Date(row.getValue('due_date'))
             return h('div', { class: 'text-muted' }, date.toLocaleDateString('fr-FR', {
                 year: 'numeric',
@@ -183,30 +237,33 @@ const columns: TableColumn<Invoice>[] = [
             }))
         }
     },
+
     {
-        accessorKey: 'amount',
-        header: () => h('div', { class: 'text-right' }, 'Montant'),
+        accessorKey: 'paid_at',
+        header: ({ column }) => {
+            const isSorted = column.getIsSorted()
+            return h(UButton, {
+                variant: 'ghost',
+                label: 'Date de paiement',
+                icon: isSorted
+                    ? isSorted === 'asc'
+                        ? 'i-lucide-arrow-up-narrow-wide'
+                        : 'i-lucide-arrow-down-wide-narrow'
+                    : 'i-lucide-arrow-up-down',
+                class: '-mx-2.5',
+                onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+            })
+        },
         cell: ({ row }) => {
-            const amount = Number.parseFloat(row.getValue('amount'))
-
-            const formatted = new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'EUR'
-            }).format(amount)
-
-            return h('div', { class: 'text-right font-medium' }, formatted)
-        }
-    },
-    {
-        accessorKey: 'TVA',
-        header: () => h('div', { class: 'text-right' }, 'TVA'),
-        cell: ({ row }) => {
-            const formatted = new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'EUR'
-            }).format(row.original.taxe_amount)
-
-            return h('div', { class: 'text-right font-medium' }, formatted)
+            if (row.getValue('paid_at') === null || row.getValue('paid_at') === '') {
+                return h('div', { class: 'text-muted' }, '')
+            }
+            const date = new Date(row.getValue('paid_at'))
+            return h('div', { class: 'text-muted' }, date.toLocaleDateString('fr-FR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }))
         }
     },
     {
@@ -294,9 +351,9 @@ const openDeleteModal = () => {
 
             <USelect v-model="statusFilter" :items="[
                 { label: 'Tout', value: 'all' },
-                { label: 'En attente', value: 'validated' },
+                { label: 'En cours', value: 'validated' },
                 { label: 'Payé', value: 'paid' },
-                { label: 'En erreur', value: 'error' }
+                { label: 'En retard', value: 'error' }
             ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
                 placeholder="Filter status" class="min-w-28" />
             <UDropdownMenu :items="table?.tableApi

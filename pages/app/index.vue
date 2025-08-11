@@ -32,9 +32,9 @@ const period = ref<Period>('journalier')
 </script>
 
 <template>
-    <UDashboardPanel id="home">
+    <UDashboardPanel id="Factures">
         <template #header>
-            <UDashboardNavbar title="Home" :ui="{ right: 'gap-3' }">
+            <UDashboardNavbar title="Factures" :ui="{ right: 'gap-3' }">
                 <template #leading>
                     <UDashboardSidebarCollapse />
                 </template>

@@ -67,9 +67,14 @@ const _useInvoices = () => {
             (sum, invoice) => sum + (invoice.amount ?? 0),
             0,
         );
+        const pendingCount = filteredInvoices.filter(
+            (invoice) =>
+                invoice.status !== "paid" && invoice.status !== "error",
+        ).length;
         return {
             total,
             count: filteredInvoices.length,
+            pendingCount,
         };
     };
 
