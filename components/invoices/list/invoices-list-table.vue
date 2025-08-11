@@ -13,7 +13,7 @@ const UCheckbox = resolveComponent('UCheckbox')
 
 const table = useTemplateRef('table')
 
-const { acceptedInvoices, pending } = useInvoices()
+const { acceptedInvoices, pending, statusFilter } = useInvoices()
 const { updateInvoice } = useInvoices()
 const { open: isSendModalOpen, selectedInvoices: listInvoicesToSend } = useInvoicesSend()
 const { open: isDeleteModalOpen, selectedInvoices: listInvoicesToDelete } = useInvoicesDelete()
@@ -293,8 +293,6 @@ const columns: TableColumn<Invoice>[] = [
     }
 ]
 
-const statusFilter = ref('all')
-
 watch(() => statusFilter.value, (newVal) => {
     if (!table?.value?.tableApi) return
 
@@ -331,7 +329,9 @@ const openDeleteModal = () => {
         <div class="flex flex-wrap items-center gap-1.5">
 
             <UButton :disabled="!table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Envoyer"
-                color="primary" variant="subtle" icon="i-lucide-send" @click="openSendModal">
+                color="primary" variant="subtle" icon="i-lucide-send" @click="openSendModal" :ui="{
+                    label: 'hidden md:block',
+                }">
                 <template #trailing>
                     <UKbd>
                         {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
@@ -339,7 +339,9 @@ const openDeleteModal = () => {
                 </template>
             </UButton>
             <UButton :disabled="!table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Supprimer"
-                color="error" variant="subtle" icon="i-lucide-trash" @click="openDeleteModal">
+                color="error" variant="subtle" icon="i-lucide-trash" @click="openDeleteModal" :ui="{
+                    label: 'hidden md:block',
+                }">
                 <template #trailing>
                     <UKbd>
                         {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}

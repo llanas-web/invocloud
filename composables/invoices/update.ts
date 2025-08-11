@@ -5,6 +5,8 @@ import type { InvoiceUpdate } from "~/types";
 const _useInvoiceUpdate = () => {
     const { invoice, updateInvoice } = useInvoiceDetails();
     const isDisabled = computed(() => invoice.value?.status === "paid");
+    const toast = useToast();
+    const paidAtInputRef = ref();
 
     const formState = reactive<InvoiceUpdate>({
         status: invoice.value?.status ?? "validated",
@@ -61,6 +63,16 @@ const _useInvoiceUpdate = () => {
 
     const onSubmit = async () => {
         if (!formState || !invoice.value) return;
+        if (formState.status === "paid" && !formState.paid_at) {
+            console.error("Paid date is required when status is 'paid'");
+            toast.add({
+                title: "Erreur",
+                description:
+                    "La date de paiement est requise lorsque le statut est 'payé'.",
+                color: "error",
+            });
+            return;
+        }
 
         const updatedInvoice = await updateInvoice(
             invoice.value.id,
@@ -80,6 +92,7 @@ const _useInvoiceUpdate = () => {
         formState,
         isDirty,
         isDisabled,
+        paidAtInputRef,
         onSubmit,
     };
 };

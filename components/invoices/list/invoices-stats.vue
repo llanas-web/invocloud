@@ -6,7 +6,7 @@ const props = defineProps<{
     range: Range
 }>()
 
-const { pending: invoicePending, invoices, getInvoicesStats } = useInvoices();
+const { pending: invoicePending, invoices, statusFilter, getInvoicesStats } = useInvoices();
 const { pending: supplierPending, suppliers, getSuppliersStats } = useSuppliers();
 
 const invoicesStats = ref({
@@ -27,8 +27,6 @@ watch(() => [props.range, suppliers.value], async () => {
     suppliersStats.value = getSuppliersStats(props.range);
 }, { immediate: true })
 
-console.log('Invoices Stats:', invoicesStats.value)
-
 function formatCurrency(value: number): string {
     return value.toLocaleString('en-US', {
         style: 'currency',
@@ -36,17 +34,25 @@ function formatCurrency(value: number): string {
         maximumFractionDigits: 0
     })
 }
+
+const onPendingInvoiceClick = () => {
+    if (statusFilter.value === 'validated') {
+        statusFilter.value = 'all'
+    } else {
+        statusFilter.value = 'validated'
+    }
+}
 </script>
 
 <template>
-    <UPageGrid class="lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-px">
+    <UPageGrid class="grid-cols-3 gap-4 sm:gap-6 lg:gap-px">
         <UPageCard icon="i-lucide-circle-dollar-sign" title="Dépenses" variant="subtle" :ui="{
             container: 'gap-y-1.5',
-            wrapper: 'items-start',
+            wrapper: 'items-center md:items-start',
             leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25 flex-col',
             title: 'font-normal text-muted text-xs uppercase'
         }" class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center justify-center md:justify-start gap-2">
                 <template v-if="invoicePending">
                     <USkeleton class="w-24 h-8" />
                 </template>
@@ -59,11 +65,11 @@ function formatCurrency(value: number): string {
         </UPageCard>
         <UPageCard icon="i-lucide-shopping-cart" title="Factures" variant="subtle" :ui="{
             container: 'gap-y-1.5',
-            wrapper: 'items-start',
+            wrapper: 'items-center md:items-start',
             leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25 flex-col',
             title: 'font-normal text-muted text-xs uppercase'
         }" class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center justify-center md:justify-start gap-2">
                 <template v-if="invoicePending">
                     <USkeleton class="w-24 h-8" />
                 </template>
@@ -74,14 +80,15 @@ function formatCurrency(value: number): string {
                 </template>
             </div>
         </UPageCard>
-        <UPageCard icon="i-lucide-clock" title="Factures en attente" variant="subtle" :ui="{
-            container: 'gap-y-1.5',
-            wrapper: 'items-start',
-            leading: 'p-2.5 rounded-full bg-red-500/10 ring ring-inset ring-red-500/25 flex-col',
-            title: 'font-normal text-muted text-xs uppercase'
-        }" class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1 cursor-pointer"
-            :onClick="() => console.log('Pending invoices clicked')">
-            <div class="flex items-center gap-2">
+        <UPageCard icon="i-lucide-clock" title="En attente" variant="subtle" :highlight="statusFilter === 'validated'"
+            :ui="{
+                container: 'gap-y-1.5',
+                wrapper: 'items-center md:items-start',
+                leading: 'p-2.5 rounded-full bg-red-500/10 ring ring-inset ring-red-500/25 flex-col',
+                title: 'font-normal text-muted text-xs uppercase'
+            }" class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1 cursor-pointer"
+            @click="onPendingInvoiceClick">
+            <div class="flex items-center justify-center md:justify-start gap-2">
                 <template v-if="invoicePending">
                     <USkeleton class="w-24 h-8" />
                 </template>

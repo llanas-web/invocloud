@@ -15,6 +15,7 @@ const _useInvoiceCreate = () => {
         comment: "",
         name: null,
         due_date: "",
+        invoice_number: "",
     });
 
     const invoiceFile = ref<File | null>(null);
@@ -27,7 +28,8 @@ const _useInvoiceCreate = () => {
             formState.taxe_amount !== 0 ||
             formState.comment !== "" ||
             formState.name !== null ||
-            formState.due_date !== ""
+            formState.due_date !== "" ||
+            formState.invoice_number !== ""
         );
     });
 

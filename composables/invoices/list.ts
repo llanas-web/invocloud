@@ -10,6 +10,7 @@ const _useInvoices = () => {
     const supabaseClient = useSupabaseClient<Database>();
     const supabaseUser = useSupabaseUser();
     const { selectedEstablishment } = useEstablishments();
+    const statusFilter = ref<string>("all");
 
     const { data: invoices, error: invoicesError, refresh, pending } =
         useAsyncData(
@@ -224,6 +225,7 @@ const _useInvoices = () => {
         pending,
         invoicesError,
         pendingInvoices,
+        statusFilter,
         getInvoices,
         getInvoicesStats,
         createInvoice,

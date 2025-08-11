@@ -3,7 +3,7 @@ import type { InvoiceStatus } from '~/types';
 import { format } from 'date-fns'
 
 const { invoice, isLoading } = useInvoiceDetails()
-const { formState, isDisabled } = useInvoiceUpdate()
+const { formState, isDisabled, paidAtInputRef } = useInvoiceUpdate()
 
 const invoiceStatus = ref<{ label: string, value: InvoiceStatus, icon: string, class: string }[]>([
     { label: 'Payée', value: 'paid', icon: 'i-lucide-check-circle', class: 'text-green-500' },
@@ -41,7 +41,8 @@ const invoiceStatus = ref<{ label: string, value: InvoiceStatus, icon: string, c
             </UFormField>
             <UFormField label="Date de paiement">
                 <USkeleton v-if="!invoice" class="h-8" />
-                <UInput v-else v-model="formState.paid_at" type="date" class="w-full" />
+                <UInput ref="paidAtInputRef" v-else v-model="formState.paid_at" type="date" class="w-full"
+                    :required="formState.status === 'paid'" />
             </UFormField>
         </div>
         <UFormField label="Statut">
