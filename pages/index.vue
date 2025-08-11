@@ -40,26 +40,25 @@ definePageMeta({
                     </div>
                 </NuxtLink>
             </template>
+            <UButton label="Fonctionnalités" :to="{ path: '/', hash: '#features' }" size="md" variant="ghost"
+                trailing-icon="i-lucide-star" :ui="{
+                    label: 'hidden md:block'
+                }" />
+            <UButton label="Tarifs" :to="{ path: '/', hash: '#pricing' }" size="md" variant="ghost"
+                trailing-icon="i-lucide-wallet" :ui="{
+                    label: 'hidden md:block'
+                }" />
             <template #right>
-                <UButton label="Fonctionnalités" :to="{ path: '/', hash: '#features' }" size="md" variant="ghost"
-                    trailing-icon="i-lucide-star" :ui="{
-                        label: 'hidden md:block'
-                    }" />
-                <UButton label="Tarifs" :to="{ path: '/', hash: '#pricing' }" size="md" variant="ghost"
-                    trailing-icon="i-lucide-wallet" :ui="{
-                        label: 'hidden md:block'
-                    }" />
-                <UButton v-if="user != null && user.is_anonymous === false" to="/app" trailingIcon="i-lucide-home"
-                    label="Tableau de bord" size="md" variant="ghost" :ui="{
+                <UButton label="Envoyer des factures" trailing-icon="i-lucide-send" size="md" variant="soft" :ui="{
+                    label: 'hidden md:block',
+                }" @click="openModal" />
+                <UButton v-if="user != null && user.is_anonymous === false" label="Tableau de bord" to="/app"
+                    trailingIcon="i-lucide-home" size="md" variant="solid" :ui="{
                         label: 'hidden md:block'
                     }" />
                 <UButton v-else label="Connexion" variant="ghost" :ui="{
                     label: 'hidden md:block'
                 }" to="/auth/login" trailingIcon="i-lucide-log-in" size="md" />
-
-                <UButton label="Envoyer des factures" trailing-icon="i-lucide-send" size="md" variant="ghost" :ui="{
-                    label: 'hidden md:block',
-                }" @click="openModal" />
             </template>
         </UHeader>
 
@@ -95,7 +94,7 @@ definePageMeta({
 
                 <UPageSection id="features" :title="page?.sections[0].title"
                     :description="page?.sections[0].description" :ui="{
-                        root: 'bg-muted text-muted pt-[var(--ui-header-height)]',
+                        root: 'bg-muted text-muted pt-[var(--ui-header-height)] md:pt-8',
                         title: 'max-w-xl mx-auto text-muted',
                         description: 'max-w-xl mx-auto text-muted',
                     }">
@@ -113,7 +112,7 @@ definePageMeta({
 
 
                 <UPageSection id="pricing" :title="page.pricing.title" :description="page.pricing.description" :ui="{
-                    root: 'text-muted pt-[var(--ui-header-height)]',
+                    root: 'text-muted pt-[var(--ui-header-height)] md:pt-8',
                     title: 'max-w-xl mx-auto text-muted',
                 }">
                     <UContainer>
@@ -131,6 +130,43 @@ definePageMeta({
                         </UPricingPlans>
                     </UContainer>
                 </UPageSection>
+
+                <UPageSection id="trust" title="Ils nous font confiance" :ui="{
+                    root: 'bg-muted text-muted pt-[var(--ui-header-height)] md:pt-8',
+                    title: 'max-w-xl mx-auto text-muted',
+                }">
+                    <UContainer class="text-center">
+                        <div class="flex flex-wrap items-center justify-center gap-3 mt-4">
+                            <span
+                                class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
+                                <UIcon name="i-lucide-check-circle-2" class="text-primary" />
+                                Supérettes
+                            </span>
+                            <span
+                                class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
+                                <UIcon name="i-lucide-check-circle-2" class="text-primary" />
+                                Cabinets comptables
+                            </span>
+                            <span
+                                class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
+                                <UIcon name="i-lucide-check-circle-2" class="text-primary" />
+                                Indépendants
+                            </span>
+                            <span
+                                class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
+                                <UIcon name="i-lucide-check-circle-2" class="text-primary" />
+                                TPE
+                            </span>
+                        </div>
+
+                        <p class="mt-8 text-lg">
+                            <UIcon name="i-lucide-trending-up" class="inline align-[-2px] text-primary mr-2" />
+                            Rejoignez les professionnels qui ont digitalisé leur facturation avec
+                            <span class="text-primary font-medium">Invocloud</span>.
+                        </p>
+                    </UContainer>
+                </UPageSection>
+
                 <UPageSection>
                     <template #title>
                         <ul class="font-normal uppercase">
@@ -154,9 +190,6 @@ definePageMeta({
                                 <UButton icon="i-simple-icons-linkedin" variant="ghost" color="primary" size="lg" />
                             </li>
                             <li>
-                                <UButton icon="i-simple-icons-x" variant="ghost" color="primary" size="lg" />
-                            </li>
-                            <li>
                                 <UButton icon="i-simple-icons-facebook" variant="ghost" color="primary" size="lg" />
                             </li>
                             <li>
@@ -168,10 +201,12 @@ definePageMeta({
             </div>
         </UMain>
 
-        <USeparator icon="i-custom-invocloud-logo" class="text-primary-100/15" />
+        <USeparator class="text-primary-100/15">
+            <UIcon name="i-custom-invocloud-logo" class="text-primary size-10" />
+        </USeparator>
 
         <UFooter>
-            <p class="text-primary">Politique de confidentialité l Conditions générales d’utilisation © 2025 Invocloud.
+            <p class="text-primary">Politique de confidentialité l Conditions générales d'utilisation © 2025 Invocloud.
                 Tous
                 droits réservés.
             </p>

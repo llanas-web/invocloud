@@ -7,16 +7,16 @@ hero:
 
 sections:
   - title: Toutes les factures dans une seule application
-    description: InvoCloud vous permet de gérer toutes vos factures en un seul endroit. Importez, créez et suivez vos factures facilement.
+    description: Accessible depuis n'importe quel navigateur, Invocloud remplace le traditionnel dossier papier ou boîte mail par une interface intuitive et puissante
     features:
       - title: Dématérialisation
-        description: Finalisez en avec les factures papier en envoyant et recevant vos factures en ligne.
+        description: Vos factures sont déposées
         icon: i-lucide-file-text
       - title: Sécurité
-        description: Transmettez vos factures grace à un lien unique garantissant la sécurité de vos données.
+        description: Vous pilotez toute votre gestion de factures depuis une interface claire, fluide et centralisée
         icon: i-lucide-shield-check
       - title: Efficacité
-        description: Accedez à vos factures et à leurs statuts à tout moment grace à un tableau de bord complet.
+        description: Vous partagez l'accès avec votre expert-comptable
         icon: i-lucide-clock
 
 pricing:
