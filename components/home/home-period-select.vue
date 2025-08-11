@@ -13,20 +13,20 @@ const days = computed(() => eachDayOfInterval(props.range))
 const periods = computed<Period[]>(() => {
   if (days.value.length <= 8) {
     return [
-      'daily'
+      'journalier'
     ]
   }
 
   if (days.value.length <= 31) {
     return [
-      'daily',
-      'weekly'
+      'journalier',
+      'hebdomadaire'
     ]
   }
 
   return [
-    'weekly',
-    'monthly'
+    'hebdomadaire',
+    'mensuel'
   ]
 })
 
@@ -39,11 +39,6 @@ watch(periods, () => {
 </script>
 
 <template>
-  <USelect
-    v-model="model"
-    :items="periods"
-    variant="ghost"
-    class="data-[state=open]:bg-elevated"
-    :ui="{ value: 'capitalize', itemLabel: 'capitalize', trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
-  />
+  <USelect v-model="model" :items="periods" variant="ghost" class="data-[state=open]:bg-elevated"
+    :ui="{ value: 'capitalize', itemLabel: 'capitalize', trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }" />
 </template>

@@ -22,9 +22,9 @@ const data = ref<DataRecord[]>([])
 
 watch([() => props.period, () => props.range], () => {
   const dates = ({
-    daily: eachDayOfInterval,
-    weekly: eachWeekOfInterval,
-    monthly: eachMonthOfInterval
+    journalier: eachDayOfInterval,
+    hebdomadaire: eachWeekOfInterval,
+    mensuel: eachMonthOfInterval
   } as Record<Period, typeof eachDayOfInterval>)[props.period](props.range)
 
   const min = 1000
@@ -42,9 +42,9 @@ const formatNumber = new Intl.NumberFormat('en', { style: 'currency', currency: 
 
 const formatDate = (date: Date): string => {
   return ({
-    daily: format(date, 'd MMM'),
-    weekly: format(date, 'd MMM'),
-    monthly: format(date, 'MMM yyy')
+    journalier: format(date, 'd MMM'),
+    hebdomadaire: format(date, 'd MMM'),
+    mensuel: format(date, 'MMM yyy')
   })[props.period]
 }
 

@@ -74,7 +74,7 @@ export interface Notification {
     date: string;
 }
 
-export type Period = "daily" | "weekly" | "monthly";
+export type Period = "journalier" | "hebdomadaire" | "mensuel";
 
 export interface Range {
     start: Date;

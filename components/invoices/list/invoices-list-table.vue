@@ -273,16 +273,16 @@ const openDeleteModal = () => {
     <div class="flex flex-wrap items-center justify-between gap-1.5">
         <div class="flex flex-wrap items-center gap-1.5">
 
-            <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Envoyer" color="primary"
-                variant="subtle" icon="i-lucide-send" @click="openSendModal">
+            <UButton :disabled="!table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Envoyer"
+                color="primary" variant="subtle" icon="i-lucide-send" @click="openSendModal">
                 <template #trailing>
                     <UKbd>
                         {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
                     </UKbd>
                 </template>
             </UButton>
-            <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Supprimer" color="error"
-                variant="subtle" icon="i-lucide-trash" @click="openDeleteModal">
+            <UButton :disabled="!table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Supprimer"
+                color="error" variant="subtle" icon="i-lucide-trash" @click="openDeleteModal">
                 <template #trailing>
                     <UKbd>
                         {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
@@ -331,8 +331,8 @@ const openDeleteModal = () => {
 
     <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
         <div class="text-sm text-muted">
-            {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} of
-            {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s) selected.
+            {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} de
+            {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} ligne(s) sélectionnée(s).
         </div>
 
         <div class="flex items-center gap-1.5">

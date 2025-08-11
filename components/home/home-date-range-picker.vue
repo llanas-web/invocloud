@@ -2,19 +2,19 @@
 import { DateFormatter, getLocalTimeZone, CalendarDate, today } from '@internationalized/date'
 import type { Range } from '~/types'
 
-const df = new DateFormatter('en-US', {
+const df = new DateFormatter('fr-FR', {
   dateStyle: 'medium'
 })
 
 const selected = defineModel<Range>({ required: true })
 
 const ranges = [
-  { label: 'Last 7 days', days: 7 },
-  { label: 'Last 14 days', days: 14 },
-  { label: 'Last 30 days', days: 30 },
-  { label: 'Last 3 months', months: 3 },
-  { label: 'Last 6 months', months: 6 },
-  { label: 'Last year', years: 1 }
+  { label: 'Derniers 7 jours', days: 7 },
+  { label: 'Derniers 14 jours', days: 14 },
+  { label: 'Derniers 30 jours', days: 30 },
+  { label: 'Derniers 3 mois', months: 3 },
+  { label: 'Derniers 6 mois', months: 6 },
+  { label: 'Dernière année', years: 1 }
 ]
 
 const toCalendarDate = (date: Date) => {
@@ -79,12 +79,7 @@ const selectRange = (range: { days?: number, months?: number, years?: number }) 
 
 <template>
   <UPopover :content="{ align: 'start' }" :modal="true">
-    <UButton
-      color="neutral"
-      variant="ghost"
-      icon="i-lucide-calendar"
-      class="data-[state=open]:bg-elevated group"
-    >
+    <UButton color="neutral" variant="ghost" icon="i-lucide-calendar" class="data-[state=open]:bg-elevated group">
       <span class="truncate">
         <template v-if="selected.start">
           <template v-if="selected.end">
@@ -100,32 +95,20 @@ const selectRange = (range: { days?: number, months?: number, years?: number }) 
       </span>
 
       <template #trailing>
-        <UIcon name="i-lucide-chevron-down" class="shrink-0 text-dimmed size-5 group-data-[state=open]:rotate-180 transition-transform duration-200" />
+        <UIcon name="i-lucide-chevron-down"
+          class="shrink-0 text-dimmed size-5 group-data-[state=open]:rotate-180 transition-transform duration-200" />
       </template>
     </UButton>
 
     <template #content>
       <div class="flex items-stretch sm:divide-x divide-default">
         <div class="hidden sm:flex flex-col justify-center">
-          <UButton
-            v-for="(range, index) in ranges"
-            :key="index"
-            :label="range.label"
-            color="neutral"
-            variant="ghost"
-            class="rounded-none px-4"
-            :class="[isRangeSelected(range) ? 'bg-elevated' : 'hover:bg-elevated/50']"
-            truncate
-            @click="selectRange(range)"
-          />
+          <UButton v-for="(range, index) in ranges" :key="index" :label="range.label" color="neutral" variant="ghost"
+            class="rounded-none px-4" :class="[isRangeSelected(range) ? 'bg-elevated' : 'hover:bg-elevated/50']"
+            truncate @click="selectRange(range)" />
         </div>
 
-        <UCalendar
-          v-model="calendarRange"
-          class="p-2"
-          :number-of-months="2"
-          range
-        />
+        <UCalendar v-model="calendarRange" class="p-2" :number-of-months="2" range />
       </div>
     </template>
   </UPopover>

@@ -36,16 +36,9 @@ const { pending } = useEstablishments()
 
 const links = ref<NavigationMenuItem[]>([
     {
-        label: 'Accueil',
-        icon: 'i-lucide-house',
-        to: '/app',
-        onSelect: () => {
-            open.value = false
-        }
-    }, {
         label: 'Factures',
         icon: 'i-lucide-files',
-        to: '/app/invoices',
+        to: '/app',
         slot: 'invoices',
         onSelect: () => {
             open.value = false
