@@ -34,20 +34,6 @@ const _useSuppliers = () => {
             },
         );
 
-    const getSuppliersStats = (range: Range) => {
-        const filteredSuppliers = suppliers.value.filter((supplier) => {
-            const createdAt = new Date(supplier.created_at);
-            return (
-                createdAt >= range.start &&
-                createdAt <= range.end
-            );
-        });
-
-        return {
-            count: filteredSuppliers.length,
-        };
-    };
-
     const createSupplier = async (
         name: string,
         emails: string[],
@@ -128,7 +114,6 @@ const _useSuppliers = () => {
         refresh,
         pending,
         suppliersError,
-        getSuppliersStats,
         createSupplier,
         updateSupplier,
         deleteSuppliers,

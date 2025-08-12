@@ -1,31 +1,25 @@
 <script setup lang="ts">
-import type { Period, Range, Stat } from '~/types'
+import { useInvoicesTableList } from '~/composables/invoices/table-list';
 
-const props = defineProps<{
-    period: Period
-    range: Range
-}>()
+const { pending: invoicePending } = useInvoices();
+const { statusFilter, filteredInvoices } = useInvoicesTableList();
 
-const { pending: invoicePending, invoices, statusFilter, getInvoicesStats } = useInvoices();
-const { pending: supplierPending, suppliers, getSuppliersStats } = useSuppliers();
-
-const invoicesStats = ref({
-    total: 0,
-    count: 0,
-    pendingCount: 0
+const invoicesStats = computed(() => {
+    const total = filteredInvoices.value.reduce(
+        (sum, invoice) => sum + (invoice.amount ?? 0),
+        0,
+    );
+    const count = filteredInvoices.value.length;
+    const pendingCount = filteredInvoices.value.filter(
+        (invoice) =>
+            invoice.status !== "paid" && invoice.status !== "error",
+    ).length;
+    return {
+        total,
+        count,
+        pendingCount,
+    };
 })
-
-const suppliersStats = ref({
-    count: 0
-})
-
-watch(() => [props.range, invoices.value], async () => {
-    invoicesStats.value = getInvoicesStats(props.range);
-}, { immediate: true })
-
-watch(() => [props.range, suppliers.value], async () => {
-    suppliersStats.value = getSuppliersStats(props.range);
-}, { immediate: true })
 
 function formatCurrency(value: number): string {
     return value.toLocaleString('en-US', {

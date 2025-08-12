@@ -10,7 +10,6 @@ const _useInvoices = () => {
     const supabaseClient = useSupabaseClient<Database>();
     const supabaseUser = useSupabaseUser();
     const { selectedEstablishment } = useEstablishments();
-    const statusFilter = ref<string>("all");
 
     const { data: invoices, error: invoicesError, refresh, pending } =
         useAsyncData(
@@ -55,29 +54,6 @@ const _useInvoices = () => {
     const pendingInvoices = computed(() =>
         invoices.value?.filter((i) => i.status === "pending") || []
     );
-
-    const getInvoicesStats = (range: Range) => {
-        const filteredInvoices = invoices.value.filter((invoice) => {
-            const invoiceDate = new Date(invoice.created_at);
-            return (
-                invoiceDate >= range.start &&
-                invoiceDate <= range.end
-            );
-        });
-        const total = filteredInvoices.reduce(
-            (sum, invoice) => sum + (invoice.amount ?? 0),
-            0,
-        );
-        const pendingCount = filteredInvoices.filter(
-            (invoice) =>
-                invoice.status !== "paid" && invoice.status !== "error",
-        ).length;
-        return {
-            total,
-            count: filteredInvoices.length,
-            pendingCount,
-        };
-    };
 
     const getInvoices = async () => {
         await refresh();
@@ -225,9 +201,7 @@ const _useInvoices = () => {
         pending,
         invoicesError,
         pendingInvoices,
-        statusFilter,
         getInvoices,
-        getInvoicesStats,
         createInvoice,
         updateInvoice,
         deleteInvoices,

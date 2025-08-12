@@ -5,6 +5,7 @@ import { LazyInvoicesDeleteModal, LazyInvoicesSendModal, UBadge, NuxtLink } from
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
 import { useInvoicesSend } from '~/composables/invoices/send'
 import { useInvoicesDelete } from '~/composables/invoices/delete'
+import { useInvoicesTableList } from '~/composables/invoices/table-list'
 
 
 const UButton = resolveComponent('UButton')
@@ -13,7 +14,8 @@ const UCheckbox = resolveComponent('UCheckbox')
 
 const table = useTemplateRef('table')
 
-const { acceptedInvoices, pending, statusFilter } = useInvoices()
+const { acceptedInvoices, pending } = useInvoices()
+const { statusFilter, rangeFilter, filteredInvoices } = useInvoicesTableList()
 const { updateInvoice } = useInvoices()
 const { open: isSendModalOpen, selectedInvoices: listInvoicesToSend } = useInvoicesSend()
 const { open: isDeleteModalOpen, selectedInvoices: listInvoicesToDelete } = useInvoicesDelete()
@@ -380,7 +382,7 @@ const openDeleteModal = () => {
     <UTable ref="table" v-model:column-visibility="columnVisibility" v-model:row-selection="rowSelection"
         v-model:pagination="pagination" :pagination-options="{
             getPaginationRowModel: getPaginationRowModel()
-        }" class="shrink-0" :data="acceptedInvoices" :columns="columns" :loading="pending" :ui="{
+        }" class="shrink-0" :data="filteredInvoices" :columns="columns" :loading="pending" :ui="{
             base: 'table-fixed border-separate border-spacing-0',
             thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
             tbody: '[&>tr]:last:[&>td]:border-b-0',

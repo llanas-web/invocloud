@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { DateFormatter, getLocalTimeZone, CalendarDate, today } from '@internationalized/date'
+import { monthsInYear, } from 'date-fns/constants';
+import { useInvoicesTableList } from '~/composables/invoices/table-list'
 import type { Range } from '~/types'
 
 const df = new DateFormatter('fr-FR', {
   dateStyle: 'medium'
 })
 
-const selected = defineModel<Range>({ required: true })
+const { rangeFilter: selected } = useInvoicesTableList();
 
 const ranges = [
   { label: 'Derniers 7 jours', days: 7 },
@@ -108,7 +110,7 @@ const selectRange = (range: { days?: number, months?: number, years?: number }) 
             truncate @click="selectRange(range)" />
         </div>
 
-        <UCalendar v-model="calendarRange" class="p-2" :number-of-months="2" range />
+        <UCalendar v-model="calendarRange" class="p-2" :number-of-months="1" range />
       </div>
     </template>
   </UPopover>
