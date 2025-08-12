@@ -50,7 +50,8 @@ const items = computed<DropdownMenuItem[][]>(() => {
         </template>
 
         <UButton v-bind="selectedEstablishment" color="neutral" variant="soft" block :square="collapsed"
-            class="data-[state=open]:bg-elevated" :class="[!collapsed && 'py-2']" :ui="{ trailingIcon: 'text-dimmed' }"
+            class="data-[state=open]:bg-elevated" :class="[!collapsed && 'py-2']"
+            :ui="{ trailingIcon: 'text-dimmed', leadingIcon: collapsed ? 'hidden' : 'block' }"
             :label="selectedEstablishment?.name || 'Sélectionner une structure'"
             trailing-icon="i-lucide-chevrons-up-down" leading-icon="i-lucide-building" />
     </UDropdownMenu>
