@@ -7,6 +7,30 @@ const _useEstablishments = () => {
     const selectedEstablishment = ref<Establishment | null>(null);
     const { userSettings } = useUserSettings();
 
+    watch(() => selectedEstablishment.value, (newEstablishment) => {
+        console.log("Selected establishment changed:", newEstablishment);
+        if (newEstablishment) {
+            localStorage.setItem("selectedEstablishment", newEstablishment.id);
+        }
+    }, { immediate: true });
+
+    const selectEstablishment = (establishments: Establishment[]) => {
+        let establishmentId: string | null = null;
+        if (selectedEstablishment.value != null) {
+            establishmentId = selectedEstablishment.value.id;
+        } else if (localStorage.getItem("selectedEstablishment")) {
+            establishmentId = localStorage.getItem("selectedEstablishment");
+        } else if (userSettings.value?.favorite_establishment_id) {
+            establishmentId = userSettings.value.favorite_establishment_id;
+        } else {
+            establishmentId = establishments[0]?.id || null;
+        }
+        console.log("Selected establishment ID:", establishmentId);
+        selectedEstablishment.value = establishments.find(
+            (est) => est.id === establishmentId,
+        ) || null;
+    };
+
     const { data: establishments, pending, refresh } = useAsyncData(
         "establishments",
         async () => {
@@ -19,22 +43,12 @@ const _useEstablishments = () => {
                 console.error("Error fetching establishments:", error);
                 return [];
             }
-            if (!selectedEstablishment.value) {
-                if (userSettings.value?.favorite_establishment_id) {
-                    selectedEstablishment.value = data.find((est) =>
-                        est.id === userSettings.value.favorite_establishment_id
-                    ) || null;
-                } else selectedEstablishment.value = data[0] || null;
-            } else if (selectedEstablishment.value != null) {
-                selectedEstablishment.value = data.find((est) =>
-                    est.id === selectedEstablishment.value!.id
-                ) || null;
-            }
+            selectEstablishment(data);
             return data;
         },
         {
             immediate: true,
-            server: true,
+            server: false,
             default: () => [],
         },
     );
