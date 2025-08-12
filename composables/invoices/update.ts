@@ -16,10 +16,10 @@ const _useInvoiceUpdate = () => {
         invoice_number: invoice.value?.invoice_number ?? "",
         due_date: invoice.value?.due_date
             ? format(invoice.value?.due_date, "yyyy-MM-dd")
-            : "",
+            : null,
         paid_at: invoice.value?.paid_at
             ? format(invoice.value?.paid_at, "yyyy-MM-dd")
-            : "",
+            : null,
     });
 
     watch(
@@ -36,13 +36,13 @@ const _useInvoiceUpdate = () => {
                         newInvoice.due_date,
                         "yyyy-MM-dd",
                     )
-                    : "";
+                    : null;
                 formState.paid_at = newInvoice.paid_at
                     ? format(
                         newInvoice.paid_at,
                         "yyyy-MM-dd",
                     )
-                    : "";
+                    : null;
             }
         },
         { immediate: true },
