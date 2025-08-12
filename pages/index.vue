@@ -54,9 +54,14 @@ definePageMeta({
                     trailingIcon="i-lucide-home" size="md" variant="solid" :ui="{
                         label: 'hidden md:block'
                     }" />
-                <UButton v-else label="Connexion" variant="solid" :ui="{
-                    label: 'hidden md:block'
-                }" to="/auth/login" trailingIcon="i-lucide-log-in" size="md" />
+                <template v-else>
+                    <UButton label="Connexion" variant="solid" :ui="{
+                        label: 'hidden md:block'
+                    }" to="/auth/login" size="md" />
+                    <UButton label="Inscription" variant="solid" :ui="{
+                        label: 'hidden md:block'
+                    }" to="/auth/sign-up" size="md" />
+                </template>
             </template>
         </UHeader>
 
@@ -77,13 +82,13 @@ definePageMeta({
                         <p class="text-muted text-lg">{{ page.description }}</p>
                     </template>
                     <template #links>
-                        <UButton v-if="user != null && user.is_anonymous === false" to="/app"
+                        <UButton v-if="user != null && user.is_anonymous === false" to="/app" class="z-50"
                             trailingIcon="i-lucide-home" size="xl">Tableau de bord</UButton>
-                        <UButton v-else to="/auth/login" trailingIcon="i-lucide-log-in" size="xl">
+                        <UButton v-else to="/auth/login" class="z-50" trailingIcon="i-lucide-log-in" size="xl">
                             Connexion
                         </UButton>
                         <UButton label="Envoyer des factures" trailing-icon="i-lucide-send" size="xl" variant="subtle"
-                            @click="openModal" :ui="{
+                            class="z-50" @click="openModal" :ui="{
                                 label: 'hidden md:block',
                             }" />
                     </template>
