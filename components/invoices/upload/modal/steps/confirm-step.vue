@@ -13,8 +13,7 @@ const { formState, possibleEstablishments, confirmState } = useInvoiceUpload()
             <UInput v-model="formState.senderEmail" placeholder="Votre email" class="w-full" :disabled="true" />
         </UFormField>
         <UFormField label="Fichier" name="invoiceFile">
-            <UInput placeholder="Choisir une facture" class="w-full" :disabled="true">{{ formState.invoiceFile?.name }}
-            </UInput>
+            <UInput v-model="formState.invoiceFile!.name" class="w-full" :disabled="true" />
         </UFormField>
         <UFormField label="Commentaire" name="comment">
             <UInput v-model="formState.comment" placeholder="Commentaire" class="w-full" :disabled="true" />
