@@ -122,7 +122,8 @@ definePageMeta({
                                     description: 'text-muted',
                                     price: 'text-muted',
                                     footer: 'items-start',
-                                    button: 'w-auto'
+                                    button: 'w-auto',
+                                    featureTitle: 'text-xs md:text-sm'
                                 }">
                             </UPricingPlan>
                         </UPricingPlans>
