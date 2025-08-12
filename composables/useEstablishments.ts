@@ -35,16 +35,19 @@ const _useEstablishments = () => {
         "establishments",
         async () => {
             const { data, error } = await supabaseClient
-                .from("establishments")
-                .select("*")
-                .eq("creator_id", user.value!.id);
+                .from("establishment_members")
+                .select("*, establishments(*)")
+                .or(`user_id.eq.${user.value!.id}`);
 
             if (error) {
                 console.error("Error fetching establishments:", error);
                 return [];
             }
-            selectEstablishment(data);
-            return data;
+            const establishmentsData = data.map((item: any) =>
+                item.establishments
+            );
+            selectEstablishment(establishmentsData);
+            return establishmentsData;
         },
         {
             immediate: true,

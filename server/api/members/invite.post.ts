@@ -2,6 +2,7 @@ import {
     serverSupabaseClient,
     serverSupabaseServiceRole,
 } from "#supabase/server";
+import { format } from "date-fns";
 import * as z from "zod";
 import { Database } from "~/types/database.types";
 
@@ -91,7 +92,7 @@ export default defineEventHandler(async (event) => {
     const { data: existingUser, error: userError } = await supabaseServiceRole
         .from("users")
         .select("*")
-        .eq("email", email);
+        .eq("email", email).single();
 
     if (userError) {
         console.error("Error checking existing user:", userError);
@@ -101,14 +102,14 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    if (existingUser && existingUser.length > 0) {
-        const { data, error } = await supabaseServiceRole
+    if (existingUser != null) {
+        const { error } = await supabaseServiceRole
             .from("establishment_members")
             .insert({
-                user_id: existingUser[0].id,
+                user_id: existingUser.id,
                 establishment_id: establishmentId,
             });
-        if (error || !data) {
+        if (error) {
             console.error(
                 "Error adding existing user to establishment:",
                 error,
@@ -119,6 +120,29 @@ export default defineEventHandler(async (event) => {
             });
         }
         console.log("Existing user added to establishment successfully");
+
+        const { emails } = useResend();
+
+        try {
+            await emails.send({
+                from: "InvoCloud <tech@llanas.dev>",
+                to: [existingUser.email],
+                subject: "Vous avez été ajouté à un établissement",
+                html:
+                    `Bonjour ${
+                        existingUser.full_name || existingUser.email
+                    },<br><br>` +
+                    `Vous avez été ajouté à l'établissement <strong>${establishment.name}</strong> par <strong>${
+                        session.session!.user.email
+                    }</strong>.<br><br>`,
+            });
+        } catch (error) {
+            console.error("Error sending email:", error);
+            throw createError({
+                status: 500,
+                message: "Error sending confirmation email",
+            });
+        }
     } else {
         const { data: inviteData, error: inviteError } =
             await supabaseServiceRole
