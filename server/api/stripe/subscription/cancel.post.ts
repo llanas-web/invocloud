@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
         .single();
 
     if (!structure?.stripe_subscription_id) {
-        return { error: "No active subscription found" };
+        return { error: "Aucun abonnement actif trouvé" };
     }
 
     // Cancel subscription at period end
@@ -26,6 +26,6 @@ export default defineEventHandler(async (event) => {
 
     return {
         success: true,
-        message: "Subscription will be canceled at the end of the period.",
+        message: "L'abonnement sera annulé à la fin de la période.",
     };
 });

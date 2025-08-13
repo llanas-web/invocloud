@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
         console.error("❌ Invalid request body", parsed.error.flatten());
         throw createError({
             statusCode: 400,
-            statusMessage: "Invalid request data",
+            statusMessage: "Données de requête invalides",
         });
     }
 
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
         console.error("❌ User is not authenticated or missing email");
         throw createError({
             statusCode: 401,
-            statusMessage: "Unauthorized",
+            statusMessage: "Non autorisé",
         });
     }
 

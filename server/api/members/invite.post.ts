@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
         console.error("Validation error:", parsed.error);
         throw createError({
             status: 400,
-            message: "Invalid request data",
+            message: "Données de requête invalides",
         });
     }
     const { email, establishmentId, invitorId } = parsed.data;
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
         console.error("Authentication error:", authError);
         throw createError({
             status: 401,
-            message: "Unauthorized",
+            message: "Utilisateur non authentifié",
         });
     }
     const userId = session.session?.user.id;
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
         console.error("User is not authorized to invite members");
         throw createError({
             status: 403,
-            message: "Forbidden",
+            message: "Interdit",
         });
     }
     // 2. Check if the establishment exists
@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
         console.error("Establishment not found:", establishmentError);
         throw createError({
             status: 404,
-            message: "Establishment not found",
+            message: "Établissement non trouvé",
         });
     }
     // 3. Check if the user is already a member of the establishment
@@ -74,14 +74,15 @@ export default defineEventHandler(async (event) => {
             console.error("Error checking existing member:", memberError);
             throw createError({
                 status: 500,
-                message: "Internal server error",
+                message: "Erreur lors de la vérification de l'adhésion",
             });
         }
         if (existingMember) {
             console.error("User is already a member of the establishment");
             throw createError({
                 status: 409,
-                message: "Conflict",
+                message:
+                    "Conflict: L'utilisateur est déjà membre de l'établissement",
             });
         }
     }
@@ -98,7 +99,7 @@ export default defineEventHandler(async (event) => {
         console.error("Error checking existing user:", userError);
         throw createError({
             status: 500,
-            message: "Internal server error",
+            message: "Erreur interne du serveur",
         });
     }
 
@@ -116,7 +117,8 @@ export default defineEventHandler(async (event) => {
             );
             throw createError({
                 status: 500,
-                message: "Failed to add existing user to establishment",
+                message:
+                    "Erreur lors de l'ajout de l'utilisateur existant à l'établissement",
             });
         }
         console.log("Existing user added to establishment successfully");
@@ -140,7 +142,7 @@ export default defineEventHandler(async (event) => {
             console.error("Error sending email:", error);
             throw createError({
                 status: 500,
-                message: "Error sending confirmation email",
+                message: "Erreur lors de l'envoi de l'email de confirmation",
             });
         }
     } else {
@@ -159,12 +161,12 @@ export default defineEventHandler(async (event) => {
             console.error("Error sending invitation email:", inviteError);
             throw createError({
                 status: 500,
-                message: "Failed to send invitation email",
+                message: "Erreur lors de l'envoi de l'email d'invitation",
             });
         }
     }
     return {
         success: true,
-        message: "Member invited successfully",
+        message: "Membre invité avec succès",
     };
 });

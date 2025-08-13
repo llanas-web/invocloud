@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     if (!invoices || !email) {
         throw createError({
             status: 400,
-            message: "Missing invoice ID or email",
+            message: "Données de requête invalides",
         });
     }
     const supabase = await serverSupabaseClient(event);
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     if (!user) {
         throw createError({
             status: 401,
-            message: "Unauthorized",
+            message: "Utilisateur non authentifié",
         });
     }
     const { data: invoicesData, error: invoicesError } = await supabase
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     if (invoicesError) {
         throw createError({
             status: 500,
-            message: "Error fetching invoices",
+            message: "Erreur lors de la récupération des factures",
         });
     }
     const { data, error } = await supabaseAdmin.storage.from("invoices")
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
     if (error) {
         throw createError({
             status: 500,
-            message: "Error creating signed URLs",
+            message: "Erreur lors de la création des URLs signées",
         });
     }
     const populatedInvoicesWithSignedUrl = invoicesData.map((
@@ -56,26 +56,26 @@ export default defineEventHandler(async (event) => {
         from: "InvoCloud <tech@llanas.dev>",
         to: [email],
         subject: `Factures de ${user.email}`,
-        html: `<p>Dear user,</p>
-               <p>Here are your invoices:</p>
+        html: `<p>Cher utilisateur,</p>
+               <p>Voici vos factures :</p>
                <ul>${
             populatedInvoicesWithSignedUrl.map((invoice) =>
                 `<li><a href="${invoice.signedUrl}">${invoice.name}</a></li>`
             )
                 .join("")
         }</ul>
-               <p>Best regards,</p>
-               <p>InvoCloud Team</p>`,
+               <p>Cordialement,</p>
+               <p>L'équipe InvoCloud</p>`,
     });
     if (emailError) {
         throw createError({
             status: 500,
-            message: "Error sending invoices",
+            message: "Erreur lors de l'envoi des factures",
         });
     }
     return {
         success: true,
-        message: "Invoices sent successfully",
+        message: "Factures envoyées avec succès",
         data: emailData,
     };
 });

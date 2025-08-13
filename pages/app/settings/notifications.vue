@@ -8,32 +8,24 @@ const state = reactive<{ [key: string]: boolean }>({
 })
 
 const sections = [{
-  title: 'Notification channels',
-  description: 'Where can we notify you?',
+  title: 'Notifications',
+  description: 'Ou pouvons nous vous notifier ?',
   fields: [{
     name: 'email',
     label: 'Email',
-    description: 'Receive a daily email digest.'
-  }, {
-    name: 'desktop',
-    label: 'Desktop',
-    description: 'Receive desktop notifications.'
-  }]
+    description: 'Recevez un résumé quotidien par e-mail.'
+  },]
 }, {
   title: 'Account updates',
-  description: 'Receive updates about Nuxt UI.',
+  description: 'Recevez des mises à jour sur Invocloud.',
   fields: [{
-    name: 'weekly_digest',
-    label: 'Weekly digest',
-    description: 'Receive a weekly digest of news.'
-  }, {
     name: 'product_updates',
-    label: 'Product updates',
-    description: 'Receive a monthly email with all new features and updates.'
+    label: 'Mises à jour du produit',
+    description: 'Recevez un e-mail mensuel avec toutes les nouvelles fonctionnalités et mises à jour.'
   }, {
     name: 'important_updates',
-    label: 'Important updates',
-    description: 'Receive emails about important updates like security fixes, maintenance, etc.'
+    label: 'Mises à jour importantes',
+    description: 'Recevez des e-mails concernant des mises à jour importantes telles que des corrections de sécurité, de la maintenance, etc.'
   }]
 }]
 
@@ -45,26 +37,12 @@ async function onChange() {
 
 <template>
   <div v-for="(section, index) in sections" :key="index">
-    <UPageCard
-      :title="section.title"
-      :description="section.description"
-      variant="naked"
-      class="mb-4"
-    />
+    <UPageCard :title="section.title" :description="section.description" variant="naked" class="mb-4" />
 
     <UPageCard variant="subtle" :ui="{ container: 'divide-y divide-default' }">
-      <UFormField
-        v-for="field in section.fields"
-        :key="field.name"
-        :name="field.name"
-        :label="field.label"
-        :description="field.description"
-        class="flex items-center justify-between not-last:pb-4 gap-2"
-      >
-        <USwitch
-          v-model="state[field.name]"
-          @update:model-value="onChange"
-        />
+      <UFormField v-for="field in section.fields" :key="field.name" :name="field.name" :label="field.label"
+        :description="field.description" class="flex items-center justify-between not-last:pb-4 gap-2">
+        <USwitch v-model="state[field.name]" @update:model-value="onChange" />
       </UFormField>
     </UPageCard>
   </div>

@@ -59,7 +59,7 @@ const _useInvoiceUpload = () => {
                 title: "Error",
                 description: (error instanceof FetchError)
                     ? error.data?.message
-                    : "Failed to request upload",
+                    : "Impossible de demander l'upload",
                 color: "error",
             });
             return;
@@ -83,7 +83,7 @@ const _useInvoiceUpload = () => {
                 },
             });
             if (!establishments || establishments.length === 0) {
-                throw new Error("No establishments found");
+                throw new Error("Aucun établissement trouvé");
             }
             possibleEstablishments.value = establishments;
             if (possibleEstablishments.value.length === 1) {
@@ -97,7 +97,7 @@ const _useInvoiceUpload = () => {
                 title: "Error",
                 description: (error instanceof FetchError)
                     ? error.data?.message
-                    : "Failed to request upload",
+                    : "Échec de la validation du token",
                 color: "error",
             });
             return;
@@ -111,7 +111,7 @@ const _useInvoiceUpload = () => {
         if (!confirmState.establishmentId) {
             toast.add({
                 title: "Error",
-                description: "Please select an establishment and supplier",
+                description: "Veuillez sélectionner un établissement et un fournisseur",
                 color: "error",
             });
             isLoading.value = false;
@@ -132,7 +132,7 @@ const _useInvoiceUpload = () => {
             });
             uploadUrl.value = url;
             if (!uploadUrl.value) {
-                throw new Error("No upload URL returned");
+                throw new Error("Aucun URL d'upload retourné");
             }
             const formData = new FormData();
             formData.append("file", formState.invoiceFile!);
@@ -142,11 +142,11 @@ const _useInvoiceUpload = () => {
                 body: formData,
             });
             if (!response.ok) {
-                throw new Error("Failed to upload file");
+                throw new Error("Échec de l'upload du fichier");
             }
             toast.add({
-                title: "Success",
-                description: "Upload confirmed successfully",
+                title: "Succès",
+                description: "Upload confirmé avec succès",
                 icon: "check",
                 color: "success",
             });
@@ -154,10 +154,10 @@ const _useInvoiceUpload = () => {
         } catch (error) {
             console.error("Error requesting upload:", error);
             toast.add({
-                title: "Error",
+                title: "Erreur",
                 description: (error instanceof FetchError)
                     ? error.data?.message
-                    : "Failed to request upload",
+                    : "Échec de la demande d'upload",
                 color: "error",
             });
         } finally {

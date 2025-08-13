@@ -16,7 +16,8 @@ export default defineEventHandler(async (event) => {
     if (!sig || !rawBody) {
         throw createError({
             statusCode: 400,
-            statusMessage: "Invalid webhook request",
+            statusMessage:
+                "Signature Stripe manquante ou corps de requête vide",
         });
     }
 
@@ -32,7 +33,7 @@ export default defineEventHandler(async (event) => {
         console.error("❌ Webhook signature verification failed:", err.message);
         throw createError({
             statusCode: 400,
-            statusMessage: "Invalid Stripe webhook signature",
+            statusMessage: "Signature Stripe invalide",
         });
     }
 
@@ -44,7 +45,7 @@ export default defineEventHandler(async (event) => {
         console.error(`❌ Error handling Stripe event ${type}:`, err);
         throw createError({
             statusCode: 500,
-            statusMessage: "Error handling Stripe event",
+            statusMessage: "Erreur lors du traitement de l'événement Stripe",
         });
     }
 

@@ -3,6 +3,8 @@ import {
     serverSupabaseServiceRole,
     serverSupabaseUser,
 } from "#supabase/server";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale/fr";
 import { z } from "zod";
 import { Database } from "~/types/database.types";
 import { generateCode, hashCode } from "~/utils/hash";
@@ -25,7 +27,7 @@ const parseBody = async (event: any) => {
         console.error("Validation error:", parsed.error);
         throw createError({
             status: 400,
-            message: "Invalid request data",
+            message: "Données de requête invalides",
         });
     }
     return parsed.data;
@@ -43,7 +45,7 @@ export default defineEventHandler(async (event) => {
     try {
         const user = await serverSupabaseUser(event);
         if (!user) {
-            throw new Error("User not found");
+            throw new Error("Utilisateur non trouvé");
         }
         console.log("Authenticated user:", user.id);
         userId = user.id;
@@ -73,7 +75,7 @@ export default defineEventHandler(async (event) => {
         console.error("Recipient user retrieval error:", recipientError);
         throw createError({
             status: 404,
-            message: "Recipient user not found",
+            message: "Email du destinataire non trouvé",
         });
     }
 
@@ -93,7 +95,7 @@ export default defineEventHandler(async (event) => {
         throw createError({
             status: 403,
             message:
-                "You are not authorized to upload invoices for this recipient",
+                "Vous n'êtes pas autorisé à envoyer des factures pour ce destinataire",
         });
     }
 
@@ -131,7 +133,8 @@ export default defineEventHandler(async (event) => {
         );
         throw createError({
             status: 500,
-            message: "Error creating new upload validation",
+            message:
+                "Erreur lors de la création de la nouvelle validation de téléchargement",
         });
     }
 
@@ -141,15 +144,20 @@ export default defineEventHandler(async (event) => {
         await emails.send({
             from: "InvoCloud <tech@llanas.dev>",
             to: [senderEmail],
-            subject: "Confirm your invoice upload",
-            html:
-                `Hello, <br /> Please confirm your invoice upload with this code: <br /> ${code} <br /> It will expire at ${expiresAt.toISOString()}.`,
+            subject: "Confirmez votre envoie de facture",
+            html: `Bonjour,<br><br>` +
+                `Pour valider l'envoie de votre facture, veuillez saisir le code suivant dans l'application : <strong>${code}</strong>.<br><br>` +
+                `Ce code est valide jusqu'au <strong>${
+                    format(expiresAt, "dd/MM/yyyy HH:mm:ss", { locale: fr })
+                }</strong>.<br><br>` +
+                `Si vous n'avez pas demandé cet envoi, veuillez ignorer ce message.<br><br>` +
+                `<p>L'équipe InvoCloud</p>`,
         });
     } catch (error) {
         console.error("Error sending email:", error);
         throw createError({
             status: 500,
-            message: "Error sending confirmation email",
+            message: "Erreur lors de l'envoi de l'e-mail de confirmation",
         });
     }
 
