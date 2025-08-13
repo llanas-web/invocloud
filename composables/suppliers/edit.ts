@@ -41,9 +41,9 @@ const _useSupplierEdit = () => {
                 : formState.emails = [emailField.value];
             emailField.value = "";
         } else {
-            useToast().add({
-                title: "Error",
-                description: "Invalid email address",
+            toast.add({
+                title: "Erreur",
+                description: "Adresse e-mail invalide",
                 color: "error",
             });
         }
@@ -61,15 +61,15 @@ const _useSupplierEdit = () => {
         isLoading.value = false;
         if (!newSupplier) {
             toast.add({
-                title: "Error",
-                description: "Failed to update supplier",
+                title: "Erreur",
+                description: "Échec de la mise à jour du fournisseur",
                 color: "error",
             });
             return;
         }
         toast.add({
-            title: "Success",
-            description: `Supplier ${newSupplier.name} updated`,
+            title: "Succès",
+            description: `Fournisseur ${newSupplier.name} mis à jour`,
             color: "success",
         });
         openModal.value = false;

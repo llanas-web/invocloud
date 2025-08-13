@@ -24,9 +24,9 @@ const _useSupplierCreate = () => {
                 : formState.emails = [emailField.value];
             emailField.value = "";
         } else {
-            useToast().add({
-                title: "Error",
-                description: "Invalid email address",
+            toast.add({
+                title: "Erreur",
+                description: "Adresse e-mail invalide",
                 color: "error",
             });
         }
@@ -41,15 +41,15 @@ const _useSupplierCreate = () => {
         isLoading.value = false;
         if (!newSupplier) {
             toast.add({
-                title: "Error",
-                description: "Failed to create supplier",
+                title: "Erreur",
+                description: "Échec de la création du fournisseur",
                 color: "error",
             });
             return;
         }
         toast.add({
-            title: "Success",
-            description: `New supplier ${newSupplier.name} added`,
+            title: "Succès",
+            description: `Nouveau fournisseur ${newSupplier.name} ajouté`,
             color: "success",
         });
         openModal.value = false;

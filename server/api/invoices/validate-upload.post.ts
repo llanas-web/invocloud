@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     if (!uploadValidationId || !selectedEstablishmentId) {
         throw createError({
             status: 400,
-            message: "Missing upload validation ID or selected establishment",
+            message: "Données de requête invalides",
         });
     }
 
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     if (!supabaseUser) {
         throw createError({
             status: 401,
-            message: "Unauthorized",
+            message: "Utilisateur non authentifié",
         });
     }
     console.log("Authenticated user:", supabaseUser.id);
@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
     if (!uploadValidation) {
         throw createError({
             status: 404,
-            message: "Upload validation not found",
+            message: "Validation de téléchargement introuvable",
         });
     }
 
@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
     if (!uploadUrl) {
         throw createError({
             status: 500,
-            message: "Error creating signed URL",
+            message: "Erreur lors de la création de l'URL signée",
         });
     }
 

@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
         console.error("Validation error:", parsed.error);
         throw createError({
             status: 400,
-            message: "Invalid request data",
+            message: "Données de requête invalides",
         });
     }
     const { password } = parsed.data;
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
         console.error("User is not authenticated");
         throw createError({
             status: 401,
-            message: "Unauthorized",
+            message: "Non autorisé",
         });
     }
 
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
         console.error("Error updating user:", error);
         throw createError({
             status: 500,
-            message: "Internal Server Error",
+            message: "Erreur lors de la mise à jour de l'utilisateur",
         });
     }
 

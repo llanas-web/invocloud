@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
         .single();
 
     if (!structure?.stripe_subscription_id) {
-        return { error: "No active trial or subscription found" };
+        return { error: "Aucun abonnement actif trouvé" };
     }
 
     // Immediately cancel the subscription (trial or not)
@@ -37,6 +37,6 @@ export default defineEventHandler(async (event) => {
 
     return {
         success: true,
-        message: "Trial or subscription has been cancelled immediately.",
+        message: "L'essai ou l'abonnement a été annulé immédiatement.",
     };
 });

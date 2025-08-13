@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
         console.error("User is not authenticated");
         throw createError({
             status: 401,
-            message: "Unauthorized",
+            message: "Non autorisé",
         });
     }
 
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
         console.error("Error deleting user:", error);
         throw createError({
             status: 500,
-            message: "Internal Server Error",
+            message: "Erreur lors de la suppression du compte utilisateur",
         });
     }
 

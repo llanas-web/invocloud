@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     if (!uploadValidationId || !token) {
         throw createError({
             status: 400,
-            message: "Missing upload validation ID or token",
+            message: "Données de requête invalides",
         });
     }
 
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     if (!supabaseUser) {
         throw createError({
             status: 401,
-            message: "Unauthorized",
+            message: "Utilisateur non authentifié",
         });
     }
 
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
         throw createError({
             status: 404,
             message: uploadValidationError?.message ||
-                "File not found or token expired",
+                "Fichier introuvable ou token expiré",
         });
     }
 
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
         throw createError({
             status: 404,
             message: establishmentsError?.message ||
-                "Establishments not found",
+                "Établissements non trouvés",
         });
     }
 

@@ -38,7 +38,7 @@ pricing:
         to: "/auth/login"
     - title: Pro
       description: Pour les utilisateurs réguliers qui ont besoin de fonctionnalités avancées.
-      price: "29.99€"
+      price: "29.90€"
       billing-cycle: "/mois"
       features:
         - Créez et gérez un nombre illimité de factures
