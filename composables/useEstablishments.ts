@@ -89,6 +89,10 @@ const _useEstablishments = () => {
     };
 
     const subscribeToStripe = async () => {
+        console.log(
+            "Subscribing to Stripe for establishment:",
+            selectedEstablishment.value,
+        );
         const { url }: { url: string } = await $fetch(
             "/api/stripe/subscription/create",
             {
