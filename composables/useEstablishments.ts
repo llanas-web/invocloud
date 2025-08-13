@@ -9,7 +9,7 @@ const _useEstablishments = () => {
 
     watch(() => selectedEstablishment.value, (newEstablishment) => {
         console.log("Selected establishment changed:", newEstablishment);
-        if (newEstablishment) {
+        if (newEstablishment && user.value) {
             localStorage.setItem("selectedEstablishment", newEstablishment.id);
         }
     }, { immediate: true });
