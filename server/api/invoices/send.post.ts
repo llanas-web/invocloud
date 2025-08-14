@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
     }));
     const signedUrls = data.map((item) => item.signedUrl);
     const { data: emailData, error: emailError } = await emails.send({
-        from: "InvoCloud <tech@llanas.dev>",
+        from: `InvoCloud <${process.env.RESEND_EMAIL_FROM}>`,
         to: [email],
         subject: `Factures de ${user.email}`,
         html: `<p>Cher utilisateur,</p>
