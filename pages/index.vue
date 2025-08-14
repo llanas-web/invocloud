@@ -38,7 +38,10 @@ useSeoMeta({
     ogDescription:
         page.value?.seo.description || page.value?.description,
     ogUrl: config.public.baseUrl ?? 'https://invocloud.fr',
-    ogImage: `${config.public.baseUrl}/thumbnail.png`,
+    ogImage: `${config.public.baseUrl}/thumbnail_300.png`,
+    ogImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
+    ogImageHeight: 144,
+    ogImageWidth: 300,
     twitterCard: 'summary_large_image'
 })
 </script>
