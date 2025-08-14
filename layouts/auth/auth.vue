@@ -2,11 +2,19 @@
 
 const router = useRouter();
 const currentRoute = router.currentRoute;
+const user = useSupabaseUser();
+const { logout } = useAuth();
 
 const buttonLabel = computed(() => {
+    if (user.value) {
+        return 'Déconnexion';
+    }
     return currentRoute.value.name === 'auth-login' ? 'S\'inscrire' : 'Connexion';
 });
 const redirectTo = computed(() => {
+    if (user.value) {
+        return '';
+    }
     return currentRoute.value.name === 'auth-login' ? '/auth/sign-up' : '/auth/login';
 });
 </script>
@@ -31,9 +39,10 @@ const redirectTo = computed(() => {
                 </NuxtLink>
             </template>
             <template #right>
-                <UButton :label="buttonLabel" variant="ghost" :ui="{
-                    label: 'hidden md:block'
-                }" :to="redirectTo" trailingIcon="i-lucide-log-in" size="md" />
+                <UButton v-if="user" :label="buttonLabel" variant="ghost" :ui="{ label: 'hidden md:block' }"
+                    @click="logout" trailingIcon="i-lucide-log-out" size="md" />
+                <UButton v-else :label="buttonLabel" variant="ghost" :ui="{ label: 'hidden md:block' }" :to="redirectTo"
+                    trailingIcon="i-lucide-log-in" size="md" />
             </template>
         </UHeader>
 

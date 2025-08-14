@@ -41,11 +41,28 @@ const _useAuth = () => {
             },
         });
         if (error) {
-            toast.add({
-                title: "Erreur lors de l'inscription",
-                description: error.message,
-                color: "error",
-            });
+            if (error.code === "user_already_exists") {
+                toast.add({
+                    title: "Utilisateur déjà existant",
+                    description: "Un compte avec cet email existe déjà.",
+                    color: "warning",
+                    actions: [
+                        {
+                            label: "Se connecter",
+                            onClick: (e) => {
+                                login(email, password);
+                                e.preventDefault();
+                            },
+                        },
+                    ],
+                });
+            } else {
+                toast.add({
+                    title: "Erreur lors de l'inscription",
+                    description: error.message,
+                    color: "error",
+                });
+            }
             return null;
         }
         return data;
@@ -74,6 +91,7 @@ const _useAuth = () => {
 
     const logout = async () => {
         const { error } = await supabase.auth.signOut();
+        localStorage.removeItem("selectedEstablishment");
         if (!error) navigateTo("/auth/login");
         else console.error("Error logging out:", error);
     };

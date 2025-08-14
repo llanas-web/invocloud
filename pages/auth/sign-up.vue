@@ -9,7 +9,8 @@ definePageMeta({
 
 const loading = ref(false)
 const { signup } = useAuth()
-const { selectedEstablishment, subscribeToStripe, refresh } = useEstablishments()
+const { subscribeToStripe, refresh } = useEstablishments()
+const user = useSupabaseUser()
 
 const fields: Array<{
     name: keyof Schema
@@ -88,7 +89,22 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     <div class="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-32 min-h-full mb-12">
         <div class="flex-1 flex justify-end items-center mx-auto">
             <div class="flex flex-col items-center justify-center gap-4 p-4 max-w-lg">
-                <UForm ref="signUpForm" :schema="schema" :state="state" :disabled="loading" @submit="onSubmit">
+                <template v-if="user != null">
+                    <div class="w-full space-y-6">
+                        <div>
+                            <h2 class="text-left text-4xl font-bold text-muted">
+                                Bonjour <span class="text-primary">
+                                    {{ user.user_metadata?.full_name || user.email }}</span>
+                            </h2>
+                            <div class="mt-1 text-left text-muted mb-4 font-sans">
+                                Terminez votre inscription à <span class="text-primary">
+                                    Invocloud
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                <UForm v-else ref="signUpForm" :schema="schema" :state="state" :disabled="loading" @submit="onSubmit">
                     <div class="w-full space-y-6">
                         <div>
                             <h2 class="text-left text-4xl font-bold text-muted">
