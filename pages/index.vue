@@ -34,15 +34,21 @@ useSeoMeta({
         page.value?.seo.title || page.value?.title,
     description:
         page.value?.seo.description || page.value?.description,
+    ogType: 'website',
+    ogLocale: 'fr_FR',
+    ogSiteName: 'Invocloud',
     ogTitle: page.value?.seo.title || page.value?.title,
     ogDescription:
         page.value?.seo.description || page.value?.description,
     ogUrl: config.public.baseUrl ?? 'https://invocloud.fr',
-    ogImage: `${config.public.baseUrl}/thumbnail_300.png`,
+    ogImage: `${config.public.baseUrl}/thumbnail_1200.png`,
     ogImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
-    ogImageHeight: 144,
-    ogImageWidth: 300,
-    twitterCard: 'summary_large_image'
+    ogImageHeight: 577,
+    ogImageWidth: 1200,
+    twitterCard: 'summary_large_image',
+    twitterImage: `${config.public.baseUrl}/thumbnail_1200.png`,
+    twitterImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
+
 })
 </script>
 
