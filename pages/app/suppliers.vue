@@ -46,14 +46,14 @@ function getRowItems(row: Row<Supplier>) {
             type: 'separator'
         },
         {
-            label: 'Delete supplier',
+            label: 'Supprimer le fournisseur',
             icon: 'i-lucide-trash',
             color: 'error',
             async onSelect() {
                 await deleteSuppliers([row.original.id])
                 toast.add({
-                    title: 'Supplier deleted',
-                    description: 'The supplier has been deleted.'
+                    title: 'Fournisseur supprimé',
+                    description: 'Le fournisseur a été supprimé.'
                 })
             }
         }

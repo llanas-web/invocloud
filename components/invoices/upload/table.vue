@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 
-const { pendingInvoices, updateInvoice } = useInvoices()
+const { pendingInvoices, deleteInvoices } = useInvoices()
 
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
+const toast = useToast()
 
 // Use the type of the items inside the pendingInvoices ref's value
 type PendingInvoices = NonNullable<(typeof pendingInvoices)['value']>[number]
@@ -53,14 +54,13 @@ const columns: TableColumn<PendingInvoices>[] = [
                 refunded: 'neutral' as const
             }[row.getValue('status') as string]
 
-            return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
-                row.getValue('status')
+            return h(UBadge, { variant: 'subtle', color }, () =>
+                "En attente"
             )
         }
     },
-    // generate a "validate invoice" column with a button
     {
-        accessorKey: 'validate',
+        accessorKey: 'Valider',
         header: '',
         cell: ({ row }) => {
             return h('div', { class: 'flex justify-end items-center gap-3' }, [
@@ -74,9 +74,32 @@ const columns: TableColumn<PendingInvoices>[] = [
                         return navigateTo(`/app/invoices/${row.original.id}`)
                     }
                 }),
+                h(UButton, {
+                    color: 'error',
+                    icon: 'i-lucide-x',
+                    size: 'sm',
+                    class: 'cursor-pointer',
+                    label: 'Refuser',
+                    onClick: async () => {
+                        const result = await deleteInvoices([row.original.id])
+                        if (result) {
+                            toast.add({
+                                title: 'Facture supprimée',
+                                description: 'La facture a été supprimée.',
+                                color: 'success'
+                            })
+                        } else {
+                            toast.add({
+                                title: 'Erreur',
+                                description: 'Une erreur est survenue lors de la suppression de la facture.',
+                                color: 'error'
+                            })
+                        }
+                    }
+                }),
             ])
         }
-    },
+    }
 ]
 
 </script>
