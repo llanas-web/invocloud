@@ -35,7 +35,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
 
 <template>
     <template v-if="pending">
-        <USkeleton class="h-4 w-[250px]" />
+        <USkeleton class="h-9 w-full" />
     </template>
     <UDropdownMenu v-else :items="items" :content="{ align: 'center', collisionPadding: 12 }"
         :ui="{ content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)' }">

@@ -20,10 +20,10 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     const { name } = event.data
     const newEstablishment = await createEstablishment(name)
     if (!newEstablishment) {
-        toast.add({ title: 'Error', description: 'Failed to create establishment', color: 'error' })
+        toast.add({ title: 'Error', description: 'Erreur lors de la création de l\'établissement', color: 'error' })
         return
     }
-    toast.add({ title: 'Success', description: `New establishment ${newEstablishment.name} added`, color: 'success' })
+    toast.add({ title: 'Success', description: `Nouvel établissement ${newEstablishment.name} ajouté`, color: 'success' })
     open.value = false
     state.name = undefined
 }

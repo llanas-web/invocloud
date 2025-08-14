@@ -38,14 +38,12 @@ const _useEstablishments = () => {
                 .from("establishment_members")
                 .select("*, establishments(*)")
                 .or(`user_id.eq.${user.value!.id}`);
-
+            await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate delay
             if (error) {
                 console.error("Error fetching establishments:", error);
                 return [];
             }
-            const establishmentsData = data.map((item: any) =>
-                item.establishments
-            );
+            const establishmentsData = data.map((item) => item.establishments);
             selectEstablishment(establishmentsData);
             return establishmentsData;
         },
@@ -64,6 +62,7 @@ const _useEstablishments = () => {
                 creator_id: user.value!.id,
             }])
             .select().single();
+        selectedEstablishment.value = newEstablishment;
 
         if (error) {
             console.error("Error creating establishment:", error);
