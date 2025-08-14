@@ -142,7 +142,7 @@ export default defineEventHandler(async (event) => {
 
     try {
         await emails.send({
-            from: "InvoCloud <tech@llanas.dev>",
+            from: `InvoCloud <${process.env.RESEND_EMAIL_FROM}>`,
             to: [senderEmail],
             subject: "Confirmez votre envoie de facture",
             html: `Bonjour,<br><br>` +

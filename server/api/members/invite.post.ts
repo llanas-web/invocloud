@@ -127,7 +127,7 @@ export default defineEventHandler(async (event) => {
 
         try {
             await emails.send({
-                from: "InvoCloud <tech@llanas.dev>",
+                from: `InvoCloud <${process.env.RESEND_EMAIL_FROM}>`,
                 to: [existingUser.email],
                 subject: "Vous avez été ajouté à un établissement",
                 html:
