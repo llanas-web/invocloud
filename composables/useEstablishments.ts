@@ -38,7 +38,6 @@ const _useEstablishments = () => {
                 .from("establishment_members")
                 .select("*, establishments(*)")
                 .or(`user_id.eq.${user.value!.id}`);
-            await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate delay
             if (error) {
                 console.error("Error fetching establishments:", error);
                 return [];
