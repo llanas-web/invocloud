@@ -4,6 +4,7 @@ import { z } from 'zod';
 import type { FormSubmitEvent } from '@nuxt/ui'
 
 const { openModal } = useInvoiceUpload()
+const config = useRuntimeConfig();
 
 const schema = z.object({
     email: z.string().email('Veuillez entrer un email valide'),
@@ -21,8 +22,24 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
 const { data: page } = await useAsyncData(() => queryCollection('index').first())
 const user = useSupabaseUser()
+
 definePageMeta({
     layout: false,
+})
+
+useSeoMeta({
+    title:
+        page.value?.seo.title || page.value?.title,
+    titleTemplate:
+        page.value?.seo.title || page.value?.title,
+    description:
+        page.value?.seo.description || page.value?.description,
+    ogTitle: page.value?.seo.title || page.value?.title,
+    ogDescription:
+        page.value?.seo.description || page.value?.description,
+    ogUrl: config.public.baseUrl ?? 'https://invocloud.fr',
+    ogImage: `${config.public.baseUrl}/thumbnail.png`,
+    twitterCard: 'summary_large_image'
 })
 </script>
 
