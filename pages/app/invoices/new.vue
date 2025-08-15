@@ -47,6 +47,7 @@ const triggerFilePicker = () => {
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const isMobile = breakpoints.smaller('lg')
+const isFormOpen = ref(false)
 </script>
 <template>
     <UDashboardPanel id="invoices-new" :default-size="25" :min-size="20" :max-size="100" resizable>
@@ -59,10 +60,17 @@ const isMobile = breakpoints.smaller('lg')
                 <template #left>
                 </template>
                 <template #right>
+                    <template v-if="isMobile">
+                        <UButton v-if="fileUrl" label="Voir la facture" variant="ghost" size="md"
+                            trailingIcon="i-lucide-eye" @click="isFormOpen = true" />
+                        <UButton v-else icon="i-lucide-plus" class="rounded-full" size="lg"
+                            @click="triggerFilePicker" />
+                    </template>
+
                 </template>
             </UDashboardNavbar>
         </template>
-        <template v-if="!isMobile" #body>
+        <template #body>
             <div class="p-2">
                 <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
                     <UIcon name="i-lucide-file-text" class="text-primary" /> Détails de la facture
@@ -76,18 +84,15 @@ const isMobile = breakpoints.smaller('lg')
                     :disabled="!isDirty" />
             </div>
         </template>
-        <template v-else #body>
-            <div v-if="fileUrl" class="bg-white shadow w-full h-full">
-                <CommonFileViewer :fileUrl="fileUrl" :fileType="fileType" :fileName="fileName" />
-            </div>
-            <div v-else class="bg-white shadow w-full h-full flex items-center justify-center p-4">
-                <UButton icon="i-lucide-plus" class="rounded-full" size="lg" @click="triggerFilePicker" />
-            </div>
-        </template>
     </UDashboardPanel>
-    <div v-if="fileUrl" class="bg-white shadow w-full ">
+    <template v-if="fileUrl">
+        <USlideover v-if="isMobile" v-model:open="isFormOpen">
+            <template #body>
+                <CommonFileViewer :fileUrl="fileUrl" :fileType="fileType" :fileName="fileName" />
+            </template>
+        </USlideover>
         <CommonFileViewer :fileUrl="fileUrl" :fileType="fileType" :fileName="fileName" />
-    </div>
+    </template>
     <div v-else class="bg-white shadow w-full flex items-center justify-center p-4">
         <UButton icon="i-lucide-plus" class="rounded-full" size="lg" @click="triggerFilePicker" />
     </div>
