@@ -6,8 +6,8 @@ definePageMeta({
     layout: 'app'
 })
 
-const { invoice, isLoading, invoiceId } = useInvoiceDetails()
-const { isDirty, onSubmit, isDisabled } = useInvoiceUpdate()
+const { invoice, isLoading: loadingDetails, invoiceId } = useInvoiceDetails()
+const { formRef, isLoading: loadingUpdate } = useInvoiceUpdate()
 
 const items = ref<BreadcrumbItem[]>([
     {
@@ -25,6 +25,8 @@ const items = ref<BreadcrumbItem[]>([
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const isMobile = breakpoints.smaller('lg')
 const isFormOpen = ref(false)
+
+const isLoading = computed(() => loadingDetails.value || loadingUpdate.value)
 </script>
 <template>
     <UDashboardPanel :id="`invoices-${invoiceId}`" :default-size="25" :min-size="20" :max-size="100" resizable>
@@ -50,10 +52,10 @@ const isFormOpen = ref(false)
                 <InvoicesDetailsUpdateForm />
             </div>
             <div class="flex justify-end p-4 mt-auto space-x-4">
-                <UButton label="Annuler" color="neutral" variant="subtle" :disabled="isLoading"
+                <UButton label="Annuler" color="neutral" variant="subtle" :disabled="!!isLoading"
                     @click="navigateTo('/app')" />
-                <UButton label="Sauvegarder" color="success" :loading="isLoading" @click="onSubmit"
-                    :disabled="!isDisabled && !isDirty" />
+                <UButton label="Sauvegarder" color="success" :loading="isLoading" @click="formRef?.submit()"
+                    :disabled="isLoading" />
             </div>
         </template>
     </UDashboardPanel>

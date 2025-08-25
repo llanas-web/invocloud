@@ -2,30 +2,37 @@
 import type { InvoiceStatus } from '~/types';
 import { format } from 'date-fns'
 
-const { invoice, isLoading } = useInvoiceDetails()
-const { formState, isDisabled, paidAtInputRef } = useInvoiceUpdate()
+const { invoice, isLoading: loadingDetails } = useInvoiceDetails()
+const { formRef, formState, formStateSchema, isLoading: loadingUpdate, onSubmit } = useInvoiceUpdate()
 
 const invoiceStatus = ref<{ label: string, value: InvoiceStatus, icon: string, class: string }[]>([
-    { label: 'Payée', value: 'paid', icon: 'i-lucide-check-circle', class: 'text-green-500' },
-    { label: 'Validée', value: 'validated', icon: 'i-lucide-check', class: 'text-blue-500' }
+    { label: 'Validée', value: 'validated', icon: 'i-lucide-check', class: 'text-blue-500' },
+    { label: 'Payée', value: 'paid', icon: 'i-lucide-euro', class: 'text-green-500' },
 ])
+
+const updateInvoiceFormRef = useTemplateRef('updateInvoiceFormRef')
+onMounted(() => {
+    formRef.value = updateInvoiceFormRef.value
+})
+
+const isLoading = computed(() => loadingDetails.value || loadingUpdate.value)
 </script>
 
 <template>
-    <UForm class="space-y-4" :state="formState" :disabled="isDisabled" :loading="isLoading">
+    <UForm @submit="onSubmit" ref="updateInvoiceFormRef" class="space-y-4" :state="formState" :disabled="isLoading"
+        :loading="isLoading" :schema="formStateSchema">
+        <UFormField name="created_at" label="Date de facture" required
+            class="flex flex-row justify-between items-center gap-4">
+            <CommonDatePicker v-model="formState.created_at" label="Date de la facture" />
+        </UFormField>
         <UFormField label="Fournisseur">
             <USkeleton v-if="!invoice" class="h-8" />
             <UInput v-else :model-value="invoice.supplier.name" icon="i-lucide-user" class="w-full" disabled />
         </UFormField>
         <UFormField label="Commentaire">
             <USkeleton v-if="!invoice" class="h-8" />
-            <UInput v-else v-model="invoice.comment" placeholder="Ajouter un commentaire..." disabled class="w-full" />
+            <UInput v-else v-model="formState.comment" placeholder="Ajouter un commentaire..." class="w-full" />
         </UFormField>
-        <UFormField label="Date de création">
-            <USkeleton v-if="!invoice" class="h-8" />
-            <UInput v-else :model-value="invoice.created_at" class="w-full" disabled />
-        </UFormField>
-        <USeparator class="my-6" />
         <UFormField label="Numéro de facture">
             <USkeleton v-if="!invoice" class="h-8" />
             <UInput v-else v-model="formState.invoice_number" class="w-full" />
@@ -34,15 +41,14 @@ const invoiceStatus = ref<{ label: string, value: InvoiceStatus, icon: string, c
             <USkeleton v-if="!invoice" class="h-8" />
             <UInput v-else v-model="formState.name" class="w-full" />
         </UFormField>
-        <div class="flex flex-row justify-between items-center">
-            <UFormField label="Date d'échéance">
+        <div class="flex flex-row justify-between items-center gap-4">
+            <UFormField name="due_date" label="Date d'échéance" class="flex-1" required>
                 <USkeleton v-if="!invoice" class="h-8" />
-                <UInput v-else v-model="formState.due_date" type="date" class="w-full" />
+                <CommonDatePicker v-else v-model="formState.due_date" label="Date d'échéance" />
             </UFormField>
-            <UFormField label="Date de paiement">
+            <UFormField name="paid_at" label="Date de paiement" class="flex-1">
                 <USkeleton v-if="!invoice" class="h-8" />
-                <UInput ref="paidAtInputRef" v-else v-model="formState.paid_at" type="date" class="w-full"
-                    :required="formState.status === 'paid'" />
+                <CommonDatePicker v-else v-model="formState.paid_at" label="Date de paiement" />
             </UFormField>
         </div>
         <UFormField label="Statut">
