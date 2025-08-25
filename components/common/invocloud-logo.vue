@@ -1,44 +1,44 @@
 <script setup lang="ts">
-    const containerRef = ref<HTMLElement | null>(null)
-    const size = ref(0)
+const containerRef = ref<HTMLElement | null>(null)
+const size = ref(0)
 
-    const props = defineProps<{
-        onClick?: () => void
-    }>()
+const props = defineProps<{
+    onClick?: () => void
+}>()
 
-    onMounted(() => {
-        if (!containerRef.value) return
+onMounted(() => {
+    if (!containerRef.value) return
 
-        const resizeObserver = new ResizeObserver(([entry]) => {
-            size.value = Math.min(entry.contentRect.width, entry.contentRect.height)
-        })
-
-        resizeObserver.observe(containerRef.value)
+    const resizeObserver = new ResizeObserver(([entry]) => {
+        size.value = Math.min(entry.contentRect.width, entry.contentRect.height)
     })
 
-    const circles = ref([
-        { scale: 1.2, startAngle: 0, endAngle: 288, color: '#9fc1ff', speed: '5s' },
-        { scale: 1, startAngle: 90, endAngle: 378, color: '#9fc1ff', speed: '8s' },
-        { scale: 0.8, startAngle: 180, endAngle: 468, color: '#9fc1ff', speed: '12s' },
-    ])
+    resizeObserver.observe(containerRef.value)
+})
 
-    const generateArcPath = (cx: number, cy: number, r: number, startAngle: number, endAngle: number) => {
-        const start = polarToCartesian(cx, cy, r, startAngle)
-        const end = polarToCartesian(cx, cy, r, endAngle)
+const circles = ref([
+    { scale: 1.2, startAngle: 0, endAngle: 288, color: '#9fc1ff', speed: '5s' },
+    { scale: 1, startAngle: 90, endAngle: 378, color: '#9fc1ff', speed: '8s' },
+    { scale: 0.8, startAngle: 180, endAngle: 468, color: '#9fc1ff', speed: '12s' },
+])
 
-        const largeArcFlag = Math.abs(endAngle - startAngle) <= 180 ? '0' : '1'
+const generateArcPath = (cx: number, cy: number, r: number, startAngle: number, endAngle: number) => {
+    const start = polarToCartesian(cx, cy, r, startAngle)
+    const end = polarToCartesian(cx, cy, r, endAngle)
 
-        return ['M', start.x, start.y, 'A', r, r, 0, largeArcFlag, 1, end.x, end.y].join(' ')
+    const largeArcFlag = Math.abs(endAngle - startAngle) <= 180 ? '0' : '1'
+
+    return ['M', start.x, start.y, 'A', r, r, 0, largeArcFlag, 1, end.x, end.y].join(' ')
+}
+
+const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: number) => {
+    const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0
+
+    return {
+        x: cx + (r * Math.cos(angleInRadians)),
+        y: cy + (r * Math.sin(angleInRadians))
     }
-
-    const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: number) => {
-        const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0
-
-        return {
-            x: cx + (r * Math.cos(angleInRadians)),
-            y: cy + (r * Math.sin(angleInRadians))
-        }
-    }
+}
 </script>
 
 <template>
@@ -48,8 +48,8 @@
                             class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" /> -->
         <!-- <img src="~/assets/images/big-btn.png"
                             class="absolute size-64 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" /> -->
-        <img src="~/assets/images/hero-effect.png"
-            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+        <NuxtImg src="/images/hero-effect.png" alt="Invocloud Logo Background Effect" size="100vw sm:50vw md:400px"
+            quality="80" format="webp" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
         <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
                             rounded-full aspect-square w-[30%] bg-linear-150 from-primary/80 to-primary/90
                             drop-shadow-2xl drop-shadow-primary
@@ -83,37 +83,37 @@
 
 
 <style scoped>
-    @keyframes rotate {
-        to {
-            transform: rotate(360deg);
-        }
+@keyframes rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-rotate-0 {
+    animation: rotate 5s linear reverse infinite;
+}
+
+.animate-rotate-1 {
+    animation: rotate 8s linear reverse infinite;
+}
+
+.animate-rotate-2 {
+    animation: rotate 12s linear reverse infinite;
+}
+
+@keyframes subtleBounce {
+
+    0%,
+    100% {
+        transform: scale(100%);
     }
 
-    .animate-rotate-0 {
-        animation: rotate 5s linear reverse infinite;
+    50% {
+        transform: scale(105%);
     }
+}
 
-    .animate-rotate-1 {
-        animation: rotate 8s linear reverse infinite;
-    }
-
-    .animate-rotate-2 {
-        animation: rotate 12s linear reverse infinite;
-    }
-
-    @keyframes subtleBounce {
-
-        0%,
-        100% {
-            transform: scale(100%);
-        }
-
-        50% {
-            transform: scale(105%);
-        }
-    }
-
-    .bounce {
-        animation: subtleBounce 2s ease-in-out infinite;
-    }
+.bounce {
+    animation: subtleBounce 2s ease-in-out infinite;
+}
 </style>
