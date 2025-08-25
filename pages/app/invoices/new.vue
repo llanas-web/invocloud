@@ -6,7 +6,7 @@ definePageMeta({
     layout: 'app'
 })
 
-const { formState, invoiceFile, isLoading, isDirty, onSubmit } = useInvoiceCreate()
+const { formRef, formState, invoiceFile, isLoading, isDirty } = useInvoiceCreate()
 
 const items = ref<BreadcrumbItem[]>([
     {
@@ -82,7 +82,7 @@ const isFormOpen = ref(false)
             <div class="flex justify-end p-4 mt-auto space-x-4">
                 <UButton label="Annuler" color="neutral" variant="subtle" :disabled="isLoading"
                     @click="navigateTo('/app')" />
-                <UButton label="Sauvegarder" color="success" :loading="isLoading" @click="onSubmit"
+                <UButton label="Sauvegarder" color="success" :loading="isLoading" @click="formRef?.submit()"
                     :disabled="!isDirty" />
             </div>
         </template>

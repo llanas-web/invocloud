@@ -2,7 +2,7 @@
 import type { UForm } from '#components';
 import type { InvoiceStatus } from '~/types';
 
-const { formRef, formState, isLoading, formStateSchema } = useInvoiceCreate()
+const { formRef, formState, isLoading, formStateSchema, onSubmit } = useInvoiceCreate()
 const { suppliers } = useSuppliers()
 const { openModal: openCreateModal, formState: createFormState } = useSupplierCreate()
 
@@ -25,8 +25,8 @@ onMounted(() => {
 
 <template>
     <LazySuppliersAddModal />
-    <UForm ref="createInvoiceFormRef" class="space-y-4" :state="formState" :disabled="isLoading" :loading="isLoading"
-        :schema="formStateSchema" :validate-on="['input', 'change', 'blur']">
+    <UForm @submit="onSubmit" ref="createInvoiceFormRef" class="space-y-4" :state="formState" :disabled="isLoading"
+        :loading="isLoading" :schema="formStateSchema" :validate-on="['input', 'change', 'blur']">
         <UFormField name="created_at" label="Date de facture" required
             class="flex flex-row justify-between items-center gap-4">
             <CommonDatePicker v-model="formState.created_at" label="Date de la facture" />

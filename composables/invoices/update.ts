@@ -1,14 +1,48 @@
+import type { UForm } from "#components";
 import { createSharedComposable } from "@vueuse/core";
 import { format } from "date-fns";
+import { z } from "zod";
 import type { InvoiceUpdate } from "~/types";
+
+const formStateSchema = z.object({
+    amount: z.number().positive("Le montant doit être positif."),
+    taxe_amount: z.number().positive(
+        "Le montant de la taxe doit être positif.",
+    ),
+    comment: z.string().optional().nullable(),
+    name: z.string().optional().nullable(),
+    due_date: z.string()
+        .min(1, "La date d'échéance est requise.")
+        .nullable()
+        .refine((val) => val !== null && val.length > 0, {
+            message: "La date d'échéance est requise.",
+        }),
+    invoice_number: z.string().min(1, "Le numéro de facture est requis."),
+    paid_at: z.string().optional().nullable(),
+    created_at: z.string().min(1, "La date de création est requise."),
+    status: z.enum(["paid", "validated", "error", "pending", "sent"]).default(
+        "validated",
+    ),
+}).refine((data) => {
+    if (data.status === "paid") {
+        return data.paid_at !== null;
+    }
+    return true;
+}, {
+    message: "La date de paiement est requise lorsque le statut est 'payé'.",
+});
+
+type Schema = z.output<typeof formStateSchema>;
 
 const _useInvoiceUpdate = () => {
     const { invoice, updateInvoice } = useInvoiceDetails();
-    const isDisabled = computed(() => invoice.value?.status === "paid");
+    const isLoading = ref(false);
     const toast = useToast();
+
+    const formRef = ref();
     const paidAtInputRef = ref();
 
-    const formState = reactive<InvoiceUpdate>({
+    const formState = reactive<Schema>({
         status: invoice.value?.status ?? "validated",
         amount: invoice.value?.amount ?? 0,
         taxe_amount: invoice.value?.taxe_amount ?? 0,
@@ -20,6 +54,11 @@ const _useInvoiceUpdate = () => {
         paid_at: invoice.value?.paid_at
             ? format(invoice.value?.paid_at, "yyyy-MM-dd")
             : null,
+        created_at: format(
+            invoice.value?.created_at ?? new Date(),
+            "yyyy-MM-dd",
+        ),
+        comment: invoice.value?.comment ?? "",
     });
 
     watch(
@@ -43,41 +82,27 @@ const _useInvoiceUpdate = () => {
                         "yyyy-MM-dd",
                     )
                     : null;
+                formState.created_at = format(
+                    newInvoice.created_at,
+                    "yyyy-MM-dd",
+                );
+                formState.comment = newInvoice.comment ?? "";
             }
         },
         { immediate: true },
     );
 
-    const isDirty = computed(() => {
-        if (!invoice.value) return false;
-        return (
-            formState.status !== invoice.value.status ||
-            formState.amount !== invoice.value.amount ||
-            formState.taxe_amount !== invoice.value.taxe_amount ||
-            formState.name !== invoice.value.name ||
-            formState.invoice_number !== invoice.value.invoice_number ||
-            formState.due_date !== invoice.value.due_date ||
-            formState.paid_at !== invoice.value.paid_at
-        );
-    });
-
     const onSubmit = async () => {
-        if (!formState || !invoice.value) return;
-        if (formState.status === "paid" && !formState.paid_at) {
-            console.error("Paid date is required when status is 'paid'");
-            toast.add({
-                title: "Erreur",
-                description:
-                    "La date de paiement est requise lorsque le statut est 'payé'.",
-                color: "error",
-            });
+        isLoading.value = true;
+        if (invoice.value == null) {
+            console.error("Invoice is not loaded");
             return;
         }
-
         const updatedInvoice = await updateInvoice(
-            invoice.value.id,
-            formState,
+            invoice.value.id as string,
+            formState as InvoiceUpdate,
         );
+        isLoading.value = false;
         if (!updatedInvoice) {
             console.error("Failed to save invoice");
             // Optional: show error toast
@@ -89,9 +114,10 @@ const _useInvoiceUpdate = () => {
     };
 
     return {
+        formRef,
+        formStateSchema,
         formState,
-        isDirty,
-        isDisabled,
+        isLoading,
         paidAtInputRef,
         onSubmit,
     };
