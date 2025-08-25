@@ -81,10 +81,10 @@ useSeoMeta({
                         label: 'hidden md:block'
                     }" />
                 <template v-else>
-                    <UButton label="Connexion" variant="solid" :ui="{
+                    <UButton label="Connexion" variant="solid" trailing-icon="i-lucide-log-in" :ui="{
                         label: 'hidden md:block'
                     }" to="/auth/login" size="md" />
-                    <UButton label="Inscription" variant="solid" :ui="{
+                    <UButton label="Inscription" trailing-icon="i-lucide-user-plus" variant="solid" :ui="{
                         label: 'hidden md:block'
                     }" to="/auth/sign-up" size="md" />
                 </template>

@@ -35,7 +35,7 @@ const columns: TableColumn<{ email: string }>[] = [
                 <UTable v-if="formState.emails?.length" :data="formState.emails?.map(email => ({ email }))"
                     :columns="columns" class="flex-1" />
                 <div class="w-full flex items-center gap-2">
-                    <UInput v-model="emailField" class="flex-grow" placeholder="Ajouter un email"
+                    <UInput v-model="emailField" class="flex-grow" placeholder="Ajouter un email" type="email"
                         :disabled="isLoading" />
                     <UButton color="primary" variant="solid" icon="i-lucide-plus" @click="addEmail" />
                 </div>
