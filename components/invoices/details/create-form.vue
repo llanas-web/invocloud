@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { UForm } from '#components';
 import type { InvoiceStatus } from '~/types';
 
-const { formState, isLoading } = useInvoiceCreate()
+const { formRef, formState, isLoading, formStateSchema } = useInvoiceCreate()
 const { suppliers } = useSuppliers()
 const { openModal: openCreateModal, formState: createFormState } = useSupplierCreate()
 
@@ -15,43 +16,54 @@ const onCreateSupplier = (newSupplierName: string) => {
     createFormState.name = newSupplierName || ''
     openCreateModal.value = true
 }
+
+const createInvoiceFormRef = useTemplateRef('createInvoiceFormRef')
+onMounted(() => {
+    formRef.value = createInvoiceFormRef.value
+})
 </script>
 
 <template>
     <LazySuppliersAddModal />
-    <UForm class="space-y-4" :state="formState" :disabled="isLoading" :loading="isLoading">
-        <UFormField label="Fournisseur">
+    <UForm ref="createInvoiceFormRef" class="space-y-4" :state="formState" :disabled="isLoading" :loading="isLoading"
+        :schema="formStateSchema" :validate-on="['input', 'change', 'blur']">
+        <UFormField name="created_at" label="Date de facture" required
+            class="flex flex-row justify-between items-center gap-4">
+            <CommonDatePicker v-model="formState.created_at" label="Date de la facture" />
+        </UFormField>
+        <UFormField name="supplier_id" label="Fournisseur" required>
             <UInputMenu v-model="formState.supplier_id" :items="suppliers" class="w-full" value-key="id" create-item
                 label-key="name" @create="onCreateSupplier" placeholder="Sélectionner un fournisseur">
             </UInputMenu>
         </UFormField>
-        <UFormField label="Commentaire">
+        <UFormField name="comment" label="Commentaire">
             <UInput v-model="formState.comment" placeholder="Ajouter un commentaire..." class="w-full" />
         </UFormField>
-        <UFormField label="Numéro de facture">
+        <UFormField name="invoice_number" label="Numéro de facture" required>
             <UInput v-model="formState.invoice_number" class="w-full" />
         </UFormField>
-        <UFormField label="Nom de la facture">
+        <UFormField name="name" label="Nom de la facture">
             <UInput v-model="formState.name" class="w-full" />
         </UFormField>
-        <div class="flex flex-row justify-between items-center">
-            <UFormField label="Date d'échéance">
-                <UInput v-model="formState.due_date" type="date" class="w-full" />
+        <div class="flex flex-row justify-between items-center gap-4">
+            <UFormField name="due_date" label="Date d'échéance" class="flex-1" required>
+                <CommonDatePicker v-model="formState.due_date" label="Date d'échéance" @change="() => {
+                    formRef?.validate({ name: 'due_date' })
+                }" @blur="() => formRef?.validate({ name: 'due_date' })" />
             </UFormField>
-            <UFormField label="Date de paiement">
-                <UInput ref="paidAtInputRef" v-model="formState.paid_at" type="date" class="w-full"
-                    :required="formState.status === 'paid'" />
+            <UFormField name="paid_at" label="Date de paiement" class="flex-1">
+                <CommonDatePicker v-model="formState.paid_at" label="Date de paiement" />
             </UFormField>
         </div>
-        <UFormField label="Statut">
+        <UFormField name="status" label="Statut" required>
             <USelect v-model="formState.status" :items="invoiceStatus" placeholder="Status de la facture"
                 class="w-full" />
         </UFormField>
-        <UFormField label="Montant TVA">
-            <UInput v-model="formState.taxe_amount" icon="i-lucide-euro" class="w-full" />
+        <UFormField name="taxe_amount" label="Montant TVA" required>
+            <UInput v-model="formState.taxe_amount" icon="i-lucide-euro" class="w-full" type="number" />
         </UFormField>
-        <UFormField label="Montant TTC">
-            <UInput v-model="formState.amount" icon="i-lucide-euro" class="w-full" />
+        <UFormField name="amount" label="Montant TTC" required>
+            <UInput v-model="formState.amount" icon="i-lucide-euro" class="w-full" type="number" />
         </UFormField>
     </UForm>
 </template>

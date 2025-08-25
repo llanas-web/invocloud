@@ -153,7 +153,7 @@ const onNewSupplier = () => {
 <template>
     <UDashboardPanel id="customers">
         <template #header>
-            <UDashboardNavbar title="Customers">
+            <UDashboardNavbar title="Fournisseurs">
                 <template #leading>
                     <UDashboardSidebarCollapse />
                 </template>

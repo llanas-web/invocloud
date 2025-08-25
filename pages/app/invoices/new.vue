@@ -31,9 +31,11 @@ const onFileChange = (event: Event) => {
     if (file) {
         invoiceFile.value = file
         formState.name = formState.name ?? file.name
+        formState.file_path = fileUrl.value
     } else {
         invoiceFile.value = null
         formState.name = formState.name ?? ''
+        formState.file_path = ''
     }
 }
 

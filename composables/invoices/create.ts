@@ -1,13 +1,41 @@
 import { createSharedComposable } from "@vueuse/core";
+import { z } from "zod";
 import type { InvoiceInsert } from "~/types";
+
+const formStateSchema = z.object({
+    file_path: z.string().min(1, "Le chemin du fichier est requis."),
+    supplier_id: z.string().min(1, "Le fournisseur est requis."),
+    amount: z.number().positive("Le montant doit être positif."),
+    taxe_amount: z.number().positive(
+        "Le montant de la taxe doit être positif.",
+    ),
+    comment: z.string().optional().nullable(),
+    name: z.string().optional().nullable(),
+    due_date: z.string()
+        .min(1, "La date d'échéance est requise.")
+        .nullable()
+        .refine((val) => val !== null && val.length > 0, {
+            message: "La date d'échéance est requise.",
+        }),
+    invoice_number: z.string().min(1, "Le numéro de facture est requis."),
+    paid_at: z.string().optional().nullable(),
+    created_at: z.string().min(1, "La date de création est requise."),
+    status: z.enum(["paid", "validated", "error", "pending", "sent"]).default(
+        "validated",
+    ),
+});
+
+type Schema = z.output<typeof formStateSchema>;
 
 const _useInvoiceCreate = () => {
     const toast = useToast();
     const { createInvoice } = useInvoices();
 
+    const formRef = ref();
     const isLoading = ref(false);
+    const isOnError = ref(false);
 
-    const formState = reactive<InvoiceInsert>({
+    const formState = reactive<Schema>({
         file_path: "",
         supplier_id: "",
         amount: 0,
@@ -17,6 +45,8 @@ const _useInvoiceCreate = () => {
         due_date: null,
         invoice_number: "",
         paid_at: null,
+        created_at: new Date().toISOString(),
+        status: "validated",
     });
 
     const invoiceFile = ref<File | null>(null);
@@ -29,25 +59,45 @@ const _useInvoiceCreate = () => {
             formState.taxe_amount !== 0 ||
             formState.comment !== "" ||
             formState.name !== null ||
-            formState.due_date !== null ||
+            formState.due_date !== new Date().toISOString() ||
             formState.invoice_number !== "" ||
-            formState.paid_at !== null
+            formState.paid_at !== null ||
+            formState.created_at !== new Date().toISOString()
         );
     });
 
     const onSubmit = async () => {
+        formRef.value?.submit();
         isLoading.value = true;
-        if (!formState || !invoiceFile.value) {
-            console.error("Form state or invoice file is missing.");
+        const { success, error, data } = formStateSchema.safeParse(formState);
+        if (!invoiceFile.value) {
+            isOnError.value = true;
+            console.error("Invoice file is missing.");
             toast.add({
-                title: "Erreur",
-                description: "Veuillez remplir tous les champs requis.",
+                title: "Aucun fichier sélectionné",
+                description:
+                    "Veuillez sélectionner un fichier pour la facture.",
                 color: "error",
             });
             isLoading.value = false;
             return;
         }
-        const newInvoice = await createInvoice(formState, invoiceFile.value);
+        if (!success || error) {
+            isOnError.value = true;
+            console.error("Form state or invoice file is missing.");
+            toast.add({
+                title: "Erreur",
+                description:
+                    "Le formulaire contient des erreurs. Veuillez vérifier les champs requis.",
+                color: "error",
+            });
+            isLoading.value = false;
+            return;
+        }
+        const newInvoice = await createInvoice(
+            formState as InvoiceInsert,
+            invoiceFile.value,
+        );
         if (!newInvoice) {
             console.error("Failed to create invoice");
             toast.add({
@@ -68,7 +118,9 @@ const _useInvoiceCreate = () => {
     };
 
     return {
+        formRef,
         formState,
+        formStateSchema,
         isDirty,
         invoiceFile,
         isLoading,
