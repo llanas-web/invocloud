@@ -28,8 +28,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-    title:
-        page.value?.seo.title || page.value?.title,
+    title: page.value?.seo.title || page.value?.title,
     titleTemplate:
         page.value?.seo.title || page.value?.title,
     description:
@@ -94,15 +93,13 @@ useSeoMeta({
         <UMain>
             <div v-if="page">
                 <LazyInvoicesUploadModalContainer size="md" variant="ghost" />
-                <UPageHero orientation="horizontal">
+                <UPageHero orientation="horizontal" :ui="{ title: 'text-muted' }">
                     <template #title>
-                        <h1 class="text-muted">
-                            {{ page.title.split(' ')[0] }}
-                            <br />
-                            et gérez vos <span class="text-primary">factures</span>
-                            <br />
-                            en toute simplicité.
-                        </h1>
+                        {{ page.title.split(' ')[0] }}
+                        <br />
+                        et gérez vos <span class="text-primary">factures</span>
+                        <br />
+                        en toute simplicité.
                     </template>
                     <template #description>
                         <p class="text-muted text-lg">{{ page.description }}</p>

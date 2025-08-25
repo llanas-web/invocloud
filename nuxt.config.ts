@@ -3,7 +3,14 @@ export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
   devtools: { enabled: false },
   css: ["~/assets/css/main.css"],
-  modules: ["@nuxtjs/supabase", "@nuxt/ui-pro", "nuxt-resend", "@nuxt/content"],
+  modules: [
+    "@nuxtjs/supabase",
+    "@nuxt/ui-pro",
+    "nuxt-resend",
+    "@nuxt/content",
+    "@nuxtjs/sitemap",
+    "@nuxt/image",
+  ],
   runtimeConfig: {
     public: {
       baseUrl: process.env.BASE_URL || "http://localhost:3000",
@@ -33,5 +40,23 @@ export default defineNuxtConfig({
   },
   ui: {
     colorMode: false,
+  },
+  app: {
+    head: {
+      htmlAttrs: {
+        lang: "fr",
+      },
+    },
+  },
+  site: {
+    url: process.env.BASE_URL || "http://localhost:3000",
+    defaultLocale: "fr",
+    locales: ["fr", "en"],
+    name: "Invocloud",
+    description: "Gérez vos factures en toute simplicité",
+  },
+  sitemap: {
+    exclude: ["/auth/**", "/app/**"],
+    include: ["/"],
   },
 });
