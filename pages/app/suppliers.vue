@@ -21,11 +21,6 @@ const table = useTemplateRef('table')
 const { suppliers, pending, deleteSuppliers } = useSuppliers()
 const { openModal: openCreateModal } = useSupplierCreate()
 
-// const columnFilters = ref([{
-//     id: 'emails',
-//     value: ''
-// }])
-const columnVisibility = ref()
 const rowSelection = ref()
 
 function getRowItems(row: Row<Supplier>) {
@@ -184,30 +179,11 @@ const onNewSupplier = () => {
                         </UButton>
                     </SuppliersDeleteModal>
                     <SuppliersEditModal />
-
-                    <UDropdownMenu :items="table?.tableApi
-                        ?.getAllColumns()
-                        .filter((column) => column.getCanHide())
-                        .map((column) => ({
-                            label: upperFirst(column.id),
-                            type: 'checkbox' as const,
-                            checked: column.getIsVisible(),
-                            onUpdateChecked(checked: boolean) {
-                                table?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
-                            },
-                            onSelect(e?: Event) {
-                                e?.preventDefault()
-                            }
-                        }))
-                        " :content="{ align: 'end' }">
-                        <UButton label="Colonnes" color="neutral" variant="outline"
-                            trailing-icon="i-lucide-settings-2" />
-                    </UDropdownMenu>
                 </div>
             </div>
 
-            <UTable ref="table" v-model:column-visibility="columnVisibility" v-model:row-selection="rowSelection"
-                v-model:pagination="pagination" :pagination-options="{
+            <UTable ref="table" v-model:row-selection="rowSelection" v-model:pagination="pagination"
+                :pagination-options="{
                     getPaginationRowModel: getPaginationRowModel()
                 }" class="shrink-0" :data="suppliers ?? undefined" :columns="columns" :loading="pending" :ui="{
                     base: 'table-fixed border-separate border-spacing-0',

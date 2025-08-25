@@ -21,7 +21,6 @@ const { open: isSendModalOpen, selectedInvoices: listInvoicesToSend } = useInvoi
 const { open: isDeleteModalOpen, selectedInvoices: listInvoicesToDelete } = useInvoicesDelete()
 declare type Invoice = NonNullable<(typeof acceptedInvoices)['value']>[number];
 
-const columnVisibility = ref()
 const rowSelection = ref({})
 
 function getRowItems(row: Row<Invoice>) {
@@ -148,7 +147,7 @@ const columns: TableColumn<Invoice>[] = [
     },
     {
         accessorKey: 'status',
-        header: 'Status',
+        header: 'Statut',
         filterFn: (row, columnId, value) => {
             if (value === 'all') return true
             if (value === 'error' && row.original.overdue) return true
@@ -360,35 +359,17 @@ const openDeleteModal = () => {
                 { label: 'En retard', value: 'error' }
             ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
                 placeholder="Filter status" class="min-w-28" />
-            <UDropdownMenu :items="table?.tableApi
-                ?.getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => ({
-                    label: upperFirst(column.id),
-                    type: 'checkbox' as const,
-                    checked: column.getIsVisible(),
-                    onUpdateChecked(checked: boolean) {
-                        table?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
-                    },
-                    onSelect(e?: Event) {
-                        e?.preventDefault()
-                    }
-                }))
-                " :content="{ align: 'end' }">
-                <UButton label="Colonnes" color="neutral" variant="outline" trailing-icon="i-lucide-settings-2" />
-            </UDropdownMenu>
         </div>
     </div>
-    <UTable ref="table" v-model:column-visibility="columnVisibility" v-model:row-selection="rowSelection"
-        v-model:pagination="pagination" :pagination-options="{
-            getPaginationRowModel: getPaginationRowModel()
-        }" class="shrink-0" :data="filteredInvoices" :columns="columns" :loading="pending" :ui="{
-            base: 'table-fixed border-separate border-spacing-0',
-            thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
-            tbody: '[&>tr]:last:[&>td]:border-b-0',
-            th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
-            td: 'border-b border-default'
-        }" />
+    <UTable ref="table" v-model:row-selection="rowSelection" v-model:pagination="pagination" :pagination-options="{
+        getPaginationRowModel: getPaginationRowModel()
+    }" class="shrink-0" :data="filteredInvoices" :columns="columns" :loading="pending" :ui="{
+        base: 'table-fixed border-separate border-spacing-0',
+        thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
+        tbody: '[&>tr]:last:[&>td]:border-b-0',
+        th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
+        td: 'border-b border-default'
+    }" />
 
     <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
         <div class="text-sm text-muted">

@@ -95,30 +95,31 @@ const links = ref<NavigationMenuItem[]>([
     },
 ])
 
-onMounted(async () => {
-    const cookie = useCookie('cookie-consent')
-    if (cookie.value === 'accepted') {
-        return
-    }
+// A décommenter lorsqu'on mettra en place les cookies
+// onMounted(async () => {
+//     const cookie = useCookie('cookie-consent')
+//     if (cookie.value === 'accepted') {
+//         return
+//     }
 
-    toast.add({
-        title: 'Nous utilisons des cookies 🍪',
-        duration: 0,
-        close: false,
-        actions: [{
-            label: 'Accepter',
-            color: 'neutral',
-            variant: 'outline',
-            onClick: () => {
-                cookie.value = 'accepted'
-            }
-        }, {
-            label: 'Refuser',
-            color: 'neutral',
-            variant: 'ghost'
-        }]
-    })
-})
+//     toast.add({
+//         title: 'Nous utilisons des cookies 🍪',
+//         duration: 0,
+//         close: false,
+//         actions: [{
+//             label: 'Accepter',
+//             color: 'neutral',
+//             variant: 'outline',
+//             onClick: () => {
+//                 cookie.value = 'accepted'
+//             }
+//         }, {
+//             label: 'Refuser',
+//             color: 'neutral',
+//             variant: 'ghost'
+//         }]
+//     })
+// })
 
 const onSubscribe = async () => {
     if (!selectedEstablishment.value) {

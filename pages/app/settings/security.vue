@@ -49,7 +49,7 @@ const onDeleteAccount = async () => {
 </script>
 
 <template>
-  <UPageCard title="Password" description="Confirmez votre mot de passe actuel avant d'en définir un nouveau."
+  <UPageCard title="Mot de passe" description="Confirmez votre mot de passe actuel avant d'en définir un nouveau."
     variant="subtle">
     <UForm :schema="passwordSchema" :state="password" :validate="validate" @submit="onSubmit"
       class="flex flex-col gap-4 max-w-xs">

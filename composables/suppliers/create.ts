@@ -34,6 +34,9 @@ const _useSupplierCreate = () => {
 
     async function onSubmit() {
         isLoading.value = true;
+        if (emailField.value !== "" && formState.emails.length === 0) {
+            addEmail();
+        }
         const newSupplier = await createSupplier(
             formState.name,
             formState.emails,
