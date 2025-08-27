@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { fr } from '@nuxt/ui-pro/locale'
 
 const router = useRouter();
 const currentRoute = router.currentRoute;
@@ -20,7 +21,7 @@ const redirectTo = computed(() => {
 </script>
 
 <template>
-    <UApp class="overflow-hidden relative">
+    <UApp :locale="fr" class="overflow-hidden relative">
         <div class="absolute h-screen w-screen overflow-hidden z-[-1]">
             <!-- Conteneur des décorations : n'affecte pas la hauteur -->
             <div class="absolute isolate h-[40%] rounded-full bg-[#5E73F7] opacity-80 blur-3xl aspect-square"

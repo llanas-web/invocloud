@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { LazyInvoicesUploadModalContainer } from '#components';
+import { fr } from '@nuxt/ui-pro/locale'
 
 const { openModal } = useInvoiceUpload()
 const user = useSupabaseUser()
@@ -9,7 +10,7 @@ const user = useSupabaseUser()
 <template>
     <div class="absolute w-96 h-96 rounded-full bg-[#5E73F7] opacity-80 blur-3xl"
         style="top: -30%; left: 50%; transform: translateX(-50%);"></div>
-    <UApp>
+    <UApp :locale="fr">
         <UHeader :toggle="false">
             <template #left>
                 <NuxtLink to="/">
