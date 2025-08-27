@@ -38,4 +38,34 @@ export const collections = {
             }),
         }),
     }),
+    faq: defineCollection({
+        type: "page",
+        source: "faq.md",
+        schema: z.object({
+            title: z.string(),
+            description: z.string(),
+            date: z.string().optional(),
+            keywords: z.string().optional(),
+        }),
+    }),
+    cgu: defineCollection({
+        type: "page",
+        source: "cgu.md",
+        schema: z.object({
+            title: z.string(),
+            description: z.string(),
+            date: z.string().optional(),
+            keywords: z.string().optional(),
+        }),
+    }),
+    pdc: defineCollection({
+        type: "page",
+        source: "pdc.md",
+        schema: z.object({
+            title: z.string(),
+            description: z.string(),
+            date: z.string().optional(),
+            keywords: z.string().optional(),
+        }),
+    }),
 };

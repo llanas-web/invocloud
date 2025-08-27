@@ -14,6 +14,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       baseUrl: process.env.BASE_URL || "http://localhost:3000",
+      vpvLicenseKey: process.env.NUXT_VPV_LICENSE_KEY || "",
     },
   },
   router: {
@@ -29,7 +30,7 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: "/auth/login",
       callback: "/auth/confirm",
-      exclude: ["/", "/auth/*", "/stripe/webhook"],
+      include: ["/app/**"],
     },
   },
   icon: {
