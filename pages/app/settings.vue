@@ -21,7 +21,7 @@ const links = [[{
   icon: 'i-lucide-bell',
   to: '/app/settings/notifications'
 }, {
-  label: 'Security',
+  label: 'Sécurité',
   icon: 'i-lucide-shield',
   to: '/app/settings/security'
 }]] satisfies NavigationMenuItem[][]
