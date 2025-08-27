@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { VPdfViewer } from '@vue-pdf-viewer/viewer'
+import { VPdfViewer, useLicense } from '@vue-pdf-viewer/viewer'
 
 const props = defineProps<{
     fileUrl: string;
     fileType: string;
     fileName: string;
 }>()
+console.log(import.meta.env.VPV_LICENSE_KEY);
+useLicense(import.meta.env.VPV_LICENSE_KEY || '')
 
 const { fileUrl, fileType, fileName } = toRefs(props)
 </script>
