@@ -22,9 +22,9 @@ const invoicesStats = computed(() => {
 })
 
 function formatCurrency(value: number): string {
-    return value.toLocaleString('en-US', {
+    return value.toLocaleString('fr-FR', {
         style: 'currency',
-        currency: 'USD',
+        currency: 'EUR',
         maximumFractionDigits: 0
     })
 }

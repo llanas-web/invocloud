@@ -141,7 +141,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
                     <div class="flex flex-col gap-2 text-muted font-sans font-medium">
                         Profitez de l'abonnement Invocloud avec
                         <span class="text-primary font-bold text-2xl lg:text-4xl">7 jours gratuits</span>
-                        <span class="text-primary">Puis 29,99€ / mois</span>
+                        <span class="text-primary">Puis 29,90€ / mois</span>
                     </div>
                 </UCard>
                 <USeparator />
