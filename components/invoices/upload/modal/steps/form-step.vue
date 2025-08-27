@@ -22,7 +22,7 @@ const onFileChange = (e: Event) => {
     <UForm ref="stepFileForm" :schema="fileFormSchema" :state="formState" class="space-y-4 mt-8">
         <UFormField label="Envoyer à" placeholder="Jean Dupont" name="recipientEmail">
             <UInput v-model="formState.recipientEmail" placeholder="Email du destinataire" class="w-full"
-                :disabled="isLoading" :autofocus="true" />
+                :disabled="isLoading" />
         </UFormField>
         <UFormField label="Votre email" placeholder="Votre email" name="senderEmail">
             <UInput v-model="formState.senderEmail" placeholder="Votre email" class="w-full" :disabled="isLoading" />
