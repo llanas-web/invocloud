@@ -51,7 +51,7 @@ const onPendingInvoiceClick = () => {
                     <USkeleton class="w-24 h-8" />
                 </template>
                 <template v-else>
-                    <span class="text-2xl font-semibold text-highlighted">
+                    <span class="text-lg lg:text-2xl font-semibold text-highlighted">
                         {{ formatCurrency(invoicesStats.total) }}
                     </span>
                 </template>
@@ -68,7 +68,7 @@ const onPendingInvoiceClick = () => {
                     <USkeleton class="w-24 h-8" />
                 </template>
                 <template v-else>
-                    <span class="text-2xl font-semibold text-highlighted">
+                    <span class="text-lg lg:text-2xl font-semibold text-highlighted">
                         {{ invoicesStats.count }}
                     </span>
                 </template>
@@ -87,7 +87,7 @@ const onPendingInvoiceClick = () => {
                     <USkeleton class="w-24 h-8" />
                 </template>
                 <template v-else>
-                    <span class="text-2xl font-semibold text-highlighted">
+                    <span class="text-lg lg:text-2xl font-semibold text-highlighted">
                         {{ invoicesStats.pendingCount }}
                     </span>
                 </template>

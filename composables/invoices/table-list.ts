@@ -10,10 +10,12 @@ const _useInvoicesTableList = () => {
         start: sub(new Date(), { months: 1 }),
         end: new Date(),
     });
+    const selectedSupplier = ref<string | null>(null);
 
     const filteredInvoices = computed(() => {
         return acceptedInvoices.value.filter((invoice) => {
             const matchesStatus = statusFilter.value === "all" ||
+                statusFilter.value === "error" && invoice.overdue ||
                 invoice.status === statusFilter.value;
             const matchesRange = !rangeFilter.value ||
                 isBefore(invoice.created_at, rangeFilter.value.end) &&
@@ -25,6 +27,7 @@ const _useInvoicesTableList = () => {
     return {
         statusFilter,
         rangeFilter,
+        selectedSupplier,
         filteredInvoices,
     };
 };
