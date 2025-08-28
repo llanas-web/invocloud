@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { upperFirst } from 'scule'
 import type { TableColumn } from '@nuxt/ui'
-import { LazyInvoicesDeleteModal, LazyInvoicesSendModal, UBadge, NuxtLink } from '#components'
+import { LazyInvoicesDeleteModal, LazyInvoicesSendModal, UBadge, NuxtLink, UInputMenu } from '#components'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
 import { useInvoicesSend } from '~/composables/invoices/send'
 import { useInvoicesDelete } from '~/composables/invoices/delete'
@@ -19,6 +19,7 @@ const { statusFilter, rangeFilter, filteredInvoices } = useInvoicesTableList()
 const { updateInvoice } = useInvoices()
 const { open: isSendModalOpen, selectedInvoices: listInvoicesToSend } = useInvoicesSend()
 const { open: isDeleteModalOpen, selectedInvoices: listInvoicesToDelete } = useInvoicesDelete()
+const { suppliers } = useSuppliers()
 declare type Invoice = NonNullable<(typeof acceptedInvoices)['value']>[number];
 
 const rowSelection = ref({})
@@ -92,6 +93,15 @@ function getRowItems(row: Row<Invoice>) {
 }
 
 
+const statusColors = {
+    pending: 'warning' as const,
+    sent: 'error' as const,
+    validated: 'warning' as const,
+    paid: 'success' as const,
+    error: 'error' as const,
+}
+
+
 const columns: TableColumn<Invoice>[] = [
     {
         id: 'select',
@@ -115,7 +125,7 @@ const columns: TableColumn<Invoice>[] = [
         accessorKey: 'number',
         header: 'Numéro de facture',
         cell: ({ row }) => {
-            return h('div', { class: 'flex items-center gap-3' }, [
+            return h('div', { class: 'flex items-center gap-3' }, () => [
                 h(NuxtLink, { class: 'font-medium text-highlighted hover:underline', to: `/app/invoices/${row.original.id}` }, row.original.invoice_number ?? ''),
             ])
         }
@@ -124,7 +134,7 @@ const columns: TableColumn<Invoice>[] = [
         accessorKey: 'supplier',
         header: 'Fournisseur',
         cell: ({ row, table }) => {
-            return h('div', { class: 'flex items-center gap-3' }, [
+            return h('div', { class: 'flex items-center gap-3' }, () => [
                 h('div', undefined, [
                     h('p', { class: 'font-medium text-highlighted' }, row.original.supplier_name),
                 ])
@@ -148,19 +158,7 @@ const columns: TableColumn<Invoice>[] = [
     {
         accessorKey: 'status',
         header: 'Statut',
-        filterFn: (row, columnId, value) => {
-            if (value === 'all') return true
-            if (value === 'error' && row.original.overdue) return true
-            return row.original.status === value
-        },
         cell: ({ row }) => {
-            const statusColors = {
-                pending: 'warning' as const,
-                sent: 'error' as const,
-                validated: 'warning' as const,
-                paid: 'success' as const,
-                error: 'error' as const,
-            }
             const color = statusColors[row.original.status as keyof typeof statusColors]
             if (row.original.overdue) {
                 return h(UBadge, { class: 'capitalize', variant: 'subtle', color: 'error' }, () =>
@@ -294,19 +292,6 @@ const columns: TableColumn<Invoice>[] = [
     }
 ]
 
-watch(() => statusFilter.value, (newVal) => {
-    if (!table?.value?.tableApi) return
-
-    const statusColumn = table.value.tableApi.getColumn('status')
-    if (!statusColumn) return
-
-    if (newVal === 'all') {
-        statusColumn.setFilterValue(undefined)
-    } else {
-        statusColumn.setFilterValue(newVal)
-    }
-})
-
 const pagination = ref({
     pageIndex: 0,
     pageSize: 10
@@ -328,9 +313,18 @@ const openDeleteModal = () => {
     <LazyInvoicesDeleteModal />
     <div class="flex flex-wrap items-center justify-between gap-1.5">
         <div class="flex flex-wrap items-center gap-1.5">
-
             <UButton :disabled="!table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Envoyer"
                 color="primary" variant="subtle" icon="i-lucide-send" @click="openSendModal" :ui="{
+                    label: 'hidden md:block',
+                }">
+                <template #trailing>
+                    <UKbd>
+                        {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
+                    </UKbd>
+                </template>
+            </UButton>
+            <UButton :disabled="!table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Télécharger"
+                color="info" variant="subtle" icon="i-lucide-download" @click="openDeleteModal" :ui="{
                     label: 'hidden md:block',
                 }">
                 <template #trailing>
