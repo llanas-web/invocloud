@@ -13,7 +13,7 @@ const { fileUrl, fileType, fileName } = toRefs(props)
 </script>
 <template>
     <template v-if="fileUrl">
-        <div v-if="fileType.includes('pdf')" class="relative h-full">
+        <div v-if="fileType.includes('pdf')" class="relative h-full w-full">
             <VPdfViewer :src="fileUrl" />
         </div>
 

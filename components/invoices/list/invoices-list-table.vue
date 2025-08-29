@@ -15,7 +15,7 @@ const UCheckbox = resolveComponent('UCheckbox')
 const table = useTemplateRef('table')
 
 const { acceptedInvoices, pending } = useInvoices()
-const { statusFilter, rangeFilter, filteredInvoices } = useInvoicesTableList()
+const { statusFilter, selectedSuppliers, filteredInvoices } = useInvoicesTableList()
 const { updateInvoice } = useInvoices()
 const { open: isSendModalOpen, selectedInvoices: listInvoicesToSend } = useInvoicesSend()
 const { open: isDeleteModalOpen, selectedInvoices: listInvoicesToDelete } = useInvoicesDelete()
@@ -133,12 +133,8 @@ const columns: TableColumn<Invoice>[] = [
     {
         accessorKey: 'supplier',
         header: 'Fournisseur',
-        cell: ({ row, table }) => {
-            return h('div', { class: 'flex items-center gap-3' }, () => [
-                h('div', undefined, [
-                    h('p', { class: 'font-medium text-highlighted' }, row.original.supplier_name),
-                ])
-            ])
+        cell: ({ row }) => {
+            return h(UButton, { onClick: () => selectedSuppliers.value = [row.original.supplier_id], variant: 'ghost' }, row.original.supplier_name)
         }
     },
     {

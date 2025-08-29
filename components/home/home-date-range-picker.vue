@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { DateFormatter, getLocalTimeZone, CalendarDate, today } from '@internationalized/date'
+import { DateFormatter, getLocalTimeZone, CalendarDate, today, startOfMonth, endOfMonth } from '@internationalized/date'
 import { useInvoicesTableList } from '~/composables/invoices/table-list'
 
 const df = new DateFormatter('fr-FR', {
   dateStyle: 'medium'
+})
+const dfSmall = new DateFormatter('fr-FR', {
+  dateStyle: 'short'
 })
 
 const { rangeFilter: selected } = useInvoicesTableList();
@@ -27,8 +30,8 @@ const toCalendarDate = (date: Date) => {
 
 const calendarRange = computed({
   get: () => ({
-    start: selected.value.start ? toCalendarDate(selected.value.start) : undefined,
-    end: selected.value.end ? toCalendarDate(selected.value.end) : undefined
+    start: selected.value.start ? toCalendarDate(selected.value.start) : toCalendarDate(new Date()),
+    end: selected.value.end ? toCalendarDate(selected.value.end) : toCalendarDate(new Date())
   }),
   set: (newValue: { start: CalendarDate | null, end: CalendarDate | null }) => {
     selected.value = {
@@ -75,18 +78,44 @@ const selectRange = (range: { days?: number, months?: number, years?: number }) 
     end: endDate.toDate(getLocalTimeZone())
   }
 }
+
+const selectCurrentMonth = () => {
+  const currentDate = today(getLocalTimeZone())
+  selected.value = {
+    start: startOfMonth(currentDate).toDate(getLocalTimeZone()),
+    end: endOfMonth(currentDate).toDate(getLocalTimeZone())
+  }
+}
+
+const onMonthSelect = (indicator: -1 | 1) => {
+  if (indicator === -1) {
+    selected.value = {
+      start: startOfMonth(calendarRange.value.start.subtract({ months: 1 })).toDate(getLocalTimeZone()),
+      end: endOfMonth(calendarRange.value.start.subtract({ months: 1 })).toDate(getLocalTimeZone())
+    }
+  } else if (indicator === 1) {
+    selected.value = {
+      start: startOfMonth(calendarRange.value.start.add({ months: 1 })).toDate(getLocalTimeZone()),
+      end: endOfMonth(calendarRange.value.start.add({ months: 1 })).toDate(getLocalTimeZone())
+    }
+  }
+}
 </script>
 
 <template>
   <UPopover :content="{ align: 'start' }" :modal="true">
-    <UButton color="neutral" variant="ghost" icon="i-lucide-calendar" class="data-[state=open]:bg-elevated group">
+    <UButton color="neutral" variant="ghost" icon="i-lucide-calendar" class="data-[state=open]:bg-elevated group" :ui="{
+      leadingIcon: 'hidden md:block'
+    }">
       <span class="truncate">
         <template v-if="selected.start">
           <template v-if="selected.end">
-            {{ df.format(selected.start) }} - {{ df.format(selected.end) }}
+            <span class="text-sm md:text-md">
+              {{ df.formatRange(selected.start, selected.end) }}
+            </span>
           </template>
           <template v-else>
-            {{ df.format(selected.start) }}
+            {{ df.formatRange(selected.start, selected.end) }}
           </template>
         </template>
         <template v-else>
@@ -107,8 +136,16 @@ const selectRange = (range: { days?: number, months?: number, years?: number }) 
             class="rounded-none px-4" :class="[isRangeSelected(range) ? 'bg-elevated' : 'hover:bg-elevated/50']"
             truncate @click="selectRange(range)" />
         </div>
-
-        <UCalendar v-model="calendarRange" class="p-2" :number-of-months="1" range lo/>
+        <div class="flex flex-col p-2 space-y-2">
+          <UCalendar v-model="calendarRange" :number-of-months="1" range>
+          </UCalendar>
+          <div class="flex justify-between w-full">
+            <UButton label="-1 mois" variant="subtle" color="neutral" size="sm" @click="() => onMonthSelect(-1)" />
+            <UButton label="Mois en cours" variant="subtle" color="neutral" size="sm"
+              @click="() => selectCurrentMonth()" />
+            <UButton label="+1 mois" variant="subtle" color="neutral" size="sm" @click="() => onMonthSelect(1)" />
+          </div>
+        </div>
       </div>
     </template>
   </UPopover>
