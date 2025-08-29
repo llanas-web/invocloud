@@ -70,6 +70,7 @@ const onNewInvoice = () => {
                         variant="outline" value-key="id" label-key="name" placeholder="Recherche fournisseur" multiple
                         delete-icon="i-lucide-x" :ui="{
                             content: 'min-w-fit',
+                            base: 'space-x-1'
                         }">
                     </UInputMenu>
                 </template>

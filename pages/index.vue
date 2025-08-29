@@ -147,7 +147,7 @@ useSeoMeta({
 
         <UPageSection>
             <template #title>
-                <ul class="font-normal uppercase space-y-4">
+                <ul class="font-normal uppercase space-y-2">
                     <li class="hover:underline">
                         <NuxtLink to="/faq">FAQ</NuxtLink>
                     </li>
