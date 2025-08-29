@@ -12,7 +12,7 @@ const invoicesStats = computed(() => {
     const count = filteredInvoices.value.length;
     const pendingCount = filteredInvoices.value.filter(
         (invoice) =>
-            invoice.status !== "paid" && invoice.status !== "error",
+            invoice.overdue,
     ).length;
     return {
         total,
@@ -30,10 +30,10 @@ function formatCurrency(value: number): string {
 }
 
 const onPendingInvoiceClick = () => {
-    if (statusFilter.value === 'validated') {
+    if (statusFilter.value === 'error') {
         statusFilter.value = 'all'
     } else {
-        statusFilter.value = 'validated'
+        statusFilter.value = 'error'
     }
 }
 </script>
@@ -74,13 +74,12 @@ const onPendingInvoiceClick = () => {
                 </template>
             </div>
         </UPageCard>
-        <UPageCard icon="i-lucide-clock" title="En attente" variant="subtle" :highlight="statusFilter === 'validated'"
-            :ui="{
-                container: 'gap-y-1.5',
-                wrapper: 'items-center md:items-start',
-                leading: 'p-2.5 rounded-full bg-red-500/10 ring ring-inset ring-red-500/25 flex-col',
-                title: 'font-normal text-muted text-xs uppercase'
-            }" class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1 cursor-pointer"
+        <UPageCard icon="i-lucide-clock" title="En retard" variant="subtle" :highlight="statusFilter === 'error'" :ui="{
+            container: 'gap-y-1.5',
+            wrapper: 'items-center md:items-start',
+            leading: 'p-2.5 rounded-full bg-red-500/10 ring ring-inset ring-red-500/25 flex-col',
+            title: 'font-normal text-muted text-xs uppercase'
+        }" class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1 cursor-pointer"
             @click="onPendingInvoiceClick">
             <div class="flex items-center justify-center md:justify-start gap-2">
                 <template v-if="invoicePending">

@@ -319,16 +319,6 @@ const openDeleteModal = () => {
                     </UKbd>
                 </template>
             </UButton>
-            <UButton :disabled="!table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Télécharger"
-                color="info" variant="subtle" icon="i-lucide-download" @click="openDeleteModal" :ui="{
-                    label: 'hidden md:block',
-                }">
-                <template #trailing>
-                    <UKbd>
-                        {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
-                    </UKbd>
-                </template>
-            </UButton>
             <UButton :disabled="!table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Supprimer"
                 color="error" variant="subtle" icon="i-lucide-trash" @click="openDeleteModal" :ui="{
                     label: 'hidden md:block',
