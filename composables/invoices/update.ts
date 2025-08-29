@@ -6,9 +6,6 @@ import type { InvoiceUpdate } from "~/types";
 
 const formStateSchema = z.object({
     amount: z.number().positive("Le montant doit être positif."),
-    taxe_amount: z.number().positive(
-        "Le montant de la taxe doit être positif.",
-    ),
     comment: z.string().optional().nullable(),
     name: z.string().optional().nullable(),
     due_date: z.string()
@@ -45,7 +42,6 @@ const _useInvoiceUpdate = () => {
     const formState = reactive<Schema>({
         status: invoice.value?.status ?? "validated",
         amount: invoice.value?.amount ?? 0,
-        taxe_amount: invoice.value?.taxe_amount ?? 0,
         name: invoice.value?.name ?? "",
         invoice_number: invoice.value?.invoice_number ?? "",
         due_date: invoice.value?.due_date
@@ -67,7 +63,6 @@ const _useInvoiceUpdate = () => {
             if (newInvoice) {
                 formState.status = newInvoice.status ?? "validated";
                 formState.amount = newInvoice.amount;
-                formState.taxe_amount = newInvoice.taxe_amount;
                 formState.name = newInvoice.name;
                 formState.invoice_number = newInvoice.invoice_number;
                 formState.due_date = newInvoice.due_date

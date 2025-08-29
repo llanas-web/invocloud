@@ -6,9 +6,6 @@ const formStateSchema = z.object({
     file_path: z.string().min(1, "Le chemin du fichier est requis."),
     supplier_id: z.string().min(1, "Le fournisseur est requis."),
     amount: z.number().positive("Le montant doit être positif."),
-    taxe_amount: z.number().positive(
-        "Le montant de la taxe doit être positif.",
-    ),
     comment: z.string().optional().nullable(),
     name: z.string().optional().nullable(),
     due_date: z.string()
@@ -39,7 +36,6 @@ const _useInvoiceCreate = () => {
         file_path: "",
         supplier_id: "",
         amount: 0,
-        taxe_amount: 0,
         comment: "",
         name: null,
         due_date: null,
@@ -56,7 +52,6 @@ const _useInvoiceCreate = () => {
             formState.file_path !== "" ||
             formState.supplier_id !== "" ||
             formState.amount !== 0 ||
-            formState.taxe_amount !== 0 ||
             formState.comment !== "" ||
             formState.name !== null ||
             formState.due_date !== new Date().toISOString() ||
@@ -67,7 +62,6 @@ const _useInvoiceCreate = () => {
     });
 
     const onSubmit = async () => {
-        formRef.value?.submit();
         isLoading.value = true;
         const { success, error, data } = formStateSchema.safeParse(formState);
         if (!invoiceFile.value) {
