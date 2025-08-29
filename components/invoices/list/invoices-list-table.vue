@@ -123,10 +123,10 @@ const columns: TableColumn<Invoice>[] = [
     },
     {
         accessorKey: 'number',
-        header: 'Numéro de facture',
+        header: 'N°',
         cell: ({ row }) => {
-            return h('div', { class: 'flex items-center gap-3' }, () => [
-                h(NuxtLink, { class: 'font-medium text-highlighted hover:underline', to: `/app/invoices/${row.original.id}` }, row.original.invoice_number ?? ''),
+            return h('div', { class: 'flex items-center gap-3' }, [
+                h(NuxtLink, { class: 'font-medium text-highlighted hover:underline', to: `/app/invoices/${row.original.id}` }, () => row.original.invoice_number),
             ])
         }
     },
@@ -143,7 +143,7 @@ const columns: TableColumn<Invoice>[] = [
         cell: ({ row }) => {
             const amount = Number.parseFloat(row.getValue('amount'))
 
-            const formatted = new Intl.NumberFormat('en-US', {
+            const formatted = new Intl.NumberFormat('fr-FR', {
                 style: 'currency',
                 currency: 'EUR'
             }).format(amount)
