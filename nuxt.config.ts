@@ -13,8 +13,8 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     public: {
-      baseUrl: process.env.BASE_URL || "http://localhost:3000",
-      vpvLicenseKey: process.env.NUXT_VPV_LICENSE_KEY || "",
+      baseUrl: process.env.NUXT_PUBLIC_BASE_URL || "http://localhost:3000",
+      vpvLicenseKey: process.env.NUXT_PUBLIC_VPV_LICENSE_KEY || "",
     },
   },
   router: {
