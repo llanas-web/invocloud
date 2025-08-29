@@ -93,7 +93,7 @@ const isFormOpen = ref(false)
                 <CommonFileViewer :fileUrl="fileUrl" :fileType="fileType" :fileName="fileName" />
             </template>
         </USlideover>
-        <CommonFileViewer :fileUrl="fileUrl" :fileType="fileType" :fileName="fileName" />
+        <CommonFileViewer class="w-full" :fileUrl="fileUrl" :fileType="fileType" :fileName="fileName" />
     </template>
     <div v-else class="bg-white shadow w-full flex items-center justify-center p-4">
         <UButton icon="i-lucide-plus" class="rounded-full" size="lg" @click="triggerFilePicker" />

@@ -29,7 +29,7 @@ onMounted(() => {
         :loading="isLoading" :schema="formStateSchema" :validate-on="['input', 'change', 'blur']">
         <UFormField name="created_at" label="Date de facture" required
             class="flex flex-row justify-between items-center gap-4">
-            <CommonDatePicker v-model="formState.created_at" label="Date de la facture" />
+            <CommonFormDatePicker v-model="formState.created_at" label="Date de la facture" />
         </UFormField>
         <UFormField name="supplier_id" label="Fournisseur" required>
             <UInputMenu v-model="formState.supplier_id" :items="suppliers" class="w-full" value-key="id" create-item
@@ -47,12 +47,12 @@ onMounted(() => {
         </UFormField>
         <div class="flex flex-row justify-between items-center gap-4">
             <UFormField name="due_date" label="Date d'échéance" class="flex-1" required>
-                <CommonDatePicker v-model="formState.due_date" label="Date d'échéance" @change="() => {
+                <CommonFormDatePicker v-model="formState.due_date" label="Date d'échéance" @change="() => {
                     formRef?.validate({ name: 'due_date' })
                 }" @blur="() => formRef?.validate({ name: 'due_date' })" />
             </UFormField>
             <UFormField name="paid_at" label="Date de paiement" class="flex-1">
-                <CommonDatePicker v-model="formState.paid_at" label="Date de paiement" />
+                <CommonFormDatePicker v-model="formState.paid_at" label="Date de paiement" />
             </UFormField>
         </div>
         <UFormField name="status" label="Statut" required>

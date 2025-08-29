@@ -10,7 +10,7 @@ const _useInvoicesTableList = () => {
         start: sub(new Date(), { months: 1 }),
         end: new Date(),
     });
-    const selectedSupplier = ref<string | null>(null);
+    const selectedSuppliers = ref<string[]>([]);
 
     const filteredInvoices = computed(() => {
         return acceptedInvoices.value.filter((invoice) => {
@@ -20,14 +20,16 @@ const _useInvoicesTableList = () => {
             const matchesRange = !rangeFilter.value ||
                 isBefore(invoice.created_at, rangeFilter.value.end) &&
                     isAfter(invoice.created_at, rangeFilter.value.start);
-            return matchesStatus && matchesRange;
+            const matchSupplier = selectedSuppliers.value.length === 0 ||
+                selectedSuppliers.value.includes(invoice.supplier_id);
+            return matchesStatus && matchesRange && matchSupplier;
         });
     });
 
     return {
         statusFilter,
         rangeFilter,
-        selectedSupplier,
+        selectedSuppliers,
         filteredInvoices,
     };
 };

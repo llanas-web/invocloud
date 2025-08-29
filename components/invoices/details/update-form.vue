@@ -23,7 +23,7 @@ const isLoading = computed(() => loadingDetails.value || loadingUpdate.value)
         :loading="isLoading" :schema="formStateSchema">
         <UFormField name="created_at" label="Date de facture" required
             class="flex flex-row justify-between items-center gap-4">
-            <CommonDatePicker v-model="formState.created_at" label="Date de la facture" />
+            <CommonFormDatePicker v-model="formState.created_at" label="Date de la facture" />
         </UFormField>
         <UFormField label="Fournisseur">
             <USkeleton v-if="!invoice" class="h-8" />
@@ -44,11 +44,11 @@ const isLoading = computed(() => loadingDetails.value || loadingUpdate.value)
         <div class="flex flex-row justify-between items-center gap-4">
             <UFormField name="due_date" label="Date d'échéance" class="flex-1" required>
                 <USkeleton v-if="!invoice" class="h-8" />
-                <CommonDatePicker v-else v-model="formState.due_date" label="Date d'échéance" />
+                <CommonFormDatePicker v-else v-model="formState.due_date" label="Date d'échéance" />
             </UFormField>
             <UFormField name="paid_at" label="Date de paiement" class="flex-1">
                 <USkeleton v-if="!invoice" class="h-8" />
-                <CommonDatePicker v-else v-model="formState.paid_at" label="Date de paiement" />
+                <CommonFormDatePicker v-else v-model="formState.paid_at" label="Date de paiement" />
             </UFormField>
         </div>
         <UFormField label="Statut">
