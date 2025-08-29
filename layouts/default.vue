@@ -55,9 +55,12 @@ const user = useSupabaseUser()
         </USeparator>
 
         <UFooter>
-            <p class="text-primary">Politique de confidentialité l Conditions générales d'utilisation © 2025 Invocloud.
-                Tous
-                droits réservés.
+            <p class="text-primary">
+                <NuxtLink class="underline" to="/pdc">Politique de confidentialité</NuxtLink>
+                |
+                <NuxtLink class="underline" to="/cgu">
+                    Conditions générales d'utilisation</NuxtLink> © 2025 Invocloud.
+                Tous droits réservés.
             </p>
         </UFooter>
     </UApp>
