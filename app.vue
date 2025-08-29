@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { fr } from '@nuxt/ui-pro/locale'
-
+import { Analytics } from '@vercel/analytics/nuxt';
 </script>
 
 <template>
+  <Analytics />
   <UApp :locale="fr">
     <NuxtLayout>
       <NuxtPage />
