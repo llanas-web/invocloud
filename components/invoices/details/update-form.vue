@@ -56,10 +56,6 @@ const isLoading = computed(() => loadingDetails.value || loadingUpdate.value)
             <USelect v-else v-model="formState.status" :items="invoiceStatus" placeholder="Status de la facture"
                 class="w-full" />
         </UFormField>
-        <UFormField label="Montant TVA">
-            <USkeleton v-if="!invoice" class="h-8" />
-            <UInput v-else v-model="formState.taxe_amount" icon="i-lucide-euro" class="w-full" />
-        </UFormField>
         <UFormField label="Montant TTC">
             <USkeleton v-if="!invoice" class="h-8" />
             <UInput v-else v-model="formState.amount" icon="i-lucide-euro" class="w-full" />
