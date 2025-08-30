@@ -6,7 +6,7 @@ const _useUser = () => {
     const user = useSupabaseUser();
     const { logout } = useAuth();
 
-    const { data: currentUser, error, refresh } = useAsyncData(async () => {
+    const { data: currentUser, error, refresh } = useAsyncData(.params.slug, async () => {
         const { data } = await supabaseClient
             .from("users")
             .select("*")
@@ -14,6 +14,8 @@ const _useUser = () => {
             .single();
 
         return data;
+    }, {
+        deep: true
     });
 
     const updateUser = async (updates: Partial<UserUpdate>) => {
