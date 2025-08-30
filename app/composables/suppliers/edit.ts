@@ -1,6 +1,6 @@
 import { createSharedComposable } from "@vueuse/core";
 import { z } from "zod";
-import type { Supplier } from "~/types";
+import type { Supplier } from "~~/types";
 
 const _useSupplierEdit = () => {
     const { updateSupplier } = useSuppliers();

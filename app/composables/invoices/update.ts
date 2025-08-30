@@ -2,7 +2,7 @@ import type { UForm } from "#components";
 import { createSharedComposable } from "@vueuse/core";
 import { format } from "date-fns";
 import { z } from "zod";
-import type { InvoiceUpdate } from "~/types";
+import type { InvoiceUpdate } from "~~/types";
 
 const formStateSchema = z.object({
     amount: z.number().positive("Le montant doit être positif."),

@@ -1,5 +1,5 @@
 import type Stripe from "stripe";
-import { StripeHandlerContext } from "@/server/lib/stripe/context";
+import { StripeHandlerContext } from "~~/server/lib/stripe/context";
 import { fromUnix, nowISO } from "~/utils/date";
 
 const getCustomerId = (customer: Stripe.Subscription["customer"]) => {

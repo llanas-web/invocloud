@@ -1,6 +1,6 @@
 import { createSharedComposable } from "@vueuse/core";
 import { z } from "zod";
-import type { InvoiceInsert } from "~/types";
+import type { InvoiceInsert } from "~~/types";
 
 const formStateSchema = z.object({
     file_path: z.string().min(1, "Le chemin du fichier est requis."),

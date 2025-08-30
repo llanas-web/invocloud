@@ -3,7 +3,7 @@ import {
     serverSupabaseUser,
 } from "#supabase/server";
 import * as z from "zod";
-import { Database } from "~/types/database.types";
+import { Database } from "~~/types/database.types";
 
 const schema = z.object({
     password: z.string().min(8, "Password must be at least 8 characters long"),

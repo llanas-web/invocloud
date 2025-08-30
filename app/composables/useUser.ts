@@ -1,12 +1,13 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { UserUpdate } from "~/types";
+import type { UserUpdate } from "~~/types";
+import type { Database } from "~~/types/database.types";
 
 const _useUser = () => {
-    const supabaseClient = useSupabaseClient();
+    const supabaseClient = useSupabaseClient<Database>();
     const user = useSupabaseUser();
     const { logout } = useAuth();
 
-    const { data: currentUser, error, refresh } = useAsyncData(.params.slug, async () => {
+    const { data: currentUser, error, refresh } = useAsyncData(async () => {
         const { data } = await supabaseClient
             .from("users")
             .select("*")
@@ -15,7 +16,7 @@ const _useUser = () => {
 
         return data;
     }, {
-        deep: true
+        deep: true,
     });
 
     const updateUser = async (updates: Partial<UserUpdate>) => {
