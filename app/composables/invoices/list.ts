@@ -1,10 +1,10 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { InvoiceInsert, InvoiceUpdate, Period, Range } from "~/types";
-import type { Database } from "~/types/database.types";
+import type { InvoiceInsert, InvoiceUpdate, Period, Range } from "~~/types";
+import type { Database } from "~~/types/database.types";
 import {
     acceptedStatus,
     InvoiceWithEstablishmentSchema,
-} from "~/types/schemas/invoices";
+} from "~~/types/schemas/invoices";
 
 const _useInvoices = () => {
     const supabaseClient = useSupabaseClient<Database>();
@@ -152,7 +152,9 @@ const _useInvoices = () => {
             return null;
         }
         const { data, message, success } = await $fetch<
-            ReturnType<typeof import("~/server/api/invoices/send.post").default>
+            ReturnType<
+                typeof import("~~/server/api/invoices/send.post").default
+            >
         >(
             `/api/invoices/send`,
             {

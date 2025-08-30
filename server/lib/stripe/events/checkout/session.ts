@@ -1,6 +1,6 @@
 import type Stripe from "stripe";
-import { StripeHandlerContext } from "@/server/lib/stripe/context";
-import { sessionMetadataSchema } from "@/server/lib/stripe/schema";
+import { StripeHandlerContext } from "~~/server/lib/stripe/context";
+import { sessionMetadataSchema } from "~~/server/lib/stripe/schema";
 import { fromUnix, nowISO } from "~/utils/date";
 
 const getSubscriptionId = (session: Stripe.Checkout.Session) => {

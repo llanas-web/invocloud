@@ -1,5 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { Establishment } from "~/types";
+import type { Establishment } from "~~/types";
 import { FetchError } from "ofetch";
 
 const _useInvoiceUpload = () => {
@@ -40,7 +40,7 @@ const _useInvoiceUpload = () => {
         try {
             const { upload_validation_id, expires_at, success } = await $fetch<
                 ReturnType<
-                    typeof import("~/server/api/invoices/request-upload.post").default
+                    typeof import("~~/server/api/invoices/request-upload.post").default
                 >
             >("/api/invoices/request-upload", {
                 method: "POST",
@@ -73,7 +73,7 @@ const _useInvoiceUpload = () => {
         try {
             const { uploadValidation, establishments } = await $fetch<
                 ReturnType<
-                    typeof import("~/server/api/invoices/validate-token.post").default
+                    typeof import("~~/server/api/invoices/validate-token.post").default
                 >
             >("/api/invoices/validate-token", {
                 method: "POST",
@@ -111,7 +111,8 @@ const _useInvoiceUpload = () => {
         if (!confirmState.establishmentId) {
             toast.add({
                 title: "Error",
-                description: "Veuillez sélectionner un établissement et un fournisseur",
+                description:
+                    "Veuillez sélectionner un établissement et un fournisseur",
                 color: "error",
             });
             isLoading.value = false;
@@ -121,7 +122,7 @@ const _useInvoiceUpload = () => {
         try {
             const { url } = await $fetch<
                 ReturnType<
-                    typeof import("~/server/api/invoices/validate-upload.post").default
+                    typeof import("~~/server/api/invoices/validate-upload.post").default
                 >
             >("/api/invoices/validate-upload", {
                 method: "POST",

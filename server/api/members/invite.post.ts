@@ -4,7 +4,7 @@ import {
 } from "#supabase/server";
 import { format } from "date-fns";
 import * as z from "zod";
-import { Database } from "~/types/database.types";
+import { Database } from "~~/types/database.types";
 
 const schema = z.object({
     email: z.string().email(),

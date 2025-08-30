@@ -1,8 +1,8 @@
 // server/api/stripe/cancel-subscription.ts
 import { defineEventHandler } from "h3";
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
-import { Database } from "~/types/database.types";
-import { stripe } from "@/server/lib/stripe/client";
+import { Database } from "~~/types/database.types";
+import { stripe } from "~~/server/lib/stripe/client";
 
 export default defineEventHandler(async (event) => {
     const supabaseClient = await serverSupabaseClient<Database>(event);

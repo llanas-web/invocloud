@@ -1,8 +1,8 @@
 // server/api/stripe/cancel-trial.ts
-import { stripe } from "@/server/lib/stripe/client";
+import { stripe } from "~~/server/lib/stripe/client";
 import { defineEventHandler } from "h3";
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
-import { Database } from "~/types/database.types";
+import { Database } from "~~/types/database.types";
 
 export default defineEventHandler(async (event) => {
     const supabaseClient = await serverSupabaseClient<Database>(event);

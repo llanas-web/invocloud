@@ -1,5 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { Establishment, EstablishmentUpdate } from "~/types";
+import type { Establishment, EstablishmentUpdate } from "~~/types";
 
 const _useEstablishments = () => {
     const supabaseClient = useSupabaseClient();

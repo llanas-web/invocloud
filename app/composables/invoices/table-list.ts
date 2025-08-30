@@ -1,5 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { Range } from "~/types";
+import type { Range } from "~~/types";
 import { isAfter, isBefore, sub } from "date-fns";
 
 const _useInvoicesTableList = () => {

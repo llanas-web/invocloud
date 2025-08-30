@@ -6,7 +6,7 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import { z } from "zod";
-import { Database } from "~/types/database.types";
+import { Database } from "~~/types/database.types";
 import { generateCode, hashCode } from "~/utils/hash";
 
 const schema = z.object({
