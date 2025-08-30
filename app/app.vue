@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { fr } from '@nuxt/ui-pro/locale'
+import { fr } from '@nuxt/ui/locale'
 import { Analytics } from '@vercel/analytics/nuxt';
 </script>
 

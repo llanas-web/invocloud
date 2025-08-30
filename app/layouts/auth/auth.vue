@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { fr } from '@nuxt/ui-pro/locale'
+import { fr } from '@nuxt/ui/locale'
 
 const router = useRouter();
 const currentRoute = router.currentRoute;

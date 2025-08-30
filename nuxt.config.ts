@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
   modules: [
     "@nuxtjs/supabase",
-    "@nuxt/ui-pro",
+    "@nuxt/ui",
     "nuxt-resend",
     "@nuxt/content",
     "@nuxtjs/sitemap",
