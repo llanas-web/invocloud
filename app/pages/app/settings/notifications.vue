@@ -16,7 +16,7 @@ const sections = [{
     description: 'Recevez un résumé quotidien par e-mail.'
   },]
 }, {
-  title: 'Account updates',
+  title: 'Mises à jour du produit',
   description: 'Recevez des mises à jour sur Invocloud.',
   fields: [{
     name: 'product_updates',

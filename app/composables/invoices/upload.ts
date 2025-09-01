@@ -19,7 +19,7 @@ const _useInvoiceUpload = () => {
         confirmToken: [] as string[],
     });
     const uploadUrl = ref<string | null>(null);
-    const possibleEstablishments = ref<Establishment[]>([]);
+    const possibleEstablishments = ref<Partial<Establishment>[]>([]);
     const confirmState = reactive({
         establishmentId: "",
         supplierId: "",
@@ -38,20 +38,32 @@ const _useInvoiceUpload = () => {
     const submitFormStep = async () => {
         isLoading.value = true;
         try {
-            const { upload_validation_id, expires_at, success } = await $fetch<
-                ReturnType<
-                    typeof import("~~/server/api/invoices/request-upload.post").default
-                >
-            >("/api/invoices/request-upload", {
-                method: "POST",
-                body: {
-                    senderEmail: formState.senderEmail,
-                    recipientEmail: formState.recipientEmail,
-                    comment: formState.comment,
-                    name: formState.invoiceFile!.name,
-                },
-            });
-            validationUploadId.value = upload_validation_id;
+            const { establishements, upload_validation, success } =
+                await $fetch<
+                    ReturnType<
+                        typeof import("~~/server/api/invoices/request-upload.post").default
+                    >
+                >("/api/invoices/request-upload", {
+                    method: "POST",
+                    body: {
+                        senderEmail: formState.senderEmail,
+                        recipientEmail: formState.recipientEmail,
+                        comment: formState.comment,
+                        name: formState.invoiceFile!.name,
+                    },
+                });
+            if (currentUser) {
+                if (establishements != null) {
+                    possibleEstablishments.value = establishements;
+                    if (possibleEstablishments.value.length === 1) {
+                        confirmState.establishmentId = possibleEstablishments
+                            .value[0]!
+                            .id!;
+                    }
+                }
+            } else if (upload_validation) {
+                validationUploadId.value = upload_validation.id;
+            }
             stepIndex.value++;
         } catch (error) {
             console.error("Error requesting upload:", error);
@@ -87,8 +99,8 @@ const _useInvoiceUpload = () => {
             }
             possibleEstablishments.value = establishments;
             if (possibleEstablishments.value.length === 1) {
-                confirmState.establishmentId =
-                    possibleEstablishments.value[0].id;
+                confirmState.establishmentId = possibleEstablishments.value[0]!
+                    .id!;
             }
             stepIndex.value++;
         } catch (error) {
@@ -127,7 +139,7 @@ const _useInvoiceUpload = () => {
             >("/api/invoices/validate-upload", {
                 method: "POST",
                 body: {
-                    uploadValidationId: validationUploadId.value,
+                    invoiceId: validationUploadId.value,
                     selectedEstablishmentId: confirmState.establishmentId,
                 },
             });
@@ -181,7 +193,7 @@ const _useInvoiceUpload = () => {
                 submitFormStep();
                 break;
             case 1:
-                submitTokenStep();
+                currentUser != null ? confirmUpload() : submitTokenStep();
                 break;
             case 2:
                 confirmUpload();

@@ -1,22 +1,18 @@
-import {
-    serverSupabaseServiceRole,
-    serverSupabaseUser,
-} from "#supabase/server";
+import { z } from "zod";
 import { hashCode } from "~/utils/hash";
+import { parseBody } from "~~/server/lib/common";
+import { serverServiceRole, serverUser } from "~~/server/lib/supabase/client";
+
+const schema = z.object({
+    uploadValidationId: z.string().uuid(),
+    token: z.string().min(6).max(6),
+});
 
 export default defineEventHandler(async (event) => {
-    const body = await readBody(event);
-    const { uploadValidationId, token } = body;
+    const { uploadValidationId, token } = await parseBody(event, schema);
 
-    if (!uploadValidationId || !token) {
-        throw createError({
-            status: 400,
-            message: "Données de requête invalides",
-        });
-    }
-
-    const supabase = serverSupabaseServiceRole(event);
-    const supabaseUser = await serverSupabaseUser(event);
+    const supabase = serverServiceRole(event);
+    const supabaseUser = await serverUser(event);
     if (!supabaseUser) {
         throw createError({
             status: 401,
