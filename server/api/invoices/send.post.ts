@@ -1,28 +1,31 @@
+import { z } from "zod";
+import { parseBody } from "~~/server/lib/common";
 import {
-    serverSupabaseClient,
-    serverSupabaseServiceRole,
-} from "#supabase/server";
+    serverClient,
+    serverServiceRole,
+    serverUser,
+} from "~~/server/lib/supabase/client";
 
 const { emails } = useResend();
 
+const schema = z.object({
+    invoices: z.array(z.string().uuid()),
+    email: z.string().email(),
+});
+
 export default defineEventHandler(async (event) => {
-    const body = await readBody<{ invoices: string[]; email: string }>(event);
-    const { invoices, email } = body;
-    if (!invoices || !email) {
-        throw createError({
-            status: 400,
-            message: "Données de requête invalides",
-        });
-    }
-    const supabase = await serverSupabaseClient(event);
-    const supabaseAdmin = await serverSupabaseServiceRole(event);
-    const { data: { user } } = await supabase.auth.getUser();
+    const { invoices, email } = await parseBody(event, schema);
+    const supabase = await serverClient(event);
+    const user = await serverUser(event);
+    const supabaseAdmin = serverServiceRole(event);
+
     if (!user) {
         throw createError({
             status: 401,
             message: "Utilisateur non authentifié",
         });
     }
+
     const { data: invoicesData, error: invoicesError } = await supabase
         .from("invoices")
         .select("name, file_path")

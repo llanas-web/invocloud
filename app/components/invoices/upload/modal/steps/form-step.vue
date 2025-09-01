@@ -2,34 +2,28 @@
 import * as z from 'zod'
 
 const { isLoading, formState } = useInvoiceUpload()
-const { currentUser } = useUser()
 
 const fileFormSchema = z.object({
-    senderEmail: z.string().email('Invalid email address'),
-    recipientEmail: z.string().email('Invalid email address'),
-    comment: z.string().optional(),
-    invoiceFile: z.instanceof(File)
+    senderEmail: z.string().email('Adresse email invalide'),
+    recipientEmail: z.string().email('Adresse email invalide'),
+    invoiceFile: z.instanceof(File, {
+        message: 'Le fichier doit être un PDF ou une image'
+    }),
+    comment: z.string().optional()
 })
-
-const onFileChange = (e: Event) => {
-    const file = (e.target as HTMLInputElement).files?.[0]
-    if (!file) return
-    formState.invoiceFile = file
-}
 </script>
 
 <template>
     <UForm ref="stepFileForm" :schema="fileFormSchema" :state="formState" class="space-y-4 mt-8">
-        <UFormField label="Envoyer à" placeholder="Jean Dupont" name="recipientEmail">
+        <UFormField label="Envoyer à" placeholder="Jean Dupont" name="recipientEmail" required>
             <UInput v-model="formState.recipientEmail" placeholder="Email du destinataire" class="w-full"
                 :disabled="isLoading" />
         </UFormField>
-        <UFormField label="Votre email" placeholder="Votre email" name="senderEmail">
+        <UFormField label="Votre email" placeholder="Votre email" name="senderEmail" required>
             <UInput v-model="formState.senderEmail" placeholder="Votre email" class="w-full" :disabled="isLoading" />
         </UFormField>
-        <UFormField label="Fichier" name="invoiceFile">
-            <UInput type="file" placeholder="Choisir une facture" @change="onFileChange" class="w-full"
-                :disabled="isLoading" />
+        <UFormField label="Facture" name="invoiceFile" required>
+            <UFileUpload v-model="formState.invoiceFile" accept="image/*,application/pdf" class="min-h-28" />
         </UFormField>
         <UFormField label="Commentaire" name="comment">
             <UInput v-model="formState.comment" placeholder="Commentaire" class="w-full" :disabled="isLoading" />

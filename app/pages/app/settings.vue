@@ -16,10 +16,10 @@ const links = [[{
   label: 'Établissements',
   icon: 'i-lucide-building',
   to: '/app/settings/establishments'
-}, {
-  label: 'Notifications',
-  icon: 'i-lucide-bell',
-  to: '/app/settings/notifications'
+  // }, {
+  //   label: 'Notifications',
+  //   icon: 'i-lucide-bell',
+  //   to: '/app/settings/notifications'
 }, {
   label: 'Sécurité',
   icon: 'i-lucide-shield',

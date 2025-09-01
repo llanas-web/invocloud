@@ -2,7 +2,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-import type { Supplier } from '~/types'
+import type { Supplier } from '~~/types'
 
 definePageMeta({
     layout: 'app'
@@ -195,8 +195,8 @@ const onNewSupplier = () => {
 
             <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
                 <div class="text-sm text-muted">
-                    {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} of
-                    {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s) selected.
+                    {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} de
+                    {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} ligne(s) sélectionnée(s).
                 </div>
 
                 <div class="flex items-center gap-1.5">

@@ -1,45 +1,29 @@
-import {
-    serverSupabaseServiceRole,
-    serverSupabaseUser,
-} from "#supabase/server";
+import { z } from "zod";
+import { parseBody } from "~~/server/lib/common";
+import { serverServiceRole, serverUser } from "~~/server/lib/supabase/client";
+
+const schema = z.object({
+    invoiceId: z.string().uuid(),
+    selectedEstablishmentId: z.string().uuid(),
+});
 
 export default defineEventHandler(async (event) => {
-    const body = await readBody(event);
-    const { uploadValidationId, selectedEstablishmentId } = body;
+    const { invoiceId, selectedEstablishmentId } = await parseBody(
+        event,
+        schema,
+    );
 
-    if (!uploadValidationId || !selectedEstablishmentId) {
-        throw createError({
-            status: 400,
-            message: "Données de requête invalides",
-        });
-    }
-
-    const supabase = serverSupabaseServiceRole(event);
-    const supabaseUser = await serverSupabaseUser(event);
-    if (!supabaseUser) {
+    const supabase = serverServiceRole(event);
+    const user = await serverUser(event);
+    if (!user) {
         throw createError({
             status: 401,
             message: "Utilisateur non authentifié",
         });
     }
-    console.log("Authenticated user:", supabaseUser.id);
+    console.log("Authenticated user:", user.id);
 
-    const { data: uploadValidation, error: uploadValidationError } =
-        await supabase
-            .from("upload_validations")
-            .select("*")
-            .eq("id", uploadValidationId)
-            .eq("uploader_id", supabaseUser.id)
-            .maybeSingle();
-    if (!uploadValidation) {
-        throw createError({
-            status: 404,
-            message: "Validation de téléchargement introuvable",
-        });
-    }
-
-    const filePath = `${selectedEstablishmentId}/${uploadValidation.id}`;
-
+    const filePath = `${selectedEstablishmentId}/${invoiceId}`;
     const { data: uploadUrl } = await supabase
         .storage
         .from("invoices")
@@ -54,11 +38,48 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    await supabase.from("upload_validations").update({
-        status: "uploaded",
-        selected_establishment: selectedEstablishmentId,
-        file_path: filePath,
-    }).eq("id", uploadValidationId);
+    if (user.is_anonymous) {
+        const { data: uploadValidation, error: uploadValidationError } =
+            await supabase
+                .from("upload_validations")
+                .select("*")
+                .eq("id", invoiceId)
+                .eq("uploader_id", user.id)
+                .maybeSingle();
+        if (!uploadValidation) {
+            throw createError({
+                status: 404,
+                message: "Validation de téléchargement introuvable",
+            });
+        }
+
+        await supabase.from("upload_validations").update({
+            status: "uploaded",
+            selected_establishment: selectedEstablishmentId,
+            file_path: filePath,
+        }).eq("id", invoiceId);
+    } else {
+        const { data: supplierId, error: supplierIdError } = await supabase
+            .from("suppliers")
+            .select("id")
+            .eq("establishment_id", selectedEstablishmentId)
+            .overlaps("emails", [user.email])
+            .single();
+        if (supplierIdError || !supplierId) {
+            throw createError({
+                status: 404,
+                message: "Fournisseur introuvable",
+            });
+        }
+
+        await supabase.from("invoices").insert({
+            id: invoiceId,
+            file_path: filePath,
+            amount: 0,
+            status: "pending",
+            supplier_id: supplierId.id,
+        });
+    }
 
     const response = {
         url: uploadUrl.signedUrl,
