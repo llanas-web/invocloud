@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { InvoiceStatus } from '~/types';
-import { format } from 'date-fns'
+import type { InvoiceStatus } from '~~/types';
 
 const { invoice, isLoading: loadingDetails } = useInvoiceDetails()
 const { formRef, formState, formStateSchema, isLoading: loadingUpdate, onSubmit } = useInvoiceUpdate()
@@ -29,19 +28,20 @@ const isLoading = computed(() => loadingDetails.value || loadingUpdate.value)
             <USkeleton v-if="!invoice" class="h-8" />
             <UInput v-else :model-value="invoice.supplier.name" icon="i-lucide-user" class="w-full" disabled />
         </UFormField>
-        <UFormField label="Commentaire">
+        <UFormField label="Commentaire" name="comment">
             <USkeleton v-if="!invoice" class="h-8" />
-            <UInput v-else v-model="formState.comment" placeholder="Ajouter un commentaire..." class="w-full" />
+            <UInput v-else v-model="formState.comment" name="comment" placeholder="Ajouter un commentaire..."
+                class="w-full" />
         </UFormField>
-        <UFormField label="Numéro de facture">
+        <UFormField name="invoice_number" label="Numéro de facture" required>
             <USkeleton v-if="!invoice" class="h-8" />
-            <UInput v-else v-model="formState.invoice_number" class="w-full" />
+            <UInput v-else v-model="formState.invoice_number" name="invoice_number" class="w-full" />
         </UFormField>
-        <UFormField label="Nom de la facture">
+        <UFormField label="Nom de la facture" name="name">
             <USkeleton v-if="!invoice" class="h-8" />
-            <UInput v-else v-model="formState.name" class="w-full" />
+            <UInput v-else v-model="formState.name" name="name" class="w-full" />
         </UFormField>
-        <div class="flex flex-row justify-between items-center gap-4">
+        <div class="flex flex-row justify-between gap-4">
             <UFormField name="due_date" label="Date d'échéance" class="flex-1" required>
                 <USkeleton v-if="!invoice" class="h-8" />
                 <CommonFormDatePicker v-else v-model="formState.due_date" label="Date d'échéance" />
@@ -51,14 +51,14 @@ const isLoading = computed(() => loadingDetails.value || loadingUpdate.value)
                 <CommonFormDatePicker v-else v-model="formState.paid_at" label="Date de paiement" />
             </UFormField>
         </div>
-        <UFormField label="Statut">
+        <UFormField label="Statut" required name="status">
             <USkeleton v-if="!invoice" class="h-8" />
-            <USelect v-else v-model="formState.status" :items="invoiceStatus" placeholder="Status de la facture"
-                class="w-full" />
+            <USelect v-else v-model="formState.status" name="status" :items="invoiceStatus"
+                placeholder="Status de la facture" class="w-full" />
         </UFormField>
-        <UFormField label="Montant TTC">
+        <UFormField label="Montant TTC" name="amount" required>
             <USkeleton v-if="!invoice" class="h-8" />
-            <UInput v-else v-model="formState.amount" icon="i-lucide-euro" class="w-full" />
+            <UInput v-else name="amount" v-model="formState.amount" icon="i-lucide-euro" class="w-full" />
         </UFormField>
     </UForm>
 </template>
