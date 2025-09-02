@@ -65,9 +65,9 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
             <ULink to="#" class="text-primary font-medium" tabindex="-1">Mot de passe oublié ?</ULink>
           </template>
           <template #footer>
-            En vous connectant, vous acceptez nos <ULink to="#" class="text-primary font-medium">Conditions
+            En vous connectant, vous acceptez nos <NuxtLink to="/cgu" class="text-primary font-medium">Conditions
               d'utilisation
-            </ULink>.
+            </NuxtLink>.
           </template>
         </UAuthForm>
       </div>
