@@ -20,7 +20,7 @@ const schema = z.object({
 
 export default defineEventHandler(async (event) => {
     let user: User | null = null;
-    let invoiceId: null | string = null;
+    let invoiceId = crypto.randomUUID();
     let possibleEstablishments: null | Partial<Establishment>[] = null;
     const { senderEmail, recipientEmail, comment, name } = await parseBody(
         event,
@@ -79,7 +79,6 @@ export default defineEventHandler(async (event) => {
         user = anonymousUser.user;
     }
 
-    const newInvoiceId = crypto.randomUUID();
     if (user.is_anonymous) {
         const code = generateCode();
         const hashedCode = hashCode(code);
@@ -89,7 +88,7 @@ export default defineEventHandler(async (event) => {
             await supabase
                 .from("upload_validations")
                 .insert({
-                    id: newInvoiceId,
+                    id: invoiceId,
                     uploader_id: user.id,
                     token_hash: hashedCode,
                     token_expires_at: expiresAt.toISOString(),
@@ -140,7 +139,6 @@ export default defineEventHandler(async (event) => {
                 message: "Erreur lors de l'envoi de l'e-mail de confirmation",
             });
         }
-        invoiceId = newUploadValidation.id;
     } else {
         const { data: establishmentsData, error: establishmentsError } =
             await supabase.from("establishments").select("id, name").in(

@@ -31,7 +31,8 @@ const confirmStep = {
     description: 'Confirmez l\'envoie du fichier',
     icon: 'i-lucide-file-check'
 };
-const stepItems = ref(!currentUser.value ? [formStep, tokenStep, confirmStep] : [formStep, confirmStep])
+
+const stepItems = computed(() => (!currentUser.value ? [formStep, tokenStep, confirmStep] : [formStep, confirmStep]))
 </script>
 
 <template>
