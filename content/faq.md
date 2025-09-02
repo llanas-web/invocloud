@@ -78,7 +78,7 @@ Oui. Vous avez un contrôle total sur ce que vous partagez, à qui, et quand.
   - Support email  
   - Accès limité  
 
-- **Pro – 29,90 € HT / mois**  
+- **Pro – 29,90 € TTC / mois**  
   - Factures illimitées  
   - Back office complet  
   - Partage comptable  
