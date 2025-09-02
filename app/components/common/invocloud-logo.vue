@@ -10,7 +10,7 @@ onMounted(() => {
     if (!containerRef.value) return
 
     const resizeObserver = new ResizeObserver(([entry]) => {
-        size.value = Math.min(entry.contentRect.width, entry.contentRect.height)
+        size.value = Math.min(entry!.contentRect.width, entry!.contentRect.height)
     })
 
     resizeObserver.observe(containerRef.value)

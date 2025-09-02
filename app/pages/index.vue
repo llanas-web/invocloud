@@ -48,7 +48,7 @@ useSeoMeta({
 
 
 <template>
-    <div v-if="page">
+    <div v-if="page != null">
         <UPageHero orientation="horizontal" :ui="{ title: 'text-muted' }">
             <template #title>
                 {{ page.title.split(' ')[0] }}
@@ -74,13 +74,13 @@ useSeoMeta({
             <CommonInvocloudLogo @click="openModal" />
         </UPageHero>
 
-        <UPageSection id="features" :title="page?.sections[0].title" :description="page?.sections[0].description" :ui="{
+        <UPageSection id="features" :title="page?.sections[0]!.title" :description="page?.sections[0]!.description" :ui="{
             root: 'bg-muted text-muted pt-[var(--ui-header-height)] md:pt-8',
             title: 'max-w-xl mx-auto text-muted',
             description: 'max-w-xl mx-auto text-muted',
         }">
             <UPageGrid>
-                <UPageCard v-for="(item, index) in page?.sections[0].features" :key="index" v-bind="item" spotlight
+                <UPageCard v-for="(item, index) in page?.sections[0]!.features" :key="index" v-bind="item" spotlight
                     variant="outline" :ui="{
                         root: 'rounded-2xl',
                         container: 'sm:px-12 sm:py-8',
@@ -117,31 +117,32 @@ useSeoMeta({
             root: 'bg-muted text-muted pt-[var(--ui-header-height)] md:pt-8',
             title: 'max-w-xl mx-auto text-muted',
         }">
-            <UContainer class="text-center">
-                <div class="flex flex-wrap items-center justify-center gap-3 mt-4">
-                    <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
-                        <UIcon name="i-lucide-check-circle-2" class="text-primary" />
-                        Supérettes
-                    </span>
-                    <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
-                        <UIcon name="i-lucide-check-circle-2" class="text-primary" />
-                        Cabinets comptables
-                    </span>
-                    <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
-                        <UIcon name="i-lucide-check-circle-2" class="text-primary" />
-                        Indépendants
-                    </span>
-                    <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
-                        <UIcon name="i-lucide-check-circle-2" class="text-primary" />
-                        TPE
-                    </span>
-                </div>
-
+            <template #description>
                 <p class="mt-8 text-lg">
                     <UIcon name="i-lucide-trending-up" class="inline align-[-2px] text-primary mr-2" />
                     Rejoignez les professionnels qui ont digitalisé leur facturation avec
                     <span class="text-primary font-medium">Invocloud</span>.
                 </p>
+            </template>
+            <UContainer class="text-center">
+                <div class="flex flex-wrap items-center justify-center gap-3 mt-4">
+                    <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
+                        <UIcon name="i-lucide-shopping-cart" class="text-primary" />
+                        Supérettes
+                    </span>
+                    <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
+                        <UIcon name="i-lucide-briefcase" class="text-primary" />
+                        Cabinets comptables
+                    </span>
+                    <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
+                        <UIcon name="i-lucide-user" class="text-primary" />
+                        Indépendants
+                    </span>
+                    <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
+                        <UIcon name="i-lucide-building" class="text-primary" />
+                        TPE
+                    </span>
+                </div>
             </UContainer>
         </UPageSection>
 
