@@ -3,6 +3,7 @@ import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
 const { selectedEstablishment, updateEstablishment } = useEstablishments()
+const { currentUser } = useUser()
 const toast = useToast()
 
 const establishmentSchema = z.object({
@@ -16,6 +17,8 @@ const establishmentState = computed(() => ({
     address: selectedEstablishment.value?.address || '',
     phone: selectedEstablishment.value?.phone || '',
 }))
+
+const isAdmin = computed(() => selectedEstablishment.value?.creator_id === currentUser.value?.id)
 
 const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof establishmentSchema>>) => {
     const { name, address, phone } = payload.data
@@ -39,11 +42,17 @@ const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof establishmentSch
 </script>
 
 <template>
-    <UForm id="settings" :schema="establishmentSchema" :state="establishmentState" @submit="onSubmit">
+    <UForm id="settings" :schema="establishmentSchema" :state="establishmentState" @submit="onSubmit"
+        :disabled="!isAdmin">
         <UPageCard :title="`Informations de la structure`"
             description="Renseignez les informations de votre structure qui se retrouverons dans les emails et les documents générés par InvoCloud"
             variant="naked" orientation="horizontal" class="mb-4">
-            <UButton form="settings" label="Sauvegarder" color="primary" type="submit" class="w-fit lg:ms-auto" />
+            <UTooltip v-if="!isAdmin" text="Seul le créateur de la structure peut modifier ces informations." :delay-duration="0">
+                <UButton form="settings" label="Sauvegarder" color="primary" type="submit" class="w-fit lg:ms-auto"
+                    disabled />
+            </UTooltip>
+            <UButton v-else form="settings" label="Sauvegarder" color="primary" type="submit"
+                class="w-fit lg:ms-auto" />
         </UPageCard>
 
         <UPageCard variant="subtle">

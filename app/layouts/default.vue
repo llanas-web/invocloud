@@ -26,11 +26,11 @@ const user = useSupabaseUser()
                 <UButton label="Fonctionnalités" :to="{ path: '/', hash: '#features' }" size="md" variant="ghost" :ui="{
                     label: 'hidden md:block'
                 }" />
-                <USeparator orientation="vertical" class="h-6" size="sm" />
+                <USeparator orientation="vertical" class="h-6 hidden md:block" size="sm" />
                 <UButton label="Tarifs" :to="{ path: '/', hash: '#pricing' }" size="md" variant="ghost" :ui="{
                     label: 'hidden md:block'
                 }" />
-                <USeparator orientation="vertical" class="h-6" size="sm" />
+                <USeparator orientation="vertical" class="h-6 hidden md:block" size="sm" />
                 <UButton v-if="user != null && user.is_anonymous === false" label="Tableau de bord" to="/app"
                     trailingIcon="i-lucide-home" size="md" variant="ghost" :ui="{
                         label: 'hidden md:block'
