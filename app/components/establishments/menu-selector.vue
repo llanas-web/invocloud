@@ -34,7 +34,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
 </script>
 
 <template>
-    <template v-if="pending">
+    <template v-if="pending || establishments.length === 0">
         <USkeleton class="h-9 w-full" />
     </template>
     <UDropdownMenu v-else :items="items" :content="{ align: 'center', collisionPadding: 12 }"

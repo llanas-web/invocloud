@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
 import { LazyInvoicesUploadModalContainer } from '#components'
+import Establishments from '~/pages/app/settings/establishments.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -10,7 +11,7 @@ const subscriptionSuccess = route.query.subscription_success === 'true'
 const toast = useToast()
 const open = ref(false)
 
-const { pending, selectedEstablishment, subscribeToStripe } = useEstablishments()
+const { pending, selectedEstablishment, establishments, subscribeToStripe } = useEstablishments()
 const user = useSupabaseUser()
 
 const isEstablishementActive = computed(() => {
@@ -162,8 +163,7 @@ const onSubscribe = async () => {
                 <UserMenu :collapsed="collapsed" />
             </template>
         </UDashboardSidebar>
-
-        <template v-if="!pending">
+        <template v-if="!pending && establishments.length > 0">
             <template v-if="isEstablishementActive">
                 <LazyInvoicesUploadModalContainer size="md" variant="ghost" />
                 <slot />
