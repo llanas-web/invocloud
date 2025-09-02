@@ -14,7 +14,7 @@ const _useInvoiceUpload = () => {
         comment: "",
         invoiceFile: undefined as File | undefined,
     });
-    const validationUploadId = ref<string | null>(null);
+    const invoiceId = ref<string | null>(null);
     const tokenState = reactive({
         confirmToken: [] as string[],
     });
@@ -38,20 +38,19 @@ const _useInvoiceUpload = () => {
     const submitFormStep = async () => {
         isLoading.value = true;
         try {
-            const { establishements, upload_validation, success } =
-                await $fetch<
-                    ReturnType<
-                        typeof import("~~/server/api/invoices/request-upload.post").default
-                    >
-                >("/api/invoices/request-upload", {
-                    method: "POST",
-                    body: {
-                        senderEmail: formState.senderEmail,
-                        recipientEmail: formState.recipientEmail,
-                        comment: formState.comment,
-                        name: formState.invoiceFile!.name,
-                    },
-                });
+            const { establishements, invoice_id, success } = await $fetch<
+                ReturnType<
+                    typeof import("~~/server/api/invoices/request-upload.post").default
+                >
+            >("/api/invoices/request-upload", {
+                method: "POST",
+                body: {
+                    senderEmail: formState.senderEmail,
+                    recipientEmail: formState.recipientEmail,
+                    comment: formState.comment,
+                    name: formState.invoiceFile!.name,
+                },
+            });
             if (currentUser) {
                 if (establishements != null) {
                     possibleEstablishments.value = establishements;
@@ -61,9 +60,8 @@ const _useInvoiceUpload = () => {
                             .id!;
                     }
                 }
-            } else if (upload_validation) {
-                validationUploadId.value = upload_validation.id;
             }
+            invoiceId.value = invoice_id;
             stepIndex.value++;
         } catch (error) {
             console.error("Error requesting upload:", error);
@@ -90,7 +88,7 @@ const _useInvoiceUpload = () => {
             >("/api/invoices/validate-token", {
                 method: "POST",
                 body: {
-                    uploadValidationId: validationUploadId.value,
+                    uploadValidationId: invoiceId.value,
                     token: tokenState.confirmToken.join(""),
                 },
             });
@@ -139,7 +137,7 @@ const _useInvoiceUpload = () => {
             >("/api/invoices/validate-upload", {
                 method: "POST",
                 body: {
-                    invoiceId: validationUploadId.value,
+                    invoiceId: invoiceId.value,
                     selectedEstablishmentId: confirmState.establishmentId,
                 },
             });
@@ -193,7 +191,7 @@ const _useInvoiceUpload = () => {
                 submitFormStep();
                 break;
             case 1:
-                currentUser != null ? confirmUpload() : submitTokenStep();
+                currentUser.value != null ? confirmUpload() : submitTokenStep();
                 break;
             case 2:
                 confirmUpload();

@@ -2,6 +2,7 @@
 import * as z from 'zod'
 
 const { tokenState } = useInvoiceUpload()
+const { currentUser } = useUser();
 
 const confirmFormSchema = z.object({
     confirmToken: z.string().array().length(6, 'Invalid token'),
@@ -9,6 +10,7 @@ const confirmFormSchema = z.object({
 </script>
 
 <template>
+    {{ currentUser }}
     <UForm ref="stepConfirmForm" :schema="confirmFormSchema" :state="tokenState" class="space-y-4 mt-8">
         <UFormField label="Code de confirmation" name="confirmToken"
             class="w-full flex flex-col items-center justify-center">
