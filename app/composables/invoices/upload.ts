@@ -139,6 +139,8 @@ const _useInvoiceUpload = () => {
                 body: {
                     invoiceId: invoiceId.value,
                     selectedEstablishmentId: confirmState.establishmentId,
+                    comment: formState.comment,
+                    fileName: formState.invoiceFile!.name,
                 },
             });
             uploadUrl.value = url;

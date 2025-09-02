@@ -40,7 +40,7 @@ const _useInvoiceUpdate = () => {
     const paidAtInputRef = ref();
 
     const formState = reactive<Schema>({
-        status: invoice.value?.status ?? "validated",
+        status: "validated",
         amount: invoice.value?.amount ?? 0,
         name: invoice.value?.name ?? "",
         invoice_number: invoice.value?.invoice_number ?? "",
@@ -61,10 +61,12 @@ const _useInvoiceUpdate = () => {
         () => invoice.value,
         (newInvoice) => {
             if (newInvoice) {
-                formState.status = newInvoice.status ?? "validated";
+                formState.status = newInvoice.status == "pending"
+                    ? "validated"
+                    : newInvoice.status ?? "validated";
                 formState.amount = newInvoice.amount;
                 formState.name = newInvoice.name;
-                formState.invoice_number = newInvoice.invoice_number;
+                formState.invoice_number = newInvoice.invoice_number ?? "";
                 formState.due_date = newInvoice.due_date
                     ? format(
                         newInvoice.due_date,

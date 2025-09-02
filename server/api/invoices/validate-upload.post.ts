@@ -5,13 +5,16 @@ import { serverServiceRole, serverUser } from "~~/server/lib/supabase/client";
 const schema = z.object({
     invoiceId: z.string().uuid(),
     selectedEstablishmentId: z.string().uuid(),
+    comment: z.string().optional(),
+    fileName: z.string().optional(),
 });
 
 export default defineEventHandler(async (event) => {
-    const { invoiceId, selectedEstablishmentId } = await parseBody(
-        event,
-        schema,
-    );
+    const { invoiceId, selectedEstablishmentId, comment, fileName } =
+        await parseBody(
+            event,
+            schema,
+        );
 
     const supabase = serverServiceRole(event);
     const user = await serverUser(event);
@@ -78,6 +81,8 @@ export default defineEventHandler(async (event) => {
             amount: 0,
             status: "pending",
             supplier_id: supplierId.id,
+            comment,
+            name: fileName,
         });
     }
 
