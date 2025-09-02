@@ -76,7 +76,7 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: num
                             drop-shadow-xl drop-shadow-primary-800
                             bounce ${!!props.onClick ? 'cursor-pointer' : ''} p-5 flex justify-center items-center`"
             @click="() => !!props.onClick ? props.onClick() : null">
-            <UIcon name="i-custom-invocloud-logo" class="text-white size-full aspect-square" />
+            <UIcon name="i-custom:invocloud-logo" class="text-white size-full aspect-square" />
         </div>
     </div>
 </template>

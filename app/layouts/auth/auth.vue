@@ -34,8 +34,8 @@ const redirectTo = computed(() => {
             <template #left>
                 <NuxtLink to="/">
                     <div class="flex gap-4 h-8">
-                        <UIcon name="i-custom-invocloud-logo" class="text-primary size-10" />
-                        <UIcon name="i-custom-invocloud" class="text-primary h-10" />
+                        <UIcon name="i-custom:invocloud-logo" class="text-primary size-10" />
+                        <UIcon name="i-custom:invocloud" class="text-primary h-10" />
                     </div>
                 </NuxtLink>
             </template>
