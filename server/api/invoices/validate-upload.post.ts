@@ -56,11 +56,19 @@ export default defineEventHandler(async (event) => {
             });
         }
 
-        await supabase.from("upload_validations").update({
-            status: "uploaded",
-            selected_establishment: selectedEstablishmentId,
-            file_path: filePath,
-        }).eq("id", invoiceId);
+        const { data: updatedUploadValidation, error: updateError } =
+            await supabase.from("upload_validations").update({
+                status: "uploaded",
+                selected_establishment: selectedEstablishmentId,
+                file_path: filePath,
+            }).eq("id", invoiceId).select().single();
+        if (updateError || !updatedUploadValidation) {
+            throw createError({
+                status: 500,
+                message:
+                    "Erreur lors de la mise à jour de la validation de téléchargement",
+            });
+        }
     } else {
         const { data: supplierId, error: supplierIdError } = await supabase
             .from("suppliers")
