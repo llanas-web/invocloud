@@ -57,6 +57,13 @@ const _useInvoiceUpdate = () => {
         comment: invoice.value?.comment ?? "",
     });
 
+    // Ensure amount is never null or undefined
+    watch(() => formState.amount, (newValue) => {
+        if (!newValue) {
+            formState.amount = 0;
+        }
+    });
+
     watch(
         () => invoice.value,
         (newInvoice) => {

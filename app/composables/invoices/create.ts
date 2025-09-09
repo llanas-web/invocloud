@@ -5,7 +5,7 @@ import type { InvoiceInsert } from "~~/types";
 const formStateSchema = z.object({
     file_path: z.string().min(1, "Le chemin du fichier est requis."),
     supplier_id: z.string().min(1, "Le fournisseur est requis."),
-    amount: z.number().positive("Le montant doit être positif."),
+    amount: z.number().positive("Le montant doit être positif.").default(0),
     comment: z.string().optional().nullable(),
     name: z.string().optional().nullable(),
     due_date: z.string()
@@ -59,6 +59,13 @@ const _useInvoiceCreate = () => {
             formState.paid_at !== null ||
             formState.created_at !== new Date().toISOString()
         );
+    });
+
+    // Ensure amount is never null or undefined
+    watch(() => formState.amount, (newValue) => {
+        if (!newValue) {
+            formState.amount = 0;
+        }
     });
 
     const onSubmit = async () => {

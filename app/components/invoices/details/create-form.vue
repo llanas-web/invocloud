@@ -59,8 +59,8 @@ onMounted(() => {
             <USelect v-model="formState.status" :items="invoiceStatus" placeholder="Status de la facture"
                 class="w-full" />
         </UFormField>
-        <UFormField name="amount" label="Montant TTC" required error="Veuillez entrer un montant au format numérique.">
-            <UInput v-model="formState.amount" icon="i-lucide-euro" class="w-full" type="number" />
+        <UFormField name="amount" label="Montant TTC" required >
+            <UInput v-model.number.trim.nullify="formState.amount" icon="i-lucide-euro" class="w-full" type="number" />
         </UFormField>
     </UForm>
 </template>

@@ -56,9 +56,9 @@ const isLoading = computed(() => loadingDetails.value || loadingUpdate.value)
             <USelect v-else v-model="formState.status" name="status" :items="invoiceStatus"
                 placeholder="Status de la facture" class="w-full" />
         </UFormField>
-        <UFormField label="Montant TTC" name="amount" required error="Veuillez entrer un montant au format numérique.">
+        <UFormField label="Montant TTC" name="amount" required>
             <USkeleton v-if="!invoice" class="h-8" />
-            <UInput v-else name="amount" v-model="formState.amount" icon="i-lucide-euro" class="w-full" />
+            <UInput v-else name="amount" v-model.number.trim="formState.amount" icon="i-lucide-euro" class="w-full" />
         </UFormField>
     </UForm>
 </template>
