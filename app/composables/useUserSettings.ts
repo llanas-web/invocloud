@@ -11,11 +11,14 @@ export const _useUserSettings = () => {
     const { data: userSettings, error, refresh } = useAsyncData(
         "userSettings",
         async () => {
+            console.log("Fetching user settings for user:", user.value?.id);
             const { data, error } = await supabase
                 .from("user_settings")
                 .select("favorite_establishment_id")
                 .eq("user_id", user.value!.id)
                 .single();
+
+            console.log(data, error);
 
             if (error && !data) {
                 return defaultUserSettings;
@@ -25,6 +28,7 @@ export const _useUserSettings = () => {
         {
             default: () => defaultUserSettings,
             watch: [user],
+            server: false,
         },
     );
 
@@ -41,8 +45,8 @@ export const _useUserSettings = () => {
                 user_id: user.value!.id,
                 favorite_establishment_id: establishmentId,
             });
-            userSettings.value.favorite_establishment_id = establishmentId;
         }
+        await refresh();
     };
 
     return {
