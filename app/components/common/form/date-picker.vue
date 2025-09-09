@@ -54,7 +54,7 @@ watch(open, (now, was) => {
                 : 'jj / mm / aaaa' }}
         </UButton>
         <template #content>
-            <UCalendar v-model="calendarDate" class="p-2" />
+            <UCalendar v-model="calendarDate" class="p-2" @update:model-value="open = false" />
         </template>
     </UPopover>
 </template>
