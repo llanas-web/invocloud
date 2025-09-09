@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
                 recipient_email: recipientEmail,
             },
         );
-
+    console.log("Suppliers data:", suppliers);
     if (suppliersError || !suppliers || suppliers.length === 0) {
         console.error("Permission check error:", suppliersError);
         throw createError({
@@ -140,11 +140,16 @@ export default defineEventHandler(async (event) => {
             });
         }
     } else {
+        const listEstablishmentIds = suppliers.map(
+            (supplier) => supplier.establishment_id,
+        );
         const { data: establishmentsData, error: establishmentsError } =
-            await supabase.from("establishments").select("id, name").in(
-                "id",
-                suppliers.map((e) => e.establishment_id),
-            );
+            await supabaseServiceRole.from("establishments").select("id, name")
+                .in(
+                    "id",
+                    listEstablishmentIds,
+                );
+        console.log("Establishments data:", establishmentsData);
 
         if (establishmentsError) {
             console.error(
