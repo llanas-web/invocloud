@@ -4,8 +4,8 @@ import type { FormSubmitEvent } from '@nuxt/ui'
 
 definePageMeta({
   layout: 'auth',
+  middleware: ['not-authenticated']
 })
-
 
 const { login } = useAuth()
 const loading = ref(false)
@@ -62,7 +62,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
             </ULink>.
           </template>
           <template #password-hint>
-            <ULink to="#" class="text-primary font-medium" tabindex="-1">Mot de passe oublié ?</ULink>
+            <ULink to="/auth/forgot-password" class="text-primary font-medium" tabindex="-1">Mot de passe oublié ?
+            </ULink>
           </template>
           <template #footer>
             En vous connectant, vous acceptez nos <NuxtLink to="/cgu" class="text-primary font-medium">Conditions

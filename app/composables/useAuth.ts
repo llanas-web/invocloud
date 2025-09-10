@@ -8,6 +8,16 @@ const _useAuth = () => {
     const redirectTo = `${config.public.baseUrl}/auth/callback`;
     const toast = useToast();
 
+    watchEffect(() => {
+        console.log("Auth - user changed:", user.value);
+        supabase.auth.onAuthStateChange((event, session) => {
+            console.log("Auth state changed:", event, session);
+            if (event === "PASSWORD_RECOVERY") {
+                navigateTo("/app/settings/security");
+            }
+        });
+    });
+
     const login = async (email: string, password: string) => {
         const { data, error } = await supabase.auth.signInWithPassword({
             email,
@@ -16,7 +26,6 @@ const _useAuth = () => {
         if (error) {
             toast.add({
                 title: "Erreur lors de la connexion",
-                description: error.message,
                 color: "error",
             });
         } else navigateTo("/app");
@@ -59,7 +68,6 @@ const _useAuth = () => {
             } else {
                 toast.add({
                     title: "Erreur lors de l'inscription",
-                    description: error.message,
                     color: "error",
                 });
             }

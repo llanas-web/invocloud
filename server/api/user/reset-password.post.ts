@@ -3,6 +3,7 @@ import {
     serverSupabaseUser,
 } from "#supabase/server";
 import * as z from "zod";
+import { parseBody } from "~~/server/lib/common";
 import { Database } from "~~/types/database.types";
 
 const schema = z.object({
@@ -10,16 +11,7 @@ const schema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-    const body = await readBody<typeof schema>(event);
-    const parsed = schema.safeParse(body);
-    if (!parsed.success) {
-        console.error("Validation error:", parsed.error);
-        throw createError({
-            status: 400,
-            message: "Données de requête invalides",
-        });
-    }
-    const { password } = parsed.data;
+    const { password } = await parseBody(event, schema);
 
     const currentUser = await serverSupabaseUser(event);
     if (!currentUser) {

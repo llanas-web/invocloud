@@ -5,6 +5,7 @@ import type { UForm } from '#components'
 
 definePageMeta({
     layout: 'auth',
+    middleware: ['not-authenticated']
 })
 
 const loading = ref(false)
