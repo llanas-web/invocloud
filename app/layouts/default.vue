@@ -12,28 +12,29 @@ const user = useSupabaseUser()
         style="top: -30%; left: 50%; transform: translateX(-50%);"></div>
     <UApp :locale="fr">
         <UHeader :toggle="false" :ui="{
-            right: 'gap-4',
+            root: 'w-full',
+            right: 'md:gap-4',
         }">
             <template #left>
                 <NuxtLink to="/">
                     <div class="flex gap-4 h-8">
                         <UIcon name="i-custom:invocloud-logo" class="text-primary size-10" />
-                        <UIcon name="i-custom:invocloud" class="text-primary h-10" />
+                        <UIcon name="i-custom:invocloud" class="text-primary h-10 " />
                     </div>
                 </NuxtLink>
             </template>
             <template #right>
                 <UButton label="Fonctionnalités" :to="{ path: '/', hash: '#features' }" size="md" variant="ghost" :ui="{
-                    label: 'hidden md:block'
+                    label: 'hidden lg:block'
                 }" />
-                <USeparator orientation="vertical" class="h-6 hidden md:block" size="sm" />
+                <USeparator orientation="vertical" class="h-6 hidden lg:block" size="sm" />
                 <UButton label="Tarifs" :to="{ path: '/', hash: '#pricing' }" size="md" variant="ghost" :ui="{
-                    label: 'hidden md:block'
+                    label: 'hidden lg:block'
                 }" />
-                <USeparator orientation="vertical" class="h-6 hidden md:block" size="sm" />
+                <USeparator orientation="vertical" class="h-6 hidden lg:block" size="sm" />
                 <UButton v-if="user != null && user.is_anonymous === false" label="Tableau de bord" to="/app"
                     trailingIcon="i-lucide-home" size="md" variant="ghost" :ui="{
-                        label: 'hidden md:block'
+                        label: 'hidden lg:block'
                     }" />
                 <template v-else>
                     <UButton label="Connexion" variant="ghost" trailing-icon="i-lucide-log-in" :ui="{

@@ -98,18 +98,18 @@ const links = ref<NavigationMenuItem[][]>([[
     {
         label: 'Website',
         icon: 'i-lucide-home',
-        to: 'https://github.com/nuxt-ui-pro/dashboard',
+        to: '/',
         target: '_blank'
     }, {
         label: 'CGU',
         icon: 'i-lucide-info',
-        to: 'https://github.com/nuxt/ui-pro',
+        to: '/cgu',
         target: '_blank'
     },
     {
         label: 'Politique de confidentialité',
         icon: 'i-lucide-lock',
-        to: 'https://github.com/nuxt/ui-pro',
+        to: '/pdc',
         target: '_blank'
     }]])
 
