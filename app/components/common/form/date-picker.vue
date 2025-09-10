@@ -14,6 +14,10 @@ const df = new DateFormatter('fr-FR', {
     dateStyle: 'medium'
 })
 
+const bddDateFormat = new DateFormatter('en-EN', {
+    dateStyle: 'short'
+})
+
 const modelValue = defineModel<string | null>()
 const open = ref(false)
 
@@ -25,12 +29,15 @@ const calendarDate = shallowRef<CalendarDate | null>(modelValue.value ? new Cale
 
 
 watch(calendarDate, async (newDate) => {
+    console.log('date-picker: calendarDate changed', newDate)
+    // This line returns the date in YYYY-MM-DD with 1 day less because of timezone issues
     const val = newDate
-        ? newDate.toDate(getLocalTimeZone()).toISOString().split('T')[0]
+        ? bddDateFormat.format(newDate.toDate(getLocalTimeZone()))
         : null
 
     // update outer v-model
     modelValue.value = val
+    console.log('date-picker: emitting', val)
 
     // fire events Nuxt UI listens to so it re-validates this field
     emit('input', val)
