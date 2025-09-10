@@ -44,7 +44,7 @@ onMounted(() => {
 })
 
 
-const links = ref<NavigationMenuItem[]>([
+const links = ref<NavigationMenuItem[][]>([[
     {
         label: 'Factures',
         icon: 'i-lucide-files',
@@ -94,7 +94,24 @@ const links = ref<NavigationMenuItem[]>([
             }
         }],
     },
-])
+], [
+    {
+        label: 'Website',
+        icon: 'i-lucide-home',
+        to: 'https://github.com/nuxt-ui-pro/dashboard',
+        target: '_blank'
+    }, {
+        label: 'CGU',
+        icon: 'i-lucide-info',
+        to: 'https://github.com/nuxt/ui-pro',
+        target: '_blank'
+    },
+    {
+        label: 'Politique de confidentialité',
+        icon: 'i-lucide-lock',
+        to: 'https://github.com/nuxt/ui-pro',
+        target: '_blank'
+    }]])
 
 // A décommenter lorsqu'on mettra en place les cookies
 // onMounted(async () => {
@@ -150,7 +167,7 @@ const onSubscribe = async () => {
             </template>
 
             <template #default="{ collapsed }">
-                <UNavigationMenu :collapsed="collapsed" :items="links" orientation="vertical">
+                <UNavigationMenu :collapsed="collapsed" :items="links[0]" orientation="vertical">
                     <!-- <template #invoices-trailing>
                         <UTooltip :text="`You have ${pendingInvoices.length ?? 0} pending invoices`" placement="right">
                             <UBadge :label="`${pendingInvoices.length}`" size="sm"
@@ -158,6 +175,10 @@ const onSubscribe = async () => {
                         </UTooltip>
                     </template> -->
                 </UNavigationMenu>
+
+
+                <UNavigationMenu :collapsed="collapsed" :items="links[1]" orientation="vertical" tooltip
+                    class="mt-auto" />
             </template>
             <template #footer="{ collapsed }">
                 <UserMenu :collapsed="collapsed" />

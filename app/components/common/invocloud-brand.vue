@@ -5,7 +5,7 @@ const props = defineProps<{
 </script>
 
 <template>
-    <NuxtLink to="/">
+    <NuxtLink to="/app">
         <div class="flex gap-4 h-8">
             <UIcon name="i-custom:invocloud-logo" class="text-primary size-10" />
             <UIcon v-if="!collapsed" name="i-custom:invocloud" class="hidden sm:block text-primary h-10" />
