@@ -104,7 +104,6 @@ const _useInvoices = () => {
             .from("invoices")
             .insert([{
                 ...invoice,
-                status: "validated",
                 file_path: uploadData.path, // Store the file path
             }])
             .select()
