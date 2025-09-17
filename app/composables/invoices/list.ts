@@ -187,6 +187,7 @@ const _useInvoices = () => {
     };
 
     const downloadInvoiceFile = async (filePath: string) => {
+        console.log("Downloading invoice file from path:", filePath);
         const { data: blob, error } = await supabaseClient.storage
             .from("invoices")
             .download(filePath);
