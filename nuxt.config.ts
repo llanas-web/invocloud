@@ -3,6 +3,12 @@ export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
   devtools: { enabled: false },
   css: ["~/assets/css/main.css"],
+  vite: {
+    worker: {
+      format: "es",
+      rollupOptions: { output: { format: "es" } },
+    },
+  },
   modules: [
     "@nuxtjs/supabase",
     "@nuxt/ui",
@@ -15,6 +21,8 @@ export default defineNuxtConfig({
     public: {
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL || "http://localhost:3000",
       vpvLicenseKey: process.env.NUXT_PUBLIC_VPV_LICENSE_KEY || "",
+      supabaseUrl: process.env.SUPABASE_URL || "",
+      supabaseAnonKey: process.env.SUPABASE_ANON_KEY || "",
     },
   },
   router: {

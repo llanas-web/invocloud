@@ -1,307 +1,316 @@
 <script setup lang="ts">
-import { upperFirst } from 'scule'
-import type { TableColumn } from '@nuxt/ui'
-import { LazyInvoicesDeleteModal, LazyInvoicesSendModal, UBadge, NuxtLink, UInputMenu } from '#components'
-import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-import { useInvoicesSend } from '~/composables/invoices/send'
-import { useInvoicesDelete } from '~/composables/invoices/delete'
-import { useInvoicesTableList } from '~/composables/invoices/table-list'
+    import { upperFirst } from 'scule'
+    import type { TableColumn } from '@nuxt/ui'
+    import { LazyInvoicesDeleteModal, LazyInvoicesSendModal, UBadge, NuxtLink, UInputMenu } from '#components'
+    import { getPaginationRowModel, type Row } from '@tanstack/table-core'
+    import { useInvoicesSend } from '~/composables/invoices/send'
+    import { useInvoicesDelete } from '~/composables/invoices/delete'
+    import { useInvoicesTableList } from '~/composables/invoices/table-list'
 
 
-const UButton = resolveComponent('UButton')
-const UDropdownMenu = resolveComponent('UDropdownMenu')
-const UCheckbox = resolveComponent('UCheckbox')
+    const UButton = resolveComponent('UButton')
+    const UDropdownMenu = resolveComponent('UDropdownMenu')
+    const UCheckbox = resolveComponent('UCheckbox')
 
-const table = useTemplateRef('table')
+    const table = useTemplateRef('table')
 
-const { acceptedInvoices, pending } = useInvoices()
-const { statusFilter, selectedSuppliers, filteredInvoices } = useInvoicesTableList()
-const { updateInvoice } = useInvoices()
-const { open: isSendModalOpen, selectedInvoices: listInvoicesToSend } = useInvoicesSend()
-const { open: isDeleteModalOpen, selectedInvoices: listInvoicesToDelete } = useInvoicesDelete()
-const { suppliers } = useSuppliers()
-declare type Invoice = NonNullable<(typeof acceptedInvoices)['value']>[number];
+    const { acceptedInvoices, pending } = useInvoices()
+    const { statusFilter, selectedSuppliers, filteredInvoices } = useInvoicesTableList()
+    const { updateInvoice } = useInvoices()
+    const { open: isSendModalOpen, selectedInvoices: listInvoicesToSend } = useInvoicesSend()
+    const { open: isDeleteModalOpen, selectedInvoices: listInvoicesToDelete } = useInvoicesDelete()
+    const { suppliers } = useSuppliers()
+    declare type Invoice = NonNullable<(typeof acceptedInvoices)['value']>[number];
+    const { launchDownloadWorker, progress, running } = useWorker();
 
-const rowSelection = ref({})
+    const rowSelection = ref({})
 
-function getRowItems(row: Row<Invoice>) {
-    return [
+    function getRowItems(row: Row<Invoice>) {
+        return [
+            {
+                type: 'label',
+                label: 'Actions'
+            },
+            {
+                label: 'Envoyer par e-mail',
+                icon: 'i-lucide-mail',
+                onSelect() {
+                    listInvoicesToSend.value = [row.original.id]
+                    isSendModalOpen.value = true
+                }
+            },
+            {
+                type: 'separator'
+            },
+            {
+                label: 'Voir la facture',
+                onSelect() {
+                    return navigateTo(`/app/invoices/${row.original.id}`)
+                },
+                icon: 'i-lucide-eye',
+
+            },
+            {
+                type: 'separator'
+            },
+            {
+                label: 'Changer le statut',
+                icon: 'i-lucide-pencil',
+                children: [
+                    {
+                        label: 'Marquer comme payé',
+                        icon: 'i-lucide-check',
+                        iconColor: 'success',
+                        onSelect() {
+                            updateInvoice(row.original.id, {
+                                status: 'paid'
+                            })
+                        }
+                    },
+                    {
+                        label: 'Marquer comme en erreur',
+                        icon: 'i-lucide-x',
+                        onSelect() {
+                            updateInvoice(row.original.id, {
+                                status: 'error'
+                            })
+                        }
+                    }
+                ]
+            },
+            {
+                type: 'separator'
+            },
+            {
+                label: 'Supprimer facture',
+                icon: 'i-lucide-trash',
+                color: 'error',
+                onSelect() {
+                    listInvoicesToDelete.value = [row.original.id]
+                    isDeleteModalOpen.value = true
+                }
+            }
+        ]
+    }
+
+
+    const statusColors = {
+        pending: 'warning' as const,
+        sent: 'error' as const,
+        validated: 'warning' as const,
+        paid: 'success' as const,
+        error: 'error' as const,
+    }
+
+
+    const columns: TableColumn<Invoice>[] = [
         {
-            type: 'label',
-            label: 'Actions'
+            id: 'select',
+            header: ({ table }) =>
+                h(UCheckbox, {
+                    'modelValue': table.getIsSomePageRowsSelected()
+                        ? 'indeterminate'
+                        : table.getIsAllPageRowsSelected(),
+                    'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
+                        table.toggleAllPageRowsSelected(!!value),
+                    'ariaLabel': 'Select all'
+                }),
+            cell: ({ row }) =>
+                h(UCheckbox, {
+                    'modelValue': row.getIsSelected(),
+                    'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
+                    'ariaLabel': 'Select row'
+                })
         },
         {
-            label: 'Envoyer par e-mail',
-            icon: 'i-lucide-mail',
-            onSelect() {
-                listInvoicesToSend.value = [row.original.id]
-                isSendModalOpen.value = true
+            accessorKey: 'number',
+            header: 'N°',
+            cell: ({ row }) => {
+                return h('div', { class: 'flex items-center gap-3' }, [
+                    h(NuxtLink, { class: 'font-medium text-highlighted hover:underline', to: `/app/invoices/${row.original.id}` }, () => row.original.invoice_number),
+                ])
             }
         },
         {
-            type: 'separator'
+            accessorKey: 'supplier',
+            header: 'Fournisseur',
+            cell: ({ row }) => {
+                return h(UButton, { onClick: () => selectedSuppliers.value = [row.original.supplier_id], variant: 'ghost' }, row.original.supplier_name)
+            }
         },
         {
-            label: 'Voir la facture',
-            onSelect() {
-                return navigateTo(`/app/invoices/${row.original.id}`)
-            },
-            icon: 'i-lucide-eye',
+            accessorKey: 'amount',
+            header: () => h('div', { class: 'text-right' }, 'Montant'),
+            cell: ({ row }) => {
+                const amount = Number.parseFloat(row.getValue('amount'))
 
+                const formatted = new Intl.NumberFormat('fr-FR', {
+                    style: 'currency',
+                    currency: 'EUR'
+                }).format(amount)
+
+                return h('div', { class: 'text-right font-medium' }, formatted)
+            }
         },
         {
-            type: 'separator'
-        },
-        {
-            label: 'Changer le statut',
-            icon: 'i-lucide-pencil',
-            children: [
-                {
-                    label: 'Marquer comme payé',
-                    icon: 'i-lucide-check',
-                    iconColor: 'success',
-                    onSelect() {
-                        updateInvoice(row.original.id, {
-                            status: 'paid'
-                        })
-                    }
-                },
-                {
-                    label: 'Marquer comme en erreur',
-                    icon: 'i-lucide-x',
-                    onSelect() {
-                        updateInvoice(row.original.id, {
-                            status: 'error'
-                        })
-                    }
+            accessorKey: 'status',
+            header: 'Statut',
+            cell: ({ row }) => {
+                const color = statusColors[row.original.status as keyof typeof statusColors]
+                if (row.original.overdue) {
+                    return h(UBadge, { class: 'capitalize', variant: 'subtle', color: 'error' }, () =>
+                        'En retard'
+                    )
                 }
-            ]
+                return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () => {
+                    switch (row.original.status) {
+                        case 'pending':
+                            return 'En attente'
+                        case 'sent':
+                            return 'Envoyé'
+                        case 'validated':
+                            return 'En cours'
+                        case 'paid':
+                            return 'Payée'
+                        case 'error':
+                            return 'Erreur'
+                    }
+                })
+            }
         },
         {
-            type: 'separator'
+            accessorKey: 'created_at',
+            header: ({ column }) => {
+                const isSorted = column.getIsSorted()
+
+                return h(UButton, {
+                    variant: 'ghost',
+                    label: 'Date de réception',
+                    icon: isSorted
+                        ? isSorted === 'asc'
+                            ? 'i-lucide-arrow-up-narrow-wide'
+                            : 'i-lucide-arrow-down-wide-narrow'
+                        : 'i-lucide-arrow-up-down',
+                    class: '-mx-2.5',
+                    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+                })
+            },
+            cell: ({ row }) => {
+                const date = new Date(row.getValue('created_at'))
+                return h('div', { class: 'text-muted' }, date.toLocaleDateString('fr-FR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                }))
+            }
         },
         {
-            label: 'Supprimer facture',
-            icon: 'i-lucide-trash',
-            color: 'error',
-            onSelect() {
-                listInvoicesToDelete.value = [row.original.id]
-                isDeleteModalOpen.value = true
+            accessorKey: 'due_date',
+            header: ({ column }) => {
+                const isSorted = column.getIsSorted()
+
+                return h(UButton, {
+                    variant: 'ghost',
+                    label: 'Date d\'échéance',
+                    icon: isSorted
+                        ? isSorted === 'asc'
+                            ? 'i-lucide-arrow-up-narrow-wide'
+                            : 'i-lucide-arrow-down-wide-narrow'
+                        : 'i-lucide-arrow-up-down',
+                    class: '-mx-2.5',
+                    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+                })
+            },
+            cell: ({ row }) => {
+                if (row.getValue('due_date') === null || row.getValue('due_date') === '') {
+                    return h('div', { class: 'text-muted' }, '')
+                }
+                const date = new Date(row.getValue('due_date'))
+                return h('div', { class: 'text-muted' }, date.toLocaleDateString('fr-FR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                }))
+            }
+        },
+
+        {
+            accessorKey: 'paid_at',
+            header: ({ column }) => {
+                const isSorted = column.getIsSorted()
+                return h(UButton, {
+                    variant: 'ghost',
+                    label: 'Date de paiement',
+                    icon: isSorted
+                        ? isSorted === 'asc'
+                            ? 'i-lucide-arrow-up-narrow-wide'
+                            : 'i-lucide-arrow-down-wide-narrow'
+                        : 'i-lucide-arrow-up-down',
+                    class: '-mx-2.5',
+                    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+                })
+            },
+            cell: ({ row }) => {
+                if (row.getValue('paid_at') === null || row.getValue('paid_at') === '') {
+                    return h('div', { class: 'text-muted' }, '')
+                }
+                const date = new Date(row.getValue('paid_at'))
+                return h('div', { class: 'text-muted' }, date.toLocaleDateString('fr-FR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                }))
+            }
+        },
+        {
+            id: 'actions',
+            cell: ({ row }) => {
+                return h(
+                    'div',
+                    { class: 'text-right' },
+                    h(
+                        UDropdownMenu,
+                        {
+                            content: {
+                                align: 'end'
+                            },
+                            items: getRowItems(row)
+                        },
+                        () =>
+                            h(UButton, {
+                                icon: 'i-lucide-ellipsis-vertical',
+                                color: 'neutral',
+                                variant: 'ghost',
+                                class: 'ml-auto'
+                            })
+                    )
+                )
             }
         }
     ]
-}
 
+    const pagination = ref({
+        pageIndex: 0,
+        pageSize: 10
+    })
 
-const statusColors = {
-    pending: 'warning' as const,
-    sent: 'error' as const,
-    validated: 'warning' as const,
-    paid: 'success' as const,
-    error: 'error' as const,
-}
-
-
-const columns: TableColumn<Invoice>[] = [
-    {
-        id: 'select',
-        header: ({ table }) =>
-            h(UCheckbox, {
-                'modelValue': table.getIsSomePageRowsSelected()
-                    ? 'indeterminate'
-                    : table.getIsAllPageRowsSelected(),
-                'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
-                    table.toggleAllPageRowsSelected(!!value),
-                'ariaLabel': 'Select all'
-            }),
-        cell: ({ row }) =>
-            h(UCheckbox, {
-                'modelValue': row.getIsSelected(),
-                'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
-                'ariaLabel': 'Select row'
-            })
-    },
-    {
-        accessorKey: 'number',
-        header: 'N°',
-        cell: ({ row }) => {
-            return h('div', { class: 'flex items-center gap-3' }, [
-                h(NuxtLink, { class: 'font-medium text-highlighted hover:underline', to: `/app/invoices/${row.original.id}` }, () => row.original.invoice_number),
-            ])
-        }
-    },
-    {
-        accessorKey: 'supplier',
-        header: 'Fournisseur',
-        cell: ({ row }) => {
-            return h(UButton, { onClick: () => selectedSuppliers.value = [row.original.supplier_id], variant: 'ghost' }, row.original.supplier_name)
-        }
-    },
-    {
-        accessorKey: 'amount',
-        header: () => h('div', { class: 'text-right' }, 'Montant'),
-        cell: ({ row }) => {
-            const amount = Number.parseFloat(row.getValue('amount'))
-
-            const formatted = new Intl.NumberFormat('fr-FR', {
-                style: 'currency',
-                currency: 'EUR'
-            }).format(amount)
-
-            return h('div', { class: 'text-right font-medium' }, formatted)
-        }
-    },
-    {
-        accessorKey: 'status',
-        header: 'Statut',
-        cell: ({ row }) => {
-            const color = statusColors[row.original.status as keyof typeof statusColors]
-            if (row.original.overdue) {
-                return h(UBadge, { class: 'capitalize', variant: 'subtle', color: 'error' }, () =>
-                    'En retard'
-                )
-            }
-            return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () => {
-                switch (row.original.status) {
-                    case 'pending':
-                        return 'En attente'
-                    case 'sent':
-                        return 'Envoyé'
-                    case 'validated':
-                        return 'En cours'
-                    case 'paid':
-                        return 'Payée'
-                    case 'error':
-                        return 'Erreur'
-                }
-            })
-        }
-    },
-    {
-        accessorKey: 'created_at',
-        header: ({ column }) => {
-            const isSorted = column.getIsSorted()
-
-            return h(UButton, {
-                variant: 'ghost',
-                label: 'Date de réception',
-                icon: isSorted
-                    ? isSorted === 'asc'
-                        ? 'i-lucide-arrow-up-narrow-wide'
-                        : 'i-lucide-arrow-down-wide-narrow'
-                    : 'i-lucide-arrow-up-down',
-                class: '-mx-2.5',
-                onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
-            })
-        },
-        cell: ({ row }) => {
-            const date = new Date(row.getValue('created_at'))
-            return h('div', { class: 'text-muted' }, date.toLocaleDateString('fr-FR', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            }))
-        }
-    },
-    {
-        accessorKey: 'due_date',
-        header: ({ column }) => {
-            const isSorted = column.getIsSorted()
-
-            return h(UButton, {
-                variant: 'ghost',
-                label: 'Date d\'échéance',
-                icon: isSorted
-                    ? isSorted === 'asc'
-                        ? 'i-lucide-arrow-up-narrow-wide'
-                        : 'i-lucide-arrow-down-wide-narrow'
-                    : 'i-lucide-arrow-up-down',
-                class: '-mx-2.5',
-                onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
-            })
-        },
-        cell: ({ row }) => {
-            if (row.getValue('due_date') === null || row.getValue('due_date') === '') {
-                return h('div', { class: 'text-muted' }, '')
-            }
-            const date = new Date(row.getValue('due_date'))
-            return h('div', { class: 'text-muted' }, date.toLocaleDateString('fr-FR', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            }))
-        }
-    },
-
-    {
-        accessorKey: 'paid_at',
-        header: ({ column }) => {
-            const isSorted = column.getIsSorted()
-            return h(UButton, {
-                variant: 'ghost',
-                label: 'Date de paiement',
-                icon: isSorted
-                    ? isSorted === 'asc'
-                        ? 'i-lucide-arrow-up-narrow-wide'
-                        : 'i-lucide-arrow-down-wide-narrow'
-                    : 'i-lucide-arrow-up-down',
-                class: '-mx-2.5',
-                onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
-            })
-        },
-        cell: ({ row }) => {
-            if (row.getValue('paid_at') === null || row.getValue('paid_at') === '') {
-                return h('div', { class: 'text-muted' }, '')
-            }
-            const date = new Date(row.getValue('paid_at'))
-            return h('div', { class: 'text-muted' }, date.toLocaleDateString('fr-FR', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            }))
-        }
-    },
-    {
-        id: 'actions',
-        cell: ({ row }) => {
-            return h(
-                'div',
-                { class: 'text-right' },
-                h(
-                    UDropdownMenu,
-                    {
-                        content: {
-                            align: 'end'
-                        },
-                        items: getRowItems(row)
-                    },
-                    () =>
-                        h(UButton, {
-                            icon: 'i-lucide-ellipsis-vertical',
-                            color: 'neutral',
-                            variant: 'ghost',
-                            class: 'ml-auto'
-                        })
-                )
-            )
-        }
+    const openSendModal = () => {
+        listInvoicesToSend.value = table.value!.tableApi?.getFilteredSelectedRowModel().rows.map(r => r.original.id) ?? []
+        isSendModalOpen.value = true
     }
-]
 
-const pagination = ref({
-    pageIndex: 0,
-    pageSize: 10
-})
+    const openDeleteModal = () => {
+        listInvoicesToDelete.value = table.value!.tableApi?.getFilteredSelectedRowModel().rows.map(r => r.original.id) ?? []
+        isDeleteModalOpen.value = true
+    }
 
-const openSendModal = () => {
-    listInvoicesToSend.value = table.value!.tableApi?.getFilteredSelectedRowModel().rows.map(r => r.original.id) ?? []
-    isSendModalOpen.value = true
-}
-
-const openDeleteModal = () => {
-    listInvoicesToDelete.value = table.value!.tableApi?.getFilteredSelectedRowModel().rows.map(r => r.original.id) ?? []
-    isDeleteModalOpen.value = true
-}
+    const downloadInvoices = () => {
+        const listSelectedInvoices = table.value!.tableApi?.getFilteredSelectedRowModel().rows.map(r => r.original as Partial<Invoice>) ?? [];
+        if (listSelectedInvoices.length === 0) {
+            return;
+        }
+        launchDownloadWorker(listSelectedInvoices);
+    }
 </script>
 
 <template>
@@ -311,6 +320,18 @@ const openDeleteModal = () => {
         <div class="flex flex-wrap items-center gap-1.5">
             <UButton :disabled="!table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Envoyer"
                 color="primary" variant="subtle" icon="i-lucide-send" @click="openSendModal" :ui="{
+                    label: 'hidden md:block',
+                }">
+                <template #trailing>
+                    <UKbd>
+                        {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
+                    </UKbd>
+                </template>
+            </UButton>
+            <UButton :disabled="!table?.tableApi?.getFilteredSelectedRowModel().rows.length || running"
+                :loading="running"
+                :label="(running && progress) ? `Téléchargement ${progress.done} / ${progress.total}` : 'Télécharger'"
+                color="primary" variant="subtle" icon="i-lucide-download" @click="downloadInvoices" :ui="{
                     label: 'hidden md:block',
                 }">
                 <template #trailing>
