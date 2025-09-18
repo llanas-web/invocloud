@@ -3,6 +3,7 @@
 import { BlobReader, BlobWriter, TextReader, ZipWriter } from "@zip.js/zip.js";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import type { Invoice } from "~~/types";
+import * as mime from "mime-types";
 // if you ever need supabase-js in worker, you can import it here and initialize with the passed keys.
 
 type DownloadMsg = {
@@ -56,7 +57,11 @@ self.onmessage = async (e: MessageEvent<string>) => {
                     .download(invoice.file_path!);
                 if (error) throw error;
                 await zip.add(
-                    `${invoice.invoice_number}.pdf`,
+                    `${invoice.invoice_number}.${
+                        mime.extension(
+                            blob.type,
+                        ) || "bin"
+                    }`,
                     new BlobReader(blob),
                 );
             } catch (e: any) {
