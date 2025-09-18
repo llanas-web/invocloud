@@ -9,12 +9,15 @@ type DownloadMsg = {
   invoices: Partial<Invoice>[];
   supabaseUrl: string;
   supabaseAnonKey: string;
+  access_token: string | undefined;
+  refresh_token: string | undefined;
 };
 
 const _useWorker = () => {
   const { public: pub } = useRuntimeConfig();
   const { selectedEstablishment } = useEstablishments();
   const { rangeFilter } = useInvoicesTableList();
+  const session = useSupabaseSession();
   const worker = shallowRef<Worker | null>(null);
   const ready = computed(() => !!worker.value);
   const queue: any[] = [];
@@ -85,6 +88,8 @@ const _useWorker = () => {
       invoices,
       supabaseUrl: pub.supabaseUrl, // from NUXT_PUBLIC_*
       supabaseAnonKey: pub.supabaseAnonKey, // from NUXT_PUBLIC_*
+      access_token: session.value?.access_token, // from session
+      refresh_token: session.value?.refresh_token, // from session
     };
     post(JSON.stringify(msg));
   }

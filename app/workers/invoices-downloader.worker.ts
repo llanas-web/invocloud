@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 // app/workers/invoices-downloader.worker.ts
 import { BlobReader, BlobWriter, TextReader, ZipWriter } from "@zip.js/zip.js";
-import { SupabaseClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import type { Invoice } from "~~/types";
 // if you ever need supabase-js in worker, you can import it here and initialize with the passed keys.
 
@@ -10,6 +10,8 @@ type DownloadMsg = {
     invoices: Partial<Invoice>[];
     supabaseUrl: string;
     supabaseAnonKey: string;
+    access_token: string;
+    refresh_token: string;
 };
 
 self.onmessage = async (e: MessageEvent<string>) => {
@@ -17,7 +19,20 @@ self.onmessage = async (e: MessageEvent<string>) => {
     if (!data || data.type !== "download") return;
 
     const { invoices, supabaseUrl, supabaseAnonKey } = data;
-    const supabaseClient = new SupabaseClient(supabaseUrl, supabaseAnonKey);
+    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+            persistSession: false,
+            detectSessionInUrl: false,
+        },
+    });
+    const { data: { session }, error } = await supabaseClient.auth.setSession({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+    });
+    if (error) {
+        (self as any).postMessage({ type: "done", blob: null });
+        return;
+    }
 
     const writer = new BlobWriter("application/zip");
     const zip = new ZipWriter(writer);
