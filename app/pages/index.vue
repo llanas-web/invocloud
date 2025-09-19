@@ -1,49 +1,49 @@
 <script setup lang="ts">
-import { z } from 'zod';
-import type { FormSubmitEvent } from '@nuxt/ui'
+    import { z } from 'zod';
+    import type { FormSubmitEvent } from '@nuxt/ui'
 
-const { openModal } = useInvoiceUpload()
-const config = useRuntimeConfig();
+    const { openModal } = useInvoiceUpload()
+    const config = useRuntimeConfig();
 
-const schema = z.object({
-    email: z.string().email('Veuillez entrer un email valide'),
-});
-const state = reactive({
-    email: ''
-});
+    const schema = z.object({
+        email: z.string().email('Veuillez entrer un email valide'),
+    });
+    const state = reactive({
+        email: ''
+    });
 
-type Schema = z.output<typeof schema>
+    type Schema = z.output<typeof schema>
 
-const onSubmit = async (event: FormSubmitEvent<Schema>) => {
-    // Handle form submission logic here
-};
+    const onSubmit = async (event: FormSubmitEvent<Schema>) => {
+        // Handle form submission logic here
+    };
 
 
-const { data: page } = await useAsyncData(() => queryCollection('index').first())
-const user = useSupabaseUser()
+    const { data: page } = await useAsyncData(() => queryCollection('index').first())
+    const user = useSupabaseUser()
 
-useSeoMeta({
-    title: page.value?.seo.title || page.value?.title,
-    titleTemplate:
-        page.value?.seo.title || page.value?.title,
-    description:
-        page.value?.seo.description || page.value?.description,
-    ogType: 'website',
-    ogLocale: 'fr_FR',
-    ogSiteName: 'Invocloud',
-    ogTitle: page.value?.seo.title || page.value?.title,
-    ogDescription:
-        page.value?.seo.description || page.value?.description,
-    ogUrl: config.public.baseUrl ?? 'https://invocloud.fr',
-    ogImage: `${config.public.baseUrl}/thumbnail_1200.png`,
-    ogImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
-    ogImageHeight: 577,
-    ogImageWidth: 1200,
-    twitterCard: 'summary_large_image',
-    twitterImage: `${config.public.baseUrl}/thumbnail_1200.png`,
-    twitterImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
+    useSeoMeta({
+        title: page.value?.seo.title || page.value?.title,
+        titleTemplate:
+            page.value?.seo.title || page.value?.title,
+        description:
+            page.value?.seo.description || page.value?.description,
+        ogType: 'website',
+        ogLocale: 'fr_FR',
+        ogSiteName: 'Invocloud',
+        ogTitle: page.value?.seo.title || page.value?.title,
+        ogDescription:
+            page.value?.seo.description || page.value?.description,
+        ogUrl: config.public.baseUrl ?? 'https://invocloud.fr',
+        ogImage: `${config.public.baseUrl}/thumbnail_1200.png`,
+        ogImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
+        ogImageHeight: 577,
+        ogImageWidth: 1200,
+        twitterCard: 'summary_large_image',
+        twitterImage: `${config.public.baseUrl}/thumbnail_1200.png`,
+        twitterImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
 
-})
+    })
 </script>
 
 
@@ -124,26 +124,34 @@ useSeoMeta({
                     <span class="text-primary font-medium">Invocloud</span>.
                 </p>
             </template>
-            <UContainer class="text-center">
-                <div class="flex flex-wrap items-center justify-center gap-3 mt-4">
-                    <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
-                        <UIcon name="i-lucide-shopping-cart" class="text-primary" />
-                        Supérettes
-                    </span>
-                    <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
-                        <UIcon name="i-lucide-briefcase" class="text-primary" />
-                        Cabinets comptables
-                    </span>
-                    <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
-                        <UIcon name="i-lucide-user" class="text-primary" />
-                        Indépendants
-                    </span>
-                    <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
-                        <UIcon name="i-lucide-building" class="text-primary" />
-                        TPE
-                    </span>
-                </div>
-            </UContainer>
+            <template #body>
+
+                <UContainer class="text-center">
+                    <div class="flex flex-wrap items-center justify-center gap-3 mt-4">
+                        <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
+                            <UIcon name="i-lucide-shopping-cart" class="text-primary" />
+                            Supérettes
+                        </span>
+                        <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
+                            <UIcon name="i-lucide-briefcase" class="text-primary" />
+                            Cabinets comptables
+                        </span>
+                        <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
+                            <UIcon name="i-lucide-user" class="text-primary" />
+                            Indépendants
+                        </span>
+                        <span class="inline-flex items-center gap-2 rounded-full bg-primary-100/15 px-4 py-2 text-xl">
+                            <UIcon name="i-lucide-building" class="text-primary" />
+                            TPE
+                        </span>
+                    </div>
+                </UContainer>
+            </template>
+            <template #footer>
+                <p class="text-center">Pour toute question, contactez-nous à l'adresse suivante : <a
+                        href="mailto:contact@invocloud.com" class="text-primary font-medium">contact@invocloud.com</a>
+                </p>
+            </template>
         </UPageSection>
 
         <UPageSection>

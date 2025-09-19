@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { LazyInvoicesUploadModalContainer } from '#components';
-import { fr } from '@nuxt/ui/locale'
+    import { LazyInvoicesUploadModalContainer } from '#components';
+    import { fr } from '@nuxt/ui/locale'
 
-const { openModal } = useInvoiceUpload()
-const user = useSupabaseUser()
+    const { openModal } = useInvoiceUpload()
+    const user = useSupabaseUser()
 
 </script>
 
@@ -67,6 +67,7 @@ const user = useSupabaseUser()
                 <NuxtLink class="underline" to="/cgu">
                     Conditions générales d'utilisation</NuxtLink> © 2025 Invocloud.
                 Tous droits réservés.
+                <a href="mailto:contact@invocloud.com" class="underline">contact@invocloud.com</a>
             </p>
         </UFooter>
     </UApp>

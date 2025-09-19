@@ -1,51 +1,51 @@
 <script setup lang="ts">
-import * as z from 'zod'
-import type { FormSubmitEvent, FormError } from '@nuxt/ui'
+  import * as z from 'zod'
+  import type { FormSubmitEvent, FormError } from '@nuxt/ui'
 
-const { resetPassword } = useAuth()
-const { deleteAccount } = useUser()
+  const { resetPassword } = useAuth()
+  const { deleteAccount } = useUser()
 
-const passwordSchema = z.object({
-  new: z.string().min(8, 'Must be at least 8 characters'),
-  newValidation: z.string().min(8, 'Must be at least 8 characters')
-})
+  const passwordSchema = z.object({
+    new: z.string().min(8, 'Must be at least 8 characters'),
+    newValidation: z.string().min(8, 'Must be at least 8 characters')
+  })
 
-type PasswordSchema = z.output<typeof passwordSchema>
+  type PasswordSchema = z.output<typeof passwordSchema>
 
-const password = reactive<Partial<PasswordSchema>>({
-  new: undefined,
-  newValidation: undefined
-})
+  const password = reactive<Partial<PasswordSchema>>({
+    new: undefined,
+    newValidation: undefined
+  })
 
-const validate = (state: Partial<PasswordSchema>): FormError[] => {
-  const errors: FormError[] = []
-  if (state?.new !== state?.newValidation) {
-    errors.push({ name: 'newValidation', message: 'Passwords must be the same' })
+  const validate = (state: Partial<PasswordSchema>): FormError[] => {
+    const errors: FormError[] = []
+    if (state?.new !== state?.newValidation) {
+      errors.push({ name: 'newValidation', message: 'Passwords must be the same' })
+    }
+    return errors
   }
-  return errors
-}
 
-const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof passwordSchema>>) => {
-  const { new: newPassword } = payload.data;
-  const response = await resetPassword(newPassword);
-}
-
-const onDeleteAccount = async () => {
-  const response = await deleteAccount();
-  if (response) {
-    useToast().add({
-      title: 'Votre compte a été supprimé avec succès.',
-      color: 'success'
-    });
-    // Redirect to home or login page
-    useRouter().push('/');
-  } else {
-    useToast().add({
-      title: 'Échec de la suppression du compte',
-      color: 'error'
-    });
+  const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof passwordSchema>>) => {
+    const { new: newPassword } = payload.data;
+    const response = await resetPassword(newPassword);
   }
-}
+
+  const onDeleteAccount = async () => {
+    const response = await deleteAccount();
+    if (response) {
+      useToast().add({
+        title: 'Votre compte a été supprimé avec succès.',
+        color: 'success'
+      });
+      // Redirect to home or login page
+      useRouter().push('/');
+    } else {
+      useToast().add({
+        title: 'Échec de la suppression du compte',
+        color: 'error'
+      });
+    }
+  }
 </script>
 
 <template>
@@ -73,4 +73,8 @@ const onDeleteAccount = async () => {
       <UButton label="Supprimer le compte" color="error" @click="onDeleteAccount" />
     </template>
   </UPageCard>
+
+  <p class="text-center mt-8 text-sm text-neutral-500">Pour toute question, contactez-nous à l'adresse suivante :
+    <a href="mailto:contact@invocloud.com" class="text-primary underline">contact@invocloud.com</a>
+  </p>
 </template>
