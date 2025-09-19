@@ -1,6 +1,6 @@
 import { createSharedComposable } from "@vueuse/core";
 import type { Range } from "~~/types";
-import { isAfter, isBefore, sub } from "date-fns";
+import { isAfter, isBefore, isEqual, isSameDay, sub } from "date-fns";
 
 const _useInvoicesTableList = () => {
     const { acceptedInvoices } = useInvoices();
@@ -18,8 +18,11 @@ const _useInvoicesTableList = () => {
                 statusFilter.value === "error" && invoice.overdue ||
                 invoice.status === statusFilter.value;
             const matchesRange = !rangeFilter.value ||
-                isBefore(invoice.created_at, rangeFilter.value.end) &&
-                    isAfter(invoice.created_at, rangeFilter.value.start);
+                isDateInRange(
+                    new Date(invoice.created_at),
+                    rangeFilter.value.start,
+                    rangeFilter.value.end,
+                );
             const matchSupplier = selectedSuppliers.value.length === 0 ||
                 selectedSuppliers.value.includes(invoice.supplier_id);
             return matchesStatus && matchesRange && matchSupplier;
