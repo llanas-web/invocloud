@@ -1,4 +1,5 @@
 import { CalendarDate } from "@internationalized/date";
+import { isAfter, isBefore, isEqual, isSameDay } from "date-fns";
 
 export function fromUnix(timestamp?: number | null): string | null {
     return timestamp ? new Date(timestamp * 1000).toISOString() : null;
@@ -14,4 +15,14 @@ export function toCalendarDate(date: Date) {
         date.getMonth() + 1,
         date.getDate(),
     );
+}
+
+export function isDateInRange(
+    date: Date,
+    start: Date,
+    end: Date,
+): boolean {
+    return isSameDay(date, start) || isSameDay(date, end) ||
+        (isBefore(date, end) || isEqual(date, end)) &&
+            (isAfter(date, start) || isEqual(date, start));
 }
