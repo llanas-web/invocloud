@@ -4,8 +4,13 @@ import { format } from "date-fns";
 import { z } from "zod";
 import type { InvoiceUpdate } from "~~/types";
 
+const amountField = z
+    .union([z.string(), z.number()]) // <- input can be string|number
+    .transform((v) => parseAmountFR(v)) // <- to number
+    .pipe(z.number().positive("Le montant doit être positif.")); // <- validate
+
 const formStateSchema = z.object({
-    amount: z.number().positive("Le montant doit être positif."),
+    amount: amountField,
     comment: z.string().optional().nullable(),
     name: z.string().optional().nullable(),
     due_date: z.string()
@@ -29,7 +34,7 @@ const formStateSchema = z.object({
     message: "La date de paiement est requise lorsque le statut est 'payé'.",
 });
 
-type Schema = z.output<typeof formStateSchema>;
+type Schema = z.input<typeof formStateSchema>;
 
 const _useInvoiceUpdate = () => {
     const { invoice, updateInvoice } = useInvoiceDetails();

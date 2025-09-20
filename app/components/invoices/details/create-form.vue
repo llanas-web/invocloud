@@ -1,26 +1,25 @@
 <script setup lang="ts">
-import type { UForm } from '#components';
-import type { InvoiceStatus } from '~/types';
+    import type { UForm } from '#components';
 
-const { formRef, formState, isLoading, formStateSchema, onSubmit } = useInvoiceCreate()
-const { suppliers } = useSuppliers()
-const { openModal: openCreateModal, formState: createFormState } = useSupplierCreate()
+    const { formRef, formState, isLoading, formStateSchema, onSubmit } = useInvoiceCreate()
+    const { suppliers } = useSuppliers()
+    const { openModal: openCreateModal, formState: createFormState } = useSupplierCreate()
 
-const invoiceStatus = ref<{ label: string, value: InvoiceStatus, icon: string, class: string }[]>([
-    { label: 'Payée', value: 'paid', icon: 'i-lucide-check-circle', class: 'text-green-500' },
-    { label: 'Validée', value: 'validated', icon: 'i-lucide-check', class: 'text-blue-500' }
-])
+    const invoiceStatus = ref<{ label: string, value: InvoiceStatus, icon: string, class: string }[]>([
+        { label: 'Payée', value: 'paid', icon: 'i-lucide-check-circle', class: 'text-green-500' },
+        { label: 'Validée', value: 'validated', icon: 'i-lucide-check', class: 'text-blue-500' }
+    ])
 
-const onCreateSupplier = (newSupplierName: string) => {
-    console.log('Creating new supplier:', newSupplierName)
-    createFormState.name = newSupplierName || ''
-    openCreateModal.value = true
-}
+    const onCreateSupplier = (newSupplierName: string) => {
+        console.log('Creating new supplier:', newSupplierName)
+        createFormState.name = newSupplierName || ''
+        openCreateModal.value = true
+    }
 
-const createInvoiceFormRef = useTemplateRef('createInvoiceFormRef')
-onMounted(() => {
-    formRef.value = createInvoiceFormRef.value
-})
+    const createInvoiceFormRef = useTemplateRef('createInvoiceFormRef')
+    onMounted(() => {
+        formRef.value = createInvoiceFormRef.value
+    })
 </script>
 
 <template>
@@ -59,8 +58,10 @@ onMounted(() => {
             <USelect v-model="formState.status" :items="invoiceStatus" placeholder="Status de la facture"
                 class="w-full" />
         </UFormField>
-        <UFormField name="amount" label="Montant TTC" required >
-            <UInput v-model.number.trim.nullify="formState.amount" icon="i-lucide-euro" class="w-full" type="number" />
+        <UFormField name="amount" label="Montant TTC" required>
+            <CommonFormNumberInput v-model.trim="formState.amount as string | undefined" icon="i-lucide-euro"
+                class="w-full" :format-on-blur="true" :fraction-digits="2" :allow-negative="false" type="string"
+                inputmode="decimal" spellcheck="false" />
         </UFormField>
     </UForm>
 </template>

@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import type { InvoiceStatus } from '~~/types';
+    import type { InvoiceStatus } from '~~/types';
 
-const { invoice, isLoading: loadingDetails } = useInvoiceDetails()
-const { formRef, formState, formStateSchema, isLoading: loadingUpdate, onSubmit } = useInvoiceUpdate()
+    const { invoice, isLoading: loadingDetails } = useInvoiceDetails()
+    const { formRef, formState, formStateSchema, isLoading: loadingUpdate, onSubmit } = useInvoiceUpdate()
 
-const invoiceStatus = ref<{ label: string, value: InvoiceStatus, icon: string, class: string }[]>([
-    { label: 'Validée', value: 'validated', icon: 'i-lucide-check', class: 'text-blue-500' },
-    { label: 'Payée', value: 'paid', icon: 'i-lucide-euro', class: 'text-green-500' },
-])
+    const invoiceStatus = ref<{ label: string, value: InvoiceStatus, icon: string, class: string }[]>([
+        { label: 'Validée', value: 'validated', icon: 'i-lucide-check', class: 'text-blue-500' },
+        { label: 'Payée', value: 'paid', icon: 'i-lucide-euro', class: 'text-green-500' },
+    ])
 
-const updateInvoiceFormRef = useTemplateRef('updateInvoiceFormRef')
-onMounted(() => {
-    formRef.value = updateInvoiceFormRef.value
-})
+    const updateInvoiceFormRef = useTemplateRef('updateInvoiceFormRef')
+    onMounted(() => {
+        formRef.value = updateInvoiceFormRef.value
+    })
 
-const isLoading = computed(() => loadingDetails.value || loadingUpdate.value)
+    const isLoading = computed(() => loadingDetails.value || loadingUpdate.value)
 </script>
 
 <template>
@@ -58,7 +58,9 @@ const isLoading = computed(() => loadingDetails.value || loadingUpdate.value)
         </UFormField>
         <UFormField label="Montant TTC" name="amount" required>
             <USkeleton v-if="!invoice" class="h-8" />
-            <UInput v-else name="amount" v-model.number.trim="formState.amount" icon="i-lucide-euro" class="w-full" />
+            <CommonFormNumberInput v-model.trim="formState.amount as string | undefined" icon="i-lucide-euro"
+                class="w-full" :format-on-blur="true" :fraction-digits="2" :allow-negative="false" type="string"
+                inputmode="decimal" spellcheck="false" />
         </UFormField>
     </UForm>
 </template>
