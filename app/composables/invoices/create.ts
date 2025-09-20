@@ -1,11 +1,17 @@
 import { createSharedComposable } from "@vueuse/core";
 import { z } from "zod";
+import { parseAmountFR } from "~/utils/number";
 import type { InvoiceInsert } from "~~/types";
+
+const amountField = z
+    .union([z.string(), z.number()]) // <- input can be string|number
+    .transform((v) => parseAmountFR(v)) // <- to number
+    .pipe(z.number().positive("Le montant doit être positif.")); // <- validate
 
 const formStateSchema = z.object({
     file_path: z.string().min(1, "Le chemin du fichier est requis."),
     supplier_id: z.string().min(1, "Le fournisseur est requis."),
-    amount: z.number().positive("Le montant doit être positif.").default(0),
+    amount: amountField,
     comment: z.string().optional().nullable(),
     name: z.string().optional().nullable(),
     due_date: z.string()
@@ -22,7 +28,8 @@ const formStateSchema = z.object({
     ),
 });
 
-type Schema = z.output<typeof formStateSchema>;
+type formInputSchema = z.input<typeof formStateSchema>;
+type formOutputSchema = z.output<typeof formStateSchema>;
 
 const _useInvoiceCreate = () => {
     const toast = useToast();
@@ -32,7 +39,7 @@ const _useInvoiceCreate = () => {
     const isLoading = ref(false);
     const isOnError = ref(false);
 
-    const formState = reactive<Schema>({
+    const formState = reactive<formInputSchema>({
         file_path: "",
         supplier_id: "",
         amount: 0,
@@ -59,13 +66,6 @@ const _useInvoiceCreate = () => {
             formState.paid_at !== null ||
             formState.created_at !== new Date().toISOString()
         );
-    });
-
-    // Ensure amount is never null or undefined
-    watch(() => formState.amount, (newValue) => {
-        if (!newValue) {
-            formState.amount = 0;
-        }
     });
 
     const onSubmit = async () => {
