@@ -1,38 +1,38 @@
 <script setup lang="ts">
-const { open, stepIndex, isLoading, onPrev, onValidate } = useInvoiceUpload()
+    const { open, stepIndex, isLoading, onPrev, onValidate } = useInvoiceUpload()
 
-const props = defineProps<{
-    size?: 'sm' | 'md' | 'lg' | 'xl',
-    variant?: 'solid' | 'ghost' | 'subtle' | 'link'
-}>()
+    const props = defineProps<{
+        size?: 'sm' | 'md' | 'lg' | 'xl',
+        variant?: 'solid' | 'ghost' | 'subtle' | 'link'
+    }>()
 
-const { currentUser } = useUser();
+    const { currentUser } = useUser();
 
-const formStep = {
-    slot: 'form' as const,
-    label: 'Send Invoices',
-    title: 'Envoyer des factures',
-    description: 'Envoyez des fichiers de factures en toute sécurité aux parties prenantes',
-    icon: 'i-lucide-send'
-};
+    const formStep = {
+        slot: 'form' as const,
+        label: 'Envoyer des factures',
+        title: 'Envoyer des factures',
+        description: 'Envoyez des fichiers de factures en toute sécurité aux parties prenantes',
+        icon: 'i-lucide-send'
+    };
 
-const tokenStep = {
-    slot: 'token' as const,
-    label: 'Confirmer l\'email',
-    title: 'Confirmer l\'email',
-    description: 'Confirmez votre adresse e-mail',
-    icon: 'i-lucide-check'
-};
+    const tokenStep = {
+        slot: 'token' as const,
+        label: 'Confirmer l\'email',
+        title: 'Confirmer l\'email',
+        description: 'Confirmez votre adresse e-mail',
+        icon: 'i-lucide-check'
+    };
 
-const confirmStep = {
-    slot: 'confirm' as const,
-    label: 'Confirmer l\'envoie',
-    title: 'Confirmer l\'envoie',
-    description: 'Confirmez l\'envoie du fichier',
-    icon: 'i-lucide-file-check'
-};
+    const confirmStep = {
+        slot: 'confirm' as const,
+        label: 'Confirmer l\'envoi',
+        title: 'Confirmer l\'envoi',
+        description: 'Confirmez l\'envoi du fichier',
+        icon: 'i-lucide-file-check'
+    };
 
-const stepItems = computed(() => (!currentUser.value ? [formStep, tokenStep, confirmStep] : [formStep, confirmStep]))
+    const stepItems = computed(() => (!currentUser.value ? [formStep, tokenStep, confirmStep] : [formStep, confirmStep]))
 </script>
 
 <template>
