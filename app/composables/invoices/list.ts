@@ -159,7 +159,7 @@ const _useInvoices = () => {
             {
                 method: "POST",
                 body: {
-                    invoices: [invoicesId],
+                    invoices: invoicesId,
                     email,
                 },
             },
