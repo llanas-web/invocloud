@@ -42,7 +42,6 @@
         twitterCard: 'summary_large_image',
         twitterImage: `${config.public.baseUrl}/thumbnail_1200.png`,
         twitterImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
-
     })
 </script>
 
