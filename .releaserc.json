@@ -2,24 +2,15 @@
   "branches": ["master"],
   "tagFormat": "v${version}",
   "plugins": [
-    ["semantic-release-gitmoji", {
-      "releaseRules": {
-        "✨": "minor",
-        "🐛": "patch",
-        "💥": "major"
-      },
-      "types": {
-        "major": [ "💥" ],
-        "minor": [ "✨" ],
-        "patch": [ "🐛", "🚑️", "🔒️", "♻️" ]
-      },
-      "skipEmoji": false
+    "semantic-release-gitmoji",
+    ["@semantic-release/npm", { "npmPublish": false }],
+    ["@semantic-release/exec", {
+      "prepareCmd": "npx gitmoji-changelog v${nextRelease.version} --output CHANGELOG.md"
     }],
-    ["@semantic-release/changelog", { "changelogFile": "CHANGELOG.md" }],
-    ["@semantic-release/github", { "assets": [] }],
     ["@semantic-release/git", {
       "assets": ["CHANGELOG.md", "package.json"],
       "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-    }]
+    }],
+    ["@semantic-release/github", { "assets": [] }]
   ]
 }
