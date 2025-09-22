@@ -1,5 +1,5 @@
+# .github/workflows/release.yml
 name: Release
-
 on:
   push:
     branches: [ master ]
@@ -9,27 +9,22 @@ permissions:
   contents: write
   issues: write
   pull-requests: write
-  actions: read
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # needed for changelog + previous tags
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+          fetch-depth: 0  # full history (tags included)
+      - name: Ensure tags
+        run: git fetch --tags --force
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-
-      - name: Install
-        run: npm ci
-
+      - run: npm ci
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run release
+        run: npx semantic-release
