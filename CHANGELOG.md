@@ -1,3 +1,15 @@
+# Changelog
+
+
+
+## 1.1.0 (2025-09-22)
+
+### Added
+- ✨  Fixing gitmoji cli [[0e4f208](https://github.com/llanas-web/invocloud/commit/0e4f208dd7b14c35bcf6a76a27f275499ce5314e)]
+
+### Fixed
+- 🐛  Fixing release name from cicd [[ae6e1f0](https://github.com/llanas-web/invocloud/commit/ae6e1f0c238dd8c27560fbb3c15caa51ea952426)]
+
 # v1.0.0 (2025-09-22)
 
 ## ✨ New Features
