@@ -1,0 +1,73 @@
+## {{nextRelease.version}} ({{datetime 'UTC:yyyy-mm-dd'}})
+
+{{!-- Added --}}
+{{#if (any commits 'sparkles')}}
+### Added
+{{#each (merge commits 'sparkles')}}
+{{> commit}}
+{{/each}}
+
+{{/if}}
+
+{{!-- Fixed --}}
+{{#if (any commits 'bug' 'ambulance')}}
+### Fixed
+{{#each (merge commits 'bug' 'ambulance')}}
+{{> commit}}
+{{/each}}
+
+{{/if}}
+
+{{!-- Security --}}
+{{#if (any commits 'lock')}}
+### Security
+{{#each (merge commits 'lock')}}
+{{> commit}}
+{{/each}}
+
+{{/if}}
+
+{{!-- Changed / Refactor / Build --}}
+{{#if (any commits 'recycle' 'wrench' 'hammer' 'package' 'truck')}}
+### Changed
+{{#each (merge commits 'recycle' 'wrench' 'hammer' 'package' 'truck')}}
+{{> commit}}
+{{/each}}
+
+{{/if}}
+
+{{!-- Docs --}}
+{{#if (any commits 'memo')}}
+### Documentation
+{{#each (merge commits 'memo')}}
+{{> commit}}
+{{/each}}
+
+{{/if}}
+
+{{!-- UI --}}
+{{#if (any commits 'lipstick')}}
+### UI
+{{#each (merge commits 'lipstick')}}
+{{> commit}}
+{{/each}}
+
+{{/if}}
+
+{{!-- Tests --}}
+{{#if (any commits 'white_check_mark' 'test_tube')}}
+### Tests
+{{#each (merge commits 'white_check_mark' 'test_tube')}}
+{{> commit}}
+{{/each}}
+
+{{/if}}
+
+{{!-- Chores --}}
+{{#if (any commits 'broom' 'fire' 'wastebasket')}}
+### Chores
+{{#each (merge commits 'broom' 'fire' 'wastebasket')}}
+{{> commit}}
+{{/each}}
+
+{{/if}}
