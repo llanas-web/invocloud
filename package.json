@@ -8,7 +8,9 @@
     "dev": "nuxt dev --inspect",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "prepare": "husky",
+    "release": "semantic-release"
   },
   "dependencies": {
     "@nuxt/content": "^3.5.1",
@@ -32,7 +34,15 @@
     "zod": "^3.24.4"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.6",
     "@types/mime-types": "^3.0.1",
-    "nuxt-resend": "^0.0.2"
+    "commitlint-plugin-gitmoji": "^2.2.6",
+    "husky": "^9.1.7",
+    "nuxt-resend": "^0.0.2",
+    "semantic-release": "^24.2.9",
+    "semantic-release-gitmoji": "^1.6.8"
   }
 }
