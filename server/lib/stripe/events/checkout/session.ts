@@ -3,6 +3,9 @@ import { StripeHandlerContext } from "~~/server/lib/stripe/context";
 import { sessionMetadataSchema } from "~~/server/lib/stripe/schema";
 import { fromUnix, nowISO } from "~/utils/date";
 
+import { format } from "date-fns";
+import { fr } from "date-fns/locale/fr";
+
 const getSubscriptionId = (session: Stripe.Checkout.Session) => {
     const { subscription } = session;
     if (!subscription) {
@@ -87,5 +90,37 @@ export async function handleCheckoutSessionCompleted(
         console.log(
             `✅ Checkout session completed for ${establishmentId}. Checkout status: ${subscriptionStatus}`,
         );
+
+        const { emails } = useResend();
+        const { data: user, error } = await ctx.supabase.from("users").select(
+            "email",
+        )
+            .eq("id", userId).single();
+        if (!user || error) {
+            console.error("❌ No user email found");
+            return;
+        }
+        try {
+            await emails.send({
+                from: `InvoCloud <${process.env.RESEND_EMAIL_FROM}>`,
+                to: [user.email],
+                subject: "Confirmation abonnement Invocloud",
+                html: `Bonjour,<br><br>` +
+                    `<p>Merci pour votre abonnement à Invocloud ! Votre essai gratuit de 7 jours a commencé. Vous pouvez dès à présent profiter de toutes les fonctionnalités premium.</p>` +
+                    `<p>Votre abonnement commencera le ${
+                        format(
+                            fromUnix(subscription.trial_end)!,
+                            "dd/MM/yyyy",
+                            {
+                                locale: fr,
+                            },
+                        )
+                    }</p><br><br>` +
+                    `<p>Si vous avez des questions, n'hésitez pas à nous contacter: <a href="mailto:contact@invocloud.fr">contact@invocloud.fr</a></p><br>` +
+                    `<p>L'équipe InvoCloud</p>`,
+            });
+        } catch (error) {
+            console.error("❌ Failed to send email:", error);
+        }
     }
 }
