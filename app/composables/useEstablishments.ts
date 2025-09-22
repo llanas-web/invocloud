@@ -148,6 +148,26 @@ const _useEstablishments = () => {
         return { success, message };
     };
 
+    const deleteEstablishment = async () => {
+        // First cancel any active subscriptions or trials
+        if (selectedEstablishment.value?.subscription_status === "active") {
+            await cancelStripeSubscription();
+        } else if (
+            selectedEstablishment.value?.subscription_status === "trialing"
+        ) {
+            await cancelStripeTrial();
+        }
+        const { error } = await supabaseClient
+            .from("establishments")
+            .delete()
+            .eq("id", selectedEstablishment.value!.id);
+        if (error) {
+            console.error("Error deleting establishment:", error);
+            return false;
+        }
+        return true;
+    };
+
     return {
         establishments,
         selectedEstablishment,
@@ -158,6 +178,7 @@ const _useEstablishments = () => {
         subscribeToStripe,
         cancelStripeTrial,
         cancelStripeSubscription,
+        deleteEstablishment,
     };
 };
 
