@@ -1,3 +1,128 @@
+# v1.0.0 (2025-09-22)
+
+## ✨ New Features
+- [`9d61734`](https://github.com/llanas-web/invocloud/commit/9d61734)  Setting auth pages 
+- [`7cf9f4c`](https://github.com/llanas-web/invocloud/commit/7cf9f4c)  Adding customer page 
+- [`d4e5fd8`](https://github.com/llanas-web/invocloud/commit/d4e5fd8)  Adding CRUD customers 
+- [`ac88960`](https://github.com/llanas-web/invocloud/commit/ac88960)  Adding Invoices dashboard 
+- [`6abd3a3`](https://github.com/llanas-web/invocloud/commit/6abd3a3)  Upload new Invoice 
+- [`e4852ca`](https://github.com/llanas-web/invocloud/commit/e4852ca)  Anonymous send invoice modal 
+- [`bae7331`](https://github.com/llanas-web/invocloud/commit/bae7331)  Adding resend email send 
+- [`4bac84a`](https://github.com/llanas-web/invocloud/commit/4bac84a)  Adding pending invoices on dashboard layout 
+- [`34ed226`](https://github.com/llanas-web/invocloud/commit/34ed226)  ADding pending invoices 
+- [`7b9a46e`](https://github.com/llanas-web/invocloud/commit/7b9a46e)  ADding decoonexion 
+- [`516298e`](https://github.com/llanas-web/invocloud/commit/516298e)  Sending invoices to customers 
+- [`24de956`](https://github.com/llanas-web/invocloud/commit/24de956)  Adding invoice viewer modal 
+- [`23a5f2b`](https://github.com/llanas-web/invocloud/commit/23a5f2b)  Adding invoices date sorting 
+- [`c635f8b`](https://github.com/llanas-web/invocloud/commit/c635f8b)  Fixing supplier handling and establishments 
+- [`062fbd9`](https://github.com/llanas-web/invocloud/commit/062fbd9)  Adding establishment dropdown menu 
+- [`5e7e292`](https://github.com/llanas-web/invocloud/commit/5e7e292)  Adding invoice details page 
+- [`7c18dee`](https://github.com/llanas-web/invocloud/commit/7c18dee)  Adding invoices based on establishment selection 
+- [`38b6d69`](https://github.com/llanas-web/invocloud/commit/38b6d69)  Adding favorite establishment 
+- [`59765dd`](https://github.com/llanas-web/invocloud/commit/59765dd)  Adding settings page 
+- [`144f763`](https://github.com/llanas-web/invocloud/commit/144f763)  Adding establishments settings 
+- [`c522bf3`](https://github.com/llanas-web/invocloud/commit/c522bf3)  Adding members invitation 
+- [`5e957f3`](https://github.com/llanas-web/invocloud/commit/5e957f3)  Adding list members and establishment status 
+- [`3e6b7ab`](https://github.com/llanas-web/invocloud/commit/3e6b7ab)  Adding establishment member and status and invitation 
+- [`1db661f`](https://github.com/llanas-web/invocloud/commit/1db661f)  Adding notification and security pages 
+- [`3425416`](https://github.com/llanas-web/invocloud/commit/3425416)  Adding home stats 
+- [`e23adc9`](https://github.com/llanas-web/invocloud/commit/e23adc9)  Adding Strip payment 
+- [`2cd29cc`](https://github.com/llanas-web/invocloud/commit/2cd29cc)  Create invoice from new page 
+- [`f877d74`](https://github.com/llanas-web/invocloud/commit/f877d74)  Adding TVA to invoice table 
+- [`d43e849`](https://github.com/llanas-web/invocloud/commit/d43e849)  Adding edit supplier modal 
+- [`743571a`](https://github.com/llanas-web/invocloud/commit/743571a)  Plug stripe payment to signup 
+- [`0fd904e`](https://github.com/llanas-web/invocloud/commit/0fd904e)  Adding overdue and filename 
+- [`75d9328`](https://github.com/llanas-web/invocloud/commit/75d9328)  Using Vue Pdf Viewer 
+- [`e091715`](https://github.com/llanas-web/invocloud/commit/e091715)  Fixing home stats with real stats 
+- [`5fd3033`](https://github.com/llanas-web/invocloud/commit/5fd3033)  Adding home page link in navbar 
+- [`e12aae1`](https://github.com/llanas-web/invocloud/commit/e12aae1)  Fixing home page 
+- [`6516c60`](https://github.com/llanas-web/invocloud/commit/6516c60)  Fixing app invoices page with stats 
+- [`fe1f135`](https://github.com/llanas-web/invocloud/commit/fe1f135)  Adding paid_at_ to invoice and fixing invoice table screen and form 
+- [`6df72b3`](https://github.com/llanas-web/invocloud/commit/6df72b3)  Adding supplier creation from invoice create form 
+- [`aabf65d`](https://github.com/llanas-web/invocloud/commit/aabf65d)  Adding on pending-card stats click filter 
+- [`5ddfdc8`](https://github.com/llanas-web/invocloud/commit/5ddfdc8)  Storing selected establishment in local storage 
+- [`1c3c24f`](https://github.com/llanas-web/invocloud/commit/1c3c24f)  ADding month range selection 
+- [`9dbb5be`](https://github.com/llanas-web/invocloud/commit/9dbb5be)  Fixing add user to establishment 
+- [`cb3bfd4`](https://github.com/llanas-web/invocloud/commit/cb3bfd4)  Fixing sign-up process and force payment for unsubscribe establishment 
+- [`fc9e121`](https://github.com/llanas-web/invocloud/commit/fc9e121)  Delete pending invoice 
+- [`17e80cb`](https://github.com/llanas-web/invocloud/commit/17e80cb)  Setting email from env variable 
+- [`f976a07`](https://github.com/llanas-web/invocloud/commit/f976a07)  Removing sleep from getting establishement 
+- [`73b66ed`](https://github.com/llanas-web/invocloud/commit/73b66ed)  Adding created_at in invoice creation and fixing invoice form 
+- [`783ba91`](https://github.com/llanas-web/invocloud/commit/783ba91)  Adding created_at in invoice update form and fixing form 
+- [`5018109`](https://github.com/llanas-web/invocloud/commit/5018109)  Adding CGU PDC and FAQ pages 
+- [`151ad5e`](https://github.com/llanas-web/invocloud/commit/151ad5e)  Adding pdf.js env variable 
+- [`50f56f8`](https://github.com/llanas-web/invocloud/commit/50f56f8)  Adding month selection and supplier filter 
+- [`1e65229`](https://github.com/llanas-web/invocloud/commit/1e65229)  Removing taxe amount 
+- [`e2cfeba`](https://github.com/llanas-web/invocloud/commit/e2cfeba)  Fixing upload invoice when logged in 
+- [`176dcd4`](https://github.com/llanas-web/invocloud/commit/176dcd4)  Adding reset password feature 
+- [`a34f301`](https://github.com/llanas-web/invocloud/commit/a34f301)  Adding CGU and home website link 
+- [`7ab4560`](https://github.com/llanas-web/invocloud/commit/7ab4560)  Adding download button 
+- [`73c1a57`](https://github.com/llanas-web/invocloud/commit/73c1a57)  Adding mime types detection to download worker 
+- [`d60d4ff`](https://github.com/llanas-web/invocloud/commit/d60d4ff)  Adding contact emails in website 
+- [`367d437`](https://github.com/llanas-web/invocloud/commit/367d437)  Adding nuxt robots for seo 
+- [`2050be7`](https://github.com/llanas-web/invocloud/commit/2050be7)  Adding github changelog and version workflow 
+
+## 🐛 Bug Fixes
+- [`3c8275a`](https://github.com/llanas-web/invocloud/commit/3c8275a)  Fix login layout and stakeholders 
+- [`f3c0f67`](https://github.com/llanas-web/invocloud/commit/f3c0f67)  Fixing unexisting impots 
+- [`46d5e27`](https://github.com/llanas-web/invocloud/commit/46d5e27)  Fixing invoice delete and dropdown menu 
+- [`00c63de`](https://github.com/llanas-web/invocloud/commit/00c63de)  Fixing upload method 
+- [`4316564`](https://github.com/llanas-web/invocloud/commit/4316564)  Multiple fixes 
+- [`8049509`](https://github.com/llanas-web/invocloud/commit/8049509)  Adding name to send-invoice email 
+- [`abc3c3c`](https://github.com/llanas-web/invocloud/commit/abc3c3c)  Fixing file type on invoices viewer 
+- [`bd39419`](https://github.com/llanas-web/invocloud/commit/bd39419)  fixing loading establishments first 
+- [`4df13c2`](https://github.com/llanas-web/invocloud/commit/4df13c2)  Fixing send modal 
+- [`41ada5b`](https://github.com/llanas-web/invocloud/commit/41ada5b)  fixing delete modal 
+- [`660b2b0`](https://github.com/llanas-web/invocloud/commit/660b2b0)  Fixing plural woring and modal display 
+- [`d095919`](https://github.com/llanas-web/invocloud/commit/d095919)  Removing pending from states change 
+- [`65e6490`](https://github.com/llanas-web/invocloud/commit/65e6490)  Fix establishment selection 
+- [`cbf15d4`](https://github.com/llanas-web/invocloud/commit/cbf15d4)  Refreshing suppliers on selected establishment changes 
+- [`3bc778f`](https://github.com/llanas-web/invocloud/commit/3bc778f)  Fixing user menu redirection 
+- [`757b5b5`](https://github.com/llanas-web/invocloud/commit/757b5b5)  Fixing anonymous upload 
+- [`2ff7644`](https://github.com/llanas-web/invocloud/commit/2ff7644)  Fixing invoice delete modal closing 
+- [`598e942`](https://github.com/llanas-web/invocloud/commit/598e942)  Fixing useInvoiceUpload renaming 
+- [`7d9d4d2`](https://github.com/llanas-web/invocloud/commit/7d9d4d2)  Fixing index upload popup 
+- [`9bf850b`](https://github.com/llanas-web/invocloud/commit/9bf850b)  Fixing pdf view on mobile 
+- [`54de1e1`](https://github.com/llanas-web/invocloud/commit/54de1e1)  Fixing send invoice when auth 
+- [`eb1c634`](https://github.com/llanas-web/invocloud/commit/eb1c634)  Removing anonymous auth from request-upload on user auth 
+- [`e2d5db0`](https://github.com/llanas-web/invocloud/commit/e2d5db0)  Fixing manual invoice upload 
+- [`871ffcf`](https://github.com/llanas-web/invocloud/commit/871ffcf)  Multiple fix for demo 
+- [`fdac36c`](https://github.com/llanas-web/invocloud/commit/fdac36c)  Fixing error on no establishment selected upload invoice 
+- [`ee7d8a6`](https://github.com/llanas-web/invocloud/commit/ee7d8a6)  Open /stripe/webhook api calls for stripe 
+- [`49a3044`](https://github.com/llanas-web/invocloud/commit/49a3044)  Fixing sign-up 
+- [`6655213`](https://github.com/llanas-web/invocloud/commit/6655213)  Removing status update on checkout complete 
+- [`33a766e`](https://github.com/llanas-web/invocloud/commit/33a766e)  Fixing stripe webhook for trailing status 
+- [`c3ddbc6`](https://github.com/llanas-web/invocloud/commit/c3ddbc6)  Fixing index logo onclick 
+- [`2318739`](https://github.com/llanas-web/invocloud/commit/2318739)  Default invoices date at null 
+- [`3460455`](https://github.com/llanas-web/invocloud/commit/3460455)  Fixing statging 
+- [`0d7235d`](https://github.com/llanas-web/invocloud/commit/0d7235d)  Storing establishment in storage only if user is authenticated 
+- [`197f97b`](https://github.com/llanas-web/invocloud/commit/197f97b)  Fixing ogImage Seo 
+- [`75861f4`](https://github.com/llanas-web/invocloud/commit/75861f4)  Fixing pdf view on mobile for new invoice 
+- [`ffe55c8`](https://github.com/llanas-web/invocloud/commit/ffe55c8)  Fixing typo traduction and icons in index 
+- [`f529aca`](https://github.com/llanas-web/invocloud/commit/f529aca)  fixing autofocus on modal invoice upload 
+- [`59f6891`](https://github.com/llanas-web/invocloud/commit/59f6891)  Fixing lang on Uapp and html 
+- [`7cf1058`](https://github.com/llanas-web/invocloud/commit/7cf1058)  Few fixes 
+- [`3b2146d`](https://github.com/llanas-web/invocloud/commit/3b2146d)  Fixing invoice status filter 
+- [`4dafb83`](https://github.com/llanas-web/invocloud/commit/4dafb83)  Fixing pdf viewer with license 
+- [`6b83b93`](https://github.com/llanas-web/invocloud/commit/6b83b93)  Fixing filter and status 
+- [`71af8c8`](https://github.com/llanas-web/invocloud/commit/71af8c8)  Fixing invoice number 
+- [`9bfb250`](https://github.com/llanas-web/invocloud/commit/9bfb250)  Adding link to FAQ Policy and CGU on index footer 
+- [`b176a55`](https://github.com/llanas-web/invocloud/commit/b176a55)  Fixing import from new nuxt4 structure 
+- [`bf00e0a`](https://github.com/llanas-web/invocloud/commit/bf00e0a)  Fixing upload when connected 
+- [`1c35a98`](https://github.com/llanas-web/invocloud/commit/1c35a98)  Fixing form upl;oad 
+- [`dc80ece`](https://github.com/llanas-web/invocloud/commit/dc80ece)  Fixing bugs 
+- [`f1daf71`](https://github.com/llanas-web/invocloud/commit/f1daf71)  Fixing icons 
+- [`c10ed07`](https://github.com/llanas-web/invocloud/commit/c10ed07)  Fixing listing establishment on upmload file while connected 
+- [`96177a3`](https://github.com/llanas-web/invocloud/commit/96177a3)  Hidden amount error message and default to 0 
+- [`5558b4f`](https://github.com/llanas-web/invocloud/commit/5558b4f)  Fixing structure favorite selection 
+- [`08c310d`](https://github.com/llanas-web/invocloud/commit/08c310d)  Fixing date format for insert in database 
+- [`a0c2a18`](https://github.com/llanas-web/invocloud/commit/a0c2a18)  Fixing validated status on create invoice 
+- [`fd93c45`](https://github.com/llanas-web/invocloud/commit/fd93c45)  Fixing worker supabase auth session for RLS errors 
+- [`c4eaeb4`](https://github.com/llanas-web/invocloud/commit/c4eaeb4)  Fixing date range comparaison 
+
+## 🚑 Critical Hotfixes
+- [`8f37c54`](https://github.com/llanas-web/invocloud/commit/8f37c54)  Fixing file upload
+
 # Changelog
 
 <a name="0.0.1"></a>
@@ -193,5 +318,3 @@
 - 🏷️ Update types [[57e56e7](https://github.com/llanas-web/invocloud/commit/57e56e792b51eed9fde336f6acdf7aae385a80c5)]
 - 🧐 Removing establishments requires in stakeholders [[e8c08ca](https://github.com/llanas-web/invocloud/commit/e8c08cad7058f926c042f0ea95a182e5b918e56e)]
 - 🏷️ Adding database types [[8b23c00](https://github.com/llanas-web/invocloud/commit/8b23c00f6785928723274f4e86b3382b4172127f)]
-
-
