@@ -4,6 +4,7 @@ import {
 } from "#supabase/server";
 import { format } from "date-fns";
 import * as z from "zod";
+import { sendEmail } from "~~/server/lib/email";
 import { Database } from "~~/types/database.types";
 
 const schema = z.object({
@@ -123,23 +124,16 @@ export default defineEventHandler(async (event) => {
         }
         console.log("Existing user added to establishment successfully");
 
-        const { emails } = useResend();
-
-        try {
-            await emails.send({
-                from: `InvoCloud <${process.env.RESEND_EMAIL_FROM}>`,
-                to: [existingUser.email],
-                subject: "Vous avez été ajouté à un établissement",
-                html:
-                    `Bonjour ${
-                        existingUser.full_name || existingUser.email
-                    },<br><br>` +
-                    `Vous avez été ajouté à l'établissement <strong>${establishment.name}</strong> par <strong>${
-                        session.session!.user.email
-                    }</strong>.<br><br>`,
-            });
-        } catch (error) {
-            console.error("Error sending email:", error);
+        const emailSend = await sendEmail(
+            [existingUser.email],
+            "Vous avez été ajouté à un établissement",
+            `Bonjour ${existingUser.full_name || existingUser.email},<br><br>` +
+                `Vous avez été ajouté à l'établissement <strong>${establishment.name}</strong> par <strong>${
+                    session.session!.user.email
+                }</strong>.<br><br>`,
+        );
+        if (!emailSend) {
+            console.error("Error sending email");
             throw createError({
                 status: 500,
                 message: "Erreur lors de l'envoi de l'email de confirmation",
