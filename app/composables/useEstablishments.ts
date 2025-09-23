@@ -161,6 +161,7 @@ const _useEstablishments = () => {
             .from("establishments")
             .delete()
             .eq("id", selectedEstablishment.value!.id);
+        await refresh();
         if (error) {
             console.error("Error deleting establishment:", error);
             return false;
