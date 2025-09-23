@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { fr } from '@nuxt/ui/locale'
-import { Analytics } from '@vercel/analytics/nuxt';
+  import { LazyCommonConfirmModal } from '#components';
+  import { fr } from '@nuxt/ui/locale'
+  import { Analytics } from '@vercel/analytics/nuxt';
 </script>
 
 <template>

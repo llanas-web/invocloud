@@ -1,9 +1,19 @@
 <script setup lang="ts">
   import { EstablishmentsMembersInviteForm } from '#components'
 
+  const { confirm } = useConfirmModal()
   const { selectedEstablishment, deleteEstablishment } = useEstablishments()
 
   const onDeleteEstablishment = async () => {
+
+    const confirmResult = await confirm({
+      title: 'Suppression de l\'établissement',
+      description: 'Êtes-vous sûr de vouloir supprimer cet établissement ? Cette action est irréversible.',
+      validateLabel: 'Supprimer',
+      rejectLabel: 'Annuler',
+      danger: true,
+    });
+    if (!confirmResult) return;
     const response = await deleteEstablishment()
     if (response) {
       useToast().add({
@@ -11,7 +21,6 @@
         color: "success",
       })
       // Redirect to home or establishments list page
-      useRouter().push('/app/settings/establishments');
     } else {
       useToast().add({
         title: "Échec de la suppression de l'établissement",
