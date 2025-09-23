@@ -10,6 +10,7 @@ import {
 } from "~~/server/lib/supabase/client";
 import type { Establishment } from "~~/types/index";
 import type { User } from "@supabase/supabase-js";
+import { sendEmail } from "~~/server/lib/email";
 
 const schema = z.object({
     senderEmail: z.string().email(),
@@ -117,23 +118,19 @@ export default defineEventHandler(async (event) => {
             });
         }
 
-        const { emails } = useResend();
-
-        try {
-            await emails.send({
-                from: `InvoCloud <${process.env.RESEND_EMAIL_FROM}>`,
-                to: [senderEmail],
-                subject: "Confirmez votre envoie de facture",
-                html: `Bonjour,<br><br>` +
-                    `Pour valider l'envoie de votre facture, veuillez saisir le code suivant dans l'application : <strong>${code}</strong>.<br><br>` +
-                    `Ce code est valide jusqu'au <strong>${
-                        format(expiresAt, "dd/MM/yyyy HH:mm:ss", { locale: fr })
-                    }</strong>.<br><br>` +
-                    `Si vous n'avez pas demandé cet envoi, veuillez ignorer ce message.<br><br>` +
-                    `<p>L'équipe InvoCloud</p>`,
-            });
-        } catch (error) {
-            console.error("Error sending email:", error);
+        const emailSend = await sendEmail(
+            [senderEmail],
+            "Confirmez votre envoie de facture",
+            `Bonjour,<br><br>` +
+                `Pour valider l'envoie de votre facture, veuillez saisir le code suivant dans l'application : <strong>${code}</strong>.<br><br>` +
+                `Ce code est valide jusqu'au <strong>${
+                    format(expiresAt, "dd/MM/yyyy HH:mm:ss", { locale: fr })
+                }</strong>.<br><br>` +
+                `Si vous n'avez pas demandé cet envoi, veuillez ignorer ce message.<br><br>` +
+                `<p>L'équipe InvoCloud</p>`,
+        );
+        if (emailSend) {
+            console.error("Error sending email");
             throw createError({
                 status: 500,
                 message: "Erreur lors de l'envoi de l'e-mail de confirmation",
