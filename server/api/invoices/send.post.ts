@@ -1,12 +1,11 @@
 import { z } from "zod";
 import { parseBody } from "~~/server/lib/common";
+import { sendEmail } from "~~/server/lib/email";
 import {
     serverClient,
     serverServiceRole,
     serverUser,
 } from "~~/server/lib/supabase/client";
-
-const { emails } = useResend();
 
 const schema = z.object({
     invoices: z.array(z.string().uuid()),
@@ -55,11 +54,11 @@ export default defineEventHandler(async (event) => {
         ...invoice,
     }));
     const signedUrls = data.map((item) => item.signedUrl);
-    const { data: emailData, error: emailError } = await emails.send({
-        from: `InvoCloud <${process.env.RESEND_EMAIL_FROM}>`,
-        to: [email],
-        subject: `Factures de ${user.email}`,
-        html: `<p>Cher utilisateur,</p>
+
+    const emailSend = await sendEmail(
+        [email],
+        `Factures de ${user.email}`,
+        `<p>Cher utilisateur,</p>
                <p>Voici vos factures :</p>
                <ul>${
             populatedInvoicesWithSignedUrl.map((invoice) =>
@@ -69,8 +68,8 @@ export default defineEventHandler(async (event) => {
         }</ul>
                <p>Cordialement,</p>
                <p>L'équipe InvoCloud</p>`,
-    });
-    if (emailError) {
+    );
+    if (!emailSend) {
         throw createError({
             status: 500,
             message: "Erreur lors de l'envoi des factures",
@@ -79,6 +78,5 @@ export default defineEventHandler(async (event) => {
     return {
         success: true,
         message: "Factures envoyées avec succès",
-        data: emailData,
     };
 });
