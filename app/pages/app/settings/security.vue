@@ -4,6 +4,7 @@
 
   const { resetPassword } = useAuth()
   const { deleteAccount } = useUser()
+  const { confirm } = useConfirmModal()
 
   const passwordSchema = z.object({
     new: z.string().min(8, 'Must be at least 8 characters'),
@@ -31,6 +32,14 @@
   }
 
   const onDeleteAccount = async () => {
+    const confirmResult = await confirm({
+      title: 'Suppression du compte',
+      description: 'Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.',
+      validateLabel: 'Supprimer',
+      rejectLabel: 'Annuler',
+      danger: true,
+    });
+    if (!confirmResult) return;
     const response = await deleteAccount();
     if (response) {
       useToast().add({
