@@ -1,155 +1,156 @@
 <script setup lang="ts">
-import type { NavigationMenuItem } from '@nuxt/ui'
-import { LazyInvoicesUploadModalContainer } from '#components'
-import Establishments from '~/pages/app/settings/establishments.vue'
+    import type { NavigationMenuItem } from '@nuxt/ui'
+    import { LazyInvoicesUploadModalContainer, LazyCommonConfirmModal } from '#components'
 
-const route = useRoute()
-const router = useRouter()
+    const route = useRoute()
+    const router = useRouter()
 
-// get the subscription_success from the query params
-const subscriptionSuccess = route.query.subscription_success === 'true'
-const toast = useToast()
-const open = ref(false)
+    // get the subscription_success from the query params
+    const subscriptionSuccess = route.query.subscription_success === 'true'
+    const toast = useToast()
+    const open = ref(false)
 
-const { pending, selectedEstablishment, establishments, subscribeToStripe } = useEstablishments()
-const user = useSupabaseUser()
+    const { pending, selectedEstablishment, establishments, subscribeToStripe } = useEstablishments()
+    const user = useSupabaseUser()
 
-const isEstablishementActive = computed(() => {
-    if (router.currentRoute.value.name?.toString().includes('app-settings')) {
-        return true;
-    }
-    return selectedEstablishment.value?.subscription_status === 'active' || selectedEstablishment.value?.subscription_status === 'trialing'
-})
-
-onMounted(() => {
-    if (subscriptionSuccess) {
-        toast.add({
-            icon: 'i-lucide-check-circle',
-            title: 'Abonnement activé! 🎉',
-            description: 'Votre abonnement a été activé avec succès.',
-            color: 'success',
-            duration: 5000,
-            actions: [{
-                label: 'Gérer les abonnements',
-                color: 'neutral',
-                variant: 'outline',
-                icon: 'i-lucide-settings',
-                size: 'sm',
-                onClick: () => {
-                    navigateTo('/app/settings/establishments#subscriptions')
-                }
-            }]
-        })
-    }
-})
-
-
-const links = ref<NavigationMenuItem[][]>([[
-    {
-        label: 'Factures',
-        icon: 'i-lucide-files',
-        to: '/app',
-        slot: 'invoices',
-        onSelect: () => {
-            open.value = false
+    const isEstablishementActive = computed(() => {
+        if (router.currentRoute.value.name?.toString().includes('app-settings')) {
+            return true;
         }
-    }, {
-        label: 'Fournisseurs',
-        icon: 'i-lucide-users',
-        to: '/app/suppliers',
-        onSelect: () => {
-            open.value = false
+        return selectedEstablishment.value?.subscription_status === 'active' || selectedEstablishment.value?.subscription_status === 'trialing'
+    })
+
+    onMounted(() => {
+        if (subscriptionSuccess) {
+            toast.add({
+                icon: 'i-lucide-check-circle',
+                title: 'Abonnement activé! 🎉',
+                description: 'Votre abonnement a été activé avec succès.',
+                color: 'success',
+                duration: 5000,
+                actions: [{
+                    label: 'Gérer les abonnements',
+                    color: 'neutral',
+                    variant: 'outline',
+                    icon: 'i-lucide-settings',
+                    size: 'sm',
+                    onClick: () => {
+                        navigateTo('/app/settings/establishments#subscriptions')
+                    }
+                }]
+            })
         }
-    },
-    {
-        label: 'Paramètres',
-        to: '/app/settings',
-        icon: 'i-lucide-settings',
-        defaultOpen: false,
-        type: 'trigger',
-        children: [{
-            label: 'General',
+    })
+
+
+    const links = ref<NavigationMenuItem[][]>([[
+        {
+            label: 'Factures',
+            icon: 'i-lucide-files',
+            to: '/app',
+            slot: 'invoices',
+            onSelect: () => {
+                open.value = false
+            }
+        }, {
+            label: 'Fournisseurs',
+            icon: 'i-lucide-users',
+            to: '/app/suppliers',
+            onSelect: () => {
+                open.value = false
+            }
+        },
+        {
+            label: 'Paramètres',
             to: '/app/settings',
-            exact: true,
-            onSelect: () => {
-                open.value = false
-            }
+            icon: 'i-lucide-settings',
+            defaultOpen: false,
+            type: 'trigger',
+            children: [{
+                label: 'General',
+                to: '/app/settings',
+                exact: true,
+                onSelect: () => {
+                    open.value = false
+                }
+            }, {
+                label: 'Établissements',
+                to: '/app/settings/establishments',
+                onSelect: () => {
+                    open.value = false
+                }
+            }, {
+                label: 'Notifications',
+                to: '/app/settings/notifications',
+                onSelect: () => {
+                    open.value = false
+                }
+            }, {
+                label: 'Securité',
+                to: '/app/settings/security',
+                onSelect: () => {
+                    open.value = false
+                }
+            }],
+        },
+    ], [
+        {
+            label: 'Website',
+            icon: 'i-lucide-home',
+            to: '/',
+            target: '_blank'
         }, {
-            label: 'Établissements',
-            to: '/app/settings/establishments',
-            onSelect: () => {
-                open.value = false
-            }
-        }, {
-            label: 'Notifications',
-            to: '/app/settings/notifications',
-            onSelect: () => {
-                open.value = false
-            }
-        }, {
-            label: 'Securité',
-            to: '/app/settings/security',
-            onSelect: () => {
-                open.value = false
-            }
-        }],
-    },
-], [
-    {
-        label: 'Website',
-        icon: 'i-lucide-home',
-        to: '/',
-        target: '_blank'
-    }, {
-        label: 'CGU',
-        icon: 'i-lucide-info',
-        to: '/cgu',
-        target: '_blank'
-    },
-    {
-        label: 'Politique de confidentialité',
-        icon: 'i-lucide-lock',
-        to: '/pdc',
-        target: '_blank'
-    }]])
+            label: 'CGU',
+            icon: 'i-lucide-info',
+            to: '/cgu',
+            target: '_blank'
+        },
+        {
+            label: 'Politique de confidentialité',
+            icon: 'i-lucide-lock',
+            to: '/pdc',
+            target: '_blank'
+        }]])
 
-// A décommenter lorsqu'on mettra en place les cookies
-// onMounted(async () => {
-//     const cookie = useCookie('cookie-consent')
-//     if (cookie.value === 'accepted') {
-//         return
-//     }
+    // A décommenter lorsqu'on mettra en place les cookies
+    // onMounted(async () => {
+    //     const cookie = useCookie('cookie-consent')
+    //     if (cookie.value === 'accepted') {
+    //         return
+    //     }
 
-//     toast.add({
-//         title: 'Nous utilisons des cookies 🍪',
-//         duration: 0,
-//         close: false,
-//         actions: [{
-//             label: 'Accepter',
-//             color: 'neutral',
-//             variant: 'outline',
-//             onClick: () => {
-//                 cookie.value = 'accepted'
-//             }
-//         }, {
-//             label: 'Refuser',
-//             color: 'neutral',
-//             variant: 'ghost'
-//         }]
-//     })
-// })
+    //     toast.add({
+    //         title: 'Nous utilisons des cookies 🍪',
+    //         duration: 0,
+    //         close: false,
+    //         actions: [{
+    //             label: 'Accepter',
+    //             color: 'neutral',
+    //             variant: 'outline',
+    //             onClick: () => {
+    //                 cookie.value = 'accepted'
+    //             }
+    //         }, {
+    //             label: 'Refuser',
+    //             color: 'neutral',
+    //             variant: 'ghost'
+    //         }]
+    //     })
+    // })
 
-const onSubscribe = async () => {
-    if (!selectedEstablishment.value) {
-        toast.add({
-            title: 'Aucun établissement sélectionné',
-            description: 'Veuillez sélectionner un établissement avant de vous abonner.',
-            color: 'warning',
-        })
-        return
+    const onSubscribe = async () => {
+        if (!selectedEstablishment.value) {
+            toast.add({
+                title: 'Aucun établissement sélectionné',
+                description: 'Veuillez sélectionner un établissement avant de vous abonner.',
+                color: 'warning',
+            })
+            return
+        }
+        await subscribeToStripe()
     }
-    await subscribeToStripe()
-}
+
+    const isModalOpen = ref(true)
 
 </script>
 
@@ -237,7 +238,5 @@ const onSubscribe = async () => {
             </template>
         </template>
         <UProgress class="w-full" v-else :ui="{ base: 'rounded-none', indicator: 'rounded-none' }" />
-
-        <!-- <NotificationsSlideover /> -->
     </UDashboardGroup>
 </template>
