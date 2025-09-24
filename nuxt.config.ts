@@ -66,7 +66,13 @@ export default defineNuxtConfig({
     description: "Gérez vos factures en toute simplicité",
   },
   sitemap: {
-    exclude: ["/auth/**", "/app/**"],
-    include: ["/"],
+    exclude: [
+      "/app/**",
+      "/auth/callback",
+      "/auth/confirm",
+      "/auth/forgot-password",
+      "/auth/update-password",
+    ],
+    include: ["/", "/auth/login", "/auth/sign-up", "/faq", "/cgu"],
   },
 });
