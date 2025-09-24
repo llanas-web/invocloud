@@ -1,9 +1,33 @@
 <script setup lang="ts">
-    import type { NavigationMenuItem } from '@nuxt/ui'
+    import type { FormSubmitEvent, NavigationMenuItem } from '@nuxt/ui'
     import { LazyInvoicesUploadModalContainer, LazyCommonConfirmModal } from '#components'
+    import { z } from 'zod'
 
     const route = useRoute()
     const router = useRouter()
+    const { createEstablishment } = useEstablishments()
+
+    const schema = z.object({
+        name: z.string().min(2, 'Too short'),
+    })
+
+    type Schema = z.output<typeof schema>
+
+    const state = reactive<Partial<Schema>>({
+        name: undefined
+    })
+
+    async function onSubmit(event: FormSubmitEvent<Schema>) {
+        const { name } = event.data
+        const newEstablishment = await createEstablishment(name)
+        if (!newEstablishment) {
+            toast.add({ title: 'Error', description: 'Erreur lors de la création de l\'établissement', color: 'error' })
+            return
+        }
+        toast.add({ title: 'Success', description: `Nouvel établissement ${newEstablishment.name} ajouté`, color: 'success' })
+        open.value = false
+        state.name = undefined
+    }
 
     // get the subscription_success from the query params
     const subscriptionSuccess = route.query.subscription_success === 'true'
@@ -236,6 +260,38 @@
                     </template>
                 </UDashboardPanel>
             </template>
+        </template>
+        <template v-else-if="!pending && establishments.length === 0">
+            <UDashboardPanel id="invoices">
+                <template #header>
+                    <UDashboardNavbar title="Aucun établissement" :ui="{ title: 'text-muted' }" />
+                </template>
+
+                <template #body>
+                    <div class="max-w-lg flex flex-col items-center justify-center gap-4 p-4 mx-auto">
+                        <div>
+                            <h2 class="text-left text-4xl font-bold text-muted">
+                                Bonjour <span class="text-primary">
+                                    {{ user?.user_metadata?.full_name || user?.email }}</span>
+                            </h2>
+                            <div class="mt-1 text-left text-muted mb-4 font-sans">
+                                Terminez votre inscription à <span class="text-primary">
+                                    Invocloud
+                                </span>
+                            </div>
+                        </div>
+                        <UForm :schema="schema" :state="state" class="w-full space-y-4" @submit="onSubmit">
+                            <UFormField label="Nom de l'établissement" placeholder="Nom de l'établissement" name="name">
+                                <UInput v-model="state.name" class="w-full" />
+                            </UFormField>
+                            <div class="flex justify-end gap-2">
+                                <UButton label="Annuler" color="neutral" variant="subtle" @click="open = false" />
+                                <UButton label="Créer" color="primary" variant="solid" type="submit" />
+                            </div>
+                        </UForm>
+                    </div>
+                </template>
+            </UDashboardPanel>
         </template>
         <UProgress class="w-full" v-else :ui="{ base: 'rounded-none', indicator: 'rounded-none' }" />
     </UDashboardGroup>

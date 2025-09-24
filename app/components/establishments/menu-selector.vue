@@ -1,41 +1,41 @@
 <script setup lang="ts">
-import type { LazyEstablishmentsAddModal } from '#components';
-import type { DropdownMenuItem } from '@nuxt/ui'
+    import type { LazyEstablishmentsAddModal } from '#components';
+    import type { DropdownMenuItem } from '@nuxt/ui'
 
-const props = defineProps<{
-    collapsed?: boolean
-}>()
+    const props = defineProps<{
+        collapsed?: boolean
+    }>()
 
-const { establishments, selectedEstablishment, pending } = useEstablishments()
-const { userSettings, toggleFavorite } = useUserSettings()
+    const { establishments, selectedEstablishment, pending } = useEstablishments()
+    const { userSettings, toggleFavorite } = useUserSettings()
 
-const addModel = useTemplateRef<typeof LazyEstablishmentsAddModal>('addModal')
+    const addModel = useTemplateRef<typeof LazyEstablishmentsAddModal>('addModal')
 
-const items = computed<DropdownMenuItem[][]>(() => {
-    console.log(userSettings.value);
-    return [
-        establishments.value.map(establishment => ({
-            id: establishment.id,
-            label: establishment.name,
-            onSelect() {
-                selectedEstablishment.value = establishment;
-            },
-            isFavorite: userSettings.value.favorite_establishment_id === establishment.id,
-        })), [{
-            label: 'Créer une structure',
-            icon: 'i-lucide-circle-plus',
-            onSelect() {
-                addModel.value?.showModal();
-            }
-        }, {
-            label: 'Gérer la structure',
-            icon: 'i-lucide-cog'
-        }]]
-})
+    const items = computed<DropdownMenuItem[][]>(() => {
+        console.log(userSettings.value);
+        return [
+            establishments.value.map(establishment => ({
+                id: establishment.id,
+                label: establishment.name,
+                onSelect() {
+                    selectedEstablishment.value = establishment;
+                },
+                isFavorite: userSettings.value.favorite_establishment_id === establishment.id,
+            })), [{
+                label: 'Créer une structure',
+                icon: 'i-lucide-circle-plus',
+                onSelect() {
+                    addModel.value?.showModal();
+                }
+            }, {
+                label: 'Gérer la structure',
+                icon: 'i-lucide-cog'
+            }]]
+    })
 </script>
 
 <template>
-    <template v-if="pending || establishments.length === 0">
+    <template v-if="pending">
         <USkeleton class="h-9 w-full" />
     </template>
     <UDropdownMenu v-else :items="items" :content="{ align: 'center', collisionPadding: 12 }"
