@@ -1,4 +1,34 @@
 import { defineEventHandler, setResponseStatus } from "h3";
+import {
+    serverClient,
+    serverServiceRole,
+    serverUser,
+} from "~~/server/lib/supabase/client";
+
+type PostmarkInbound = {
+    From: string;
+    FromFull: { Email: string; Name: string };
+    To: string;
+    ToFull: { Email: string; Name: string }[];
+    Cc: string;
+    CcFull: { Email: string; Name: string }[];
+    Bcc: string;
+    BccFull: { Email: string; Name: string }[];
+    Subject: string;
+    TextBody: string;
+    HtmlBody: string;
+    Tag: string;
+    MessageID: string;
+    Attachments: {
+        Name: string;
+        ContentType: string;
+        ContentLength: number;
+        Content: string; // base64
+    }[];
+    OriginalRecipient: string;
+    CampaignID: string | null;
+    MessageStream: string;
+};
 
 export default defineEventHandler(async (event) => {
     // Expect Basic Auth: "Basic base64(username:password)"
@@ -21,21 +51,114 @@ export default defineEventHandler(async (event) => {
         setResponseStatus(event, 401);
         return { error: "Unauthorized" };
     }
+    console.log("Inbound auth: successful");
 
     // Postmark sends JSON for inbound
-    const body = await readBody(event);
+    const {
+        FromFull: sender,
+        ToFull: recipients,
+        Subject: subject,
+        Attachments: attachments,
+    } = await readBody<PostmarkInbound>(event);
+
+    if (attachments.length === 0) {
+        console.error("No attachments found in email from:", sender.Email);
+        throw createError({ status: 400, message: "No attachments found" });
+    }
 
     // TODO: lookup alias -> établissement, stockage, création facture
     console.log("[INBOUND]", {
-        from: body?.FromFull?.Email,
-        to: body?.ToFull?.map((t: any) => t.Email),
-        subject: body?.Subject,
-        attachments: body?.Attachments?.map((a: any) => ({
+        from: sender.Email,
+        to: recipients.map((t) => t.Email),
+        subject,
+        attachments: attachments.map((a) => ({
             name: a.Name,
             type: a.ContentType,
             size: a.ContentLength,
         })),
     });
+
+    const supabaseServiceRole = serverServiceRole(event);
+
+    const recipientEmail = recipients?.[0]?.Email?.toLowerCase();
+    if (!sender?.Email || !recipientEmail) {
+        throw createError({ status: 400, message: "Invalid email data" });
+    }
+
+    // local-part: remove '+tag' if present
+    const localPartFull = recipientEmail.split("@")[0]; // e.g. "eurl-llanas+tag"
+    const emailPrefix = localPartFull.split("+")[0];
+
+    // 1) Trouver l'établissement par email_prefix
+    const { data: est, error: estErr } = await supabaseServiceRole
+        .from("establishments")
+        .select("id, email_prefix")
+        .eq("email_prefix", emailPrefix)
+        .maybeSingle();
+    if (estErr || !est) {
+        throw createError({ status: 404, message: "Unknown recipient alias" });
+    }
+
+    console.log("Matched establishment:", est.id, est.email_prefix);
+    console.log("sender.Email:", sender.Email);
+    console.log("recipientEmail:", recipientEmail);
+
+    const { data: supplier, error: suppliersError } = await supabaseServiceRole
+        .from("suppliers").select("*").eq("establishment_id", est.id).overlaps(
+            "emails",
+            [sender.Email],
+        ).maybeSingle();
+
+    if (suppliersError || !supplier) {
+        console.error("Supplier lookup error:", suppliersError);
+        throw createError({
+            status: 403,
+            message: "Sender not authorized for this establishment",
+        });
+    }
+    console.log("Authorized sender for establishment:", est.id);
+
+    const preferred = attachments.find((a) =>
+        a.ContentType === "application/pdf"
+    ) ?? attachments[0];
+
+    const newInvoiceId = crypto.randomUUID();
+    const sanitizedName = (preferred.Name || "invoice.pdf").replace(
+        /[^a-zA-Z0-9._-]/g,
+        "_",
+    );
+    const path = `${est.id}/${newInvoiceId}/${sanitizedName}`;
+
+    // 4) Upload Storage
+    const { error: uploadError } = await supabaseServiceRole
+        .storage.from("invoices")
+        .upload(path, Buffer.from(preferred.Content, "base64"), {
+            contentType: preferred.ContentType || "application/octet-stream",
+            upsert: false,
+        });
+    if (uploadError) {
+        throw createError({ status: 500, message: "Attachment upload failed" });
+    }
+
+    if (uploadError) {
+        console.error("Attachment upload error:", uploadError);
+        throw createError({ status: 500, message: "Attachment upload failed" });
+    }
+    console.log("Attachment uploaded to path:", path);
+
+    const { data: invoice, error: invoiceError } = await supabaseServiceRole
+        .from("invoices").insert({
+            id: crypto.randomUUID(),
+            supplier_id: supplier.id,
+            file_path: path,
+            comment: subject,
+        }).select().single();
+
+    if (invoiceError) {
+        console.error("Invoice creation error:", invoiceError);
+        throw createError({ status: 500, message: "Invoice creation failed" });
+    }
+    console.log("Invoice record created, id:", invoice.id);
 
     return { ok: true };
 });
