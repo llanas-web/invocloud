@@ -1,44 +1,47 @@
 <script lang="ts" setup>
-import * as z from 'zod'
-import type { FormSubmitEvent } from '@nuxt/ui'
+    import * as z from 'zod'
+    import type { FormSubmitEvent } from '@nuxt/ui'
 
-const { selectedEstablishment, updateEstablishment } = useEstablishments()
-const { currentUser } = useUser()
-const toast = useToast()
+    const { selectedEstablishment, updateEstablishment } = useEstablishments()
+    const { currentUser } = useUser()
+    const toast = useToast()
 
-const establishmentSchema = z.object({
-    name: z.string().min(2, 'Establishment name is required'),
-    address: z.string().optional(),
-    phone: z.string().optional(),
-})
-
-const establishmentState = computed(() => ({
-    name: selectedEstablishment.value?.name || '',
-    address: selectedEstablishment.value?.address || '',
-    phone: selectedEstablishment.value?.phone || '',
-}))
-
-const isAdmin = computed(() => selectedEstablishment.value?.creator_id === currentUser.value?.id)
-
-const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof establishmentSchema>>) => {
-    const { name, address, phone } = payload.data
-    const { data, error } = await updateEstablishment({
-        name,
-        address,
-        phone
+    const establishmentSchema = z.object({
+        name: z.string().min(2, 'Establishment name is required'),
+        address: z.string().optional(),
+        phone: z.string().optional(),
+        email_prefix: z.string().min(2, 'Email prefix is required'),
     })
-    if (data) {
-        toast.add({
-            title: 'Establishment updated successfully',
-            color: 'success',
+
+    const establishmentState = computed(() => ({
+        name: selectedEstablishment.value?.name || '',
+        address: selectedEstablishment.value?.address || '',
+        phone: selectedEstablishment.value?.phone || '',
+        email_prefix: selectedEstablishment.value?.email_prefix || '',
+    }))
+
+    const isAdmin = computed(() => selectedEstablishment.value?.creator_id === currentUser.value?.id)
+
+    const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof establishmentSchema>>) => {
+        const { name, address, phone, email_prefix } = payload.data
+        const { data, error } = await updateEstablishment({
+            name,
+            address,
+            phone,
+            email_prefix: email_prefix,
         })
-    } else {
-        toast.add({
-            title: 'Failed to update establishment',
-            color: 'error',
-        })
+        if (data) {
+            toast.add({
+                title: 'Establishment updated successfully',
+                color: 'success',
+            })
+        } else {
+            toast.add({
+                title: 'Failed to update establishment',
+                color: 'error',
+            })
+        }
     }
-}
 </script>
 
 <template>
@@ -47,7 +50,8 @@ const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof establishmentSch
         <UPageCard :title="`Informations de la structure`"
             description="Renseignez les informations de votre structure qui se retrouverons dans les emails et les documents générés par InvoCloud"
             variant="naked" orientation="horizontal" class="mb-4">
-            <UTooltip v-if="!isAdmin" text="Seul le créateur de la structure peut modifier ces informations." :delay-duration="0">
+            <UTooltip v-if="!isAdmin" text="Seul le créateur de la structure peut modifier ces informations."
+                :delay-duration="0">
                 <UButton form="settings" label="Sauvegarder" color="primary" type="submit" class="w-fit lg:ms-auto"
                     disabled />
             </UTooltip>
@@ -68,6 +72,11 @@ const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof establishmentSch
             <UFormField name="phone" label="Téléphone" description="Numéro de téléphone de contact pour la structure."
                 class="flex max-sm:flex-col justify-between items-start gap-4">
                 <UInput v-model="establishmentState.phone" type="tel" autocomplete="off" />
+            </UFormField>
+            <UFormField name="email_prefix" label="Préfixe email"
+                description="Le préfixe email permet de recevoir des factures par email" required
+                class="flex max-sm:flex-col justify-between items-start gap-4">
+                <UInput v-model="establishmentState.email_prefix" autocomplete="off" />
             </UFormField>
         </UPageCard>
     </UForm>
