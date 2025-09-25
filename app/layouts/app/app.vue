@@ -5,7 +5,7 @@
 
     const route = useRoute()
     const router = useRouter()
-    const { createEstablishment } = useEstablishments()
+    const { createEstablishment, loaded } = useEstablishments()
 
     const schema = z.object({
         name: z.string().min(2, 'Too short'),
@@ -261,7 +261,7 @@
                 </UDashboardPanel>
             </template>
         </template>
-        <template v-else-if="!pending && establishments.length === 0">
+        <template v-else-if="loaded && !pending && establishments.length === 0">
             <UDashboardPanel id="invoices">
                 <template #header>
                     <UDashboardNavbar title="Aucun établissement" :ui="{ title: 'text-muted' }" />

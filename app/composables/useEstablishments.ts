@@ -7,6 +7,7 @@ const _useEstablishments = () => {
     const user = useSupabaseUser();
     const selectedEstablishment = ref<Establishment | null>(null);
     const { userSettings } = useUserSettings();
+    const loaded = ref(false);
 
     watch(() => selectedEstablishment.value, (newEstablishment) => {
         console.log("Selected establishment changed:", newEstablishment);
@@ -45,6 +46,7 @@ const _useEstablishments = () => {
             }
             const establishmentsData = data.map((item) => item.establishments);
             selectEstablishment(establishmentsData);
+            loaded.value = true;
             return establishmentsData;
         },
         {
@@ -190,6 +192,7 @@ const _useEstablishments = () => {
         establishments,
         selectedEstablishment,
         pending,
+        loaded,
         refresh,
         createEstablishment,
         updateEstablishment,
