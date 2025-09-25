@@ -73,6 +73,23 @@ const _useEstablishments = () => {
         return newEstablishment;
     };
 
+    const isEmailPrefixAvailable = async (email_prefix: string) => {
+        const { data, error } = await supabaseClient
+            .from("establishments")
+            .select("id")
+            .eq("email_prefix", email_prefix)
+            .neq("id", selectedEstablishment.value!.id)
+            .maybeSingle();
+
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Pour l'UX
+        console.log(data);
+        if (error) {
+            console.error("Error checking email prefix availability:", error);
+            return false;
+        }
+        return data === null;
+    };
+
     const updateEstablishment = async (
         establishment: Partial<EstablishmentUpdate>,
     ) => {
@@ -180,6 +197,7 @@ const _useEstablishments = () => {
         cancelStripeTrial,
         cancelStripeSubscription,
         deleteEstablishment,
+        isEmailPrefixAvailable,
     };
 };
 
