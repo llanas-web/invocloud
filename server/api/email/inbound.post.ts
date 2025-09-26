@@ -152,6 +152,7 @@ export default defineEventHandler(async (event) => {
             supplier_id: supplier.id,
             file_path: path,
             comment: subject,
+            source: "email",
         }).select().single();
 
     if (invoiceError) {

@@ -26,6 +26,7 @@
     "@zip.js/zip.js": "2.8.2",
     "date-fns": "^4.1.0",
     "mime-types": "^3.0.1",
+    "mindee": "^4.29.0-rc1",
     "nuxt": "^4.0.3",
     "stripe": "^18.2.1",
     "supabase": "^2.22.12",
