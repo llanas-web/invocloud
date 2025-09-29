@@ -5,8 +5,8 @@ import type {
     OcrSubmitResult,
     OcrWebhookPayload,
 } from "../types";
-import { readRawBody } from "h3";
-import { ClientV2, InputSource, internal, LocalResponse } from "mindee";
+import * as mindee from "mindee";
+import type { EventHandlerRequest, H3Event } from "h3";
 
 /**
  * Mindee Invoice API (predict v4)
@@ -14,11 +14,10 @@ import { ClientV2, InputSource, internal, LocalResponse } from "mindee";
  * Webhook signature header: `Mindee-Signature: t=...,v1=...`
  */
 export class MindeeProvider implements OcrProvider {
-    private endpoint =
-        "https://api.mindee.net/v1/products/mindee/invoices/v4/predict";
     private MINDEE_API_KEY = process.env.MINDEE_API_KEY;
     private MINDEE_MODEL_ID = process.env.MINDEE_MODEL_ID;
-    private webhookSecret = process.env.MINDEE_WEBHOOK_SECRET!; // configuré dans le dashboard Mindee
+    private MINDEE_WEBHOOK_ID = process.env.MINDEE_WEBHOOK_ID;
+    private MINDEE_WEBHOOK_SECRET = process.env.MINDEE_WEBHOOK_SECRET;
 
     private checkConfig() {
         if (!this.MINDEE_API_KEY) {
@@ -27,7 +26,10 @@ export class MindeeProvider implements OcrProvider {
         if (!this.MINDEE_MODEL_ID) {
             throw new Error("Mindee Model ID is not configured");
         }
-        if (!this.webhookSecret) {
+        if (!this.MINDEE_WEBHOOK_ID) {
+            throw new Error("Mindee Webhook secret is not configured");
+        }
+        if (!this.MINDEE_WEBHOOK_SECRET) {
             throw new Error("Mindee Webhook secret is not configured");
         }
     }
@@ -71,20 +73,27 @@ export class MindeeProvider implements OcrProvider {
         url: string,
         opts: OcrSubmitOptions,
     ): Promise<OcrSubmitResult> {
-        const inputSource = new internal.input.PathInput({
-            inputPath: url,
-        });
-        if (!this.MINDEE_API_KEY || !this.MINDEE_MODEL_ID) {
+        this.checkConfig();
+        if (
+            !this.MINDEE_API_KEY || !this.MINDEE_MODEL_ID ||
+            !this.MINDEE_WEBHOOK_ID
+        ) {
             throw createError({
                 status: 500,
                 message: "OCR service is not configured",
             });
         }
-        const mindeeClient = new ClientV2({ apiKey: this.MINDEE_API_KEY });
+        const mindeeClient = new mindee.ClientV2({
+            apiKey: this.MINDEE_API_KEY,
+        });
+        const loadedDocument = mindeeClient.docFromUrl(url);
+        await loadedDocument.init();
         const { job } = await mindeeClient.enqueueInference(
-            inputSource,
+            await loadedDocument.asLocalInputSource(),
             {
                 modelId: this.MINDEE_MODEL_ID,
+                webhookIds: [this.MINDEE_WEBHOOK_ID!],
+                alias: opts.invoiceId,
             },
         );
         if (!job) {
@@ -96,41 +105,143 @@ export class MindeeProvider implements OcrProvider {
         return { jobId: job.id };
     }
 
-    async parseWebhook(event: any): Promise<OcrWebhookPayload> {
-        const signatureHeader = getHeader(event, "mindee-signature") || "";
-        const body = await readBody(event);
-        const localResponse = new LocalResponse(body);
-        await localResponse.init();
-        const isValid = localResponse.isValidHmacSignature(
-            "obviously-fake-secret-key",
-            signatureHeader,
-        );
-        if (!isValid) {
+    async parseWebhook(
+        event: H3Event<EventHandlerRequest>,
+    ): Promise<OcrWebhookPayload> {
+        this.checkConfig();
+        const sig = getHeader(event, "X-Signature") || "";
+        const raw = await readRawBody(event, "utf8");
+
+        console.log("Mindee Webhook received, signature:", sig);
+        console.log("Raw body:", raw);
+
+        if (!raw) {
             throw createError({
-                statusCode: 401,
-                statusMessage: "Unauthorized",
+                statusCode: 400,
+                statusMessage: "Empty body",
             });
         }
-        // Le corps JSON Mindee
-        const jobId: string | undefined = body?.job?.id ?? body?.document?.id;
 
-        // Mapping vers notre format commun
-        const p = body?.document?.inference?.prediction ?? {};
-        const pred: OcrPrediction = {
-            invoiceNumber: p?.invoice_number?.values?.[0]?.content ?? null,
-            totalTtc: p?.total_amount?.value ?? null,
-            currency: p?.total_amount?.currency ?? null,
-            dueDate: p?.due_date?.value ?? null,
-            providerRaw: body,
+        // 3) HMAC verify using raw
+        const lr = new mindee.LocalResponse(raw);
+        await lr.init();
+        const ok = lr.isValidHmacSignature(
+            process.env.MINDEE_WEBHOOK_SECRET!,
+            sig,
+        );
+        if (!ok) {
+            throw createError({
+                statusCode: 401,
+                statusMessage: "Invalid signature",
+            });
+        }
+
+        // 4) Only now parse JSON if you need to
+        const payload = JSON.parse(raw || "{}");
+
+        const jobId = payload?.job?.id ??
+            payload?.document?.id ??
+            payload?.inference?.id ??
+            null;
+
+        const {
+            invoiceNumber,
+            totalAmount,
+            currency,
+            dueDate,
+        } = extractInvoiceFields(payload);
+
+        return {
+            isValid: true,
+            jobId,
+            prediction: {
+                invoiceNumber,
+                totalTtc: totalAmount,
+                currency,
+                dueDate,
+            },
+            raw: payload,
         };
-
-        return { isValid: true, jobId, prediction: pred, raw: body };
     }
 }
 
-// util H3
 function getHeader(event: any, name: string): string | null {
     const v = event.node?.req?.headers?.[name] ??
         event.node?.req?.headers?.[name.toLowerCase()];
     return Array.isArray(v) ? v[0] : v ?? null;
+}
+
+/**
+ * Supports both:
+ *  - Prebuilt Invoice v4 => payload.document.inference.prediction
+ *  - V2/custom schema    => payload.inference.result.fields (map or array)
+ */
+function extractInvoiceFields(payload: any) {
+    // A) Prebuilt invoice v4 (common path)
+    const pred = payload?.document?.inference?.prediction;
+    if (pred) {
+        return {
+            invoiceNumber: pred?.invoice_number?.values?.[0]?.content ??
+                pred?.invoice_number?.value ?? null,
+            totalAmount: pred?.total_amount?.value ?? pred?.total_incl?.value ??
+                null,
+            currency: pred?.total_amount?.currency ?? null,
+            dueDate: pred?.due_date?.value ?? null,
+        };
+    }
+
+    // B) V2/custom: inference.result.fields
+    const fields = payload?.inference?.result?.fields;
+    if (fields) {
+        // fields can be a Map-like object or an array of { name, value, ... }
+        const getSimple = (name: string) => {
+            // object style
+            if (fields[name]?.value !== undefined) return fields[name].value;
+            if (fields[name]?.stringValue !== undefined) {
+                return fields[name].stringValue;
+            }
+            if (fields[name]?.numberValue !== undefined) {
+                return fields[name].numberValue;
+            }
+
+            // array style
+            if (Array.isArray(fields)) {
+                const f = fields.find((x: any) => x?.name === name);
+                if (!f) return null;
+                return f.value ?? f.stringValue ?? f.numberValue ?? null;
+            }
+            return null;
+        };
+
+        // sometimes currency is nested (e.g., locale.currency)
+        const getNestedCurrency = () => {
+            const locale = fields["locale"]?.fields ||
+                (Array.isArray(fields)
+                    ? fields.find((x: any) => x?.name === "locale")?.fields
+                    : null);
+            if (!locale) return null;
+
+            if (Array.isArray(locale)) {
+                const c = locale.find((x: any) => x?.name === "currency");
+                return c?.value ?? c?.stringValue ?? null;
+            }
+            return locale["currency"]?.value ??
+                locale["currency"]?.stringValue ?? null;
+        };
+
+        return {
+            invoiceNumber: getSimple("invoice_number"),
+            totalAmount: getSimple("total_amount"),
+            currency: getSimple("currency") ?? getNestedCurrency(),
+            dueDate: getSimple("due_date"),
+        };
+    }
+
+    // Unknown schema
+    return {
+        invoiceNumber: null,
+        totalAmount: null,
+        currency: null,
+        dueDate: null,
+    };
 }
