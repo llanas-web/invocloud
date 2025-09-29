@@ -2,7 +2,6 @@ import { defineEventHandler } from "h3";
 import { serverServiceRole } from "~~/server/lib/supabase/client";
 import { parseBody } from "~~/server/lib/common";
 import { z } from "zod";
-import { PathInput } from "mindee/src/input";
 import { getOcrProvider } from "~~/server/lib/ocr/factory";
 import { OcrProviderName } from "~~/server/lib/ocr/types";
 
@@ -73,6 +72,9 @@ export default defineEventHandler(async (event) => {
         });
     }
     console.log("Created invoice job:", invoiceJob.id);
+    await supabaseServiceRole.from("invoices").update({
+        status: "ocr",
+    }).eq("id", invoiceId);
 
     return { jobId: invoiceJob.id };
 });
