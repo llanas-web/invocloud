@@ -2,6 +2,11 @@
 
 
 
+## 1.1.1 (2025-09-30)
+
+### Fixed
+- 🚑  Hotfix production safeguard deletion [[283dfc0](https://github.com/llanas-web/invocloud/commit/283dfc030d4759e2944ecab4310a8821d0cb9dc2)]
+
 ## 1.1.0 (2025-09-22)
 
 ### Added
