@@ -2,6 +2,11 @@
 
 
 
+## 1.2.1 (2025-10-02)
+
+### Fixed
+- 🚑  Hotfix breaking changes and permissions [[2b4a5d6](https://github.com/llanas-web/invocloud/commit/2b4a5d61134e6c4d1a4594b95446ccaff4eb6a73)]
+
 ## 1.2.0 (2025-10-02)
 
 ### Added
