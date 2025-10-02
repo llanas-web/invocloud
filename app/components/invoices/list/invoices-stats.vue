@@ -40,7 +40,7 @@
 
 <template>
     <UPageGrid class="grid-cols-3 gap-4 sm:gap-6 lg:gap-px">
-        <UPageCard icon="i-lucide-euro" title="Volume" variant="subtle" :ui="{
+        <UPageCard icon="i-lucide-euro" title="Volumes" variant="subtle" :ui="{
             container: 'gap-y-1.5',
             wrapper: 'items-center md:items-start',
             leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25 flex-col',
