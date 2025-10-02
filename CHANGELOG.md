@@ -2,6 +2,28 @@
 
 
 
+## 1.2.0 (2025-10-02)
+
+### Added
+- ✨  Adding establishment delete [[40d8771](https://github.com/llanas-web/invocloud/commit/40d87718360e3696c53666138c02b8d0267cc09e)]
+- ✨  Adding email when subscription start [[638f2d9](https://github.com/llanas-web/invocloud/commit/638f2d9944d2d00cc1e1e1018db32004ae7c640d)]
+- ✨  Adding establishment creation on all estab deletion [[9c43b9c](https://github.com/llanas-web/invocloud/commit/9c43b9c03a0c4c54da926cfe903694693cdd8b76)]
+- ✨  Finalizing email inbound webhook [[b1122d0](https://github.com/llanas-web/invocloud/commit/b1122d090dd7647fea2922f225df634b9764fc78)]
+- ✨  Adding prefix_email update from establishment [[483ce84](https://github.com/llanas-web/invocloud/commit/483ce84c0c292acca57f3cf5dec22e2f12425b65)]
+- ✨  Adding ocr [[6991a4b](https://github.com/llanas-web/invocloud/commit/6991a4b0a191700e1c19bcae0e8cac1d899f9339)]
+- ✨  Creating vercel cron jobs for ocr_job [[8e2e6b9](https://github.com/llanas-web/invocloud/commit/8e2e6b92b1a8ea8d68ebf13fe6a492fa44a386a1)]
+
+### Fixed
+- 🐛  Fixing establishment loading screen [[0bc8782](https://github.com/llanas-web/invocloud/commit/0bc8782b6076649e75c6c57be5c1c8e707ecb8ee)]
+- 🐛  Fix ocr mindee implementation [[094ecb6](https://github.com/llanas-web/invocloud/commit/094ecb61a2be016c7d9afe8d7e45056e03f8eede)]
+
+### Security
+- 🔒 ️ Fixing inbound security [[b77b091](https://github.com/llanas-web/invocloud/commit/b77b0915126046d14452b955200049cdbf752163)]
+
+### Changed
+- ♻️  Refactoring email backendservice [[f26fcee](https://github.com/llanas-web/invocloud/commit/f26fceed79472aaafd56988a419017683fe626f9)]
+- ♻️  Making confirm modal abstract and programaticly used [[a824211](https://github.com/llanas-web/invocloud/commit/a824211926de41bb68c1b52fdb7df517f631041a)]
+
 ## 1.1.1 (2025-09-30)
 
 ### Fixed
