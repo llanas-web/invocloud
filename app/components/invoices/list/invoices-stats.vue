@@ -1,46 +1,46 @@
 <script setup lang="ts">
-import { useInvoicesTableList } from '~/composables/invoices/table-list';
+    import { useInvoicesTableList } from '~/composables/invoices/table-list';
 
-const { pending: invoicePending } = useInvoices();
-const { statusFilter, filteredInvoices } = useInvoicesTableList();
+    const { pending: invoicePending } = useInvoices();
+    const { statusFilter, filteredInvoices } = useInvoicesTableList();
 
-const invoicesStats = computed(() => {
-    const total = filteredInvoices.value.reduce(
-        (sum, invoice) => sum + (invoice.amount ?? 0),
-        0,
-    );
-    const count = filteredInvoices.value.length;
-    const pendingCount = filteredInvoices.value.filter(
-        (invoice) =>
-            invoice.overdue,
-    ).length;
-    return {
-        total,
-        count,
-        pendingCount,
-    };
-})
-
-function formatCurrency(value: number): string {
-    return value.toLocaleString('fr-FR', {
-        style: 'currency',
-        currency: 'EUR',
-        maximumFractionDigits: 0
+    const invoicesStats = computed(() => {
+        const total = filteredInvoices.value.reduce(
+            (sum, invoice) => sum + (invoice.amount ?? 0),
+            0,
+        );
+        const count = filteredInvoices.value.length;
+        const pendingCount = filteredInvoices.value.filter(
+            (invoice) =>
+                invoice.overdue,
+        ).length;
+        return {
+            total,
+            count,
+            pendingCount,
+        };
     })
-}
 
-const onPendingInvoiceClick = () => {
-    if (statusFilter.value === 'error') {
-        statusFilter.value = 'all'
-    } else {
-        statusFilter.value = 'error'
+    function formatCurrency(value: number): string {
+        return value.toLocaleString('fr-FR', {
+            style: 'currency',
+            currency: 'EUR',
+            maximumFractionDigits: 0
+        })
     }
-}
+
+    const onPendingInvoiceClick = () => {
+        if (statusFilter.value === 'error') {
+            statusFilter.value = 'all'
+        } else {
+            statusFilter.value = 'error'
+        }
+    }
 </script>
 
 <template>
     <UPageGrid class="grid-cols-3 gap-4 sm:gap-6 lg:gap-px">
-        <UPageCard icon="i-lucide-euro" title="Dépenses" variant="subtle" :ui="{
+        <UPageCard icon="i-lucide-euro" title="Volume" variant="subtle" :ui="{
             container: 'gap-y-1.5',
             wrapper: 'items-center md:items-start',
             leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25 flex-col',
