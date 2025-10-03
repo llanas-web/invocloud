@@ -2,6 +2,11 @@
 
 
 
+## 1.2.3 (2025-10-03)
+
+### Fixed
+- 🐛  Fixing upload source from uploads [[a4229c5](https://github.com/llanas-web/invocloud/commit/a4229c594c3c31e99731cffc417e89e2d077e1fb)]
+
 ## 1.2.2 (2025-10-03)
 
 ### Fixed
