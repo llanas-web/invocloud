@@ -1,4 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
+import createUserRepository from "#shared/repositories/user.repository";
 
 const defaultUserSettings = {
     favorite_establishment_id: null,
@@ -6,20 +7,16 @@ const defaultUserSettings = {
 
 export const _useUserSettings = () => {
     const supabase = useSupabaseClient();
+    const userRepository = createUserRepository(supabase);
     const user = useSupabaseUser();
 
     const { data: userSettings, error, refresh } = useAsyncData(
         "userSettings",
         async () => {
             console.log("Fetching user settings for user:", user.value?.id);
-            const { data, error } = await supabase
-                .from("user_settings")
-                .select("favorite_establishment_id")
-                .eq("user_id", user.value!.id)
-                .single();
-
-            console.log(data, error);
-
+            const { data, error } = await userRepository.getUserSettings(
+                user.value!.id,
+            );
             if (error && !data) {
                 return defaultUserSettings;
             }
@@ -34,15 +31,12 @@ export const _useUserSettings = () => {
 
     const toggleFavorite = async (establishmentId: string) => {
         if (userSettings.value.favorite_establishment_id === establishmentId) {
-            // unset
-            await supabase.from("user_settings").update({
+            await userRepository.updateUserSettings(user.value!.id, {
                 favorite_establishment_id: null,
-            }).eq("user_id", user.value!.id);
+            });
             userSettings.value.favorite_establishment_id = null;
         } else {
-            // set
-            await supabase.from("user_settings").upsert({
-                user_id: user.value!.id,
+            await userRepository.updateUserSettings(user.value!.id, {
                 favorite_establishment_id: establishmentId,
             });
         }
