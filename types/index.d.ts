@@ -5,6 +5,10 @@ export type User = Database["public"]["Tables"]["users"]["Row"];
 export type UserInsert = Database["public"]["Tables"]["users"]["Insert"];
 export type UserUpdate = Database["public"]["Tables"]["users"]["Update"];
 
+export type UserSettings = Database["public"]["Tables"]["user_settings"]["Row"];
+export type UserSettingsInsert =
+    Database["public"]["Tables"]["user_settings"]["Insert"];
+
 export type Establishment =
     Database["public"]["Tables"]["establishments"]["Row"];
 export type EstablishmentInsert =

@@ -1,4 +1,4 @@
-import type { User, UserUpdate } from "~~/types";
+import type { User, UserSettings, UserUpdate } from "~~/types";
 import type { Database } from "~~/types/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -60,11 +60,39 @@ const createUserRepository = (supabase: SupabaseClient<Database>) => {
         return true;
     };
 
+    const getUserSettings = async (id: string) => {
+        const response = await supabase
+            .from("user_settings")
+            .select("*")
+            .eq("user_id", id)
+            .single();
+        if (response.error) {
+            console.error("Error fetching user settings:", response.error);
+        }
+        return response;
+    };
+
+    const updateUserSettings = async (
+        id: string,
+        settings: Partial<UserSettings>,
+    ) => {
+        const response = await supabase
+            .from("user_settings")
+            .update(settings)
+            .eq("user_id", id);
+        if (response.error) {
+            console.error("Error updating user settings:", response.error);
+        }
+        return response;
+    };
+
     return {
         getUserById,
         updateUser,
         getUserByEmail,
         deleteUser,
+        getUserSettings,
+        updateUserSettings,
     };
 };
 
