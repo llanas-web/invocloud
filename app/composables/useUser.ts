@@ -1,31 +1,30 @@
 import { createSharedComposable } from "@vueuse/core";
 import type { UserUpdate } from "~~/types";
 import type { Database } from "~~/types/database.types";
+import createUserRepository from "#shared/repositories/user.repository";
 
 const _useUser = () => {
     const supabaseClient = useSupabaseClient<Database>();
     const user = useSupabaseUser();
     const { logout } = useAuth();
 
-    const { data: currentUser, error, refresh } = useAsyncData(async () => {
-        const { data } = await supabaseClient
-            .from("users")
-            .select("*")
-            .eq("id", user.value!.id)
-            .single();
+    const userRepository = createUserRepository(supabaseClient);
 
+    const { data: currentUser, error, refresh } = useAsyncData(async () => {
+        const { data } = await userRepository.getUserById(
+            user.value!.id,
+        );
         return data;
     }, {
         deep: true,
     });
 
     const updateUser = async (updates: Partial<UserUpdate>) => {
-        const { data, error: updateError } = await supabaseClient
-            .from("users")
-            .update(updates)
-            .eq("id", user.value!.id);
+        const { data, error: updateError } = await userRepository.updateUser(
+            user.value!.id,
+            updates,
+        );
         if (updateError) {
-            console.error("Error updating user:", updateError);
             return null;
         }
         await refresh();
@@ -33,14 +32,13 @@ const _useUser = () => {
     };
 
     const deleteAccount = async () => {
-        const { data, error } = await useFetch("/api/user/delete-account", {
-            method: "POST",
-        });
-        if (error.value) {
-            console.error("Error deleting account:", error.value);
+        const success = await userRepository.deleteUser(
+            user.value!.id,
+        );
+        if (!success) {
             return false;
         }
-        console.log("Account deleted successfully:", data.value);
+        console.log("Account deleted successfully:", success);
         await logout();
         return true;
     };
