@@ -5,6 +5,7 @@ import {
 import { format } from "date-fns";
 import * as z from "zod";
 import { sendEmail } from "~~/server/lib/email";
+import createEstablishmentRepository from "#shared/repositories/establishment.repository";
 import { Database } from "~~/types/database.types";
 
 const schema = z.object({
@@ -29,6 +30,11 @@ export default defineEventHandler(async (event) => {
     const { email, establishmentId, invitorId } = parsed.data;
 
     const supabaseClient = await serverSupabaseClient<Database>(event);
+    const supabaseServiceRole = serverSupabaseServiceRole<Database>(event);
+
+    const establishmentRepository = createEstablishmentRepository(
+        supabaseServiceRole,
+    );
 
     // 1. Check if the user is authenticated
     const { data: session, error: authError } = await supabaseClient.auth
@@ -49,28 +55,22 @@ export default defineEventHandler(async (event) => {
         });
     }
     // 2. Check if the establishment exists
-    const { data: establishment, error: establishmentError } =
-        await supabaseClient
-            .from("establishments")
-            .select("*")
-            .eq("id", establishmentId)
-            .single();
-    if (establishmentError || !establishment) {
+    const { data: establishments, error: establishmentError } =
+        await establishmentRepository.getEstablishmentsByIds([establishmentId]);
+    if (establishmentError || establishments.length === 0) {
         console.error("Establishment not found:", establishmentError);
         throw createError({
             status: 404,
             message: "Établissement non trouvé",
         });
     }
+    const establishment = establishments[0];
     // 3. Check if the user is already a member of the establishment
     if (establishment.creator_id !== userId) {
-        const { data: existingMember, error: memberError } =
-            await supabaseClient
-                .from("establishment_members")
-                .select("*")
-                .eq("user_id", userId)
-                .eq("establishment_id", establishmentId)
-                .single();
+        const { data: establishmentMembers, error: memberError } =
+            await establishmentRepository.getEstablishmentsMembers(
+                establishmentId,
+            );
         if (memberError) {
             console.error("Error checking existing member:", memberError);
             throw createError({
@@ -78,7 +78,12 @@ export default defineEventHandler(async (event) => {
                 message: "Erreur lors de la vérification de l'adhésion",
             });
         }
-        if (existingMember) {
+        if (
+            establishmentMembers.length > 0 &&
+            establishmentMembers.findIndex((member) =>
+                    member.user_id === userId
+                ) !== -1
+        ) {
             console.error("User is already a member of the establishment");
             throw createError({
                 status: 409,
@@ -87,8 +92,6 @@ export default defineEventHandler(async (event) => {
             });
         }
     }
-
-    const supabaseServiceRole = serverSupabaseServiceRole<Database>(event);
 
     // 5 Check if the member already exists in supabase
     const { data: existingUser, error: userError } = await supabaseServiceRole

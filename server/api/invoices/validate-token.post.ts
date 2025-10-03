@@ -2,6 +2,7 @@ import { z } from "zod";
 import { hashCode } from "~/utils/hash";
 import { parseBody } from "~~/server/lib/common";
 import { serverServiceRole, serverUser } from "~~/server/lib/supabase/client";
+import createEstablishmentRepository from "#shared/repositories/establishment.repository";
 
 const schema = z.object({
     uploadValidationId: z.string().uuid(),
@@ -12,6 +13,7 @@ export default defineEventHandler(async (event) => {
     const { uploadValidationId, token } = await parseBody(event, schema);
 
     const supabase = serverServiceRole(event);
+    const establishmentRepository = createEstablishmentRepository(supabase);
     const supabaseUser = await serverUser(event);
     if (!supabaseUser) {
         throw createError({
@@ -40,10 +42,9 @@ export default defineEventHandler(async (event) => {
     }
 
     const { data: possibleEstablishments, error: establishmentsError } =
-        await supabase
-            .from("establishments")
-            .select("id, name")
-            .in("id", uploadValidation.establishments);
+        await establishmentRepository.getEstablishmentsByIds(
+            uploadValidation.establishments,
+        );
 
     if (establishmentsError || !possibleEstablishments) {
         throw createError({

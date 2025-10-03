@@ -6,6 +6,7 @@ import { fromUnix, nowISO } from "~/utils/date";
 
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
+import createEstablishmentRepository from "~~/shared/repositories/establishment.repository";
 
 const getSubscriptionId = (session: Stripe.Checkout.Session) => {
     const { subscription } = session;
@@ -48,6 +49,9 @@ export async function handleCheckoutSessionCompleted(
 ) {
     const subscriptionId = getSubscriptionId(session);
     const customerId = getCustomerId(session.customer);
+    const establishmentRepository = createEstablishmentRepository(
+        ctx.supabase,
+    );
     if (!subscriptionId || !customerId) {
         console.error("❌ Missing subscription or customer ID");
         return;
@@ -74,16 +78,16 @@ export async function handleCheckoutSessionCompleted(
         ? "trialing"
         : "active";
 
-    const { error } = await ctx.supabase
-        .from("establishments")
-        .update({
+    const { error } = await establishmentRepository.updateEstablishment(
+        establishmentId,
+        {
             subscription_status: subscriptionStatus,
             stripe_customer_id: customerId,
             stripe_subscription_id: subscriptionId,
             subscription_start: nowISO(),
             trial_end: fromUnix(subscription.trial_end),
-        })
-        .eq("id", establishmentId);
+        },
+    );
 
     if (error) {
         console.error("❌ Failed to update establishment:", error);

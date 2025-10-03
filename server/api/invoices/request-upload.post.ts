@@ -11,6 +11,7 @@ import {
 import type { Establishment } from "~~/types/index";
 import type { User } from "@supabase/supabase-js";
 import { sendEmail } from "~~/server/lib/email";
+import createEstablishmentRepository from "#shared/repositories/establishment.repository";
 
 const schema = z.object({
     senderEmail: z.string().email(),
@@ -30,6 +31,9 @@ export default defineEventHandler(async (event) => {
 
     const supabase = await serverClient(event);
     const supabaseServiceRole = serverServiceRole(event);
+    const establishmentRepository = createEstablishmentRepository(
+        supabaseServiceRole,
+    );
 
     // 1. Check permission
     const { data: suppliers, error: suppliersError } = await supabaseServiceRole
@@ -141,11 +145,9 @@ export default defineEventHandler(async (event) => {
             (supplier) => supplier.establishment_id,
         );
         const { data: establishmentsData, error: establishmentsError } =
-            await supabaseServiceRole.from("establishments").select("id, name")
-                .in(
-                    "id",
-                    listEstablishmentIds,
-                );
+            await establishmentRepository.getEstablishmentsByIds(
+                listEstablishmentIds,
+            );
         console.log("Establishments data:", establishmentsData);
 
         if (establishmentsError) {
