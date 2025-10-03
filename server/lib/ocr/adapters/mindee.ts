@@ -86,10 +86,10 @@ export class MindeeProvider implements OcrProvider {
         const mindeeClient = new mindee.ClientV2({
             apiKey: this.MINDEE_API_KEY,
         });
-        const loadedDocument = mindeeClient.docFromUrl(url);
+        const loadedDocument = new mindee.UrlInput({ url });
         await loadedDocument.init();
         const { job } = await mindeeClient.enqueueInference(
-            await loadedDocument.asLocalInputSource(),
+            loadedDocument,
             {
                 modelId: this.MINDEE_MODEL_ID,
                 webhookIds: [this.MINDEE_WEBHOOK_ID!],

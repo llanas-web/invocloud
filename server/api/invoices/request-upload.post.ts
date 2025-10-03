@@ -129,7 +129,7 @@ export default defineEventHandler(async (event) => {
                 `Si vous n'avez pas demandé cet envoi, veuillez ignorer ce message.<br><br>` +
                 `<p>L'équipe InvoCloud</p>`,
         );
-        if (emailSend) {
+        if (!emailSend) {
             console.error("Error sending email");
             throw createError({
                 status: 500,
