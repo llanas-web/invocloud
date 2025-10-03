@@ -52,7 +52,9 @@ const _useInvoices = () => {
     );
 
     const pendingInvoices = computed(() =>
-        invoices.value?.filter((i) => i.status === "pending") || []
+        invoices.value?.filter((i) =>
+            i.status === "pending" || i.status === "ocr"
+        ) || []
     );
 
     const getInvoices = async () => {
@@ -150,7 +152,7 @@ const _useInvoices = () => {
             console.error("Invoice IDDs are required to send invoices.");
             return null;
         }
-        const { data, message, success } = await $fetch<
+        const { message, success } = await $fetch<
             ReturnType<
                 typeof import("~~/server/api/invoices/send.post").default
             >
@@ -168,7 +170,7 @@ const _useInvoices = () => {
             console.error("Error sending invoices:", message);
             return null;
         }
-        return data;
+        return success;
     };
 
     const getInvoliceUrl = async (invoiceId: string) => {
