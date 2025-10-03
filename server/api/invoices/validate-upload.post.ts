@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { parseBody } from "~~/server/lib/common";
 import { serverServiceRole, serverUser } from "~~/server/lib/supabase/client";
+import createInvoiceRepository from "#shared/repositories/invoice.repository";
 
 const schema = z.object({
     invoiceId: z.string().uuid(),
@@ -17,6 +18,7 @@ export default defineEventHandler(async (event) => {
         );
 
     const supabase = serverServiceRole(event);
+    const invoiceRepository = createInvoiceRepository(supabase);
     const user = await serverUser(event);
     if (!user) {
         throw createError({
@@ -83,7 +85,7 @@ export default defineEventHandler(async (event) => {
             });
         }
 
-        await supabase.from("invoices").insert({
+        await invoiceRepository.createInvoice([{
             id: invoiceId,
             file_path: filePath,
             amount: 0,
@@ -92,7 +94,7 @@ export default defineEventHandler(async (event) => {
             comment,
             name: fileName,
             source: "upload",
-        });
+        }]);
     }
 
     const response = {

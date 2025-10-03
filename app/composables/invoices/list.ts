@@ -1,4 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
+import createInvoiceRepository from "#shared/repositories/invoice.repository";
 import type { InvoiceInsert, InvoiceUpdate, Period, Range } from "~~/types";
 import type { Database } from "~~/types/database.types";
 import {
@@ -8,6 +9,7 @@ import {
 
 const _useInvoices = () => {
     const supabaseClient = useSupabaseClient<Database>();
+    const invoiceRepository = createInvoiceRepository(supabaseClient);
     const supabaseUser = useSupabaseUser();
     const { selectedEstablishment } = useEstablishments();
 
@@ -15,30 +17,14 @@ const _useInvoices = () => {
         useAsyncData(
             "invoices",
             async () => {
-                const { data, error } = await supabaseClient
-                    .from("invoices_with_establishment")
-                    .select("*")
-                    .eq(
-                        "establishment_id",
+                const { data, error } = await invoiceRepository
+                    .getInvoicesByEstablishment(
                         selectedEstablishment.value!.id,
                     );
                 if (error || !data) {
-                    console.error("Error fetching invoices:", error);
                     return [];
                 }
-                const parsedData = InvoiceWithEstablishmentSchema.array()
-                    .safeParse(
-                        data,
-                    );
-                if (!parsedData.success) {
-                    console.error(
-                        "Error parsing invoices data:",
-                        parsedData.error,
-                    );
-                    return [];
-                }
-                // If the establishment is not selected, return an empty array
-                return parsedData.data;
+                return data;
             },
             {
                 default: () => [],
@@ -68,14 +54,11 @@ const _useInvoices = () => {
             );
             return null;
         }
-        const { data, error } = await supabaseClient
-            .from("invoices")
-            .update(invoice)
-            .eq("id", invoiceId)
-            .select()
-            .single();
+        const { data, error } = await invoiceRepository.updateInvoice(
+            invoiceId,
+            invoice,
+        );
         if (error) {
-            console.error("Error updating invoice:", error);
             return null;
         }
         await refresh();
@@ -102,17 +85,11 @@ const _useInvoices = () => {
             console.error("Error uploading invoice file:", uploadError);
             return null;
         }
-        const { data, error } = await supabaseClient
-            .from("invoices")
-            .insert([{
-                ...invoice,
-                file_path: uploadData.path, // Store the file path
-            }])
-            .select()
-            .single();
-
+        const { data, error } = await invoiceRepository.createInvoice([{
+            ...invoice,
+            file_path: uploadData.path,
+        }]);
         if (error) {
-            console.error("Error creating invoice:", error);
             return null;
         }
         await refresh();
@@ -135,12 +112,10 @@ const _useInvoices = () => {
                 return null;
             }
         }
-        const { data, error } = await supabaseClient
-            .from("invoices")
-            .delete()
-            .in("id", invoiceIds);
+        const { data, error } = await invoiceRepository.deleteInvoices(
+            invoiceIds,
+        );
         if (error) {
-            console.error("Error deleting invoices:", error);
             return null;
         }
         await refresh();

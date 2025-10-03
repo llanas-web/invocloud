@@ -1,10 +1,12 @@
 import { createSharedComposable } from "@vueuse/core";
 import type { InvoiceUpdate } from "~~/types";
 import type { Database } from "~~/types/database.types";
+import createInvoiceRepository from "#shared/repositories/invoice.repository";
 
 const _useInvoiceDetails = () => {
     const route = useRoute();
     const supabaseClient = useSupabaseClient<Database>();
+    const invoiceRepository = createInvoiceRepository(supabaseClient);
     const { refresh, pending } = useInvoices();
 
     const invoiceId = computed(() => route.params.id as string);
@@ -22,22 +24,18 @@ const _useInvoiceDetails = () => {
                 );
                 return null;
             }
-            const { data, error } = await supabaseClient
-                .from("invoices")
-                .select(`*,
-                    supplier:suppliers(id, name)
-                `)
-                .eq("id", invoiceId.value)
-                .single();
-            if (error) {
-                console.error("Error fetching invoice details:", error);
+            const { data, error } = await invoiceRepository.getInvoicesByIds(
+                [invoiceId.value],
+            );
+            if (error || !data || data.length === 0) {
                 return null;
             }
+            const invoice = data[0]!;
             return {
-                ...data,
-                supplier: Array.isArray(data.supplier)
-                    ? data.supplier[0]
-                    : data.supplier,
+                ...invoice,
+                supplier: Array.isArray(invoice.supplier)
+                    ? invoice.supplier[0]
+                    : invoice.supplier,
             };
         },
         {
@@ -53,14 +51,11 @@ const _useInvoiceDetails = () => {
             );
             return null;
         }
-        const { data, error } = await supabaseClient
-            .from("invoices")
-            .update(invoice)
-            .eq("id", invoiceId)
-            .select()
-            .single();
+        const { data, error } = await invoiceRepository.updateInvoice(
+            invoiceId,
+            invoice,
+        );
         if (error) {
-            console.error("Error updating invoice:", error);
             return null;
         }
         await refresh();
