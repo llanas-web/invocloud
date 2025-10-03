@@ -2,6 +2,11 @@
 
 
 
+## 1.2.2 (2025-10-03)
+
+### Fixed
+- 🚑  Hotfix versions and mindee [[46fa4d0](https://github.com/llanas-web/invocloud/commit/46fa4d029da8fed10f6b74325c6f89bbc75dc450)]
+
 ## 1.2.1 (2025-10-02)
 
 ### Fixed
