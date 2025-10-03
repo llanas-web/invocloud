@@ -1,15 +1,14 @@
 import { createSharedComposable } from "@vueuse/core";
 import createInvoiceRepository from "#shared/repositories/invoice.repository";
-import type { InvoiceInsert, InvoiceUpdate, Period, Range } from "~~/types";
+import type { InvoiceInsert, InvoiceUpdate } from "~~/types";
 import type { Database } from "~~/types/database.types";
-import {
-    acceptedStatus,
-    InvoiceWithEstablishmentSchema,
-} from "~~/types/schemas/invoices";
+import { acceptedStatus } from "~~/types/schemas/invoices";
+import createStorageRepository from "#shared/repositories/storage.repository";
 
 const _useInvoices = () => {
     const supabaseClient = useSupabaseClient<Database>();
     const invoiceRepository = createInvoiceRepository(supabaseClient);
+    const storageRepository = createStorageRepository(supabaseClient);
     const supabaseUser = useSupabaseUser();
     const { selectedEstablishment } = useEstablishments();
 
@@ -73,16 +72,12 @@ const _useInvoices = () => {
         // generate id UUID
         invoice.id = crypto.randomUUID();
 
-        // Upload the invoice file to Supabase Storage
-        const { data: uploadData, error: uploadError } = await supabaseClient
-            .storage
-            .from("invoices")
-            .upload(
-                `${selectedEstablishment.value!.id}/${invoice.id}`,
+        const { data: uploadData, error: uploadError } = await storageRepository
+            .uploadInvoiceFile(
                 invoiceFile,
+                `${selectedEstablishment.value!.id}/${invoice.id}`,
             );
-        if (uploadError) {
-            console.error("Error uploading invoice file:", uploadError);
+        if (uploadError || !uploadData) {
             return null;
         }
         const { data, error } = await invoiceRepository.createInvoice([{
@@ -101,14 +96,12 @@ const _useInvoices = () => {
             console.error("No invoice IDs provided for deletion.");
             return null;
         }
-        // Delete the invoice files from Supabase Storage
         for (const invoiceId of invoiceIds) {
-            const { error: deleteError } = await supabaseClient
-                .storage
-                .from("invoices")
-                .remove([`${supabaseUser.value!.id}/${invoiceId}`]);
+            const { error: deleteError } = await storageRepository
+                .removeInvoiceFile(
+                    `${supabaseUser.value!.id}/${invoiceId}`,
+                );
             if (deleteError) {
-                console.error("Error deleting invoice file:", deleteError);
                 return null;
             }
         }
@@ -153,11 +146,11 @@ const _useInvoices = () => {
             console.error("Invoice ID is required to get the invoice URL.");
             return null;
         }
-        const { data, error } = await supabaseClient.storage
-            .from("invoices")
-            .createSignedUrl(`${supabaseUser.value!.id}/${invoiceId}`, 60);
-        if (error) {
-            console.error("Error creating signed URL for invoice:", error);
+        const { data, error } = await storageRepository.createSignedUrl(
+            `${supabaseUser.value!.id}/${invoiceId}`,
+            60,
+        );
+        if (error || !data) {
             return null;
         }
         return data.signedUrl;
@@ -165,9 +158,8 @@ const _useInvoices = () => {
 
     const downloadInvoiceFile = async (filePath: string) => {
         console.log("Downloading invoice file from path:", filePath);
-        const { data: blob, error } = await supabaseClient.storage
-            .from("invoices")
-            .download(filePath);
+        const { data: blob, error } = await storageRepository
+            .downloadInvoiceFile(filePath);
 
         if (error || !blob) throw error || new Error("No blob found");
         return blob;

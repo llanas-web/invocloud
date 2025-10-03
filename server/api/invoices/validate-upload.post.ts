@@ -2,6 +2,7 @@ import { z } from "zod";
 import { parseBody } from "~~/server/lib/common";
 import { serverServiceRole, serverUser } from "~~/server/lib/supabase/client";
 import createInvoiceRepository from "#shared/repositories/invoice.repository";
+import createStorageRepository from "#shared/repositories/storage.repository";
 
 const schema = z.object({
     invoiceId: z.string().uuid(),
@@ -19,6 +20,7 @@ export default defineEventHandler(async (event) => {
 
     const supabase = serverServiceRole(event);
     const invoiceRepository = createInvoiceRepository(supabase);
+    const storageRepository = createStorageRepository(supabase);
     const user = await serverUser(event);
     if (!user) {
         throw createError({
@@ -29,12 +31,9 @@ export default defineEventHandler(async (event) => {
     console.log("Authenticated user:", user.id);
 
     const filePath = `${selectedEstablishmentId}/${invoiceId}`;
-    const { data: uploadUrl } = await supabase
-        .storage
-        .from("invoices")
-        .createSignedUploadUrl(
-            filePath,
-        );
+    const { data: uploadUrl } = await storageRepository.createSignedUploadUrl(
+        filePath,
+    );
 
     if (!uploadUrl) {
         throw createError({

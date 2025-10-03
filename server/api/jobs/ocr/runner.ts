@@ -1,5 +1,6 @@
 import { getOcrProvider } from "~~/server/lib/ocr/factory";
 import { serverServiceRole } from "~~/server/lib/supabase/client";
+import createStorageRepository from "#shared/repositories/storage.repository";
 
 export default defineEventHandler(async (event) => {
     // SECURITY CHECK
@@ -16,6 +17,7 @@ export default defineEventHandler(async (event) => {
     // INIT
     const ocrProvider = getOcrProvider("mindee");
     const supabaseAdmin = serverServiceRole(event);
+    const storageRepository = createStorageRepository(supabaseAdmin);
 
     // GET THE JOBS
     const { data: jobs, error } = await supabaseAdmin
@@ -66,9 +68,11 @@ export default defineEventHandler(async (event) => {
     };
 
     // Getting the signedUrl
-    const { data: signedUrls, error: signedUrlError } = await supabaseAdmin
-        .storage.from("invoices")
-        .createSignedUrls(jobs.map((job) => job.invoice!.file_path), 60);
+    const { data: signedUrls, error: signedUrlError } = await storageRepository
+        .createSignedUrls(
+            jobs.map((job) => job.invoice!.file_path),
+            60,
+        );
     if (signedUrlError) {
         console.error("Error creating signed URLs:", signedUrlError);
         throw createError({

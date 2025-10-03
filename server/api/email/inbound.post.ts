@@ -3,6 +3,7 @@ import { serverServiceRole } from "~~/server/lib/supabase/client";
 import { InvoiceInsert } from "~~/types";
 import createEstablishmentRepository from "#shared/repositories/establishment.repository";
 import createInvoiceRepository from "#shared/repositories/invoice.repository";
+import createStorageRepository from "#shared/repositories/storage.repository";
 
 type PostmarkInbound = {
     From: string;
@@ -82,6 +83,7 @@ export default defineEventHandler(async (event) => {
         supabaseServiceRole,
     );
     const invoiceRepository = createInvoiceRepository(supabaseServiceRole);
+    const storageRepository = createStorageRepository(supabaseServiceRole);
 
     const recipientEmail = recipients?.[0]?.Email?.toLowerCase();
     if (!sender?.Email || !recipientEmail) {
@@ -135,15 +137,16 @@ export default defineEventHandler(async (event) => {
             );
             const path = `${est.id}/${newInvoiceId}/${sanitizedName}`;
 
-            // 4) Upload Storage
-            const { error: uploadError } = await supabaseServiceRole
-                .storage.from("invoices")
-                .upload(path, Buffer.from(a.Content, "base64"), {
-                    contentType: a.ContentType ||
-                        "application/octet-stream",
-                    upsert: false,
-                });
-            console.log("Attachment uploaded to path:", path);
+            const { error: uploadError } = await storageRepository
+                .uploadInvoiceFile(
+                    Buffer.from(a.Content, "base64") as unknown as File,
+                    path,
+                    {
+                        contentType: a.ContentType ||
+                            "application/octet-stream",
+                        upsert: false,
+                    },
+                );
             return { id: newInvoiceId, path };
         }),
     );
