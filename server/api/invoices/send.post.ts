@@ -7,6 +7,7 @@ import {
     serverUser,
 } from "~~/server/lib/supabase/client";
 import createInvoiceRepository from "#shared/repositories/invoice.repository";
+import createStorageRepository from "#shared/repositories/storage.repository";
 
 const schema = z.object({
     invoices: z.array(z.string().uuid()),
@@ -17,6 +18,7 @@ export default defineEventHandler(async (event) => {
     const { invoices, email } = await parseBody(event, schema);
     const supabase = await serverClient(event);
     const invoiceRepository = createInvoiceRepository(supabase);
+    const storageRepository = createStorageRepository(supabase);
     const user = await serverUser(event);
     const supabaseAdmin = serverServiceRole(event);
 
@@ -35,11 +37,10 @@ export default defineEventHandler(async (event) => {
             message: "Erreur lors de la récupération des factures",
         });
     }
-    const { data, error } = await supabaseAdmin.storage.from("invoices")
-        .createSignedUrls(
-            invoicesData.map((invoice) => invoice.file_path!),
-            60 * 60 * 24, // 24 hours
-        );
+    const { data, error } = await storageRepository.createSignedUrls(
+        invoicesData.map((invoice) => invoice.file_path!),
+        60 * 60 * 24, // 24 hours
+    );
     if (error) {
         throw createError({
             status: 500,
