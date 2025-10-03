@@ -2,6 +2,11 @@
 
 
 
+## 1.3.0 (2025-10-03)
+
+### Added
+- ✨  Making magic email multiple attachments [[93a68ed](https://github.com/llanas-web/invocloud/commit/93a68ed57878970375c09da8a44961fdee5e91ee)]
+
 ## 1.2.3 (2025-10-03)
 
 ### Fixed
