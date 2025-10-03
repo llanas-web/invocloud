@@ -1,106 +1,100 @@
 <script setup lang="ts">
-import type { TableColumn } from '@nuxt/ui'
+    import type { TableColumn } from '@nuxt/ui'
 
-const { pendingInvoices, deleteInvoices } = useInvoices()
+    const { pendingInvoices, deleteInvoices } = useInvoices()
 
-const UBadge = resolveComponent('UBadge')
-const UButton = resolveComponent('UButton')
-const toast = useToast()
+    const UBadge = resolveComponent('UBadge')
+    const UButton = resolveComponent('UButton')
+    const toast = useToast()
 
-// Use the type of the items inside the pendingInvoices ref's value
-type PendingInvoices = NonNullable<(typeof pendingInvoices)['value']>[number]
+    // Use the type of the items inside the pendingInvoices ref's value
+    type PendingInvoices = NonNullable<(typeof pendingInvoices)['value']>[number]
 
-const columns: TableColumn<PendingInvoices>[] = [
-    {
-        accessorKey: 'supplier',
-        header: 'Fournisseur',
-        cell: ({ row, table }) => {
-            return h('div', { class: 'flex items-center gap-3' }, [
-                h('div', undefined, [
-                    h('p', { class: 'font-medium text-highlighted' }, row.original.supplier_name),
+    const columns: TableColumn<PendingInvoices>[] = [
+        {
+            accessorKey: 'supplier',
+            header: 'Fournisseur',
+            cell: ({ row, table }) => {
+                return h('div', { class: 'flex items-center gap-3' }, [
+                    h('div', undefined, [
+                        h('p', { class: 'font-medium text-highlighted' }, row.original.supplier_name),
+                    ])
                 ])
-            ])
-        }
-    },
-    {
-        accessorKey: 'comment',
-        header: 'Commentaire',
-        cell: ({ row }) => {
-            return h('span', { class: 'font-medium text-highlighted' },
-                row.getValue('comment')
-            )
-        }
-    },
-    {
-        accessorKey: 'created_at',
-        header: 'Envoyé le',
-        cell: ({ row }) => {
-            return new Date(row.getValue('created_at')).toLocaleString('fr-FR', {
-                day: 'numeric',
-                month: 'short',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            })
-        }
-    },
-    {
-        accessorKey: 'status',
-        header: 'Status',
-        cell: ({ row }) => {
-            const color = {
-                paid: 'success' as const,
-                failed: 'error' as const,
-                refunded: 'neutral' as const
-            }[row.getValue('status') as string]
-
-            return h(UBadge, { variant: 'subtle', color }, () =>
-                "En attente"
-            )
-        }
-    },
-    {
-        accessorKey: 'Valider',
-        header: '',
-        cell: ({ row }) => {
-            return h('div', { class: 'flex justify-end items-center gap-3' }, [
-                h(UButton, {
-                    color: 'success',
-                    icon: 'i-lucide-check',
-                    size: 'sm',
-                    class: 'cursor-pointer',
-                    label: 'Accepter',
-                    onClick: () => {
-                        return navigateTo(`/app/invoices/${row.original.id}`)
-                    }
-                }),
-                h(UButton, {
-                    color: 'error',
-                    icon: 'i-lucide-x',
-                    size: 'sm',
-                    class: 'cursor-pointer',
-                    label: 'Refuser',
-                    onClick: async () => {
-                        const result = await deleteInvoices([row.original.id])
-                        if (result) {
-                            toast.add({
-                                title: 'Facture supprimée',
-                                description: 'La facture a été supprimée.',
-                                color: 'success'
-                            })
-                        } else {
-                            toast.add({
-                                title: 'Erreur',
-                                description: 'Une erreur est survenue lors de la suppression de la facture.',
-                                color: 'error'
-                            })
+            }
+        },
+        {
+            accessorKey: 'comment',
+            header: 'Commentaire',
+            cell: ({ row }) => {
+                return h('span', { class: 'font-medium text-highlighted' },
+                    row.getValue('comment')
+                )
+            }
+        },
+        {
+            accessorKey: 'created_at',
+            header: 'Envoyé le',
+            cell: ({ row }) => {
+                return new Date(row.getValue('created_at')).toLocaleString('fr-FR', {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                })
+            }
+        },
+        {
+            accessorKey: 'status',
+            header: 'Status',
+            cell: ({ row }) => {
+                return h(UBadge, { variant: 'subtle', color: 'neutral' }, () =>
+                    row.original.status === 'ocr' ? 'En cours de traitement OCR' : 'En attente de validation'
+                )
+            }
+        },
+        {
+            accessorKey: 'Valider',
+            header: '',
+            cell: ({ row }) => {
+                return h('div', { class: 'flex justify-end items-center gap-3' }, [
+                    h(UButton, {
+                        color: 'success',
+                        icon: 'i-lucide-check',
+                        size: 'sm',
+                        class: 'cursor-pointer',
+                        label: 'Accepter',
+                        onClick: () => {
+                            return navigateTo(`/app/invoices/${row.original.id}`)
                         }
-                    }
-                }),
-            ])
+                    }),
+                    h(UButton, {
+                        color: 'error',
+                        icon: 'i-lucide-x',
+                        size: 'sm',
+                        class: 'cursor-pointer',
+                        label: 'Refuser',
+                        onClick: async () => {
+                            const result = await deleteInvoices([row.original.id])
+                            if (result) {
+                                toast.add({
+                                    title: 'Facture supprimée',
+                                    description: 'La facture a été supprimée.',
+                                    color: 'success'
+                                })
+                            } else {
+                                toast.add({
+                                    title: 'Erreur',
+                                    description: 'Une erreur est survenue lors de la suppression de la facture.',
+                                    color: 'error'
+                                })
+                            }
+                        }
+                    }),
+                ])
+            }
         }
-    }
-]
+    ]
 
 </script>
 
