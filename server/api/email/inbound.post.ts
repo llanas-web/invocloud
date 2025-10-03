@@ -4,6 +4,7 @@ import {
     serverServiceRole,
     serverUser,
 } from "~~/server/lib/supabase/client";
+import { InvoiceInsert } from "~~/types";
 
 type PostmarkInbound = {
     From: string;
@@ -118,48 +119,57 @@ export default defineEventHandler(async (event) => {
     }
     console.log("Authorized sender for establishment:", est.id);
 
-    const preferred = attachments.find((a) =>
+    const listAttachmentsPdf = attachments.filter((a) =>
         a.ContentType === "application/pdf"
-    ) ?? attachments[0];
-
-    const newInvoiceId = crypto.randomUUID();
-    const sanitizedName = (preferred.Name || "invoice.pdf").replace(
-        /[^a-zA-Z0-9._-]/g,
-        "_",
     );
-    const path = `${est.id}/${newInvoiceId}/${sanitizedName}`;
-
-    // 4) Upload Storage
-    const { error: uploadError } = await supabaseServiceRole
-        .storage.from("invoices")
-        .upload(path, Buffer.from(preferred.Content, "base64"), {
-            contentType: preferred.ContentType || "application/octet-stream",
-            upsert: false,
-        });
-    if (uploadError) {
-        throw createError({ status: 500, message: "Attachment upload failed" });
+    if (listAttachmentsPdf.length === 0) {
+        console.error("No PDF attachments found in email from:", sender.Email);
+        throw createError({ status: 400, message: "No PDF attachments found" });
     }
 
-    if (uploadError) {
-        console.error("Attachment upload error:", uploadError);
-        throw createError({ status: 500, message: "Attachment upload failed" });
-    }
-    console.log("Attachment uploaded to path:", path);
+    const listUploadedInvoices = await Promise.all(
+        listAttachmentsPdf.map(async (a) => {
+            const newInvoiceId = crypto.randomUUID();
+            const sanitizedName = (a.Name || "invoice.pdf").replace(
+                /[^a-zA-Z0-9._-]/g,
+                "_",
+            );
+            const path = `${est.id}/${newInvoiceId}/${sanitizedName}`;
 
-    const { data: invoice, error: invoiceError } = await supabaseServiceRole
-        .from("invoices").insert({
-            id: crypto.randomUUID(),
-            supplier_id: supplier.id,
-            file_path: path,
-            comment: subject,
-            source: "email",
-        }).select().single();
+            // 4) Upload Storage
+            const { error: uploadError } = await supabaseServiceRole
+                .storage.from("invoices")
+                .upload(path, Buffer.from(a.Content, "base64"), {
+                    contentType: a.ContentType ||
+                        "application/octet-stream",
+                    upsert: false,
+                });
+            console.log("Attachment uploaded to path:", path);
+            return { id: newInvoiceId, path };
+        }),
+    );
+
+    const listNewInvoices: InvoiceInsert[] = listUploadedInvoices.map((
+        { id, path },
+    ) => ({
+        id,
+        supplier_id: supplier.id,
+        file_path: path,
+        comment: subject,
+        source: "email",
+    }));
+
+    const { data: invoices, error: invoiceError } = await supabaseServiceRole
+        .from("invoices").insert(listNewInvoices).select();
 
     if (invoiceError) {
         console.error("Invoice creation error:", invoiceError);
         throw createError({ status: 500, message: "Invoice creation failed" });
     }
-    console.log("Invoice record created, id:", invoice.id);
+    console.log(
+        "Invoice record created, id:",
+        invoices.map((inv) => inv.id).join(", "),
+    );
 
     return { ok: true };
 });
