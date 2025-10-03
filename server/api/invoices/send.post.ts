@@ -6,6 +6,7 @@ import {
     serverServiceRole,
     serverUser,
 } from "~~/server/lib/supabase/client";
+import createInvoiceRepository from "#shared/repositories/invoice.repository";
 
 const schema = z.object({
     invoices: z.array(z.string().uuid()),
@@ -15,6 +16,7 @@ const schema = z.object({
 export default defineEventHandler(async (event) => {
     const { invoices, email } = await parseBody(event, schema);
     const supabase = await serverClient(event);
+    const invoiceRepository = createInvoiceRepository(supabase);
     const user = await serverUser(event);
     const supabaseAdmin = serverServiceRole(event);
 
@@ -25,10 +27,8 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    const { data: invoicesData, error: invoicesError } = await supabase
-        .from("invoices")
-        .select("name, file_path")
-        .in("id", invoices);
+    const { data: invoicesData, error: invoicesError } = await invoiceRepository
+        .getInvoicesByIds(invoices);
     if (invoicesError) {
         throw createError({
             status: 500,

@@ -4,6 +4,7 @@ import { parseBody } from "~~/server/lib/common";
 import { z } from "zod";
 import { getOcrProvider } from "~~/server/lib/ocr/factory";
 import { OcrProviderName } from "~~/server/lib/ocr/types";
+import createInvoiceRepository from "#shared/repositories/invoice.repository";
 
 const schema = z.object({
     id: z.string().uuid(),
@@ -24,16 +25,13 @@ export default defineEventHandler(async (event) => {
 
     // Genearte signed URL for upload
     const supabaseServiceRole = serverServiceRole(event);
-    const { data: invoice, error: invoiceError } = await supabaseServiceRole
-        .from("invoices")
-        .select("file_path")
-        .eq("id", invoiceId)
-        .single();
-
-    if (invoiceError || !invoice) {
+    const invoiceRepository = createInvoiceRepository(supabaseServiceRole);
+    const { data: invoices, error: invoiceError } = await invoiceRepository
+        .getInvoicesByIds([invoiceId]);
+    if (invoiceError || !invoices || invoices.length === 0) {
         throw createError({ status: 404, message: "Invoice not found" });
     }
-
+    const invoice = invoices[0]!;
     const { data: signedUrls, error: signedUrlError } =
         await supabaseServiceRole
             .storage.from("invoices")
@@ -72,9 +70,9 @@ export default defineEventHandler(async (event) => {
         });
     }
     console.log("Created invoice job:", invoiceJob.id);
-    await supabaseServiceRole.from("invoices").update({
+    await invoiceRepository.updateInvoice(invoiceId, {
         status: "ocr",
-    }).eq("id", invoiceId);
+    });
 
     return { jobId: invoiceJob.id };
 });
