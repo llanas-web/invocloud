@@ -91,6 +91,7 @@ export default defineEventHandler(async (event) => {
             supplier_id: supplierId.id,
             comment,
             name: fileName,
+            source: "upload",
         });
     }
 
