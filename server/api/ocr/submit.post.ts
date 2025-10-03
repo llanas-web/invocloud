@@ -5,6 +5,7 @@ import { z } from "zod";
 import { getOcrProvider } from "~~/server/lib/ocr/factory";
 import { OcrProviderName } from "~~/server/lib/ocr/types";
 import createInvoiceRepository from "#shared/repositories/invoice.repository";
+import createStorageRepository from "#shared/repositories/storage.repository";
 
 const schema = z.object({
     id: z.string().uuid(),
@@ -26,16 +27,15 @@ export default defineEventHandler(async (event) => {
     // Genearte signed URL for upload
     const supabaseServiceRole = serverServiceRole(event);
     const invoiceRepository = createInvoiceRepository(supabaseServiceRole);
+    const storageRepository = createStorageRepository(supabaseServiceRole);
     const { data: invoices, error: invoiceError } = await invoiceRepository
         .getInvoicesByIds([invoiceId]);
     if (invoiceError || !invoices || invoices.length === 0) {
         throw createError({ status: 404, message: "Invoice not found" });
     }
     const invoice = invoices[0]!;
-    const { data: signedUrls, error: signedUrlError } =
-        await supabaseServiceRole
-            .storage.from("invoices")
-            .createSignedUrls([invoice.file_path], 60);
+    const { data: signedUrls, error: signedUrlError } = await storageRepository
+        .createSignedUrls([invoice.file_path], 60);
 
     if (signedUrlError || !signedUrls || signedUrls.length === 0) {
         throw createError({ status: 404, message: "Invoice not found" });
