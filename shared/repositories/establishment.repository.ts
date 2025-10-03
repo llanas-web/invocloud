@@ -70,6 +70,27 @@ const createEstablishmentRepository = (supabase: SupabaseClient<Database>) => {
         return membersResponse;
     };
 
+    const addMemberToEstablishment = async (
+        establishmentId: string,
+        userId: string,
+    ) => {
+        const memberResponse = await supabase
+            .from("establishment_members")
+            .insert({
+                establishment_id: establishmentId,
+                user_id: userId,
+            })
+            .select()
+            .single();
+        if (memberResponse.error) {
+            console.error(
+                "Error adding member to establishment:",
+                memberResponse.error,
+            );
+        }
+        return memberResponse;
+    };
+
     const createEstablishment = async (
         data: Omit<EstablishmentInsert, "email_prefix">,
     ) => {
@@ -156,6 +177,7 @@ const createEstablishmentRepository = (supabase: SupabaseClient<Database>) => {
         getEstablishmentsByIds,
         getEstablishmentsFromMemberId,
         getEstablishmentsMembers,
+        addMemberToEstablishment,
         getEstablishmentByPrefix,
         createEstablishment,
         isEmailPrefixAvailable,
