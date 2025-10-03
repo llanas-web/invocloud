@@ -1,12 +1,8 @@
-import { create } from "domain";
 import { defineEventHandler, setResponseStatus } from "h3";
-import {
-    serverClient,
-    serverServiceRole,
-    serverUser,
-} from "~~/server/lib/supabase/client";
+import { serverServiceRole } from "~~/server/lib/supabase/client";
 import { InvoiceInsert } from "~~/types";
 import createEstablishmentRepository from "#shared/repositories/establishment.repository";
+import createInvoiceRepository from "#shared/repositories/invoice.repository";
 
 type PostmarkInbound = {
     From: string;
@@ -85,6 +81,7 @@ export default defineEventHandler(async (event) => {
     const establishmentRepository = createEstablishmentRepository(
         supabaseServiceRole,
     );
+    const invoiceRepository = createInvoiceRepository(supabaseServiceRole);
 
     const recipientEmail = recipients?.[0]?.Email?.toLowerCase();
     if (!sender?.Email || !recipientEmail) {
@@ -161,8 +158,8 @@ export default defineEventHandler(async (event) => {
         source: "email",
     }));
 
-    const { data: invoices, error: invoiceError } = await supabaseServiceRole
-        .from("invoices").insert(listNewInvoices).select();
+    const { data: invoices, error: invoiceError } = await invoiceRepository
+        .createInvoice(listNewInvoices);
 
     if (invoiceError) {
         console.error("Invoice creation error:", invoiceError);
