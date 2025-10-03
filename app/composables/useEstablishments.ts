@@ -83,7 +83,7 @@ const _useEstablishments = () => {
             .neq("id", selectedEstablishment.value!.id)
             .maybeSingle();
 
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Pour l'UX
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         console.log(data);
         if (error) {
             console.error("Error checking email prefix availability:", error);
