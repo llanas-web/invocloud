@@ -1,20 +1,20 @@
 import { createSharedComposable } from "@vueuse/core";
+import createEstablishmentRepository from "#shared/repositories/establishment.repository";
 
 const _useMembers = () => {
     const supabaseClient = useSupabaseClient();
+    const establishmentRepository = createEstablishmentRepository(
+        supabaseClient,
+    );
     const user = useSupabaseUser();
     const { selectedEstablishment } = useEstablishments();
 
     const { data: members, error, refresh } = useAsyncData(
         "members",
         async () => {
-            const { data, error } = await supabaseClient
-                .from("establishment_members")
-                .select("*, user:users(*)")
-                .eq("establishment_id", selectedEstablishment.value!.id);
-
+            const { data, error } = await establishmentRepository
+                .getEstablishmentsMembers(selectedEstablishment.value!.id);
             if (error) {
-                console.error("Error fetching members:", error);
                 return [];
             }
             return data;

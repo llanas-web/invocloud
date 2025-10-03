@@ -108,12 +108,11 @@ export default defineEventHandler(async (event) => {
     }
 
     if (existingUser != null) {
-        const { error } = await supabaseServiceRole
-            .from("establishment_members")
-            .insert({
-                user_id: existingUser.id,
-                establishment_id: establishmentId,
-            });
+        const { error } = await establishmentRepository
+            .addMemberToEstablishment(
+                establishmentId,
+                existingUser.id,
+            );
         if (error) {
             console.error(
                 "Error adding existing user to establishment:",
