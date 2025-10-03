@@ -3,9 +3,13 @@ import { stripe } from "~~/server/lib/stripe/client";
 import { defineEventHandler } from "h3";
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
 import { Database } from "~~/types/database.types";
+import createEstablishmentRepository from "#shared/repositories/establishment.repository";
 
 export default defineEventHandler(async (event) => {
     const supabaseClient = await serverSupabaseClient<Database>(event);
+    const establishmentRepository = createEstablishmentRepository(
+        supabaseClient,
+    );
     const user = await serverSupabaseUser(event);
     if (!user) {
         return { error: "Not authenticated" };
@@ -13,27 +17,25 @@ export default defineEventHandler(async (event) => {
 
     const { establishmentId } = await readBody(event);
 
-    const { data: structure } = await supabaseClient
-        .from("establishments")
-        .select("stripe_subscription_id")
-        .eq("id", establishmentId)
-        .single();
+    const { data: establishments } = await establishmentRepository
+        .getEstablishmentsByIds([establishmentId], true);
+    if (!establishments || establishments.length === 0) {
+        return { error: "Établissement non trouvé" };
+    }
+    const establishment = establishments[0];
 
-    if (!structure?.stripe_subscription_id) {
+    if (!establishment?.stripe_subscription_id) {
         return { error: "Aucun abonnement actif trouvé" };
     }
 
     // Immediately cancel the subscription (trial or not)
-    await stripe.subscriptions.cancel(structure.stripe_subscription_id);
+    await stripe.subscriptions.cancel(establishment.stripe_subscription_id);
 
     // Update DB
-    await supabaseClient
-        .from("establishments")
-        .update({
-            subscription_status: "canceled",
-            subscription_end: new Date().toISOString(),
-        })
-        .eq("id", establishmentId);
+    await establishmentRepository.updateEstablishment(establishmentId, {
+        subscription_status: "canceled",
+        subscription_end: new Date().toISOString(),
+    });
 
     return {
         success: true,

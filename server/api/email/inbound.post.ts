@@ -1,3 +1,4 @@
+import { create } from "domain";
 import { defineEventHandler, setResponseStatus } from "h3";
 import {
     serverClient,
@@ -5,6 +6,7 @@ import {
     serverUser,
 } from "~~/server/lib/supabase/client";
 import { InvoiceInsert } from "~~/types";
+import createEstablishmentRepository from "#shared/repositories/establishment.repository";
 
 type PostmarkInbound = {
     From: string;
@@ -80,6 +82,9 @@ export default defineEventHandler(async (event) => {
     });
 
     const supabaseServiceRole = serverServiceRole(event);
+    const establishmentRepository = createEstablishmentRepository(
+        supabaseServiceRole,
+    );
 
     const recipientEmail = recipients?.[0]?.Email?.toLowerCase();
     if (!sender?.Email || !recipientEmail) {
@@ -91,11 +96,8 @@ export default defineEventHandler(async (event) => {
     const emailPrefix = localPartFull.split("+")[0];
 
     // 1) Trouver l'établissement par email_prefix
-    const { data: est, error: estErr } = await supabaseServiceRole
-        .from("establishments")
-        .select("id, email_prefix")
-        .eq("email_prefix", emailPrefix)
-        .maybeSingle();
+    const { data: est, error: estErr } = await establishmentRepository
+        .getEstablishmentByPrefix(emailPrefix);
     if (estErr || !est) {
         throw createError({ status: 404, message: "Unknown recipient alias" });
     }

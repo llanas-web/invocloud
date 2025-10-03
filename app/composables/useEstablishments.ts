@@ -1,9 +1,13 @@
 import { createSharedComposable } from "@vueuse/core";
+import createEstablishmentRepository from "#shared/repositories/establishment.repository";
 import type { Establishment, EstablishmentUpdate } from "~~/types";
 import type { Database } from "~~/types/database.types";
 
 const _useEstablishments = () => {
     const supabaseClient = useSupabaseClient<Database>();
+    const establishmentRepository = createEstablishmentRepository(
+        supabaseClient,
+    );
     const user = useSupabaseUser();
     const selectedEstablishment = ref<Establishment | null>(null);
     const { userSettings } = useUserSettings();
@@ -36,10 +40,8 @@ const _useEstablishments = () => {
     const { data: establishments, pending, refresh } = useAsyncData(
         "establishments",
         async () => {
-            const { data, error } = await supabaseClient
-                .from("establishment_members")
-                .select("*, establishments(*)")
-                .or(`user_id.eq.${user.value!.id}`);
+            const { data, error } = await establishmentRepository
+                .getEstablishmentsFromMemberId(user.value!.id);
             if (error) {
                 console.error("Error fetching establishments:", error);
                 return [];
@@ -57,49 +59,37 @@ const _useEstablishments = () => {
     );
 
     const createEstablishment = async (name: string) => {
-        const { data: newEstablishment, error } = await supabaseClient
-            .from("establishments")
-            .insert([{
+        const { data: newEstablishment, error } = await establishmentRepository
+            .createEstablishment({
                 name,
                 creator_id: user.value!.id,
-            }])
-            .select().single();
+            });
+
         selectedEstablishment.value = newEstablishment;
 
         if (error) {
-            console.error("Error creating establishment:", error);
             return null;
         }
         refresh();
-
         return newEstablishment;
     };
 
-    const isEmailPrefixAvailable = async (email_prefix: string) => {
-        const { data, error } = await supabaseClient
-            .from("establishments")
-            .select("id")
-            .eq("email_prefix", email_prefix)
-            .neq("id", selectedEstablishment.value!.id)
-            .maybeSingle();
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        console.log(data);
-        if (error) {
-            console.error("Error checking email prefix availability:", error);
-            return false;
-        }
-        return data === null;
+    const isEmailPrefixAvailable = (email_prefix: string) => {
+        return establishmentRepository
+            .isEmailPrefixAvailable(
+                email_prefix,
+                selectedEstablishment.value?.id,
+            );
     };
 
     const updateEstablishment = async (
         establishment: Partial<EstablishmentUpdate>,
     ) => {
-        const { data, error } = await supabaseClient.from("establishments")
-            .update(establishment)
-            .eq("id", selectedEstablishment.value!.id)
-            .select()
-            .single();
+        const { data, error } = await establishmentRepository
+            .updateEstablishment(
+                selectedEstablishment.value!.id,
+                establishment,
+            );
         if (!error && data) {
             await refresh();
         }
@@ -176,16 +166,9 @@ const _useEstablishments = () => {
         ) {
             await cancelStripeTrial();
         }
-        const { error } = await supabaseClient
-            .from("establishments")
-            .delete()
-            .eq("id", selectedEstablishment.value!.id);
-        await refresh();
-        if (error) {
-            console.error("Error deleting establishment:", error);
-            return false;
-        }
-        return true;
+        return await establishmentRepository.deleteEstablishment(
+            selectedEstablishment.value!.id,
+        );
     };
 
     return {

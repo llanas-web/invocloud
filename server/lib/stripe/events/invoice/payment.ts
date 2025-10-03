@@ -1,6 +1,7 @@
 import type Stripe from "stripe";
 import { StripeHandlerContext } from "~~/server/lib/stripe/context";
 import { fromUnix } from "~/utils/date";
+import createEstablishmentRepository from "#shared/repositories/establishment.repository";
 
 const getCustomerId = (customer: Stripe.Invoice["customer"]) => {
     if (typeof customer === "string") {
@@ -16,17 +17,18 @@ export async function handleInvoicePaymentSucceeded(
     ctx: StripeHandlerContext,
 ) {
     const customerId = getCustomerId(invoice.customer);
+    const establishmentRepository = createEstablishmentRepository(ctx.supabase);
     if (!customerId) {
         console.warn("ℹ️ Invoice not tied to a subscription. Skipping.");
         return;
     }
 
-    const { error } = await ctx.supabase
-        .from("establishments")
-        .update({
+    const { error } = await establishmentRepository.updateEstablishment(
+        customerId,
+        {
             subscription_end: fromUnix(invoice.period_end),
-        })
-        .eq("stripe_customer_id", customerId);
+        },
+    );
 
     if (error) {
         console.error(
