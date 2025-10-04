@@ -12,6 +12,7 @@ import type { Establishment } from "~~/types/index";
 import type { User } from "@supabase/supabase-js";
 import { sendEmail } from "~~/server/lib/email";
 import createEstablishmentRepository from "#shared/repositories/establishment.repository";
+import createUploadRepository from "#shared/repositories/upload.repository";
 
 const schema = z.object({
     senderEmail: z.string().email(),
@@ -34,6 +35,7 @@ export default defineEventHandler(async (event) => {
     const establishmentRepository = createEstablishmentRepository(
         supabaseServiceRole,
     );
+    const uploadRepository = createUploadRepository(supabaseServiceRole);
 
     // 1. Check permission
     const { data: suppliers, error: suppliersError } = await supabaseServiceRole
@@ -86,29 +88,18 @@ export default defineEventHandler(async (event) => {
 
     if (user.is_anonymous) {
         const code = generateCode();
-        const hashedCode = hashCode(code);
-        const expiresAt = new Date(Date.now() + 1000 * 60 * 10); // 10 minutes
 
         const { data: newUploadValidation, error: newUploadValidationError } =
-            await supabase
-                .from("upload_validations")
-                .insert({
-                    id: invoiceId,
-                    uploader_id: user.id,
-                    token_hash: hashedCode,
-                    token_expires_at: expiresAt.toISOString(),
-                    comment: comment || null,
-                    suppliers: suppliers.map((supplier) =>
-                        supplier.supplier_id
-                    ),
-                    establishments: suppliers.map(
-                        (supplier) => supplier.establishment_id,
-                    ),
-                    recipient_email: recipientEmail,
-                    file_name: name,
-                })
-                .select()
-                .single();
+            await uploadRepository.createUploadValidation(
+                invoiceId,
+                user.id,
+                code,
+                suppliers.map((supplier) => supplier.supplier_id),
+                suppliers.map((supplier) => supplier.establishment_id),
+                recipientEmail,
+                name,
+                comment,
+            );
 
         if (newUploadValidationError) {
             console.error(
@@ -128,7 +119,11 @@ export default defineEventHandler(async (event) => {
             `Bonjour,<br><br>` +
                 `Pour valider l'envoie de votre facture, veuillez saisir le code suivant dans l'application : <strong>${code}</strong>.<br><br>` +
                 `Ce code est valide jusqu'au <strong>${
-                    format(expiresAt, "dd/MM/yyyy HH:mm:ss", { locale: fr })
+                    format(
+                        newUploadValidation.token_expires_at,
+                        "dd/MM/yyyy HH:mm:ss",
+                        { locale: fr },
+                    )
                 }</strong>.<br><br>` +
                 `Si vous n'avez pas demandé cet envoi, veuillez ignorer ce message.<br><br>` +
                 `<p>L'équipe InvoCloud</p>`,

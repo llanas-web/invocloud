@@ -4,6 +4,7 @@ import { serverServiceRole, serverUser } from "~~/server/lib/supabase/client";
 import createInvoiceRepository from "#shared/repositories/invoice.repository";
 import createStorageRepository from "#shared/repositories/storage.repository";
 import createSupplierRepository from "#shared/repositories/supplier.repository";
+import createUploadRepository from "#shared/repositories/upload.repository";
 
 const schema = z.object({
     invoiceId: z.string().uuid(),
@@ -23,6 +24,7 @@ export default defineEventHandler(async (event) => {
     const invoiceRepository = createInvoiceRepository(supabase);
     const storageRepository = createStorageRepository(supabase);
     const supplierRepository = createSupplierRepository(supabase);
+    const uploadRepository = createUploadRepository(supabase);
     const user = await serverUser(event);
     if (!user) {
         throw createError({
@@ -46,26 +48,16 @@ export default defineEventHandler(async (event) => {
 
     if (user.is_anonymous) {
         const { data: uploadValidation, error: uploadValidationError } =
-            await supabase
-                .from("upload_validations")
-                .select("*")
-                .eq("id", invoiceId)
-                .eq("uploader_id", user.id)
-                .maybeSingle();
-        if (!uploadValidation) {
-            throw createError({
-                status: 404,
-                message: "Validation de téléchargement introuvable",
-            });
-        }
-
-        const { data: updatedUploadValidation, error: updateError } =
-            await supabase.from("upload_validations").update({
-                status: "uploaded",
-                selected_establishment: selectedEstablishmentId,
-                file_path: filePath,
-            }).eq("id", invoiceId).select().single();
-        if (updateError || !updatedUploadValidation) {
+            await uploadRepository.validateUpload(
+                invoiceId,
+                user.id,
+                {
+                    status: "uploaded",
+                    selected_establishment: selectedEstablishmentId,
+                    file_path: filePath,
+                },
+            );
+        if (uploadValidationError || !uploadValidation) {
             throw createError({
                 status: 500,
                 message:
