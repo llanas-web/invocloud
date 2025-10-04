@@ -6,7 +6,8 @@ import { fromUnix, nowISO } from "~/utils/date";
 
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
-import createEstablishmentRepository from "~~/shared/repositories/establishment.repository";
+import createEstablishmentRepository from "#shared/repositories/establishment.repository";
+import createUserRepository from "#shared/repositories/user.repository";
 
 const getSubscriptionId = (session: Stripe.Checkout.Session) => {
     const { subscription } = session;
@@ -49,6 +50,7 @@ export async function handleCheckoutSessionCompleted(
 ) {
     const subscriptionId = getSubscriptionId(session);
     const customerId = getCustomerId(session.customer);
+    const userRepository = createUserRepository(ctx.supabase);
     const establishmentRepository = createEstablishmentRepository(
         ctx.supabase,
     );
@@ -96,16 +98,13 @@ export async function handleCheckoutSessionCompleted(
             `✅ Checkout session completed for ${establishmentId}. Checkout status: ${subscriptionStatus}`,
         );
 
-        const { data: user, error } = await ctx.supabase.from("users").select(
-            "email",
-        )
-            .eq("id", userId).single();
+        const { data: user, error } = await userRepository.getUserById(userId);
         if (!user || error) {
             console.error("❌ No user email found");
             return;
         }
         await sendEmail(
-            [user.email],
+            [user.email!],
             "Confirmation abonnement Invocloud",
             `Bonjour,<br><br>` +
                 `<p>Merci pour votre abonnement à Invocloud ! Votre essai gratuit de 7 jours a commencé. Vous pouvez dès à présent profiter de toutes les fonctionnalités premium.</p>` +

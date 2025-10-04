@@ -5,11 +5,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 const createUserRepository = (supabase: SupabaseClient<Database>) => {
     const getUserById = async (
         id: string,
-        params: (keyof User | "*")[] = ["*"],
     ) => {
         const userResponse = await supabase
             .from("users")
-            .select(params.join(", "))
+            .select("*")
             .eq("id", id)
             .single();
         if (userResponse.error) {
@@ -32,11 +31,10 @@ const createUserRepository = (supabase: SupabaseClient<Database>) => {
 
     const getUserByEmail = async (
         email: string,
-        params: (keyof User | "*")[] = ["*"],
     ) => {
         const userResponse = await supabase
             .from("users")
-            .select(params.join(", "))
+            .select("*")
             .eq("email", email)
             .single();
         if (userResponse.error) {
