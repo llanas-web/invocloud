@@ -1,6 +1,7 @@
 import { getOcrProvider } from "~~/server/lib/ocr/factory";
 import { serverServiceRole } from "~~/server/lib/supabase/client";
 import createStorageRepository from "#shared/repositories/storage.repository";
+import createInvoiceTaskRepository from "#shared/repositories/tasks/invoice_task.repository";
 
 export default defineEventHandler(async (event) => {
     // SECURITY CHECK
@@ -18,15 +19,10 @@ export default defineEventHandler(async (event) => {
     const ocrProvider = getOcrProvider("mindee");
     const supabaseAdmin = serverServiceRole(event);
     const storageRepository = createStorageRepository(supabaseAdmin);
+    const invoiceTaskRepository = createInvoiceTaskRepository(supabaseAdmin);
 
     // GET THE JOBS
-    const { data: jobs, error } = await supabaseAdmin
-        .from("invoice_jobs")
-        .select(`*, invoice:invoices(id, file_path)`)
-        .eq("status", "queued")
-        .lt("attempts", 5)
-        .order("created_at", { ascending: true })
-        .limit(25);
+    const { data: jobs, error } = await invoiceTaskRepository.getInvoiceTasks();
 
     console.log("Fetched OCR jobs:", jobs);
 
@@ -51,17 +47,12 @@ export default defineEventHandler(async (event) => {
             console.error(`Failed to submit job for invoice ${jobId}`);
             return;
         }
-        const { error: updateError } = await supabaseAdmin
-            .from("invoice_jobs")
-            .update({
+        const { error: updateError } = await invoiceTaskRepository
+            .updateInvoiceTask(jobId, {
                 status: "submitted",
                 job_id: result.jobId,
                 attempts: attempts + 1,
-            })
-            .eq("id", jobId);
-        if (updateError) {
-            console.error(`Error updating job ${jobId}:`, updateError);
-        }
+            });
         console.log(
             `Job ${jobId} submitted successfully.`,
         );

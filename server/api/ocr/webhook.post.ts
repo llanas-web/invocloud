@@ -2,6 +2,7 @@ import { serverServiceRole } from "~~/server/lib/supabase/client";
 import { OcrProviderName } from "~~/server/lib/ocr/types";
 import { getOcrProvider } from "~~/server/lib/ocr/factory";
 import createInvoiceRepository from "#shared/repositories/invoice.repository";
+import createInvoiceTaskRepository from "#shared/repositories/tasks/invoice_task.repository";
 
 export default defineEventHandler(async (event) => {
     const providerName = (getQuery(event).provider as OcrProviderName) ??
@@ -9,6 +10,9 @@ export default defineEventHandler(async (event) => {
     const provider = getOcrProvider(providerName);
     const supabaseServiceRole = serverServiceRole(event);
     const invoiceRepository = createInvoiceRepository(supabaseServiceRole);
+    const invoiceTaskRepository = createInvoiceTaskRepository(
+        supabaseServiceRole,
+    );
 
     const { isValid, jobId, prediction, raw } = await provider.parseWebhook(
         event,
@@ -18,10 +22,9 @@ export default defineEventHandler(async (event) => {
         if (!jobId) {
             throw createError({ status: 400, message: "Invalid jobId" });
         } else {
-            supabaseServiceRole.from("invoice_jobs").update({
+            await invoiceTaskRepository.updateInvoiceTask(jobId, {
                 status: "error",
-                error_message: "Invalid webhook",
-            }).eq("job_id", jobId!);
+            }, "job_id");
             throw createError({ status: 400, message: "Invalid webhook" });
         }
     }
@@ -29,12 +32,11 @@ export default defineEventHandler(async (event) => {
     console.log("OCR Webhook received for jobId:", jobId);
     if (jobId && prediction) {
         console.log("predictions: ", prediction);
-        const { data: jobData, error: jobError } = await supabaseServiceRole
-            .from("invoice_jobs")
-            .update({
+        const { data: jobData, error: jobError } = await invoiceTaskRepository
+            .updateInvoiceTask(jobId, {
                 status: "done",
                 raw_result: typeof raw === "object" ? JSON.stringify(raw) : raw,
-            }).eq("job_id", jobId!).select().maybeSingle();
+            });
         if (jobError || !jobData) {
             throw createError({ status: 404, message: "Job not found" });
         }
