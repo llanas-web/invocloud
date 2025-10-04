@@ -21,7 +21,7 @@ const createSupplierRepository = (supabaseClient: SupabaseClient<Database>) => {
         return { data, error };
     };
 
-    const isEmailAuthorizedForEstablishment = async (
+    const getSupplierByEmailAndEstablishmentId = async (
         establishmentId: string,
         email: string,
     ) => {
@@ -33,9 +33,8 @@ const createSupplierRepository = (supabaseClient: SupabaseClient<Database>) => {
             .maybeSingle();
         if (error) {
             console.error("Error checking email authorization:", error);
-            return false;
         }
-        return !!data;
+        return { data, error };
     };
 
     const createSupplier = async (supplier: SupplierInsert) => {
@@ -82,7 +81,7 @@ const createSupplierRepository = (supabaseClient: SupabaseClient<Database>) => {
         createSupplier,
         updateSupplier,
         deleteSuppliers,
-        isEmailAuthorizedForEstablishment,
+        getSupplierByEmailAndEstablishmentId,
     };
 };
 

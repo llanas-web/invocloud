@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import * as z from "zod";
 import { sendEmail } from "~~/server/lib/email";
 import createEstablishmentRepository from "#shared/repositories/establishment.repository";
+import createUserRepository from "#shared/repositories/user.repository";
 import { Database } from "~~/types/database.types";
 
 const schema = z.object({
@@ -31,10 +32,10 @@ export default defineEventHandler(async (event) => {
 
     const supabaseClient = await serverSupabaseClient<Database>(event);
     const supabaseServiceRole = serverSupabaseServiceRole<Database>(event);
-
     const establishmentRepository = createEstablishmentRepository(
         supabaseServiceRole,
     );
+    const userRepository = createUserRepository(supabaseServiceRole);
 
     // 1. Check if the user is authenticated
     const { data: session, error: authError } = await supabaseClient.auth
@@ -94,13 +95,10 @@ export default defineEventHandler(async (event) => {
     }
 
     // 5 Check if the member already exists in supabase
-    const { data: existingUser, error: userError } = await supabaseServiceRole
-        .from("users")
-        .select("*")
-        .eq("email", email).single();
+    const { data: existingUser, error: userError } = await userRepository
+        .getUserByEmail(email);
 
     if (userError) {
-        console.error("Error checking existing user:", userError);
         throw createError({
             status: 500,
             message: "Erreur interne du serveur",
