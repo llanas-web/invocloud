@@ -45,6 +45,15 @@ export type UploadValidationInsert =
 export type UploadValidationUpdate =
     Database["public"]["Tables"]["upload_validations"]["Update"];
 
+export type InvoiceTask = Database["public"]["Tables"]["invoice_jobs"]["Row"];
+export type InvoiceTaskInsert =
+    Database["public"]["Tables"]["invoice_jobs"]["Insert"];
+export type InvoiceTaskUpdate =
+    Database["public"]["Tables"]["invoice_jobs"]["Update"];
+
+export type InvoiceTasksStatus =
+    Database["public"]["Enums"]["invoice_job_status"];
+
 export interface Mail {
     id: number;
     unread?: boolean;
