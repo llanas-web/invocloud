@@ -4,6 +4,7 @@ import { InvoiceInsert } from "~~/types";
 import createEstablishmentRepository from "#shared/repositories/establishment.repository";
 import createInvoiceRepository from "#shared/repositories/invoice.repository";
 import createStorageRepository from "#shared/repositories/storage.repository";
+import createSupplierRepository from "#shared/repositories/supplier.repository";
 
 type PostmarkInbound = {
     From: string;
@@ -106,13 +107,13 @@ export default defineEventHandler(async (event) => {
     console.log("sender.Email:", sender.Email);
     console.log("recipientEmail:", recipientEmail);
 
-    const isAuthorized = await supplierRepository
-        .isEmailAuthorizedForEstablishment(
+    const { data: supplier, error: supplierError } = await supplierRepository
+        .getSupplierByEmailAndEstablishmentId(
             est.id,
             sender.Email,
         );
 
-    if (!isAuthorized) {
+    if (!supplierError || !supplier) {
         throw createError({
             status: 403,
             message: "Sender not authorized for this establishment",
