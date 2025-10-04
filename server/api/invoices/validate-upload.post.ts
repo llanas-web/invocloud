@@ -3,6 +3,7 @@ import { parseBody } from "~~/server/lib/common";
 import { serverServiceRole, serverUser } from "~~/server/lib/supabase/client";
 import createInvoiceRepository from "#shared/repositories/invoice.repository";
 import createStorageRepository from "#shared/repositories/storage.repository";
+import createSupplierRepository from "#shared/repositories/supplier.repository";
 
 const schema = z.object({
     invoiceId: z.string().uuid(),
@@ -21,6 +22,7 @@ export default defineEventHandler(async (event) => {
     const supabase = serverServiceRole(event);
     const invoiceRepository = createInvoiceRepository(supabase);
     const storageRepository = createStorageRepository(supabase);
+    const supplierRepository = createSupplierRepository(supabase);
     const user = await serverUser(event);
     if (!user) {
         throw createError({
@@ -71,13 +73,20 @@ export default defineEventHandler(async (event) => {
             });
         }
     } else {
-        const { data: supplierId, error: supplierIdError } = await supabase
-            .from("suppliers")
-            .select("id")
-            .eq("establishment_id", selectedEstablishmentId)
-            .overlaps("emails", [user.email])
-            .single();
-        if (supplierIdError || !supplierId) {
+        const { data: suppliers, error: supplierIdError } =
+            await supplierRepository.getSuppliersByEstablishment(
+                selectedEstablishmentId,
+            );
+        if (supplierIdError || !suppliers) {
+            throw createError({
+                status: 404,
+                message: "Fournisseur introuvable",
+            });
+        }
+        const supplierId = suppliers.find((s) =>
+            s.emails.includes(user.email!)
+        );
+        if (!supplierId) {
             throw createError({
                 status: 404,
                 message: "Fournisseur introuvable",
