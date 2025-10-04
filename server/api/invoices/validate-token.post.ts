@@ -3,6 +3,7 @@ import { hashCode } from "~/utils/hash";
 import { parseBody } from "~~/server/lib/common";
 import { serverServiceRole, serverUser } from "~~/server/lib/supabase/client";
 import createEstablishmentRepository from "#shared/repositories/establishment.repository";
+import createUploadRepository from "#shared/repositories/upload.repository";
 
 const schema = z.object({
     uploadValidationId: z.string().uuid(),
@@ -14,6 +15,7 @@ export default defineEventHandler(async (event) => {
 
     const supabase = serverServiceRole(event);
     const establishmentRepository = createEstablishmentRepository(supabase);
+    const uploadRepository = createUploadRepository(supabase);
     const supabaseUser = await serverUser(event);
     if (!supabaseUser) {
         throw createError({
@@ -25,13 +27,11 @@ export default defineEventHandler(async (event) => {
     const hashedCode = hashCode(token);
 
     const { data: uploadValidation, error: uploadValidationError } =
-        await supabase
-            .from("upload_validations")
-            .select("*")
-            .eq("id", uploadValidationId)
-            .eq("uploader_id", supabaseUser.id)
-            .eq("token_hash", hashedCode)
-            .maybeSingle();
+        await uploadRepository.isTokenValid(
+            uploadValidationId,
+            supabaseUser.id,
+            hashedCode,
+        );
 
     if (uploadValidationError || !uploadValidation) {
         throw createError({

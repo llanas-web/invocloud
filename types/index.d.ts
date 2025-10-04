@@ -38,6 +38,13 @@ export type InvoiceStatus = Database["public"]["Enums"]["invoices_status"];
 export type InvoiceWithEstablishment =
     Database["public"]["Views"]["invoices_with_establishment"]["Row"];
 
+export type UploadValidation =
+    Database["public"]["Tables"]["upload_validations"]["Row"];
+export type UploadValidationInsert =
+    Database["public"]["Tables"]["upload_validations"]["Insert"];
+export type UploadValidationUpdate =
+    Database["public"]["Tables"]["upload_validations"]["Update"];
+
 export interface Mail {
     id: number;
     unread?: boolean;
