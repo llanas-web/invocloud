@@ -1,28 +1,21 @@
 import { createSharedComposable } from "@vueuse/core";
+import createSupplierRepository from "#shared/repositories/supplier.repository";
 import type { Range, SupplierUpdate } from "~~/types";
 
 const _useSuppliers = () => {
     const supabaseClient = useSupabaseClient();
+    const supplierRepository = createSupplierRepository(supabaseClient);
     const { selectedEstablishment } = useEstablishments();
 
     const { data: suppliers, error: suppliersError, refresh, pending } =
         useAsyncData(
             "suppliers",
             async () => {
-                const { data, error } = await supabaseClient
-                    .from("suppliers")
-                    .select(`
-                        *,
-                        establishment:establishments (
-                            id,
-                            name
-                        )
-                    `).eq(
-                        "establishment_id",
+                const { data, error } = await supplierRepository
+                    .getSuppliersByEstablishment(
                         selectedEstablishment.value!.id,
                     );
                 if (error) {
-                    console.error("Error fetching suppliers:", error);
                     return [];
                 }
                 return data;
@@ -48,16 +41,13 @@ const _useSuppliers = () => {
             );
             return null;
         }
-        const { data, error } = await supabaseClient
-            .from("suppliers")
-            .insert([{
+        const { data, error } = await supplierRepository
+            .createSupplier({
                 name,
                 establishment_id: selectedEstablishment.value!.id,
-                emails: emails,
-            }]).select().single();
-
+                emails,
+            });
         if (error) {
-            console.error("Error creating supplier:", error);
             return null;
         }
         await refresh();
@@ -76,12 +66,8 @@ const _useSuppliers = () => {
             console.error("Supplier ID and updated data are required.");
             return null;
         }
-        const { data, error } = await supabaseClient
-            .from("suppliers")
-            .update(updatedSupplier)
-            .eq("id", supplierId)
-            .select()
-            .single();
+        const { data, error } = await supplierRepository
+            .updateSupplier(supplierId, updatedSupplier);
 
         if (error) {
             console.error("Error updating supplier:", error);
@@ -96,10 +82,8 @@ const _useSuppliers = () => {
             console.error("No supplier IDs provided for deletion.");
             return null;
         }
-        const { data, error } = await supabaseClient
-            .from("suppliers")
-            .delete()
-            .in("id", supplierIds);
+        const { data, error } = await supplierRepository
+            .deleteSuppliers(supplierIds);
 
         if (error) {
             console.error("Error deleting suppliers:", error);

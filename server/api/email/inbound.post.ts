@@ -84,6 +84,7 @@ export default defineEventHandler(async (event) => {
     );
     const invoiceRepository = createInvoiceRepository(supabaseServiceRole);
     const storageRepository = createStorageRepository(supabaseServiceRole);
+    const supplierRepository = createSupplierRepository(supabaseServiceRole);
 
     const recipientEmail = recipients?.[0]?.Email?.toLowerCase();
     if (!sender?.Email || !recipientEmail) {
@@ -105,14 +106,13 @@ export default defineEventHandler(async (event) => {
     console.log("sender.Email:", sender.Email);
     console.log("recipientEmail:", recipientEmail);
 
-    const { data: supplier, error: suppliersError } = await supabaseServiceRole
-        .from("suppliers").select("*").eq("establishment_id", est.id).overlaps(
-            "emails",
-            [sender.Email],
-        ).maybeSingle();
+    const isAuthorized = await supplierRepository
+        .isEmailAuthorizedForEstablishment(
+            est.id,
+            sender.Email,
+        );
 
-    if (suppliersError || !supplier) {
-        console.error("Supplier lookup error:", suppliersError);
+    if (!isAuthorized) {
         throw createError({
             status: 403,
             message: "Sender not authorized for this establishment",
