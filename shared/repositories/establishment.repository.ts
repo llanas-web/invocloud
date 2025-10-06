@@ -59,7 +59,7 @@ const createEstablishmentRepository = (supabase: SupabaseClient<Database>) => {
     const getEstablishmentsMembers = async (establishmentId: string) => {
         const membersResponse = await supabase
             .from("establishment_members")
-            .select("*, users(*)")
+            .select("*, user:users(*)")
             .eq("establishment_id", establishmentId);
         if (membersResponse.error) {
             console.error(

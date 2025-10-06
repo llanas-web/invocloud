@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import type { DropdownMenuItem } from '@nuxt/ui'
+    import type { DropdownMenuItem } from '@nuxt/ui'
 
-const toast = useToast()
-const { members } = useMembers()
-const q = ref('')
+    const toast = useToast()
+    const { members } = useMembers()
+    const q = ref('')
 
-const items = [{
-    label: 'Edit member',
-    onSelect: () => console.log('Edit member')
-}, {
-    label: 'Remove member',
-    color: 'error' as const,
-    onSelect: () => console.log('Remove member')
-}] satisfies DropdownMenuItem[]
+    const items = [{
+        label: 'Edit member',
+        onSelect: () => console.log('Edit member')
+    }, {
+        label: 'Remove member',
+        color: 'error' as const,
+        onSelect: () => console.log('Remove member')
+    }] satisfies DropdownMenuItem[]
 
-const memberStatusLabels = {
-    accepted: { label: 'Accepté', color: 'success' },
-    declined: { label: 'Refusé', color: 'error' },
-    pending: { label: 'En attente', color: 'warning' }
-} as const
+    const memberStatusLabels = {
+        accepted: { label: 'Accepté', color: 'success' },
+        declined: { label: 'Refusé', color: 'error' },
+        pending: { label: 'En attente', color: 'warning' }
+    } as const
 </script>
 
 <template>
@@ -34,10 +34,10 @@ const memberStatusLabels = {
                 <div class="flex items-center gap-3 min-w-0">
                     <div class="text-sm min-w-0">
                         <p class="text-highlighted font-medium truncate">
-                            {{ member.user.full_name }}
+                            {{ member.user?.full_name }}
                         </p>
                         <p class="text-muted truncate">
-                            {{ member.user.email }}
+                            {{ member.user?.email }}
                         </p>
                     </div>
                 </div>
