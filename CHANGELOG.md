@@ -2,6 +2,11 @@
 
 
 
+## 1.3.2 (2025-10-06)
+
+### Fixed
+- 🚑  Hotfix update amout error [[dfcd893](https://github.com/llanas-web/invocloud/commit/dfcd8934210cc87a70c9f588f36804ae5e4a39bf)]
+
 ## 1.3.1 (2025-10-06)
 
 ### Fixed
