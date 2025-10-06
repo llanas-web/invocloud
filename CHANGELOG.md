@@ -2,6 +2,11 @@
 
 
 
+## 1.3.1 (2025-10-06)
+
+### Fixed
+- 🚑  Fixing invoice upload from new invoices [[eb1effe](https://github.com/llanas-web/invocloud/commit/eb1effef689d07817260c5579ec1faff51b4bd21)]
+
 ## 1.3.0 (2025-10-03)
 
 ### Added
