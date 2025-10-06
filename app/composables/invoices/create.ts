@@ -96,7 +96,7 @@ const _useInvoiceCreate = () => {
             return;
         }
         const newInvoice = await createInvoice(
-            formState as InvoiceInsert,
+            data,
             invoiceFile.value,
         );
         if (!newInvoice) {
