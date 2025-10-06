@@ -36,7 +36,7 @@ const createUserRepository = (supabase: SupabaseClient<Database>) => {
             .from("users")
             .select("*")
             .eq("email", email)
-            .single();
+            .maybeSingle();
         if (userResponse.error) {
             console.error("Error fetching user by email:", userResponse.error);
         }
