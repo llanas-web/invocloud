@@ -62,13 +62,6 @@ const _useInvoiceUpdate = () => {
         comment: invoice.value?.comment ?? "",
     });
 
-    // Ensure amount is never null or undefined
-    watch(() => formState.amount, (newValue) => {
-        if (!newValue) {
-            formState.amount = 0;
-        }
-    });
-
     watch(
         () => invoice.value,
         (newInvoice) => {
@@ -107,16 +100,37 @@ const _useInvoiceUpdate = () => {
             console.error("Invoice is not loaded");
             return;
         }
+        const { success, error, data } = formStateSchema.safeParse(formState);
+        if (!success || error) {
+            console.error("Form validation failed:", error);
+            toast.add({
+                title: "Erreur",
+                description:
+                    "Le formulaire contient des erreurs. Veuillez vérifier les champs requis.",
+                color: "error",
+            });
+            isLoading.value = false;
+            return;
+        }
         const updatedInvoice = await updateInvoice(
             invoice.value.id as string,
-            formState as InvoiceUpdate,
+            data,
         );
         isLoading.value = false;
         if (!updatedInvoice) {
             console.error("Failed to save invoice");
-            // Optional: show error toast
+            toast.add({
+                title: "Erreur",
+                description: "Échec de la mise à jour de la facture.",
+                color: "error",
+            });
             return;
         }
+        toast.add({
+            title: "Succès",
+            description: "Facture mise à jour avec succès.",
+            color: "success",
+        });
 
         Object.assign(invoice.value!, formState);
         navigateTo("/app");
