@@ -2,7 +2,6 @@ import {
     serverSupabaseClient,
     serverSupabaseServiceRole,
 } from "#supabase/server";
-import { format } from "date-fns";
 import * as z from "zod";
 import { sendEmail } from "~~/server/lib/email";
 import createEstablishmentRepository from "#shared/repositories/establishment.repository";

@@ -122,7 +122,7 @@ const _useInvoices = () => {
         }
         const { message, success } = await $fetch<
             ReturnType<
-                typeof import("~~/server/api/invoices/send.post").default
+                typeof import("~~/server/api/security/invoice/send.post").default
             >
         >(
             `/api/invoices/send`,

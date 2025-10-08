@@ -22,9 +22,10 @@ const formStateSchema = z.object({
     invoice_number: z.string().min(1, "Le numéro de facture est requis."),
     paid_at: z.string().optional().nullable(),
     created_at: z.string().min(1, "La date de création est requise."),
-    status: z.enum(["paid", "validated", "error", "pending", "sent"]).default(
-        "validated",
-    ),
+    status: z.enum(["paid", "validated", "error", "pending", "sent", "ocr"])
+        .default(
+            "validated",
+        ),
 }).refine((data) => {
     if (data.status === "paid") {
         return data.paid_at !== null;
