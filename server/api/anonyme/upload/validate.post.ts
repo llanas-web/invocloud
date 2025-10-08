@@ -1,6 +1,5 @@
-import { z } from "zod";
+import z from "zod";
 import { hashCode } from "~/utils/hash";
-import { parseBody } from "~~/server/lib/common";
 import { serverServiceRole, serverUser } from "~~/server/lib/supabase/client";
 import createEstablishmentRepository from "#shared/repositories/establishment.repository";
 import createUploadRepository from "#shared/repositories/upload.repository";
@@ -11,7 +10,10 @@ const schema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-    const { uploadValidationId, token } = await parseBody(event, schema);
+    const { uploadValidationId, token } = await parseBody(
+        event,
+        schema,
+    );
 
     const supabase = serverServiceRole(event);
     const establishmentRepository = createEstablishmentRepository(supabase);

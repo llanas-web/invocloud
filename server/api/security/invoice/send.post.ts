@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { parseBody } from "~~/server/lib/common";
 import { sendEmail } from "~~/server/lib/email";
 import {
     serverClient,
@@ -10,8 +9,8 @@ import createInvoiceRepository from "#shared/repositories/invoice.repository";
 import createStorageRepository from "#shared/repositories/storage.repository";
 
 const schema = z.object({
-    invoices: z.array(z.string().uuid()),
-    email: z.string().email(),
+    invoices: z.array(z.uuid()),
+    email: z.email(),
 });
 
 export default defineEventHandler(async (event) => {

@@ -12,7 +12,6 @@ export default defineEventHandler(async (event) => {
     );
     const { establishmentId } = await readBody(event);
 
-    // Get user's establishment
     const { data: establishments } = await establishmentRepository
         .getEstablishmentsByIds([establishmentId], true);
     if (!establishments || establishments.length === 0) {
@@ -25,12 +24,18 @@ export default defineEventHandler(async (event) => {
     }
 
     // Cancel subscription at period end
-    await stripe.subscriptions.update(establishment.stripe_subscription_id, {
-        cancel_at_period_end: true,
-    });
+    if (establishment.subscription_status === "trialing") {
+        await stripe.subscriptions.cancel(establishment.stripe_subscription_id);
+    } else {
+        await stripe.subscriptions.update(
+            establishment.stripe_subscription_id,
+            {
+                cancel_at_period_end: true,
+            },
+        );
+    }
 
     return {
         success: true,
-        message: "L'abonnement sera annulé à la fin de la période.",
     };
 });

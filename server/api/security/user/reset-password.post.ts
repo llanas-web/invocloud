@@ -3,7 +3,6 @@ import {
     serverSupabaseUser,
 } from "#supabase/server";
 import * as z from "zod";
-import { parseBody } from "~~/server/lib/common";
 import { Database } from "~~/types/database.types";
 
 const schema = z.object({

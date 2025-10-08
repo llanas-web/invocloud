@@ -25,6 +25,22 @@ const createEstablishmentRepository = (supabase: SupabaseClient<Database>) => {
         return establishmentsResponse;
     };
 
+    const getEstablishmentsByUploadId = async (uploadId: string) => {
+        const { data } = await supabase.auth.getUser();
+        const establishmentsResponse = await supabase
+            .from("upload_validations")
+            .select("establishments(id, name)")
+            .eq("upload_id", uploadId)
+            .eq("uploader_id", data.user!.id);
+        if (establishmentsResponse.error) {
+            console.error(
+                "Error fetching establishments from upload ID:",
+                establishmentsResponse.error,
+            );
+        }
+        return establishmentsResponse;
+    };
+
     const getEstablishmentsFromMemberId = async (
         userId: string,
     ) => {
@@ -139,6 +155,23 @@ const createEstablishmentRepository = (supabase: SupabaseClient<Database>) => {
         return data === null;
     };
 
+    const getSuppliersFromEmailSender = async (
+        senderEmail: string,
+        recipientEmail: string,
+    ) => {
+        const response = await supabase
+            .rpc(
+                "check_sender_authorized",
+                {
+                    sender_email: senderEmail,
+                    recipient_email: recipientEmail,
+                },
+            );
+        if (response.error) {
+            console.error("Permission check error:", response.error.message);
+        }
+        return response;
+    };
     const updateEstablishment = async (
         id: string,
         updates: Partial<Establishment>,
@@ -175,12 +208,14 @@ const createEstablishmentRepository = (supabase: SupabaseClient<Database>) => {
 
     return {
         getEstablishmentsByIds,
+        getEstablishmentsByUploadId,
         getEstablishmentsFromMemberId,
         getEstablishmentsMembers,
         addMemberToEstablishment,
         getEstablishmentByPrefix,
         createEstablishment,
         isEmailPrefixAvailable,
+        getSuppliersFromEmailSender,
         deleteEstablishment,
         updateEstablishment,
     };

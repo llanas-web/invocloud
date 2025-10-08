@@ -46,7 +46,7 @@ const createUserRepository = (supabase: SupabaseClient<Database>) => {
     const deleteUser = async (id: string) => {
         const userResponse = await useFetch<
             ReturnType<
-                typeof import("~~/server/api/user/delete-account.post").default
+                typeof import("~~/server/api/security/user/delete-account.post").default
             >
         >("/api/user/delete-account", {
             method: "POST",
