@@ -1,6 +1,10 @@
 import { createSharedComposable } from "@vueuse/core";
+import SupabaseAuthRepository from "~~/shared/providers/auth/supabase/auth.repository";
 
 const _useAuth = () => {
+    const authRepository = new SupabaseAuthRepository(
+        useSupabaseClient(),
+    );
     const supabase = useSupabaseClient();
     const user = useSupabaseUser();
     const session = useSupabaseSession();
