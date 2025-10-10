@@ -2,10 +2,10 @@ import z from "zod";
 import createEstablishmentService from "~~/server/lib/services/establishments.service";
 import { serverClient, serverServiceRole } from "~~/server/lib/supabase/client";
 import { parseBody } from "~~/server/utils/error-handler";
-import createEstablishmentRepository from "#shared/repositories/establishment.repository";
-import createUploadRepository from "#shared/repositories/upload.repository";
+import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
+import createUploadRepository from "~~/shared/providers/database/supabase/repositories/upload-validation.repository";
 import { generateCode } from "~/utils/hash";
-import { sendEmail } from "~~/server/lib/email";
+import { sendEmail } from "~~/server/lib/providers/email";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 

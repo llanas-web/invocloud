@@ -1,4 +1,4 @@
-import { OcrProviderName } from "./types";
+import { OcrProviderName } from "../../../../types/providers/ocr/mindee/types";
 import type { OcrProvider } from "./provider";
 import { MindeeProvider } from "./adapters/mindee";
 

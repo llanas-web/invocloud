@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "~~/types/database.types";
+import type { Database } from "~~/types/providers/database/supabase/database.types";
 
 const createStorageRepository = (supabase: SupabaseClient<Database>) => {
     const uploadInvoiceFile = async (

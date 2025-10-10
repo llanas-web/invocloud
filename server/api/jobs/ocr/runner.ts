@@ -1,6 +1,6 @@
-import { getOcrProvider } from "~~/server/lib/ocr/factory";
+import { getOcrProvider } from "~~/server/lib/providers/ocr/factory";
 import { serverServiceRole } from "~~/server/lib/supabase/client";
-import createStorageRepository from "#shared/repositories/storage.repository";
+import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
 import createInvoiceTaskRepository from "#shared/repositories/tasks/invoice_task.repository";
 
 export default defineEventHandler(async (event) => {

@@ -1,5 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import createUserRepository from "#shared/repositories/user.repository";
+import createUserRepository from "~~/shared/providers/database/supabase/repositories/user.repository";
 
 const defaultUserSettings = {
     favorite_establishment_id: null,

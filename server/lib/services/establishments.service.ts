@@ -1,4 +1,4 @@
-import createEstablishmentRepository from "#shared/repositories/establishment.repository";
+import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
 import { serverClient, serverServiceRole } from "../supabase/client";
 import type { EventHandlerRequest, H3Event } from "h3";
 

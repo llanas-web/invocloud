@@ -1,7 +1,7 @@
 import { createSharedComposable } from "@vueuse/core";
 import type { UserUpdate } from "~~/types";
 import type { Database } from "~~/types/database.types";
-import createUserRepository from "#shared/repositories/user.repository";
+import createUserRepository from "~~/shared/providers/database/supabase/repositories/user.repository";
 
 const _useUser = () => {
     const supabaseClient = useSupabaseClient<Database>();

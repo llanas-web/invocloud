@@ -3,7 +3,7 @@ import { defineEventHandler } from "h3";
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
 import { Database } from "~~/types/database.types";
 import { stripe } from "~~/server/lib/stripe/client";
-import createEstablishmentRepository from "#shared/repositories/establishment.repository";
+import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
 
 export default defineEventHandler(async (event) => {
     const supabaseClient = await serverSupabaseClient<Database>(event);

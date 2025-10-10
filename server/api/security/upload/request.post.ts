@@ -1,7 +1,7 @@
 import { z } from "zod";
 import createEstablishmentService from "~~/server/lib/services/establishments.service";
 import { serverServiceRole } from "~~/server/lib/supabase/client";
-import createEstablishmentRepository from "#shared/repositories/establishment.repository";
+import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
 
 const schema = z.object({
     senderEmail: z.string().email(),

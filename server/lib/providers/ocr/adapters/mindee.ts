@@ -4,7 +4,7 @@ import type {
     OcrSubmitOptions,
     OcrSubmitResult,
     OcrWebhookPayload,
-} from "../types";
+} from "../../../../../types/providers/ocr/mindee/types";
 import * as mindee from "mindee";
 import type { EventHandlerRequest, H3Event } from "h3";
 

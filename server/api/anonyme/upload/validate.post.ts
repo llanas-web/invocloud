@@ -1,8 +1,8 @@
 import z from "zod";
 import { hashCode } from "~/utils/hash";
 import { serverServiceRole, serverUser } from "~~/server/lib/supabase/client";
-import createEstablishmentRepository from "#shared/repositories/establishment.repository";
-import createUploadRepository from "#shared/repositories/upload.repository";
+import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
+import createUploadRepository from "~~/shared/providers/database/supabase/repositories/upload-validation.repository";
 
 const schema = z.object({
     uploadValidationId: z.string().uuid(),
