@@ -16,9 +16,8 @@ import type {
     EstablishmentModelInsert,
     EstablishmentModelUpdate,
 } from "~~/shared/models/establishment.model";
-import type { MemberModel } from "~~/shared/models/member.model";
 
-export default class EstablishmentRepository
+export class EstablishmentRepository
     implements EstablishmentsInterface, EstablishmentMembersInterface {
     constructor(private supabase: SupabaseClient<Database>) {}
 

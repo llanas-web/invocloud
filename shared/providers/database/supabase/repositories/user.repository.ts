@@ -1,6 +1,4 @@
 import type {
-    User,
-    UserSettings,
     UserSettingsUpdate,
     UserUpdate,
 } from "~~/types/providers/database/index";
@@ -14,19 +12,20 @@ import SupabaseError from "../supabase-error";
 import { userMapperFromDatabase } from "../mapper";
 import { userSettingsMapperFromDatabase } from "../mapper/user-settings.mapper";
 
-export default class UserRepository
-    implements UserInterface, UserSettingsInterface {
+export class UserRepository implements UserInterface, UserSettingsInterface {
     constructor(private supabase: SupabaseClient<Database>) {}
 
-    async getUser(filter?: { id?: string; email?: string }) {
-        const request = this.supabase.from("users").select("*");
-        if (filter?.id) request.eq("id", filter.id);
-        if (filter?.email) request.eq("email", filter.email);
-        const { data, error } = await request.single();
+    async getUser(
+        filter?: { id?: string; email?: string },
+    ) {
+        let request = this.supabase.from("users").select("*");
+        if (filter?.id) request = request.eq("id", filter.id);
+        if (filter?.email) request = request.eq("email", filter.email);
+        const { data, error } = await request.maybeSingle();
         if (error) {
             throw new SupabaseError("Error fetching user:", error);
         }
-        return userMapperFromDatabase(data);
+        return data ? userMapperFromDatabase(data) : null;
     }
 
     async updateUser(id: string, updates: UserUpdate) {

@@ -1,4 +1,4 @@
-import { serverServiceRole } from "~~/server/lib/supabase/client";
+import { serverServiceRole } from "~~/shared/providers/database/supabase/client";
 import { OcrProviderName } from "~~/types/providers/ocr/mindee/types";
 import { getOcrProvider } from "~~/server/lib/providers/ocr/factory";
 import createInvoiceRepository from "~~/shared/providers/database/supabase/repositories/invoice.repository";

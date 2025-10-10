@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { serverServiceRole, serverUser } from "~~/server/lib/supabase/client";
+import {
+    serverServiceRole,
+    serverUser,
+} from "~~/shared/providers/database/supabase/client";
 import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
 import createUploadRepository from "~~/shared/providers/database/supabase/repositories/upload-validation.repository";
 

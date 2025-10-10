@@ -1,6 +1,6 @@
 import { z } from "zod";
 import createEstablishmentService from "~~/server/lib/services/establishments.service";
-import { serverServiceRole } from "~~/server/lib/supabase/client";
+import { serverServiceRole } from "~~/shared/providers/database/supabase/client";
 import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
 
 const schema = z.object({

@@ -1,5 +1,5 @@
 import { getOcrProvider } from "~~/server/lib/providers/ocr/factory";
-import { serverServiceRole } from "~~/server/lib/supabase/client";
+import { serverServiceRole } from "~~/shared/providers/database/supabase/client";
 import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
 import createInvoiceTaskRepository from "#shared/repositories/tasks/invoice_task.repository";
 
