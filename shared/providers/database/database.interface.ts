@@ -120,7 +120,7 @@ export interface UserInterface {
     updateUser(
         id: string,
         updates: UserUpdate,
-    ): Promise<UserModel | null>;
+    ): Promise<UserModel>;
     deleteUser(id: string): Promise<boolean>;
 }
 
@@ -132,4 +132,12 @@ export interface UserSettingsInterface {
         userId: string,
         settings: UserSettingsUpdate,
     ): Promise<UserSettingsModel | null>;
+}
+
+export interface AdminInterface {
+    inviteUserByEmail(
+        email: string,
+        data: object,
+        redirectTo: string,
+    ): Promise<boolean>;
 }

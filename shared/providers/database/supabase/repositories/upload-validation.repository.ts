@@ -1,16 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type {
-    UploadValidation,
-    UploadValidationInsert,
-    UploadValidationUpdate,
-} from "~~/types/providers/database/index";
+import type { UploadValidationUpdate } from "~~/types/providers/database/index";
 import type { Database } from "~~/types/providers/database/supabase/database.types";
 import { hashCode } from "~/utils/hash";
 import type { UploadValidationsInterface } from "../../database.interface";
 import SupabaseError from "../supabase-error";
 
-export default class UploadValidationRepository
-    implements UploadValidationsInterface {
+export class UploadValidationRepository implements UploadValidationsInterface {
     constructor(private supabase: SupabaseClient<Database>) {}
 
     async createUploadValidation(

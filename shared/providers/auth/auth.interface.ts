@@ -4,6 +4,7 @@ import type {
 } from "~~/shared/models/auth-user.model";
 
 export interface AuthInterface {
+    currentUser: AuthUserModel | AnonymousAuthUserModel | null;
     signInWithPassword(
         email: string,
         password: string,

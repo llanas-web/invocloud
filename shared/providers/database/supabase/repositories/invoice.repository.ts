@@ -5,12 +5,11 @@ import type {
     InvoiceUpdate,
 } from "~~/types/providers/database/index";
 import type { InvoicesInterface } from "../../database.interface";
-import type { InvoiceModel } from "~~/shared/models/invoice.model";
 import SupabaseError from "../supabase-error";
 import { invoiceMapperFromDatabase } from "../mapper/invoice.mapper";
 import { supplierMapperFromDatabase } from "../mapper/supplier.mapper";
 
-export default class InvoiceRepository implements InvoicesInterface {
+export class InvoiceRepository implements InvoicesInterface {
     constructor(private supabase: SupabaseClient<Database>) {}
 
     async getAllInvoices(

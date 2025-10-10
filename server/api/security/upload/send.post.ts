@@ -1,7 +1,10 @@
 import { success, z } from "zod";
 import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
 import createUploadRepository from "~~/shared/providers/database/supabase/repositories/upload-validation.repository";
-import { serverServiceRole, serverUser } from "~~/server/lib/supabase/client";
+import {
+    serverServiceRole,
+    serverUser,
+} from "~~/shared/providers/database/supabase/client";
 import createInvoiceRepository from "~~/shared/providers/database/supabase/repositories/invoice.repository";
 import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
 import createSupplierRepository from "~~/shared/providers/database/supabase/repositories/supplier.repository";

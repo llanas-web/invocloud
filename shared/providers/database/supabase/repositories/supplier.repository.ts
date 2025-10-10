@@ -8,7 +8,7 @@ import type { SuppliersInterface } from "../../database.interface";
 import SupabaseError from "../supabase-error";
 import { supplierMapperFromDatabase } from "../mapper/supplier.mapper";
 
-export default class SupplierRepository implements SuppliersInterface {
+export class SupplierRepository implements SuppliersInterface {
     constructor(private supabase: SupabaseClient<Database>) {}
 
     async getAllSuppliers(

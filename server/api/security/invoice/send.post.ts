@@ -4,7 +4,7 @@ import {
     serverClient,
     serverServiceRole,
     serverUser,
-} from "~~/server/lib/supabase/client";
+} from "~~/shared/providers/database/supabase/client";
 import createInvoiceRepository from "~~/shared/providers/database/supabase/repositories/invoice.repository";
 import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
 

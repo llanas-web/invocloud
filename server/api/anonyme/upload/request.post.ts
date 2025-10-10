@@ -1,6 +1,9 @@
 import z from "zod";
 import createEstablishmentService from "~~/server/lib/services/establishments.service";
-import { serverClient, serverServiceRole } from "~~/server/lib/supabase/client";
+import {
+    serverClient,
+    serverServiceRole,
+} from "~~/shared/providers/database/supabase/client";
 import { parseBody } from "~~/server/utils/error-handler";
 import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
 import createUploadRepository from "~~/shared/providers/database/supabase/repositories/upload-validation.repository";

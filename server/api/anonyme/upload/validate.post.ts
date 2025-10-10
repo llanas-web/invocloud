@@ -1,6 +1,9 @@
 import z from "zod";
 import { hashCode } from "~/utils/hash";
-import { serverServiceRole, serverUser } from "~~/server/lib/supabase/client";
+import {
+    serverServiceRole,
+    serverUser,
+} from "~~/shared/providers/database/supabase/client";
 import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
 import createUploadRepository from "~~/shared/providers/database/supabase/repositories/upload-validation.repository";
 
