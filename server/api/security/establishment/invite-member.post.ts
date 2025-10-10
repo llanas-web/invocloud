@@ -4,8 +4,8 @@ import {
 } from "#supabase/server";
 import * as z from "zod";
 import { sendEmail } from "~~/server/lib/email";
-import createEstablishmentRepository from "#shared/repositories/establishment.repository";
-import createUserRepository from "#shared/repositories/user.repository";
+import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
+import createUserRepository from "~~/shared/providers/database/supabase/repositories/user.repository";
 import { Database } from "~~/types/database.types";
 
 const schema = z.object({

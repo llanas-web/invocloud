@@ -1,7 +1,7 @@
 import { createSharedComposable } from "@vueuse/core";
 import type { InvoiceUpdate } from "~~/types";
 import type { Database } from "~~/types/database.types";
-import createInvoiceRepository from "#shared/repositories/invoice.repository";
+import createInvoiceRepository from "~~/shared/providers/database/supabase/repositories/invoice.repository";
 
 const _useInvoiceDetails = () => {
     const route = useRoute();

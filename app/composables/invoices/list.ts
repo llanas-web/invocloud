@@ -1,9 +1,9 @@
 import { createSharedComposable } from "@vueuse/core";
-import createInvoiceRepository from "#shared/repositories/invoice.repository";
+import createInvoiceRepository from "~~/shared/providers/database/supabase/repositories/invoice.repository";
 import type { InvoiceInsert, InvoiceUpdate } from "~~/types";
 import type { Database } from "~~/types/database.types";
 import { acceptedStatus } from "~~/types/schemas/invoices";
-import createStorageRepository from "#shared/repositories/storage.repository";
+import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
 
 const _useInvoices = () => {
     const supabaseClient = useSupabaseClient<Database>();

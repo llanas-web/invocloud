@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { serverServiceRole, serverUser } from "~~/server/lib/supabase/client";
-import createStorageRepository from "#shared/repositories/storage.repository";
-import createUploadRepository from "#shared/repositories/upload.repository";
+import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
+import createUploadRepository from "~~/shared/providers/database/supabase/repositories/upload-validation.repository";
 
 const schema = z.object({
     invoiceId: z.string().uuid(),

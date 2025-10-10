@@ -1,9 +1,9 @@
 import { createSharedComposable } from "@vueuse/core";
 import type { Establishment } from "~~/types";
 import { FetchError } from "ofetch";
-import createInvoiceRepository from "#shared/repositories/invoice.repository";
+import createInvoiceRepository from "~~/shared/providers/database/supabase/repositories/invoice.repository";
 import type { Database } from "~~/types/database.types";
-import createUploadRepository from "~~/shared/repositories/upload.repository";
+import createUploadRepository from "~~/shared/providers/database/supabase/repositories/upload-validation.repository";
 
 const _useInvoiceUpload = () => {
     const toast = useToast();

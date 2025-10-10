@@ -1,5 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import createSupplierRepository from "#shared/repositories/supplier.repository";
+import createSupplierRepository from "~~/shared/providers/database/supabase/repositories/supplier.repository";
 import type { Range, SupplierUpdate } from "~~/types";
 
 const _useSuppliers = () => {

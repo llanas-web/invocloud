@@ -1,5 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import createEstablishmentRepository from "#shared/repositories/establishment.repository";
+import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
 
 const _useMembers = () => {
     const supabaseClient = useSupabaseClient();

@@ -5,8 +5,8 @@ import {
     serverServiceRole,
     serverUser,
 } from "~~/server/lib/supabase/client";
-import createInvoiceRepository from "#shared/repositories/invoice.repository";
-import createStorageRepository from "#shared/repositories/storage.repository";
+import createInvoiceRepository from "~~/shared/providers/database/supabase/repositories/invoice.repository";
+import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
 
 const schema = z.object({
     invoices: z.array(z.uuid()),

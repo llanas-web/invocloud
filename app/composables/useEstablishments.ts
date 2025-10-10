@@ -1,5 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import createEstablishmentRepository from "#shared/repositories/establishment.repository";
+import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
 import type { Establishment, EstablishmentUpdate } from "~~/types";
 import type { Database } from "~~/types/database.types";
 
