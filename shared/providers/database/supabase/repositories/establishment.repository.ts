@@ -1,6 +1,6 @@
 import type { Database } from "~~/types/providers/database/supabase/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { EstablishmentsInterface } from "../../database.interface";
+import type { EstablishmentRepository } from "../../database.interface";
 import SupabaseError from "../supabase-error";
 import {
     establishmentInsertMapperToDatabase,
@@ -14,7 +14,8 @@ import type {
     EstablishmentModelUpdate,
 } from "~~/shared/models/establishment.model";
 
-export class EstablishmentRepository implements EstablishmentsInterface {
+export class EstablishmentSupabaseRepository
+    implements EstablishmentRepository {
     constructor(private supabase: SupabaseClient<Database>) {}
 
     getAllEstablishments = async (
