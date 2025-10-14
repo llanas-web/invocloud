@@ -4,12 +4,12 @@ import type {
 } from "~~/types/providers/database/index";
 import type { Database } from "~~/types/providers/database/supabase/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { UserInterface } from "../../database.interface";
+import type { UserRepository } from "../../database.interface";
 import SupabaseError from "../supabase-error";
 import { userMapperFromDatabase } from "../mapper";
 import { userSettingsMapperFromDatabase } from "../mapper/user-settings.mapper";
 
-export class UserRepository implements UserInterface {
+export class UserSupabaseRepository implements UserRepository {
     constructor(private supabase: SupabaseClient<Database>) {}
 
     async getUser(

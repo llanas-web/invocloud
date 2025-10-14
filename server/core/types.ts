@@ -1,22 +1,22 @@
 import type { AuthInterface } from "~~/shared/providers/auth/auth.interface";
 import {
-    AdminInterface,
-    EstablishmentsInterface,
-    InvoicesInterface,
-    SuppliersInterface,
-    UploadValidationsInterface,
-    UserInterface,
+    AdminRepository,
+    EstablishmentRepository,
+    InvoiceRepository,
+    SupplierRepository,
+    UploadValidationRepository,
+    UserRepository,
 } from "~~/shared/providers/database/database.interface";
 
 export type Deps = {
     repos: {
-        establishmentRepository: EstablishmentsInterface;
-        invoiceRepository: InvoicesInterface;
-        supplierRepository: SuppliersInterface;
-        userRepository: UserInterface;
-        uploadValidationRepository: UploadValidationsInterface;
+        establishmentRepository: EstablishmentRepository;
+        invoiceRepository: InvoiceRepository;
+        supplierRepository: SupplierRepository;
+        userRepository: UserRepository;
+        uploadValidationRepository: UploadValidationRepository;
         authRepository: AuthInterface;
-        adminRepository: AdminInterface;
+        adminRepository: AdminRepository;
     };
 };
 

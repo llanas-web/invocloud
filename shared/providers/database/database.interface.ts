@@ -19,7 +19,7 @@ import type {
     UserUpdate,
 } from "~~/types/providers/database/index";
 
-export interface EstablishmentsInterface {
+export interface EstablishmentRepository {
     getAllEstablishments(
         filters: {
             ids?: string[];
@@ -61,7 +61,7 @@ export interface EstablishmentsInterface {
     ): Promise<boolean>;
 }
 
-export interface InvoicesInterface {
+export interface InvoiceRepository {
     getAllInvoices(
         filters?: {
             ids?: string[];
@@ -78,7 +78,7 @@ export interface InvoicesInterface {
     deleteInvoices(invoiceIds: string[]): Promise<boolean>;
 }
 
-export interface SuppliersInterface {
+export interface SupplierRepository {
     getAllSuppliers(
         filters?: { establishmentIds: string[]; emails: string[] },
     ): Promise<SupplierModel[]>;
@@ -92,7 +92,7 @@ export interface SuppliersInterface {
     deleteSupplier(supplierId: string): Promise<boolean>;
 }
 
-export interface UploadValidationsInterface {
+export interface UploadValidationRepository {
     createUploadValidation(
         senderEmail: string,
         recipientEmail: string,
@@ -110,7 +110,7 @@ export interface UploadValidationsInterface {
     ): Promise<boolean>;
 }
 
-export interface UserInterface {
+export interface UserRepository {
     getUser(
         filter?: { id?: string; email?: string },
     ): Promise<UserModel | null>;
@@ -128,7 +128,7 @@ export interface UserInterface {
     ): Promise<UserSettingsModel | null>;
 }
 
-export interface AdminInterface {
+export interface AdminRepository {
     inviteUserByEmail(
         email: string,
         data: object,

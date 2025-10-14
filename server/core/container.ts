@@ -6,12 +6,12 @@ import {
     serverUser,
 } from "~~/shared/providers/database/supabase/client";
 import {
-    AdminRepository,
-    EstablishmentRepository,
-    InvoiceRepository,
-    SupplierRepository,
-    UploadValidationRepository,
-    UserRepository,
+    AdminSupabaseRepository,
+    EstablishmentSupabaseRepository,
+    InvoiceSupabaseRepository,
+    SupplierSupabaseRepository,
+    UploadValidationSupabaseRepository,
+    UserSupabaseRepository,
 } from "~~/shared/providers/database/supabase/repositories";
 import SupabaseAuthRepository from "#shared/providers/auth/supabase/auth.repository";
 import DatabaseFactory from "#shared/providers/database/database-factory";

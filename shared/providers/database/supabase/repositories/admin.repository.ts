@@ -1,8 +1,8 @@
 import DatabaseError from "../../database-error";
-import type { AdminInterface } from "../../database.interface";
+import type { AdminRepository } from "../../database.interface";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-export class AdminRepository implements AdminInterface {
+export class AdminSupabaseRepository implements AdminRepository {
     constructor(private supabaseClient: SupabaseClient) {}
 
     async inviteUserByEmail(
@@ -23,4 +23,4 @@ export class AdminRepository implements AdminInterface {
     }
 }
 
-export default AdminRepository;
+export default AdminSupabaseRepository;
