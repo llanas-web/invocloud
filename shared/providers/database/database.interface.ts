@@ -48,9 +48,6 @@ export interface EstablishmentsInterface {
         recipientEmail: string,
     ): Promise<EstablishmentShortModel[]>;
     deleteEstablishment(id: string): Promise<boolean>;
-}
-
-export interface EstablishmentMembersInterface {
     getEstablishmentMembers(
         establishmentId: string,
     ): Promise<MemberModel[]>;
@@ -122,9 +119,6 @@ export interface UserInterface {
         updates: UserUpdate,
     ): Promise<UserModel>;
     deleteUser(id: string): Promise<boolean>;
-}
-
-export interface UserSettingsInterface {
     getUserSettings(
         userId: string,
     ): Promise<UserSettingsModel | null>;

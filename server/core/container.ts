@@ -14,7 +14,7 @@ import {
     UserRepository,
 } from "~~/shared/providers/database/supabase/repositories";
 import SupabaseAuthRepository from "#shared/providers/auth/supabase/auth.repository";
-import { sendEmail } from "../lib/providers/email";
+import DatabaseFactory from "#shared/providers/database/database-factory";
 
 export async function buildRequestScope(
     event: H3Event<EventHandlerRequest>,
@@ -23,6 +23,7 @@ export async function buildRequestScope(
     const requestId = getHeader(event, "x-request-id") ?? crypto.randomUUID();
 
     const ss = serverServiceRole(event);
+    const { getRepository } = DatabaseFactory.getInstance(ss);
 
     const ctx: RequestContext = {
         requestId,
@@ -33,13 +34,15 @@ export async function buildRequestScope(
 
     const deps: Deps = {
         repos: {
-            uploadValidationRepository: new UploadValidationRepository(ss),
-            establishmentRepository: new EstablishmentRepository(ss),
-            invoiceRepository: new InvoiceRepository(ss),
-            supplierRepository: new SupplierRepository(ss),
-            userRepository: new UserRepository(ss),
-            authRepository: new SupabaseAuthRepository(ss),
-            adminRepository: new AdminRepository(ss),
+            uploadValidationRepository: getRepository(
+                "uploadValidationRepository",
+            ),
+            establishmentRepository: getRepository("establishmentRepository"),
+            invoiceRepository: getRepository("invoiceRepository"),
+            supplierRepository: getRepository("supplierRepository"),
+            userRepository: getRepository("userRepository"),
+            authRepository: getRepository("authRepository"),
+            adminRepository: getRepository("adminRepository"),
         },
     };
     return { ctx, deps };
