@@ -1,15 +1,14 @@
+import type { Database } from "#build/types/supabase-database";
 import { createSharedComposable } from "@vueuse/core";
-import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
-import type { Establishment, EstablishmentUpdate } from "~~/types";
-import type { Database } from "~~/types/database.types";
+import type { EstablishmentModel } from "~~/shared/models/establishment.model";
+import DatabaseFactory from "~~/shared/providers/database/database-factory";
 
 const _useEstablishments = () => {
     const supabaseClient = useSupabaseClient<Database>();
-    const establishmentRepository = createEstablishmentRepository(
-        supabaseClient,
-    );
+    const { getRepository } = DatabaseFactory.getInstance(supabaseClient);
+    const establishmentRepository = getRepository("establishmentRepository");
     const user = useSupabaseUser();
-    const selectedEstablishment = ref<Establishment | null>(null);
+    const selectedEstablishment = ref<EstablishmentModel | null>(null);
     const { userSettings } = useUserSettings();
     const loaded = ref(false);
 
@@ -20,7 +19,7 @@ const _useEstablishments = () => {
         }
     }, { immediate: true });
 
-    const selectEstablishment = (establishments: Establishment[]) => {
+    const selectEstablishment = (establishments: EstablishmentModel[]) => {
         let establishmentId: string | null = null;
         if (selectedEstablishment.value != null) {
             establishmentId = selectedEstablishment.value.id;
@@ -40,16 +39,11 @@ const _useEstablishments = () => {
     const { data: establishments, pending, refresh } = useAsyncData(
         "establishments",
         async () => {
-            const { data, error } = await establishmentRepository
+            const establishements = await establishmentRepository
                 .getEstablishmentsFromMemberId(user.value!.id);
-            if (error) {
-                console.error("Error fetching establishments:", error);
-                return [];
-            }
-            const establishmentsData = data.map((item) => item.establishments);
-            selectEstablishment(establishmentsData);
+            selectEstablishment(establishements);
             loaded.value = true;
-            return establishmentsData;
+            return establishements;
         },
         {
             immediate: true,
@@ -59,17 +53,14 @@ const _useEstablishments = () => {
     );
 
     const createEstablishment = async (name: string) => {
-        const { data: newEstablishment, error } = await establishmentRepository
+        const newEstablishment = await establishmentRepository
             .createEstablishment({
                 name,
-                creator_id: user.value!.id,
+                creatorId: user.value!.id,
+                emailPrefix: name.toLowerCase().replace(/\s+/g, "-"),
             });
 
         selectedEstablishment.value = newEstablishment;
-
-        if (error) {
-            return null;
-        }
         refresh();
         return newEstablishment;
     };

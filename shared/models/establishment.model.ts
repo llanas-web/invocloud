@@ -41,9 +41,9 @@ export type EstablishmentShortModel = Pick<
     "id" | "name"
 >;
 
-export type EstablishmentModelInsert = Omit<
+export type EstablishmentModelInsert = Pick<
     EstablishmentModel,
-    "id" | "createdAt" | "updatedAt" | "subscription"
+    "name" | "creatorId" | "emailPrefix"
 >;
 
 export type EstablishmentModelUpdate = Partial<
