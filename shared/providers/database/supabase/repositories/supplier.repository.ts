@@ -5,8 +5,9 @@ import type {
 } from "~~/types/providers/database/index";
 import type { Database } from "~~/types/providers/database/supabase/database.types";
 import type { SupplierRepository } from "../../database.interface";
-import SupabaseError from "../supabase-error";
 import { supplierMapperFromDatabase } from "../mapper/supplier.mapper";
+import { Err, Ok } from "../../result";
+import { SupabaseError } from "../supabase-error";
 
 export class SupplierSupabaseRepository implements SupplierRepository {
     constructor(private supabase: SupabaseClient<Database>) {}
@@ -26,10 +27,8 @@ export class SupplierSupabaseRepository implements SupplierRepository {
         const { data, error } = await request.order("created_at", {
             ascending: false,
         });
-        if (error) {
-            throw new SupabaseError("Error fetching suppliers:", error);
-        }
-        return data.map(supplierMapperFromDatabase);
+        if (error) return Err(SupabaseError.fromPostgrest(error));
+        return Ok(data.map(supplierMapperFromDatabase));
     }
 
     async createSupplier(supplier: SupplierInsert) {
@@ -42,10 +41,8 @@ export class SupplierSupabaseRepository implements SupplierRepository {
                         name
                     )`)
             .single();
-        if (error) {
-            throw new SupabaseError("Error creating supplier:", error);
-        }
-        return supplierMapperFromDatabase(data);
+        if (error) return Err(SupabaseError.fromPostgrest(error));
+        return Ok(supplierMapperFromDatabase(data));
     }
 
     async updateSupplier(supplierId: string, updatedSupplier: SupplierUpdate) {
@@ -60,20 +57,16 @@ export class SupplierSupabaseRepository implements SupplierRepository {
                     )`)
             .single();
 
-        if (error) {
-            throw new SupabaseError("Error updating supplier:", error);
-        }
-
-        return supplierMapperFromDatabase(data);
+        if (error) return Err(SupabaseError.fromPostgrest(error));
+        return Ok(supplierMapperFromDatabase(data));
     }
+
     async deleteSupplier(supplierId: string) {
         const { error } = await this.supabase
             .from("suppliers")
             .delete()
             .eq("id", supplierId);
-        if (error) {
-            throw new SupabaseError("Error deleting supplier:", error);
-        }
-        return true;
+        if (error) return Err(SupabaseError.fromPostgrest(error));
+        return Ok(true);
     }
 }

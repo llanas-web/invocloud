@@ -1,91 +1,158 @@
 import type { Database } from "#build/types/supabase-database";
-import { createSharedComposable } from "@vueuse/core";
+import { createSharedComposable, useLocalStorage } from "@vueuse/core";
 import type { EstablishmentModel } from "~~/shared/models/establishment.model";
 import DatabaseFactory from "~~/shared/providers/database/database-factory";
+import type { EstablishmentUpdate } from "~~/types/providers/database";
+import useAsyncAction from "./core/useAsyncAction";
+
+function slugify(s: string) {
+    return s.trim().toLowerCase().replace(/\s+/g, "-").replace(
+        /[^a-z0-9-]/g,
+        "",
+    );
+}
 
 const _useEstablishments = () => {
-    const supabaseClient = useSupabaseClient<Database>();
-    const { getRepository } = DatabaseFactory.getInstance(supabaseClient);
-    const establishmentRepository = getRepository("establishmentRepository");
+    const supabase = useSupabaseClient<Database>();
     const user = useSupabaseUser();
-    const selectedEstablishment = ref<EstablishmentModel | null>(null);
     const { userSettings } = useUserSettings();
-    const loaded = ref(false);
 
-    watch(() => selectedEstablishment.value, (newEstablishment) => {
-        console.log("Selected establishment changed:", newEstablishment);
-        if (newEstablishment && user.value) {
-            localStorage.setItem("selectedEstablishment", newEstablishment.id);
-        }
-    }, { immediate: true });
+    const { getRepository } = DatabaseFactory.getInstance(supabase);
+    const establishmentRepository = getRepository("establishmentRepository");
 
-    const selectEstablishment = (establishments: EstablishmentModel[]) => {
-        let establishmentId: string | null = null;
-        if (selectedEstablishment.value != null) {
-            establishmentId = selectedEstablishment.value.id;
-        } else if (localStorage.getItem("selectedEstablishment")) {
-            establishmentId = localStorage.getItem("selectedEstablishment");
-        } else if (userSettings.value?.favorite_establishment_id) {
-            establishmentId = userSettings.value.favorite_establishment_id;
-        } else {
-            establishmentId = establishments[0]?.id || null;
-        }
-        console.log("Selected establishment ID:", establishmentId);
-        selectedEstablishment.value = establishments.find(
-            (est) => est.id === establishmentId,
-        ) || null;
-    };
+    // --- State
+    const selectedId = useLocalStorage<string | null>(
+        "selectedEstablishmentId",
+        null,
+    );
 
-    const { data: establishments, pending, refresh } = useAsyncData(
-        "establishments",
+    const key = computed(() => `establishments:${user.value?.id ?? "anon"}`);
+    const fetchError = ref<unknown>(null);
+
+    const {
+        data: establishments,
+        pending: pendingFetch,
+        refresh,
+    } = useAsyncData(
+        key,
         async () => {
-            const establishements = await establishmentRepository
-                .getEstablishmentsFromMemberId(user.value!.id);
-            selectEstablishment(establishements);
-            loaded.value = true;
-            return establishements;
+            fetchError.value = null;
+            if (!user.value?.id) return [];
+            const res = await establishmentRepository
+                .getEstablishmentsFromMemberId(user.value.id);
+            if (!res.ok) {
+                fetchError.value = res.error;
+                return [];
+            }
+            // (ré)initialise la sélection quand la liste arrive
+            ensureSelection(res.value);
+            return res.value;
         },
         {
-            immediate: true,
             server: false,
-            default: () => [],
+            immediate: true,
+            default: () => [] as EstablishmentModel[],
+            watch: [() => user.value?.id],
         },
     );
 
-    const createEstablishment = async (name: string) => {
-        const newEstablishment = await establishmentRepository
-            .createEstablishment({
+    // Sélection dérivée (pas de double source de vérité)
+    const selectedEstablishment = computed<EstablishmentModel | null>(() => {
+        if (!selectedId.value) return null;
+        return establishments.value.find((e) => e.id === selectedId.value) ??
+            null;
+    });
+
+    // --- Helpers sélection
+    function exists(id?: string | null) {
+        return !!id && establishments.value.some((e) => e.id === id);
+    }
+
+    function ensureSelection(list: EstablishmentModel[]) {
+        // ordre: selectedId → favori user → premier → null
+        const candidate =
+            (exists(selectedId.value)
+                ? selectedId.value
+                : (exists(userSettings.value?.favorite_establishment_id)
+                    ? userSettings.value?.favorite_establishment_id
+                    : list[0]?.id)) ?? null;
+
+        selectedId.value = candidate;
+    }
+
+    /** Sélectionne explicitement un établissement (id) */
+    function selectEstablishment(id: string | null) {
+        selectedId.value = exists(id) ? id : null;
+        if (!selectedId.value) ensureSelection(establishments.value);
+    }
+
+    // Si la liste change et invalide la sélection, on retombe sur un fallback
+    watch(establishments, (list) => {
+        if (!exists(selectedId.value)) ensureSelection(list);
+    });
+
+    // --- Actions states
+    const createEstablishmentAction = useAsyncAction(
+        async (name: string) => {
+            const body = {
                 name,
-                creatorId: user.value!.id,
-                emailPrefix: name.toLowerCase().replace(/\s+/g, "-"),
-            });
-
-        selectedEstablishment.value = newEstablishment;
-        refresh();
-        return newEstablishment;
-    };
-
-    const isEmailPrefixAvailable = (email_prefix: string) => {
-        return establishmentRepository
-            .isEmailPrefixAvailable(
-                email_prefix,
-                selectedEstablishment.value?.id,
+                creatorId: user.value?.id ?? "",
+                emailPrefix: slugify(name),
+            };
+            const result = await establishmentRepository.createEstablishment(
+                body,
             );
-    };
+            if (!result.ok) throw result.error;
+            establishments.value.push(result.value);
+            selectedId.value = result.value.id;
+            refresh();
+            return result.value;
+        },
+    );
 
-    const updateEstablishment = async (
-        establishment: Partial<EstablishmentUpdate>,
-    ) => {
-        const { data, error } = await establishmentRepository
-            .updateEstablishment(
-                selectedEstablishment.value!.id,
-                establishment,
+    const updateEstablishmentAction = useAsyncAction(
+        async (patch: Partial<EstablishmentUpdate>) => {
+            const estId = selectedId.value;
+            if (!estId) throw new Error("No establishment selected");
+            const result = await establishmentRepository.updateEstablishment(
+                estId,
+                patch,
             );
-        if (!error && data) {
-            await refresh();
-        }
-        return { data, error };
-    };
+            if (!result.ok) throw result.error;
+            const updatedEstablishment = result.value;
+            const i = establishments.value.findIndex((e) =>
+                e.id === updatedEstablishment.id
+            );
+            if (i >= 0) establishments.value[i] = updatedEstablishment;
+            return updatedEstablishment;
+        },
+    );
+
+    const deleteEstablishmentAction = useAsyncAction(
+        async (id: string) => {
+            const result = await establishmentRepository.deleteEstablishment(
+                id,
+            );
+            if (!result.ok) throw result.error;
+            establishments.value = establishments.value.filter((e) =>
+                e.id !== id
+            );
+            if (selectedId.value === id) selectedId.value = null;
+            refresh();
+            return true;
+        },
+    );
+
+    const checkEmailPrefixAvailable = useAsyncAction(
+        async (emailPrefix: string, excludeEstablishmentId?: string) => {
+            const result = await establishmentRepository.isEmailPrefixAvailable(
+                emailPrefix,
+                excludeEstablishmentId,
+            );
+            if (!result.ok) throw result.error;
+            return result.value;
+        },
+    );
 
     const subscribeToStripe = async () => {
         console.log(
@@ -148,33 +215,30 @@ const _useEstablishments = () => {
         return { success, message };
     };
 
-    const deleteEstablishment = async () => {
-        // First cancel any active subscriptions or trials
-        if (selectedEstablishment.value?.subscription_status === "active") {
-            await cancelStripeSubscription();
-        } else if (
-            selectedEstablishment.value?.subscription_status === "trialing"
-        ) {
-            await cancelStripeTrial();
-        }
-        return await establishmentRepository.deleteEstablishment(
-            selectedEstablishment.value!.id,
-        );
-    };
-
     return {
+        // data
         establishments,
         selectedEstablishment,
-        pending,
-        loaded,
+
+        // fetch states
+        pendingFetch,
+        fetchError,
+
+        // actions
         refresh,
-        createEstablishment,
-        updateEstablishment,
+        selectEstablishment,
+
+        // CRUD actions
+        createEstablishment: createEstablishmentAction,
+        updateEstablishment: updateEstablishmentAction,
+        deleteEstablishment: deleteEstablishmentAction,
+
+        // Async actions
+        checkEmailPrefixAvailable: checkEmailPrefixAvailable,
+
         subscribeToStripe,
         cancelStripeTrial,
         cancelStripeSubscription,
-        deleteEstablishment,
-        isEmailPrefixAvailable,
     };
 };
 

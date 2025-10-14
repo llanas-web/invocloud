@@ -18,6 +18,11 @@ import type {
     UserSettingsUpdate,
     UserUpdate,
 } from "~~/types/providers/database/index";
+import type { SupabaseError } from "./supabase/supabase-error";
+import type { DomainError } from "~~/shared/errors/domain.error";
+import type { Result } from "./result";
+
+type EncapsulatedResult<T> = Promise<Result<T, SupabaseError | DomainError>>;
 
 export interface EstablishmentRepository {
     getAllEstablishments(
@@ -25,40 +30,41 @@ export interface EstablishmentRepository {
             ids?: string[];
             prefixEmails?: string[];
         },
-    ): Promise<EstablishmentModel[]>;
+    ): EncapsulatedResult<EstablishmentModel[]>;
     getEstablishmentsShortFromUploadId(
         uploadId: string,
         userId: string,
-    ): Promise<EstablishmentShortModel[]>;
+    ): EncapsulatedResult<EstablishmentShortModel[]>;
     getEstablishmentsFromMemberId(
         userId: string,
-    ): Promise<EstablishmentModel[]>;
+    ): EncapsulatedResult<EstablishmentModel[]>;
     isEmailPrefixAvailable(
         emailPrefix: string,
-    ): Promise<boolean>;
+        excludeEstablishmentId?: string,
+    ): EncapsulatedResult<boolean>;
     createEstablishment(
         establishment: EstablishmentModelInsert,
-    ): Promise<EstablishmentModel | null>;
+    ): EncapsulatedResult<EstablishmentModel>;
     updateEstablishment(
         id: string,
         establishment: EstablishmentModelUpdate,
-    ): Promise<EstablishmentModel | null>;
+    ): EncapsulatedResult<EstablishmentModel>;
     getEstablishmentsShortFromEmails(
         emailSender: string,
         recipientEmail: string,
-    ): Promise<EstablishmentShortModel[]>;
-    deleteEstablishment(id: string): Promise<boolean>;
+    ): EncapsulatedResult<EstablishmentShortModel[]>;
+    deleteEstablishment(id: string): EncapsulatedResult<boolean>;
     getEstablishmentMembers(
         establishmentId: string,
-    ): Promise<MemberModel[]>;
+    ): EncapsulatedResult<MemberModel[]>;
     addEstablishmentMember(
         establishmentId: string,
         userId: string,
-    ): Promise<MemberModel>;
+    ): EncapsulatedResult<MemberModel>;
     removeEstablishmentMember(
         establishmentId: string,
         userId: string,
-    ): Promise<boolean>;
+    ): EncapsulatedResult<boolean>;
 }
 
 export interface InvoiceRepository {
@@ -67,29 +73,29 @@ export interface InvoiceRepository {
             ids?: string[];
             establishmentIds?: string[];
         },
-    ): Promise<InvoiceModel[] | null>;
+    ): EncapsulatedResult<InvoiceModel[] | null>;
     createInvoice(
         invoices: InvoiceInsert[],
-    ): Promise<InvoiceModel[] | null>;
+    ): EncapsulatedResult<InvoiceModel[] | null>;
     updateInvoice(
         invoiceId: string,
         invoice: InvoiceUpdate,
-    ): Promise<InvoiceModel | null>;
-    deleteInvoices(invoiceIds: string[]): Promise<boolean>;
+    ): EncapsulatedResult<InvoiceModel | null>;
+    deleteInvoices(invoiceIds: string[]): EncapsulatedResult<boolean>;
 }
 
 export interface SupplierRepository {
     getAllSuppliers(
         filters?: { establishmentIds: string[]; emails: string[] },
-    ): Promise<SupplierModel[]>;
+    ): EncapsulatedResult<SupplierModel[]>;
     createSupplier(
         supplier: SupplierInsert,
-    ): Promise<SupplierModel>;
+    ): EncapsulatedResult<SupplierModel>;
     updateSupplier(
         supplierId: string,
         updatedSupplier: SupplierUpdate,
-    ): Promise<SupplierModel>;
-    deleteSupplier(supplierId: string): Promise<boolean>;
+    ): EncapsulatedResult<SupplierModel>;
+    deleteSupplier(supplierId: string): EncapsulatedResult<boolean>;
 }
 
 export interface UploadValidationRepository {
@@ -98,34 +104,34 @@ export interface UploadValidationRepository {
         recipientEmail: string,
         token: string,
         uploaderId?: string,
-    ): Promise<string>;
+    ): EncapsulatedResult<string>;
     isTokenValid(
         uploadValidationId: string,
         uploaderId: string,
         token: string,
-    ): Promise<boolean>;
+    ): EncapsulatedResult<boolean>;
     updateUploadValidation(
         uploadValidationId: string,
         updates: UploadValidationUpdate,
-    ): Promise<boolean>;
+    ): EncapsulatedResult<boolean>;
 }
 
 export interface UserRepository {
     getUser(
         filter?: { id?: string; email?: string },
-    ): Promise<UserModel | null>;
+    ): EncapsulatedResult<UserModel | null>;
     updateUser(
         id: string,
         updates: UserUpdate,
-    ): Promise<UserModel>;
-    deleteUser(id: string): Promise<boolean>;
+    ): EncapsulatedResult<UserModel>;
+    deleteUser(id: string): EncapsulatedResult<boolean>;
     getUserSettings(
         userId: string,
-    ): Promise<UserSettingsModel | null>;
+    ): EncapsulatedResult<UserSettingsModel | null>;
     upsertUserSettings(
         userId: string,
         settings: UserSettingsUpdate,
-    ): Promise<UserSettingsModel | null>;
+    ): EncapsulatedResult<UserSettingsModel | null>;
 }
 
 export interface AdminRepository {
@@ -133,5 +139,5 @@ export interface AdminRepository {
         email: string,
         data: object,
         redirectTo: string,
-    ): Promise<boolean>;
+    ): EncapsulatedResult<boolean>;
 }
