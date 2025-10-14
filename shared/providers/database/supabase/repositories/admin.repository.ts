@@ -1,6 +1,7 @@
-import DatabaseError from "../../database-error";
 import type { AdminRepository } from "../../database.interface";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { SupabaseError } from "../supabase-error";
+import { Err, Ok } from "../../result";
 
 export class AdminSupabaseRepository implements AdminRepository {
     constructor(private supabaseClient: SupabaseClient) {}
@@ -9,7 +10,7 @@ export class AdminSupabaseRepository implements AdminRepository {
         email: string,
         data: object = {},
         redirectTo: string = "",
-    ): Promise<boolean> {
+    ) {
         const { error } = await this.supabaseClient.auth.admin
             .inviteUserByEmail(
                 email,
@@ -18,8 +19,8 @@ export class AdminSupabaseRepository implements AdminRepository {
                     redirectTo,
                 },
             );
-        if (error) throw new DatabaseError("Error inviting user", error);
-        return true;
+        if (error) return Err(SupabaseError.fromPostgrest(error));
+        return Ok(true);
     }
 }
 
