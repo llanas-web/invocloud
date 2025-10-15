@@ -9,10 +9,8 @@ import {
 } from "~/types/schemas/forms/suppliers.schema";
 
 const _useSupplierUpdate = () => {
-    const supabase = useSupabaseClient();
-    const { getRepository } = DatabaseFactory.getInstance(supabase);
+    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const supplierRepository = getRepository("supplierRepository");
-    const { selectedEstablishment } = useEstablishments();
 
     const { refresh } = useSuppliers();
     const supplier = ref<SupplierModel | null>(null);

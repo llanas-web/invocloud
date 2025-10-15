@@ -1,6 +1,5 @@
 import { z } from "zod";
 import DatabaseFactory from "~~/shared/providers/database/database-factory";
-import type { Database } from "~~/types/providers/database/supabase/database.types";
 import useAsyncAction from "../core/useAsyncAction";
 import { createSharedComposable } from "@vueuse/core";
 
@@ -19,9 +18,8 @@ function slugify(s: string) {
 }
 
 const _useEstablishmentCreate = () => {
-    const supabaseClient = useSupabaseClient<Database>();
     const supabaseUser = useSupabaseUser();
-    const { getRepository } = DatabaseFactory.getInstance(supabaseClient);
+    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const establishmentRepository = getRepository("establishmentRepository");
     const { establishments, refresh, selectEstablishment } =
         useEstablishments();

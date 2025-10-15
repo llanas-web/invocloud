@@ -1,7 +1,6 @@
 import { createSharedComposable } from "@vueuse/core";
 import { z } from "zod";
 import DatabaseFactory from "~~/shared/providers/database/database-factory";
-import type { Database } from "~~/types/providers/database/supabase/database.types";
 import useAsyncAction from "../core/useAsyncAction";
 
 const stateSchema = z.array(z.string()).min(
@@ -11,8 +10,7 @@ const stateSchema = z.array(z.string()).min(
 type inputSchema = z.input<typeof stateSchema>;
 
 const _useInvoicesDelete = () => {
-    const supabaseClient = useSupabaseClient<Database>();
-    const { getRepository } = DatabaseFactory.getInstance(supabaseClient);
+    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const invoiceRepository = getRepository("invoiceRepository");
     const open = ref(false);
     const selectedInvoices = ref<inputSchema>([]);

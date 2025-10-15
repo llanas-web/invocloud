@@ -3,12 +3,10 @@ import { acceptedStatus } from "~~/types/schemas/invoices";
 import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
 import type { Database } from "~~/types/providers/database/supabase/database.types";
 import DatabaseFactory from "~~/shared/providers/database/database-factory";
-import type { InvoiceModel } from "~~/shared/models/invoice.model";
 
 const _useInvoices = () => {
-    const supabaseClient = useSupabaseClient<Database>();
     const supabaseUser = useSupabaseUser();
-    const { getRepository } = DatabaseFactory.getInstance(supabaseClient);
+    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const invoiceRepository = getRepository("invoiceRepository");
 
     const { selectedEstablishment } = useEstablishments();

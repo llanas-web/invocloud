@@ -1,15 +1,13 @@
 import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "../core/useAsyncAction";
 import DatabaseFactory from "~~/shared/providers/database/database-factory";
-import type { Database } from "~~/types/providers/database/supabase/database.types";
 import {
     type UpdateInvoiceForm,
     UpdateInvoiceSchema,
 } from "~/types/schemas/forms/invoices.schema";
 
 const _useInvoiceUpdate = () => {
-    const supabaseClient = useSupabaseClient<Database>();
-    const { getRepository } = DatabaseFactory.getInstance(supabaseClient);
+    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const invoiceRepository = getRepository("invoiceRepository");
     const { invoice } = useInvoiceDetails();
 

@@ -1,12 +1,9 @@
 import { createSharedComposable } from "@vueuse/core";
-import useAsyncAction from "../core/useAsyncAction";
 import DatabaseFactory from "~~/shared/providers/database/database-factory";
-import type { Supplier } from "~~/types/providers/database";
 import type SupplierModel from "~~/shared/models/supplier.model";
 
 const _useSuppliers = () => {
-    const supabase = useSupabaseClient();
-    const { getRepository } = DatabaseFactory.getInstance(supabase);
+    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const supplierRepository = getRepository("supplierRepository");
     const { selectedEstablishment } = useEstablishments();
 

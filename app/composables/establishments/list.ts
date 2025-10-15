@@ -1,4 +1,3 @@
-import type { Database } from "#build/types/supabase-database";
 import { createSharedComposable, useLocalStorage } from "@vueuse/core";
 import type { EstablishmentModel } from "~~/shared/models/establishment.model";
 import DatabaseFactory from "~~/shared/providers/database/database-factory";
@@ -12,11 +11,10 @@ function slugify(s: string) {
 }
 
 const _useEstablishmentsList = () => {
-    const supabase = useSupabaseClient<Database>();
     const user = useSupabaseUser();
     const { userSettings } = useUserSettings();
 
-    const { getRepository } = DatabaseFactory.getInstance(supabase);
+    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const establishmentRepository = getRepository("establishmentRepository");
 
     // --- State

@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { createSharedComposable } from "@vueuse/core";
 import DatabaseFactory from "~~/shared/providers/database/database-factory";
-import type { Database } from "~~/types/providers/database/supabase/database.types";
 import useAsyncAction from "../core/useAsyncAction";
 
 export const UpdateEstablishmentSchema = z.object({
@@ -17,8 +16,7 @@ export type UpdateEstablishmentCommand = z.output<
 >;
 
 const _useEstablishmentUpdate = () => {
-    const supabaseClient = useSupabaseClient<Database>();
-    const { getRepository } = DatabaseFactory.getInstance(supabaseClient);
+    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const establishmentRepository = getRepository("establishmentRepository");
     const { selectedEstablishment, refresh } = useEstablishments();
 

@@ -7,8 +7,7 @@ const defaultUserSettings = {
 };
 
 export const _useUserSettings = () => {
-    const supabase = useSupabaseClient();
-    const { getRepository } = DatabaseFactory.getInstance(supabase);
+    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const userRepository = getRepository("userRepository");
     const user = useSupabaseUser();
 

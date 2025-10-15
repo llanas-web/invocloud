@@ -5,8 +5,7 @@ import DatabaseFactory from "~~/shared/providers/database/database-factory";
 import type { CreateSupplierForm } from "~/types/schemas/forms/suppliers.schema";
 
 const _useSupplierCreate = () => {
-    const supabase = useSupabaseClient();
-    const { getRepository } = DatabaseFactory.getInstance(supabase);
+    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const supplierRepository = getRepository("supplierRepository");
     const { selectedEstablishment } = useEstablishments();
     const toast = useToast();
