@@ -6,11 +6,10 @@ import type { UserUpdate } from "~~/types/providers/database";
 import type { UserModel, UserModelUpdate } from "~~/shared/models/user.model";
 
 const _useUser = () => {
-    const supabase = useSupabaseClient<Database>();
     const supabaseUser = useSupabaseUser();
     const { logout } = useAuth();
 
-    const { getRepository } = DatabaseFactory.getInstance(supabase);
+    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const userRepository = getRepository("userRepository");
 
     const {

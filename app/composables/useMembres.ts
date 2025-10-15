@@ -3,8 +3,7 @@ import useAsyncAction from "./core/useAsyncAction";
 import DatabaseFactory from "~~/shared/providers/database/database-factory";
 
 const _useMembers = () => {
-    const supabase = useSupabaseClient();
-    const { getRepository } = DatabaseFactory.getInstance(supabase);
+    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const establishmentRepository = getRepository("establishmentRepository");
     const user = useSupabaseUser();
     const { selectedEstablishment } = useEstablishments();

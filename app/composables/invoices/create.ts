@@ -9,8 +9,7 @@ import {
 import { InvoiceStatus } from "~~/shared/models/invoice.model";
 
 const _useInvoiceCreate = () => {
-    const supabaseClient = useSupabaseClient<Database>();
-    const { getRepository } = DatabaseFactory.getInstance(supabaseClient);
+    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const invoiceRepository = getRepository("invoiceRepository");
 
     const formRef = ref();
