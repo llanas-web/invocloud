@@ -2,10 +2,13 @@ import { createSharedComposable } from "@vueuse/core";
 import { z } from "zod";
 import type SupplierModel from "~~/shared/models/supplier.model";
 import useAsyncAction from "../core/useAsyncAction";
-import type { SupplierModelUpdate } from "~~/shared/models/supplier.model";
 import DatabaseFactory from "~~/shared/providers/database/database-factory";
+import {
+    type UpdateSupplierForm,
+    UpdateSupplierSchema,
+} from "~/types/schemas/forms/suppliers.schema";
 
-const _useSupplierEdit = () => {
+const _useSupplierUpdate = () => {
     const supabase = useSupabaseClient();
     const { getRepository } = DatabaseFactory.getInstance(supabase);
     const supplierRepository = getRepository("supplierRepository");
@@ -17,7 +20,7 @@ const _useSupplierEdit = () => {
 
     const openModal = ref(false);
 
-    const formState = reactive<{ name: string; emails: string[] }>({
+    const formState = reactive<UpdateSupplierForm>({
         name: "",
         emails: [],
     });
@@ -57,13 +60,14 @@ const _useSupplierEdit = () => {
     };
 
     const { data: updatedSupplier, error, pending, execute } = useAsyncAction(
-        async (supplierId: string, updatedSupplier: SupplierModelUpdate) => {
-            if (!selectedEstablishment.value) {
-                throw new Error("No establishment selected.");
+        async () => {
+            if (!supplier.value) {
+                throw new Error("No supplier selected.");
             }
+            const parsed = UpdateSupplierSchema.parse(formState);
             const _updatedSupplier = await supplierRepository.updateSupplier(
-                supplierId,
-                updatedSupplier,
+                supplier.value.id,
+                parsed,
             );
             openModal.value = false;
             formState.name = "";
@@ -86,4 +90,4 @@ const _useSupplierEdit = () => {
     };
 };
 
-export const useSupplierEdit = createSharedComposable(_useSupplierEdit);
+export const useSupplierUpdate = createSharedComposable(_useSupplierUpdate);
