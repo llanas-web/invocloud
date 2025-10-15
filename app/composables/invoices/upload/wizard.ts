@@ -1,11 +1,9 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { Establishment } from "~~/types";
 import { FetchError } from "ofetch";
-import createInvoiceRepository from "~~/shared/providers/database/supabase/repositories/invoice.repository";
-import type { Database } from "~~/types/database.types";
-import createUploadRepository from "~~/shared/providers/database/supabase/repositories/upload-validation.repository";
+import type { EstablishmentModel } from "~~/shared/models/establishment.model";
+import type { Database } from "~~/types/providers/database/supabase/database.types";
 
-const _useInvoiceUpload = () => {
+const _useUploadWizard = () => {
     const toast = useToast();
     const { currentUser } = useUser();
     const { user } = useAuth();
@@ -23,7 +21,7 @@ const _useInvoiceUpload = () => {
         confirmToken: [] as string[],
     });
     const uploadUrl = ref<string | null>(null);
-    const possibleEstablishments = ref<Partial<Establishment>[]>([]);
+    const possibleEstablishments = ref<Partial<EstablishmentModel>[]>([]);
     const confirmState = reactive({
         establishmentId: "",
         supplierId: "",
@@ -267,6 +265,6 @@ const _useInvoiceUpload = () => {
     };
 };
 
-export const useInvoiceUpload = createSharedComposable(
-    _useInvoiceUpload,
+export const useUploadWizard = createSharedComposable(
+    _useUploadWizard,
 );

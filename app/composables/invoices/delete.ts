@@ -1,55 +1,41 @@
 import { createSharedComposable } from "@vueuse/core";
+import { z } from "zod";
+import DatabaseFactory from "~~/shared/providers/database/database-factory";
+import type { Database } from "~~/types/providers/database/supabase/database.types";
+import useAsyncAction from "../core/useAsyncAction";
+
+const stateSchema = z.array(z.string()).min(
+    1,
+    "Sélectionnez au moins une facture.",
+);
+type inputSchema = z.input<typeof stateSchema>;
 
 const _useInvoicesDelete = () => {
+    const supabaseClient = useSupabaseClient<Database>();
+    const { getRepository } = DatabaseFactory.getInstance(supabaseClient);
+    const invoiceRepository = getRepository("invoiceRepository");
     const open = ref(false);
-    const loading = ref(false);
-    const selectedInvoices = ref<string[]>([]);
-    const { deleteInvoices } = useInvoices();
-    const toast = useToast();
+    const selectedInvoices = ref<inputSchema>([]);
 
     const resetForm = () => {
         selectedInvoices.value = [];
     };
 
-    const onSubmit = async () => {
-        loading.value = true;
-        if (selectedInvoices.value.length === 0) {
-            toast.add({
-                title: "Erreur",
-                description:
-                    "Veuillez sélectionner au moins une facture à supprimer.",
-                color: "error",
-            });
-            loading.value = false;
-            return;
-        }
-        const result = await deleteInvoices(selectedInvoices.value);
-        if (!result) {
-            console.error("Failed to delete invoices");
-            toast.add({
-                title: "Erreur",
-                description:
-                    "Une erreur est survenue lors de la suppression des factures.",
-                color: "error",
-            });
-            loading.value = false;
-            return;
-        }
-        toast.add({
-            title: "Factures supprimées",
-            description: "Les factures ont été supprimées avec succès.",
-            color: "success",
-        });
-        open.value = false;
-        loading.value = false;
-        resetForm();
-    };
+    const { error, pending, execute } = useAsyncAction(
+        async () => {
+            const parsed = stateSchema.parse(selectedInvoices.value);
+            await invoiceRepository.deleteInvoices(parsed);
+            resetForm();
+        },
+    );
 
     return {
         open,
-        loading,
+        resetForm,
+        error,
+        pending,
         selectedInvoices,
-        onSubmit,
+        onSubmit: execute,
     };
 };
 

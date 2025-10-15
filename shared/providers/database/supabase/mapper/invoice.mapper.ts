@@ -22,10 +22,14 @@ export const invoiceMapperFromDatabase = (
         source: invoiceSource,
         status: invoiceStatus,
         updatedAt: fromStringToLocalDate(invoice.updated_at),
+        paidAt: invoice.paid_at != null
+            ? fromStringToLocalDate(invoice.paid_at)
+            : null,
         dueDate: invoice.due_date != null
             ? fromStringToLocalDate(invoice.due_date)
             : null,
         filePath: invoice.file_path,
+        comment: invoice.comment,
         supplier: supplier,
     });
 };

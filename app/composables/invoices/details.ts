@@ -1,42 +1,31 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { InvoiceUpdate } from "~~/types";
-import type { Database } from "~~/types/database.types";
-import createInvoiceRepository from "~~/shared/providers/database/supabase/repositories/invoice.repository";
+import z from "zod";
+import DatabaseFactory from "~~/shared/providers/database/database-factory";
+import type { Database } from "~~/types/providers/database/supabase/database.types";
 
 const _useInvoiceDetails = () => {
     const route = useRoute();
     const supabaseClient = useSupabaseClient<Database>();
-    const invoiceRepository = createInvoiceRepository(supabaseClient);
-    const { refresh, pending } = useInvoices();
+    const { getRepository } = DatabaseFactory.getInstance(supabaseClient);
+    const invoiceRepository = getRepository("invoiceRepository");
 
     const invoiceId = computed(() => route.params.id as string);
 
     const {
         data: invoice,
-        refresh: refreshInvoice,
-        pending: isInvoiceLoading,
+        pending,
+        error,
+        refresh,
     } = useAsyncData(
         "invoice-details",
         async () => {
-            if (!route.params.id) {
-                console.error(
-                    "Invoice ID is required to fetch invoice details.",
-                );
-                return null;
-            }
-            const { data, error } = await invoiceRepository.getInvoicesByIds(
-                [invoiceId.value],
+            const parsed = z.uuid({
+                message: "ID de facture invalide.",
+            }).parse(route.params.id);
+            const invoices = await invoiceRepository.getAllInvoices(
+                { ids: [parsed] },
             );
-            if (error || !data || data.length === 0) {
-                return null;
-            }
-            const invoice = data[0]!;
-            return {
-                ...invoice,
-                supplier: Array.isArray(invoice.supplier)
-                    ? invoice.supplier[0]
-                    : invoice.supplier,
-            };
+            return invoices[0]!;
         },
         {
             watch: [invoiceId],
@@ -44,29 +33,12 @@ const _useInvoiceDetails = () => {
         },
     );
 
-    const updateInvoice = async (invoiceId: string, invoice: InvoiceUpdate) => {
-        if (!invoiceId || !invoice) {
-            console.error(
-                "Invoice ID and data are required to update an invoice.",
-            );
-            return null;
-        }
-        const { data, error } = await invoiceRepository.updateInvoice(
-            invoiceId,
-            invoice,
-        );
-        if (error) {
-            return null;
-        }
-        await refresh();
-        return data;
-    };
-
     return {
         invoiceId,
         invoice,
-        isLoading: computed(() => pending.value || isInvoiceLoading.value),
-        updateInvoice,
+        pending,
+        error,
+        refresh,
     };
 };
 

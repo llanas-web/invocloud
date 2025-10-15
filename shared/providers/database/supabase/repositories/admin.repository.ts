@@ -1,7 +1,6 @@
 import type { AdminRepository } from "../../database.interface";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SupabaseError } from "../supabase-error";
-import { Err, Ok } from "../../result";
 
 export class AdminSupabaseRepository implements AdminRepository {
     constructor(private supabaseClient: SupabaseClient) {}
@@ -19,8 +18,8 @@ export class AdminSupabaseRepository implements AdminRepository {
                     redirectTo,
                 },
             );
-        if (error) return Err(SupabaseError.fromPostgrest(error));
-        return Ok(true);
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return true;
     }
 }
 

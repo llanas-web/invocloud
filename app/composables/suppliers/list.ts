@@ -1,106 +1,38 @@
 import { createSharedComposable } from "@vueuse/core";
-import createSupplierRepository from "~~/shared/providers/database/supabase/repositories/supplier.repository";
-import type { Range, SupplierUpdate } from "~~/types";
+import useAsyncAction from "../core/useAsyncAction";
+import DatabaseFactory from "~~/shared/providers/database/database-factory";
+import type { Supplier } from "~~/types/providers/database";
+import type SupplierModel from "~~/shared/models/supplier.model";
 
 const _useSuppliers = () => {
-    const supabaseClient = useSupabaseClient();
-    const supplierRepository = createSupplierRepository(supabaseClient);
+    const supabase = useSupabaseClient();
+    const { getRepository } = DatabaseFactory.getInstance(supabase);
+    const supplierRepository = getRepository("supplierRepository");
     const { selectedEstablishment } = useEstablishments();
 
-    const { data: suppliers, error: suppliersError, refresh, pending } =
-        useAsyncData(
-            "suppliers",
-            async () => {
-                const { data, error } = await supplierRepository
-                    .getSuppliersByEstablishment(
-                        selectedEstablishment.value!.id,
-                    );
-                if (error) {
-                    return [];
-                }
-                return data;
-            },
-            {
-                default: () => [],
-                lazy: true,
-                watch: [selectedEstablishment],
-            },
-        );
-
-    const createSupplier = async (
-        name: string,
-        emails: string[],
-    ) => {
-        if (!selectedEstablishment.value) {
-            console.error("No establishment selected.");
-            return null;
-        }
-        if (!name || emails.length === 0) {
-            console.error(
-                "Name and supplier members are required to create a supplier.",
-            );
-            return null;
-        }
-        const { data, error } = await supplierRepository
-            .createSupplier({
-                name,
-                establishment_id: selectedEstablishment.value!.id,
-                emails,
-            });
-        if (error) {
-            return null;
-        }
-        await refresh();
-        return data;
-    };
-
-    const updateSupplier = async (
-        supplierId: string,
-        updatedSupplier: SupplierUpdate,
-    ) => {
-        if (!selectedEstablishment.value) {
-            console.error("No establishment selected.");
-            return null;
-        }
-        if (!supplierId || !updatedSupplier) {
-            console.error("Supplier ID and updated data are required.");
-            return null;
-        }
-        const { data, error } = await supplierRepository
-            .updateSupplier(supplierId, updatedSupplier);
-
-        if (error) {
-            console.error("Error updating supplier:", error);
-            return null;
-        }
-        await refresh();
-        return data;
-    };
-
-    const deleteSuppliers = async (supplierIds: string[]) => {
-        if (!supplierIds || supplierIds.length === 0) {
-            console.error("No supplier IDs provided for deletion.");
-            return null;
-        }
-        const { data, error } = await supplierRepository
-            .deleteSuppliers(supplierIds);
-
-        if (error) {
-            console.error("Error deleting suppliers:", error);
-            return null;
-        }
-        await refresh();
-        return data;
-    };
+    const { data: suppliers, error, refresh, pending } = useAsyncData<
+        SupplierModel[]
+    >(
+        "suppliers",
+        async () => {
+            const suppliers = await supplierRepository
+                .getAllSuppliers({
+                    establishmentIds: [selectedEstablishment.value!.id],
+                });
+            return suppliers;
+        },
+        {
+            default: () => [],
+            lazy: true,
+            watch: [selectedEstablishment],
+        },
+    );
 
     return {
         suppliers,
         refresh,
         pending,
-        suppliersError,
-        createSupplier,
-        updateSupplier,
-        deleteSuppliers,
+        error,
     };
 };
 

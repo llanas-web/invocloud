@@ -1,5 +1,6 @@
 import { createSharedComposable } from "@vueuse/core";
-import createUserRepository from "~~/shared/providers/database/supabase/repositories/user.repository";
+import useAsyncAction from "./core/useAsyncAction";
+import DatabaseFactory from "~~/shared/providers/database/database-factory";
 
 const defaultUserSettings = {
     favorite_establishment_id: null,
@@ -7,20 +8,16 @@ const defaultUserSettings = {
 
 export const _useUserSettings = () => {
     const supabase = useSupabaseClient();
-    const userRepository = createUserRepository(supabase);
+    const { getRepository } = DatabaseFactory.getInstance(supabase);
+    const userRepository = getRepository("userRepository");
     const user = useSupabaseUser();
 
-    const { data: userSettings, error, refresh } = useAsyncData(
+    const { data: userSettings, error, pending, refresh } = useAsyncData(
         "userSettings",
         async () => {
-            console.log("Fetching user settings for user:", user.value?.id);
-            const { data, error } = await userRepository.getUserSettings(
+            return await userRepository.getUserSettings(
                 user.value!.id,
             );
-            if (error && !data) {
-                return defaultUserSettings;
-            }
-            return data;
         },
         {
             default: () => defaultUserSettings,
@@ -29,25 +26,32 @@ export const _useUserSettings = () => {
         },
     );
 
-    const toggleFavorite = async (establishmentId: string) => {
-        if (userSettings.value.favorite_establishment_id === establishmentId) {
-            await userRepository.updateUserSettings(user.value!.id, {
-                favorite_establishment_id: null,
-            });
-            userSettings.value.favorite_establishment_id = null;
-        } else {
-            await userRepository.updateUserSettings(user.value!.id, {
-                favorite_establishment_id: establishmentId,
-            });
-        }
-        await refresh();
-    };
+    const toggleFavoriteAction = useAsyncAction(
+        async (establishmentId: string) => {
+            if (!user.value?.id) throw new Error("No user id");
+            const newUserSettings = await userRepository.upsertUserSettings(
+                user.value.id,
+                {
+                    favorite_establishment_id:
+                        userSettings.value.favorite_establishment_id ===
+                                establishmentId
+                            ? null
+                            : establishmentId,
+                },
+            );
+            userSettings.value = newUserSettings;
+            await refresh();
+            return userSettings.value;
+        },
+    );
 
     return {
         userSettings,
         error,
+        pending,
         refresh,
-        toggleFavorite,
+
+        toggleFavorite: toggleFavoriteAction,
     };
 };
 

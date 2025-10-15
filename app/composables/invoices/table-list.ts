@@ -1,10 +1,20 @@
 import { createSharedComposable } from "@vueuse/core";
+import { sub } from "date-fns";
+import { InvoiceStatus } from "~~/shared/models/invoice.model";
 import type { Range } from "~~/types";
-import { isAfter, isBefore, isEqual, isSameDay, sub } from "date-fns";
+
+const ACCEPTED_STATUSES = [
+    InvoiceStatus.VALIDATED,
+    InvoiceStatus.PAID,
+];
 
 const _useInvoicesTableList = () => {
-    const { acceptedInvoices } = useInvoices();
+    const { invoices } = useInvoices();
 
+    const acceptedInvoices = computed(() =>
+        invoices.value?.filter((i) => ACCEPTED_STATUSES.includes(i.status!)) ||
+        []
+    );
     const statusFilter = ref<string>("all");
     const rangeFilter = shallowRef<Range>({
         start: sub(new Date(), { months: 1 }),
@@ -15,16 +25,16 @@ const _useInvoicesTableList = () => {
     const filteredInvoices = computed(() => {
         return acceptedInvoices.value.filter((invoice) => {
             const matchesStatus = statusFilter.value === "all" ||
-                statusFilter.value === "error" && invoice.overdue ||
+                statusFilter.value === "error" && invoice.isOverdue ||
                 invoice.status === statusFilter.value;
             const matchesRange = !rangeFilter.value ||
                 isDateInRange(
-                    new Date(invoice.created_at),
+                    new Date(invoice.createdAt),
                     rangeFilter.value.start,
                     rangeFilter.value.end,
                 );
             const matchSupplier = selectedSuppliers.value.length === 0 ||
-                selectedSuppliers.value.includes(invoice.supplier_id);
+                selectedSuppliers.value.includes(invoice.supplier.id);
             return matchesStatus && matchesRange && matchSupplier;
         });
     });
