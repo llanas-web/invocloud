@@ -2,6 +2,7 @@ import { createSharedComposable } from "@vueuse/core";
 import { z } from "zod";
 import useAsyncAction from "../core/useAsyncAction";
 import DatabaseFactory from "~~/shared/providers/database/database-factory";
+import type { CreateSupplierForm } from "~/types/schemas/forms/suppliers.schema";
 
 const _useSupplierCreate = () => {
     const supabase = useSupabaseClient();
@@ -12,7 +13,7 @@ const _useSupplierCreate = () => {
 
     const openModal = ref(false);
 
-    const formState = reactive<{ name: string; emails: string[] }>({
+    const formState = reactive<CreateSupplierForm>({
         name: "",
         emails: [],
     });
@@ -20,21 +21,19 @@ const _useSupplierCreate = () => {
     const emailField = ref("");
 
     const addEmail = () => {
-        if (
-            emailField.value &&
-            z.email().safeParse(emailField.value).success
-        ) {
-            formState.emails
-                ? formState.emails.push(emailField.value)
-                : formState.emails = [emailField.value];
-            emailField.value = "";
-        } else {
+        const { data, success } = z.email().safeParse(emailField.value);
+        if (!success) {
             toast.add({
                 title: "Erreur",
                 description: "Adresse e-mail invalide",
                 color: "error",
             });
+            return;
         }
+        formState.emails
+            ? formState.emails.push(data)
+            : formState.emails = [data];
+        emailField.value = "";
     };
 
     const { data: newSupplier, error, pending, execute } = useAsyncAction(
