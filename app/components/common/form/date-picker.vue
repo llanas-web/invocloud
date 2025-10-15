@@ -1,54 +1,54 @@
 <script setup lang="ts">
-import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date'
-const props = defineProps<{
-    label?: string
-}>()
+    import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date'
+    const props = defineProps<{
+        label?: string
+    }>()
 
-const emit = defineEmits<{
-    (e: 'input', value: string | null): void
-    (e: 'change', value: string | null): void
-    (e: 'blur'): void
-}>()
+    const emit = defineEmits<{
+        (e: 'input', value: string | null): void
+        (e: 'change', value: string | null): void
+        (e: 'blur'): void
+    }>()
 
-const df = new DateFormatter('fr-FR', {
-    dateStyle: 'medium'
-})
+    const df = new DateFormatter('fr-FR', {
+        dateStyle: 'medium'
+    })
 
-const bddDateFormat = new DateFormatter('en-EN', {
-    dateStyle: 'short'
-})
+    const bddDateFormat = new DateFormatter('en-EN', {
+        dateStyle: 'short'
+    })
 
-const modelValue = defineModel<string | null>()
-const open = ref(false)
+    const modelValue = defineModel<string | null>()
+    const open = ref(false)
 
-const calendarDate = shallowRef<CalendarDate | null>(modelValue.value ? new CalendarDate(
-    new Date(modelValue.value).getFullYear(),
-    new Date(modelValue.value).getMonth() + 1,
-    new Date(modelValue.value).getDate()
-) : null)
+    const calendarDate = shallowRef<CalendarDate | null>(modelValue.value ? new CalendarDate(
+        new Date(modelValue.value).getFullYear(),
+        new Date(modelValue.value).getMonth() + 1,
+        new Date(modelValue.value).getDate()
+    ) : null)
 
 
-watch(calendarDate, async (newDate) => {
-    console.log('date-picker: calendarDate changed', newDate)
-    // This line returns the date in YYYY-MM-DD with 1 day less because of timezone issues
-    const val = newDate
-        ? bddDateFormat.format(newDate.toDate(getLocalTimeZone()))
-        : null
+    watch(calendarDate, async (newDate) => {
+        console.log('date-picker: calendarDate changed', newDate)
+        // This line returns the date in YYYY-MM-DD with 1 day less because of timezone issues
+        const val = newDate
+            ? bddDateFormat.format(newDate.toDate(getLocalTimeZone()))
+            : null
 
-    // update outer v-model
-    modelValue.value = val
-    console.log('date-picker: emitting', val)
+        // update outer v-model
+        modelValue.value = val
+        console.log('date-picker: emitting', val)
 
-    // fire events Nuxt UI listens to so it re-validates this field
-    emit('input', val)
-    emit('change', val)
+        // fire events Nuxt UI listens to so it re-validates this field
+        emit('input', val)
+        emit('change', val)
 
-})
+    })
 
-// when the popover closes, emit blur so 'validate-on' can clear the error
-watch(open, (now, was) => {
-    if (was === true && now === false) emit('blur')
-})
+    // when the popover closes, emit blur so 'validate-on' can clear the error
+    watch(open, (now, was) => {
+        if (was === true && now === false) emit('blur')
+    })
 </script>
 
 <template>

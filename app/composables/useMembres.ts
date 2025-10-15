@@ -1,23 +1,28 @@
 import { createSharedComposable } from "@vueuse/core";
-import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
+import useAsyncAction from "./core/useAsyncAction";
+import DatabaseFactory from "~~/shared/providers/database/database-factory";
 
 const _useMembers = () => {
-    const supabaseClient = useSupabaseClient();
-    const establishmentRepository = createEstablishmentRepository(
-        supabaseClient,
-    );
+    const supabase = useSupabaseClient();
+    const { getRepository } = DatabaseFactory.getInstance(supabase);
+    const establishmentRepository = getRepository("establishmentRepository");
     const user = useSupabaseUser();
     const { selectedEstablishment } = useEstablishments();
 
-    const { data: members, error, refresh } = useAsyncData(
-        "members",
+    const {
+        data: members,
+        pending: pendingFetch,
+        error: fetchError,
+        refresh,
+    } = useAsyncData(
+        () => `members:${selectedEstablishment.value?.id ?? "anon"}`,
         async () => {
-            const { data, error } = await establishmentRepository
-                .getEstablishmentsMembers(selectedEstablishment.value!.id);
-            if (error) {
-                return [];
-            }
-            return data;
+            if (!selectedEstablishment.value?.id) return [];
+            const establishmentMembers = await establishmentRepository
+                .getEstablishmentMembers(
+                    selectedEstablishment.value.id,
+                );
+            return establishmentMembers;
         },
         {
             default: () => [],
@@ -26,11 +31,8 @@ const _useMembers = () => {
         },
     );
 
-    const inviteMember = async (email: string) => {
-        if (!email) {
-            console.error("Email is required to invite a member.");
-            return null;
-        }
+    const inviteMemberAction = useAsyncAction(async (email: string) => {
+        if (!email) throw new Error("Email is required to invite a member.");
         const { data, error } = await useFetch(
             "/api/members/invite",
             {
@@ -42,18 +44,18 @@ const _useMembers = () => {
                 },
             },
         );
-        if (error.value) {
-            console.error("Error inviting member:", error.value);
-            return null;
-        }
+        if (error.value) throw error.value;
         return data.value;
-    };
+    });
 
     return {
         members,
-        error,
+        pendingFetch,
+        fetchError,
         refresh,
-        inviteMember,
+
+        // Action d'invitation
+        inviteMember: inviteMemberAction,
     };
 };
 

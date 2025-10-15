@@ -1,9 +1,13 @@
 import { createSharedComposable } from "@vueuse/core";
 import { z } from "zod";
+import useAsyncAction from "../core/useAsyncAction";
+import DatabaseFactory from "~~/shared/providers/database/database-factory";
 
 const _useSupplierCreate = () => {
-    const { createSupplier } = useSuppliers();
-    const isLoading = ref(false);
+    const supabase = useSupabaseClient();
+    const { getRepository } = DatabaseFactory.getInstance(supabase);
+    const supplierRepository = getRepository("supplierRepository");
+    const { selectedEstablishment } = useEstablishments();
     const toast = useToast();
 
     const openModal = ref(false);
@@ -12,12 +16,13 @@ const _useSupplierCreate = () => {
         name: "",
         emails: [],
     });
+
     const emailField = ref("");
 
     const addEmail = () => {
         if (
             emailField.value &&
-            z.string().email().safeParse(emailField.value).success
+            z.email().safeParse(emailField.value).success
         ) {
             formState.emails
                 ? formState.emails.push(emailField.value)
@@ -32,41 +37,32 @@ const _useSupplierCreate = () => {
         }
     };
 
-    async function onSubmit() {
-        isLoading.value = true;
-        if (emailField.value !== "" && formState.emails.length === 0) {
-            addEmail();
-        }
-        const newSupplier = await createSupplier(
-            formState.name,
-            formState.emails,
-        );
-        isLoading.value = false;
-        if (!newSupplier) {
-            toast.add({
-                title: "Erreur",
-                description: "Échec de la création du fournisseur",
-                color: "error",
+    const { data: newSupplier, error, pending, execute } = useAsyncAction(
+        async (name: string, emails: string[]) => {
+            if (!selectedEstablishment.value) {
+                throw new Error("No establishment selected.");
+            }
+            const _newSupplier = await supplierRepository.createSupplier({
+                name,
+                establishment_id: selectedEstablishment.value.id,
+                emails,
             });
-            return;
-        }
-        toast.add({
-            title: "Succès",
-            description: `Nouveau fournisseur ${newSupplier.name} ajouté`,
-            color: "success",
-        });
-        openModal.value = false;
-        formState.name = "";
-        formState.emails = [];
-    }
+            openModal.value = false;
+            formState.name = "";
+            formState.emails = [];
+            return _newSupplier;
+        },
+    );
 
     return {
+        newSupplier,
+        error,
+        pending,
         openModal,
         formState,
-        isLoading,
         emailField,
         addEmail,
-        onSubmit,
+        onSubmit: execute,
     };
 };
 

@@ -19,3 +19,5 @@ export class UserModel {
         this.fullName = fullName;
     }
 }
+
+export type UserModelUpdate = Partial<Pick<UserModel, "fullName">>;

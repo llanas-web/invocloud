@@ -12,7 +12,6 @@ import type {
     EstablishmentModelInsert,
     EstablishmentModelUpdate,
 } from "~~/shared/models/establishment.model";
-import { Err, Ok } from "../../result";
 import { DomainError } from "~~/shared/errors/domain.error";
 import { SupabaseError } from "../supabase-error";
 
@@ -36,22 +35,18 @@ export class EstablishmentSupabaseRepository
         }
 
         const { data, error } = await request;
-        if (error) return Err(SupabaseError.fromPostgrest(error));
+        if (error) throw SupabaseError.fromPostgrest(error);
         else if (!data?.length) {
-            return Err(
-                new DomainError(
-                    "NO_ESTABLISHMENT",
-                    "Aucun établissement trouvé",
-                    {
-                        filters,
-                    },
-                ),
+            throw new DomainError(
+                "NO_ESTABLISHMENT",
+                "Aucun établissement trouvé",
+                {
+                    filters,
+                },
             );
         }
-        return Ok(
-            data.map((establishment) =>
-                establishmentMapperFromDatabase(establishment)
-            ),
+        return data.map((establishment) =>
+            establishmentMapperFromDatabase(establishment)
         );
     };
 
@@ -65,25 +60,21 @@ export class EstablishmentSupabaseRepository
             .eq("upload_id", uploadId)
             .eq("uploader_id", userId);
 
-        if (error) return Err(SupabaseError.fromPostgrest(error));
+        if (error) throw SupabaseError.fromPostgrest(error);
         else if (!data?.length) {
-            return Err(
-                new DomainError(
-                    "NO_ESTABLISHMENT",
-                    "Aucun établissement trouvé",
-                    { uploadId, userId },
-                ),
+            throw new DomainError(
+                "NO_ESTABLISHMENT",
+                "Aucun établissement trouvé",
+                { uploadId, userId },
             );
         }
 
-        return Ok(
-            data.filter((data) => data.establishments != null).map((
-                { establishments },
-            ) => establishmentShortMapper(
-                establishments!.id,
-                establishments!.name,
-            )),
-        );
+        return data.filter((data) => data.establishments != null).map((
+            { establishments },
+        ) => establishmentShortMapper(
+            establishments!.id,
+            establishments!.name,
+        ));
     };
 
     getEstablishmentsFromMemberId = async (
@@ -93,24 +84,18 @@ export class EstablishmentSupabaseRepository
             .from("establishment_members")
             .select("establishments(*)")
             .or(`user_id.eq.${userId}`);
-        if (error) return Err(SupabaseError.fromPostgrest(error));
+        if (error) throw SupabaseError.fromPostgrest(error);
         if (!data?.length) {
-            return Err(
-                new DomainError(
-                    "NO_ESTABLISHMENT",
-                    "Aucun établissement trouvé",
-                    { userId },
-                ),
+            throw new DomainError(
+                "NO_ESTABLISHMENT",
+                "Aucun établissement trouvé",
+                { userId },
             );
         }
-        return Ok(
-            data.filter((establishments) =>
-                establishments.establishments != null
-            )
-                .map((em) =>
-                    establishmentMapperFromDatabase(em.establishments!)
-                ),
-        );
+        return data.filter((establishments) =>
+            establishments.establishments != null
+        )
+            .map((em) => establishmentMapperFromDatabase(em.establishments!));
     };
 
     getEstablishmentMembers = async (establishmentId: string) => {
@@ -118,22 +103,18 @@ export class EstablishmentSupabaseRepository
             .from("establishment_members")
             .select("*, user:users(*)")
             .eq("establishment_id", establishmentId);
-        if (error) return Err(SupabaseError.fromPostgrest(error));
+        if (error) throw SupabaseError.fromPostgrest(error);
         if (!data?.length) {
-            return Err(
-                new DomainError(
-                    "NO_ESTABLISHMENT",
-                    "Aucun établissement trouvé",
-                    { establishmentId },
-                ),
+            throw new DomainError(
+                "NO_ESTABLISHMENT",
+                "Aucun établissement trouvé",
+                { establishmentId },
             );
         }
-        return Ok(
-            data.map((member) => {
-                const userModel = userMapperFromDatabase(member.user);
-                return memberMapperFromDatabase(member, userModel);
-            }),
-        );
+        return data.map((member) => {
+            const userModel = userMapperFromDatabase(member.user);
+            return memberMapperFromDatabase(member, userModel);
+        });
     };
 
     addEstablishmentMember = async (
@@ -148,19 +129,19 @@ export class EstablishmentSupabaseRepository
             })
             .select("*, user:users(*)")
             .single();
-        if (error) return Err(SupabaseError.fromPostgrest(error));
+        if (error) throw SupabaseError.fromPostgrest(error);
         if (!data) {
-            return Err(
-                new DomainError(
-                    "NO_MEMBER",
-                    "Membre non trouvé après insertion",
-                    { establishmentId, userId },
-                ),
+            throw new DomainError(
+                "NO_MEMBER",
+                "Membre non trouvé après insertion",
+                { establishmentId, userId },
             );
         }
 
-        const userModel = userMapperFromDatabase(data.user);
-        return Ok(memberMapperFromDatabase(data, userModel));
+        return memberMapperFromDatabase(
+            data,
+            userMapperFromDatabase(data.user),
+        );
     };
 
     removeEstablishmentMember = async (
@@ -173,8 +154,8 @@ export class EstablishmentSupabaseRepository
             .eq("establishment_id", establishmentId)
             .eq("user_id", userId);
 
-        if (error) return Err(SupabaseError.fromPostgrest(error));
-        return Ok(true);
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return true;
     };
 
     createEstablishment = async (
@@ -186,17 +167,15 @@ export class EstablishmentSupabaseRepository
         const { data, error } = await this.supabase.from("establishments")
             .insert(establishmentToInsert).select().single();
 
-        if (error) return Err(SupabaseError.fromPostgrest(error));
+        if (error) throw SupabaseError.fromPostgrest(error);
         if (!data) {
-            return Err(
-                new DomainError(
-                    "NO_ESTABLISHMENT",
-                    "Établissement non trouvé après insertion",
-                    { establishmentToInsert },
-                ),
+            throw new DomainError(
+                "NO_ESTABLISHMENT",
+                "Établissement non trouvé après insertion",
+                { establishmentToInsert },
             );
         }
-        return Ok(establishmentMapperFromDatabase(data));
+        return establishmentMapperFromDatabase(data);
     };
 
     isEmailPrefixAvailable = async (
@@ -213,17 +192,15 @@ export class EstablishmentSupabaseRepository
         }
         request.maybeSingle();
         const { data, error } = await request;
-        if (error) return Err(SupabaseError.fromPostgrest(error));
+        if (error) throw SupabaseError.fromPostgrest(error);
         if (!data) {
-            return Err(
-                new DomainError(
-                    "NO_ESTABLISHMENT",
-                    "Aucun établissement trouvé",
-                    { emailPrefix },
-                ),
+            throw new DomainError(
+                "NO_ESTABLISHMENT",
+                "Aucun établissement trouvé",
+                { emailPrefix },
             );
         }
-        return Ok(true);
+        return true;
     };
 
     getEstablishmentsShortFromEmails = async (
@@ -247,21 +224,17 @@ export class EstablishmentSupabaseRepository
             )
             .contains("emails", [senderEmail]);
 
-        if (error) return Err(SupabaseError.fromPostgrest(error));
+        if (error) throw SupabaseError.fromPostgrest(error);
         if (!data?.length) {
-            return Err(
-                new DomainError(
-                    "NO_ESTABLISHMENT",
-                    "Aucun établissement trouvé",
-                    { senderEmail, recipientEmail },
-                ),
+            throw new DomainError(
+                "NO_ESTABLISHMENT",
+                "Aucun établissement trouvé",
+                { senderEmail, recipientEmail },
             );
         }
 
-        return Ok(
-            data.map(({ establishments }) =>
-                establishmentShortMapper(establishments.id, establishments.name)
-            ),
+        return data.map(({ establishments }) =>
+            establishmentShortMapper(establishments.id, establishments.name)
         );
     };
 
@@ -276,17 +249,15 @@ export class EstablishmentSupabaseRepository
             .select()
             .single();
 
-        if (error) return Err(SupabaseError.fromPostgrest(error));
+        if (error) throw SupabaseError.fromPostgrest(error);
         if (!data) {
-            return Err(
-                new DomainError(
-                    "NO_ESTABLISHMENT",
-                    "Établissement non trouvé après mise à jour",
-                    { id, updates },
-                ),
+            throw new DomainError(
+                "NO_ESTABLISHMENT",
+                "Établissement non trouvé après mise à jour",
+                { id, updates },
             );
         }
-        return Ok(establishmentMapperFromDatabase(data));
+        return establishmentMapperFromDatabase(data);
     };
 
     deleteEstablishment = async (id: string) => {
@@ -294,7 +265,7 @@ export class EstablishmentSupabaseRepository
             .from("establishments")
             .delete()
             .eq("id", id);
-        if (error) return Err(SupabaseError.fromPostgrest(error));
-        return Ok(true);
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return true;
     };
 }

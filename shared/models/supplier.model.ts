@@ -33,3 +33,10 @@ export default class SupplierModel {
         this.establishmentId = establishmentId;
     }
 }
+
+export type SupplierModelUpdate = Partial<
+    Omit<SupplierModel, "id" | "createdAt" | "establishmentId" | "updatedAt">
+>;
+export type SupplierModelInsert =
+    & Omit<SupplierModel, "id" | "createdAt" | "updatedAt">
+    & { id?: string };

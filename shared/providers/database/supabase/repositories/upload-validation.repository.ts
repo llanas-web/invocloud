@@ -3,7 +3,6 @@ import type { UploadValidationUpdate } from "~~/types/providers/database/index";
 import type { Database } from "~~/types/providers/database/supabase/database.types";
 import { hashCode } from "~/utils/hash";
 import type { UploadValidationRepository } from "../../database.interface";
-import { Err, Ok } from "../../result";
 import { SupabaseError } from "../supabase-error";
 
 export class UploadValidationSupabaseRepository
@@ -30,8 +29,8 @@ export class UploadValidationSupabaseRepository
             })
             .select("id")
             .single();
-        if (error) return Err(SupabaseError.fromPostgrest(error));
-        return Ok(data.id);
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return data.id;
     }
 
     async isTokenValid(
@@ -48,8 +47,8 @@ export class UploadValidationSupabaseRepository
             .eq("token_hash", hashedCode)
             .gt("token_expires_at", new Date().toISOString())
             .single();
-        if (error) return Err(SupabaseError.fromPostgrest(error));
-        return Ok(!!data);
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return !!data;
     }
 
     async updateUploadValidation(
@@ -60,7 +59,7 @@ export class UploadValidationSupabaseRepository
             .from("upload_validations")
             .update(updates)
             .eq("id", uploadValidationId);
-        if (error) return Err(SupabaseError.fromPostgrest(error));
-        return Ok(true);
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return true;
     }
 }

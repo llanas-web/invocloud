@@ -2,8 +2,7 @@ import type { Database } from "#build/types/supabase-database";
 import { createSharedComposable, useLocalStorage } from "@vueuse/core";
 import type { EstablishmentModel } from "~~/shared/models/establishment.model";
 import DatabaseFactory from "~~/shared/providers/database/database-factory";
-import type { EstablishmentUpdate } from "~~/types/providers/database";
-import useAsyncAction from "./core/useAsyncAction";
+import useAsyncAction from "../core/useAsyncAction";
 
 function slugify(s: string) {
     return s.trim().toLowerCase().replace(/\s+/g, "-").replace(
@@ -12,7 +11,7 @@ function slugify(s: string) {
     );
 }
 
-const _useEstablishments = () => {
+const _useEstablishmentsList = () => {
     const supabase = useSupabaseClient<Database>();
     const user = useSupabaseUser();
     const { userSettings } = useUserSettings();
@@ -85,42 +84,6 @@ const _useEstablishments = () => {
         if (!exists(selectedId.value)) ensureSelection(list);
     });
 
-    // --- Actions states
-    const createEstablishmentAction = useAsyncAction(
-        async (name: string) => {
-            const body = {
-                name,
-                creatorId: user.value?.id ?? "",
-                emailPrefix: slugify(name),
-            };
-            const newEstablishment = await establishmentRepository
-                .createEstablishment(
-                    body,
-                );
-            establishments.value.push(newEstablishment);
-            selectedId.value = newEstablishment.id;
-            refresh();
-            return newEstablishment;
-        },
-    );
-
-    const updateEstablishmentAction = useAsyncAction(
-        async (patch: Partial<EstablishmentUpdate>) => {
-            const estId = selectedId.value;
-            if (!estId) throw new Error("No establishment selected");
-            const updatedEstablishment = await establishmentRepository
-                .updateEstablishment(
-                    estId,
-                    patch,
-                );
-            const i = establishments.value.findIndex((e) =>
-                e.id === updatedEstablishment.id
-            );
-            if (i >= 0) establishments.value[i] = updatedEstablishment;
-            return updatedEstablishment;
-        },
-    );
-
     const deleteEstablishmentAction = useAsyncAction(
         async (id: string) => {
             await establishmentRepository
@@ -133,17 +96,6 @@ const _useEstablishments = () => {
             if (selectedId.value === id) selectedId.value = null;
             refresh();
             return true;
-        },
-    );
-
-    const checkEmailPrefixAvailable = useAsyncAction(
-        async (emailPrefix: string, excludeEstablishmentId?: string) => {
-            const isAvailable = await establishmentRepository
-                .isEmailPrefixAvailable(
-                    emailPrefix,
-                    excludeEstablishmentId,
-                );
-            return isAvailable;
         },
     );
 
@@ -222,12 +174,7 @@ const _useEstablishments = () => {
         selectEstablishment,
 
         // CRUD actions
-        createEstablishment: createEstablishmentAction,
-        updateEstablishment: updateEstablishmentAction,
         deleteEstablishment: deleteEstablishmentAction,
-
-        // Async actions
-        checkEmailPrefixAvailable: checkEmailPrefixAvailable,
 
         subscribeToStripe,
         cancelStripeTrial,
@@ -235,4 +182,6 @@ const _useEstablishments = () => {
     };
 };
 
-export const useEstablishments = createSharedComposable(_useEstablishments);
+export const useEstablishmentsList = createSharedComposable(
+    _useEstablishmentsList,
+);

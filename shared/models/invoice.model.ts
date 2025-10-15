@@ -23,10 +23,12 @@ export class InvoiceModel {
     amount: number;
     dueDate: Date | null;
     updatedAt: Date;
+    paidAt: Date | null;
     filePath: string | null;
     invoiceNumber: string | null;
     source: InvoiceSource;
     status: InvoiceStatus;
+    comment: string | null;
     supplier: SupplierModel;
 
     constructor({
@@ -36,10 +38,12 @@ export class InvoiceModel {
         amount,
         dueDate = null,
         updatedAt,
+        paidAt = null,
         filePath = null,
         invoiceNumber = null,
-        source,
+        source = InvoiceSource.APP,
         status,
+        comment = null,
         supplier,
     }: {
         id: string;
@@ -48,10 +52,12 @@ export class InvoiceModel {
         amount: number;
         dueDate: Date | null;
         updatedAt: Date;
+        paidAt: Date | null;
         filePath: string | null;
         invoiceNumber: string | null;
         source: InvoiceSource;
         status: InvoiceStatus;
+        comment: string | null;
         supplier: SupplierModel;
     }) {
         this.id = id;
@@ -60,10 +66,12 @@ export class InvoiceModel {
         this.amount = amount;
         this.dueDate = dueDate;
         this.updatedAt = updatedAt;
+        this.paidAt = paidAt;
         this.filePath = filePath;
         this.invoiceNumber = invoiceNumber;
         this.source = source;
         this.status = status;
+        this.comment = comment;
         this.supplier = supplier;
     }
 
@@ -75,3 +83,13 @@ export class InvoiceModel {
         return false;
     }
 }
+
+export type InvoiceModelUpdate = Partial<
+    Omit<InvoiceModel, "id" | "createdAt" | "updatedAt" | "supplier">
+>;
+export type InvoiceModelInsert =
+    & Omit<
+        InvoiceModel,
+        "id" | "createdAt" | "updatedAt" | "supplier" | "isOverdue" | "source"
+    >
+    & { id?: string };

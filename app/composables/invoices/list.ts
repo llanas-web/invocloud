@@ -1,36 +1,34 @@
 import { createSharedComposable } from "@vueuse/core";
-import createInvoiceRepository from "~~/shared/providers/database/supabase/repositories/invoice.repository";
-import type { InvoiceInsert, InvoiceUpdate } from "~~/types";
-import type { Database } from "~~/types/database.types";
 import { acceptedStatus } from "~~/types/schemas/invoices";
 import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
+import type { Database } from "~~/types/providers/database/supabase/database.types";
+import DatabaseFactory from "~~/shared/providers/database/database-factory";
+import type { InvoiceModel } from "~~/shared/models/invoice.model";
 
 const _useInvoices = () => {
     const supabaseClient = useSupabaseClient<Database>();
-    const invoiceRepository = createInvoiceRepository(supabaseClient);
-    const storageRepository = createStorageRepository(supabaseClient);
     const supabaseUser = useSupabaseUser();
-    const { selectedEstablishment } = useEstablishments();
+    const { getRepository } = DatabaseFactory.getInstance(supabaseClient);
+    const invoiceRepository = getRepository("invoiceRepository");
 
-    const { data: invoices, error: invoicesError, refresh, pending } =
-        useAsyncData(
-            "invoices",
-            async () => {
-                const { data, error } = await invoiceRepository
-                    .getInvoicesByEstablishment(
-                        selectedEstablishment.value!.id,
-                    );
-                if (error || !data) {
-                    return [];
-                }
-                return data;
-            },
-            {
-                default: () => [],
-                watch: [selectedEstablishment],
-                lazy: true,
-            },
-        );
+    const { selectedEstablishment } = useEstablishments();
+    const storageRepository = createStorageRepository(supabaseClient);
+
+    const { data: invoices, error, refresh, pending } = useAsyncData(
+        "invoices",
+        async () => {
+            const invoices = await invoiceRepository
+                .getAllInvoices({
+                    establishmentIds: [selectedEstablishment.value!.id],
+                });
+            return invoices;
+        },
+        {
+            default: () => [],
+            watch: [selectedEstablishment],
+            lazy: true,
+        },
+    );
 
     const acceptedInvoices = computed(() =>
         invoices.value?.filter((i) => acceptedStatus.includes(i.status!)) || []
@@ -41,79 +39,6 @@ const _useInvoices = () => {
             i.status === "pending" || i.status === "ocr"
         ) || []
     );
-
-    const getInvoices = async () => {
-        await refresh();
-    };
-
-    const updateInvoice = async (invoiceId: string, invoice: InvoiceUpdate) => {
-        if (!invoiceId || !invoice) {
-            console.error(
-                "Invoice ID and data are required to update an invoice.",
-            );
-            return null;
-        }
-        const { data, error } = await invoiceRepository.updateInvoice(
-            invoiceId,
-            invoice,
-        );
-        if (error) {
-            return null;
-        }
-        await refresh();
-        return data;
-    };
-
-    const createInvoice = async (invoice: InvoiceInsert, invoiceFile: File) => {
-        if (!invoice) {
-            console.error("Invoice data is required to create an invoice.");
-            return null;
-        }
-        // generate id UUID
-        invoice.id = crypto.randomUUID();
-
-        const { data: uploadData, error: uploadError } = await storageRepository
-            .uploadInvoiceFile(
-                invoiceFile,
-                `${selectedEstablishment.value!.id}/${invoice.id}`,
-            );
-        if (uploadError || !uploadData) {
-            return null;
-        }
-        const { data, error } = await invoiceRepository.createInvoice([{
-            ...invoice,
-            file_path: uploadData.path,
-        }]);
-        if (error) {
-            return null;
-        }
-        await refresh();
-        return data;
-    };
-
-    const deleteInvoices = async (invoiceIds: string[]) => {
-        if (!invoiceIds || invoiceIds.length === 0) {
-            console.error("No invoice IDs provided for deletion.");
-            return null;
-        }
-        for (const invoiceId of invoiceIds) {
-            const { error: deleteError } = await storageRepository
-                .removeInvoiceFile(
-                    `${supabaseUser.value!.id}/${invoiceId}`,
-                );
-            if (deleteError) {
-                return null;
-            }
-        }
-        const { data, error } = await invoiceRepository.deleteInvoices(
-            invoiceIds,
-        );
-        if (error) {
-            return null;
-        }
-        await refresh();
-        return true;
-    };
 
     const sendInvoice = async (invoicesId: string[], email: string) => {
         if (!invoicesId || invoicesId.length === 0) {
@@ -170,12 +95,8 @@ const _useInvoices = () => {
         acceptedInvoices,
         refresh,
         pending,
-        invoicesError,
+        error,
         pendingInvoices,
-        getInvoices,
-        createInvoice,
-        updateInvoice,
-        deleteInvoices,
         sendInvoice,
         getInvoliceUrl,
         downloadInvoiceFile,

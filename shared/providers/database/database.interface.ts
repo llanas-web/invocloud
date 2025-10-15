@@ -4,11 +4,14 @@ import type {
     EstablishmentModelUpdate,
     EstablishmentShortModel,
 } from "#shared/models/establishment.model";
-import type { InvoiceModel } from "~~/shared/models/invoice.model";
+import type {
+    InvoiceModel,
+    InvoiceModelUpdate,
+} from "~~/shared/models/invoice.model";
 import type { MemberModel } from "~~/shared/models/member.model";
 import type SupplierModel from "~~/shared/models/supplier.model";
 import type UserSettingsModel from "~~/shared/models/user-settings.model";
-import type { UserModel } from "~~/shared/models/user.model";
+import type { UserModel, UserModelUpdate } from "~~/shared/models/user.model";
 import type {
     InvoiceInsert,
     InvoiceUpdate,
@@ -16,13 +19,9 @@ import type {
     SupplierUpdate,
     UploadValidationUpdate,
     UserSettingsUpdate,
-    UserUpdate,
 } from "~~/types/providers/database/index";
-import type { SupabaseError } from "./supabase/supabase-error";
-import type { DomainError } from "~~/shared/errors/domain.error";
-import type { Result } from "./result";
 
-type EncapsulatedResult<T> = Promise<Result<T, SupabaseError | DomainError>>;
+type EncapsulatedResult<T> = Promise<T>;
 
 export interface EstablishmentRepository {
     getAllEstablishments(
@@ -73,20 +72,20 @@ export interface InvoiceRepository {
             ids?: string[];
             establishmentIds?: string[];
         },
-    ): EncapsulatedResult<InvoiceModel[] | null>;
+    ): EncapsulatedResult<InvoiceModel[]>;
     createInvoice(
         invoices: InvoiceInsert[],
-    ): EncapsulatedResult<InvoiceModel[] | null>;
+    ): EncapsulatedResult<InvoiceModel[]>;
     updateInvoice(
         invoiceId: string,
-        invoice: InvoiceUpdate,
-    ): EncapsulatedResult<InvoiceModel | null>;
+        invoice: InvoiceModelUpdate,
+    ): EncapsulatedResult<InvoiceModel>;
     deleteInvoices(invoiceIds: string[]): EncapsulatedResult<boolean>;
 }
 
 export interface SupplierRepository {
     getAllSuppliers(
-        filters?: { establishmentIds: string[]; emails: string[] },
+        filters?: { establishmentIds?: string[]; emails?: string[] },
     ): EncapsulatedResult<SupplierModel[]>;
     createSupplier(
         supplier: SupplierInsert,
@@ -119,19 +118,19 @@ export interface UploadValidationRepository {
 export interface UserRepository {
     getUser(
         filter?: { id?: string; email?: string },
-    ): EncapsulatedResult<UserModel | null>;
+    ): EncapsulatedResult<UserModel>;
     updateUser(
         id: string,
-        updates: UserUpdate,
+        updates: UserModelUpdate,
     ): EncapsulatedResult<UserModel>;
     deleteUser(id: string): EncapsulatedResult<boolean>;
     getUserSettings(
         userId: string,
-    ): EncapsulatedResult<UserSettingsModel | null>;
+    ): EncapsulatedResult<UserSettingsModel>;
     upsertUserSettings(
         userId: string,
         settings: UserSettingsUpdate,
-    ): EncapsulatedResult<UserSettingsModel | null>;
+    ): EncapsulatedResult<UserSettingsModel>;
 }
 
 export interface AdminRepository {

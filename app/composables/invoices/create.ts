@@ -1,131 +1,89 @@
 import { createSharedComposable } from "@vueuse/core";
 import { z } from "zod";
 import { parseAmountFR } from "~/utils/number";
-import type { InvoiceInsert } from "~~/types";
+import DatabaseFactory from "~~/shared/providers/database/database-factory";
+import type { Database } from "~~/types/providers/database/supabase/database.types";
+import useAsyncAction from "../core/useAsyncAction";
+import { InvoiceSource, InvoiceStatus } from "~~/shared/models/invoice.model";
 
-const amountField = z
-    .union([z.string(), z.number()]) // <- input can be string|number
-    .transform((v) => parseAmountFR(v)) // <- to number
-    .pipe(z.number().positive("Le montant doit être positif.")); // <- validate
+const amountField = z.union([z.string(), z.number()])
+    .transform(parseAmountFR)
+    .pipe(z.number().positive("Le montant doit être positif."));
 
-const formStateSchema = z.object({
-    file_path: z.string().min(1, "Le chemin du fichier est requis."),
-    supplier_id: z.string().min(1, "Le fournisseur est requis."),
+export const CreateInvoiceSchema = z.object({
+    supplierId: z.uuid("Fournisseur invalide"),
     amount: amountField,
-    comment: z.string().optional().nullable(),
-    name: z.string().optional().nullable(),
-    due_date: z.string()
-        .min(1, "La date d'échéance est requise.")
-        .nullable()
-        .refine((val) => val !== null && val.length > 0, {
-            message: "La date d'échéance est requise.",
-        }),
-    invoice_number: z.string().min(1, "Le numéro de facture est requis."),
-    paid_at: z.string().optional().nullable(),
-    created_at: z.string().min(1, "La date de création est requise."),
-    status: z.enum(["paid", "validated", "error", "pending", "sent"]).default(
-        "validated",
-    ),
+    filePath: z.string().min(1, "Fichier requis"),
+    invoiceNumber: z.string().min(1, "Numéro requis"),
+    name: z.string().nullable().optional(),
+    comment: z.string().nullable().optional(),
+    dueDate: z.date().nullable().optional(), // Date en domaine
+    paidAt: z.date().nullable().optional(),
+    status: z.enum(InvoiceStatus).default(InvoiceStatus.VALIDATED),
+    source: z.enum(InvoiceSource).default(InvoiceSource.APP),
 });
 
-type formInputSchema = z.input<typeof formStateSchema>;
-type formOutputSchema = z.output<typeof formStateSchema>;
+export type CreateInvoiceForm = z.input<typeof CreateInvoiceSchema>; // pour le state
+export type CreateInvoiceCommand = z.output<typeof CreateInvoiceSchema>; // pour le repo
 
 const _useInvoiceCreate = () => {
-    const toast = useToast();
-    const { createInvoice } = useInvoices();
+    const supabaseClient = useSupabaseClient<Database>();
+    const supabaseUser = useSupabaseUser();
+    const { getRepository } = DatabaseFactory.getInstance(supabaseClient);
+    const invoiceRepository = getRepository("invoiceRepository");
 
     const formRef = ref();
-    const isLoading = ref(false);
-    const isOnError = ref(false);
 
-    const formState = reactive<formInputSchema>({
-        file_path: "",
-        supplier_id: "",
+    const formState = reactive<CreateInvoiceForm>({
+        filePath: "",
+        supplierId: "",
         amount: 0,
         comment: "",
         name: null,
-        due_date: null,
-        invoice_number: "",
-        paid_at: null,
-        created_at: new Date().toISOString(),
-        status: "validated",
+        dueDate: null,
+        invoiceNumber: "",
+        paidAt: null,
+        status: InvoiceStatus.VALIDATED,
     });
 
     const invoiceFile = ref<File | null>(null);
 
+    const initialParsed = CreateInvoiceSchema.parse(formState);
+
     const isDirty = computed(() => {
-        return (
-            formState.file_path !== "" ||
-            formState.supplier_id !== "" ||
-            formState.amount !== 0 ||
-            formState.comment !== "" ||
-            formState.name !== null ||
-            formState.due_date !== new Date().toISOString() ||
-            formState.invoice_number !== "" ||
-            formState.paid_at !== null ||
-            formState.created_at !== new Date().toISOString()
-        );
+        const currentParsed = CreateInvoiceSchema.parse(formState);
+        return JSON.stringify(currentParsed) !== JSON.stringify(initialParsed);
     });
 
-    const onSubmit = async () => {
-        isLoading.value = true;
-        const { success, error, data } = formStateSchema.safeParse(formState);
-        if (!invoiceFile.value) {
-            isOnError.value = true;
-            console.error("Invoice file is missing.");
-            toast.add({
-                title: "Aucun fichier sélectionné",
-                description:
-                    "Veuillez sélectionner un fichier pour la facture.",
-                color: "error",
-            });
-            isLoading.value = false;
-            return;
-        }
-        if (!success || error) {
-            isOnError.value = true;
-            console.error("Form state or invoice file is missing.");
-            toast.add({
-                title: "Erreur",
-                description:
-                    "Le formulaire contient des erreurs. Veuillez vérifier les champs requis.",
-                color: "error",
-            });
-            isLoading.value = false;
-            return;
-        }
-        const newInvoice = await createInvoice(
-            data,
-            invoiceFile.value,
-        );
-        if (!newInvoice) {
-            console.error("Failed to create invoice");
-            toast.add({
-                title: "Erreur",
-                description: "La création de la facture a échoué.",
-                color: "error",
-            });
-            isLoading.value = false;
-            return;
-        }
-        isLoading.value = false;
-        toast.add({
-            title: "Facture créée",
-            description: "La facture a été créée avec succès.",
-            color: "success",
-        });
-        navigateTo("/app");
-    };
+    const { data: newInvoice, error, pending, execute } = useAsyncAction(
+        async () => {
+            const parsedInvoice = CreateInvoiceSchema.parse(formState);
+            if (!invoiceFile.value) {
+                throw new Error("No invoice file provided.");
+            }
+            const newInvoiceId = crypto.randomUUID();
+            throw new Error("Not implemented");
+            // await storageRepository.uploadFile({
+            //     file: invoiceFile.value,
+            //     path: `${selectedEstablishment.value!.id}/${newInvoiceId}`,
+            //     type: "invoices",
+            // });
+            // await invoiceRepository.createInvoice(
+            //     parsedInvoice,
+            // );
+            // navigateTo("/app");
+        },
+    );
 
     return {
         formRef,
         formState,
-        formStateSchema,
         isDirty,
         invoiceFile,
-        isLoading,
-        onSubmit,
+        onSubmit: execute,
+        newInvoice,
+        error,
+        pending,
     };
 };
 

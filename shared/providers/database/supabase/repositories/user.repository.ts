@@ -7,8 +7,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { UserRepository } from "../../database.interface";
 import { userMapperFromDatabase } from "../mapper";
 import { userSettingsMapperFromDatabase } from "../mapper/user-settings.mapper";
-import { Err, Ok } from "../../result";
 import { SupabaseError } from "../supabase-error";
+import type { UserModelUpdate } from "~~/shared/models/user.model";
+import { DomainError } from "~~/shared/errors/domain.error";
 
 export class UserSupabaseRepository implements UserRepository {
     constructor(private supabase: SupabaseClient<Database>) {}
@@ -23,19 +24,24 @@ export class UserSupabaseRepository implements UserRepository {
 
         const { data, error } = await request.maybeSingle();
 
-        if (error) return Err(SupabaseError.fromPostgrest(error));
-        return Ok(data ? userMapperFromDatabase(data) : null);
+        if (error) throw SupabaseError.fromPostgrest(error);
+        if (!data) {
+            throw new DomainError("USER_NOT_FOUND", "Utilisateur non trouvé");
+        }
+        return userMapperFromDatabase(data);
     }
 
-    async updateUser(id: string, updates: UserUpdate) {
+    async updateUser(id: string, updates: UserModelUpdate) {
         const { data, error } = await this.supabase
             .from("users")
-            .update(updates)
+            .update({
+                full_name: updates.fullName,
+            })
             .eq("id", id)
             .select()
             .single();
-        if (error) return Err(SupabaseError.fromPostgrest(error));
-        return Ok(userMapperFromDatabase(data));
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return userMapperFromDatabase(data);
     }
 
     async deleteUser(id: string) {
@@ -43,8 +49,8 @@ export class UserSupabaseRepository implements UserRepository {
             .from("users")
             .delete()
             .eq("id", id);
-        if (error) return Err(SupabaseError.fromPostgrest(error));
-        return Ok(true);
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return true;
     }
 
     async getUserSettings(userId: string) {
@@ -53,8 +59,8 @@ export class UserSupabaseRepository implements UserRepository {
             .select("*")
             .eq("user_id", userId)
             .single();
-        if (error) return Err(SupabaseError.fromPostgrest(error));
-        return Ok(userSettingsMapperFromDatabase(data));
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return userSettingsMapperFromDatabase(data);
     }
 
     async upsertUserSettings(userId: string, settings: UserSettingsUpdate) {
@@ -63,7 +69,7 @@ export class UserSupabaseRepository implements UserRepository {
             .upsert({ user_id: userId, ...settings })
             .select()
             .single();
-        if (error) return Err(SupabaseError.fromPostgrest(error));
-        return Ok(userSettingsMapperFromDatabase(data));
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return userSettingsMapperFromDatabase(data);
     }
 }

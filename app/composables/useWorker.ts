@@ -2,11 +2,12 @@
 import { createSharedComposable } from "@vueuse/core";
 import { useInvoicesTableList } from "./invoices/table-list";
 import { format } from "date-fns";
-import type { Invoice } from "~~/types";
+import useAsyncAction from "./core/useAsyncAction";
+import type { InvoiceModel } from "~~/shared/models/invoice.model";
 
 type DownloadMsg = {
   type: "download";
-  invoices: Partial<Invoice>[];
+  invoices: Partial<InvoiceModel>[];
   supabaseUrl: string;
   supabaseAnonKey: string;
   access_token: string | undefined;
@@ -79,26 +80,29 @@ const _useWorker = () => {
     else queue.push(message);
   }
 
-  async function launchDownloadWorker(invoices: Invoice[]) {
-    if (!invoices?.length) return;
-    running.value = true;
-    // only pass PUBLIC values to the worker
-    const msg: DownloadMsg = {
-      type: "download",
-      invoices,
-      supabaseUrl: pub.supabaseUrl, // from NUXT_PUBLIC_*
-      supabaseAnonKey: pub.supabaseAnonKey, // from NUXT_PUBLIC_*
-      access_token: session.value?.access_token, // from session
-      refresh_token: session.value?.refresh_token, // from session
-    };
-    post(JSON.stringify(msg));
-  }
+  const launchDownloadWorkerAction = useAsyncAction(
+    async (invoices: InvoiceModel[]) => {
+      if (!invoices?.length) throw new Error("Aucune facture à télécharger");
+      running.value = true;
+      const msg: DownloadMsg = {
+        type: "download",
+        invoices,
+        supabaseUrl: pub.supabaseUrl,
+        supabaseAnonKey: pub.supabaseAnonKey,
+        access_token: session.value?.access_token,
+        refresh_token: session.value?.refresh_token,
+      };
+      post(JSON.stringify(msg));
+      // On peut attendre la fin via progress/running si besoin
+      return true;
+    },
+  );
 
   return {
     ready,
     running,
     progress,
-    launchDownloadWorker,
+    launchDownloadWorker: launchDownloadWorkerAction,
     // expose for rare low-level needs:
     _worker: worker,
   };

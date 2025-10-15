@@ -6,7 +6,6 @@ import type {
 import type { Database } from "~~/types/providers/database/supabase/database.types";
 import type { SupplierRepository } from "../../database.interface";
 import { supplierMapperFromDatabase } from "../mapper/supplier.mapper";
-import { Err, Ok } from "../../result";
 import { SupabaseError } from "../supabase-error";
 
 export class SupplierSupabaseRepository implements SupplierRepository {
@@ -27,8 +26,8 @@ export class SupplierSupabaseRepository implements SupplierRepository {
         const { data, error } = await request.order("created_at", {
             ascending: false,
         });
-        if (error) return Err(SupabaseError.fromPostgrest(error));
-        return Ok(data.map(supplierMapperFromDatabase));
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return data.map(supplierMapperFromDatabase);
     }
 
     async createSupplier(supplier: SupplierInsert) {
@@ -41,8 +40,8 @@ export class SupplierSupabaseRepository implements SupplierRepository {
                         name
                     )`)
             .single();
-        if (error) return Err(SupabaseError.fromPostgrest(error));
-        return Ok(supplierMapperFromDatabase(data));
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return supplierMapperFromDatabase(data);
     }
 
     async updateSupplier(supplierId: string, updatedSupplier: SupplierUpdate) {
@@ -57,8 +56,8 @@ export class SupplierSupabaseRepository implements SupplierRepository {
                     )`)
             .single();
 
-        if (error) return Err(SupabaseError.fromPostgrest(error));
-        return Ok(supplierMapperFromDatabase(data));
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return supplierMapperFromDatabase(data);
     }
 
     async deleteSupplier(supplierId: string) {
@@ -66,7 +65,7 @@ export class SupplierSupabaseRepository implements SupplierRepository {
             .from("suppliers")
             .delete()
             .eq("id", supplierId);
-        if (error) return Err(SupabaseError.fromPostgrest(error));
-        return Ok(true);
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return true;
     }
 }

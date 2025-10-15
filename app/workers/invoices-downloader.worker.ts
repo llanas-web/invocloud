@@ -2,14 +2,14 @@
 // app/workers/invoices-downloader.worker.ts
 import { BlobReader, BlobWriter, TextReader, ZipWriter } from "@zip.js/zip.js";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import type { Invoice } from "~~/types";
 import * as mime from "mime-types";
 import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
+import type { InvoiceModel } from "~~/shared/models/invoice.model";
 // if you ever need supabase-js in worker, you can import it here and initialize with the passed keys.
 
 type DownloadMsg = {
     type: "download";
-    invoices: Partial<Invoice>[];
+    invoices: Partial<InvoiceModel>[];
     supabaseUrl: string;
     supabaseAnonKey: string;
     access_token: string;
@@ -54,10 +54,10 @@ self.onmessage = async (e: MessageEvent<string>) => {
             }
             try {
                 const { data: blob, error } = await storageRepository
-                    .downloadInvoiceFile(invoice.file_path!);
+                    .downloadInvoiceFile(invoice.filePath!);
                 if (error) throw error;
                 await zip.add(
-                    `${invoice.invoice_number}.${
+                    `${invoice.invoiceNumber}.${
                         mime.extension(
                             blob.type,
                         ) || "bin"
@@ -66,7 +66,7 @@ self.onmessage = async (e: MessageEvent<string>) => {
                 );
             } catch (e: any) {
                 await zip.add(
-                    `${invoice.invoice_number}-ERROR.txt`,
+                    `${invoice.invoiceNumber}-ERROR.txt`,
                     new TextReader(String(e?.message ?? "error")),
                 );
             } finally {
