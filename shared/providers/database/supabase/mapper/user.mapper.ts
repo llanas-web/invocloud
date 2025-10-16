@@ -1,4 +1,4 @@
-import { UserModel } from "#shared/models/user.model";
+import { UserModel } from "~~/shared/types/models/user.model";
 import { fromStringToLocalDate } from "#shared/utils/date.utils";
 import type { User } from "~~/types/providers/database";
 

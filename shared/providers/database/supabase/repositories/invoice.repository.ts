@@ -9,7 +9,7 @@ import { invoiceMapperFromDatabase } from "../mapper/invoice.mapper";
 import { supplierMapperFromDatabase } from "../mapper/supplier.mapper";
 import { SupabaseError } from "../supabase-error";
 import { DomainError } from "~~/shared/errors/domain.error";
-import type { InvoiceModelUpdate } from "~~/shared/models/invoice.model";
+import type { InvoiceModelUpdate } from "~~/shared/types/models/invoice.model";
 
 export class InvoiceSupabaseRepository implements InvoiceRepository {
     constructor(private supabase: SupabaseClient<Database>) {}

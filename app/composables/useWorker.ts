@@ -3,7 +3,7 @@ import { createSharedComposable } from "@vueuse/core";
 import { useInvoicesTableList } from "./invoices/table-list";
 import { format } from "date-fns";
 import useAsyncAction from "./core/useAsyncAction";
-import type { InvoiceModel } from "~~/shared/models/invoice.model";
+import type { InvoiceModel } from "~~/shared/types/models/invoice.model";
 
 type DownloadMsg = {
   type: "download";

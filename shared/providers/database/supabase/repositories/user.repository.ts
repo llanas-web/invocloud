@@ -8,7 +8,7 @@ import type { UserRepository } from "../../database.interface";
 import { userMapperFromDatabase } from "../mapper";
 import { userSettingsMapperFromDatabase } from "../mapper/user-settings.mapper";
 import { SupabaseError } from "../supabase-error";
-import type { UserModelUpdate } from "~~/shared/models/user.model";
+import type { UserModelUpdate } from "~~/shared/types/models/user.model";
 import { DomainError } from "~~/shared/errors/domain.error";
 
 export class UserSupabaseRepository implements UserRepository {

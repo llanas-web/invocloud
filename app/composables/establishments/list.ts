@@ -1,5 +1,5 @@
 import { createSharedComposable, useLocalStorage } from "@vueuse/core";
-import type { EstablishmentModel } from "~~/shared/models/establishment.model";
+import type { EstablishmentModel } from "~~/shared/types/models/establishment.model";
 import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import useAsyncAction from "../core/useAsyncAction";
 
