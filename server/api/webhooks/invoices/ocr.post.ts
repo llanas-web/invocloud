@@ -1,5 +1,5 @@
 import { serverServiceRole } from "~~/shared/providers/database/supabase/client";
-import { OcrProviderName } from "~~/types/providers/ocr/mindee/types";
+import { OcrProviderName } from "~~/shared/types/providers/ocr/types";
 import { getOcrProvider } from "~~/server/lib/providers/ocr/factory";
 import createInvoiceRepository from "~~/shared/providers/database/supabase/repositories/invoice.repository";
 import createInvoiceTaskRepository from "#shared/repositories/tasks/invoice_task.repository";

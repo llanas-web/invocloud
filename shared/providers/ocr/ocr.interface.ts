@@ -1,9 +1,8 @@
 import type {
-    OcrPrediction,
     OcrSubmitOptions,
     OcrSubmitResult,
     OcrWebhookPayload,
-} from "../../../../types/providers/ocr/mindee/types";
+} from "~~/shared/types/providers/ocr/types";
 
 export interface OcrProvider {
     /** Envoi d’un fichier binaire */
