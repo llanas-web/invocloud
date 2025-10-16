@@ -4,7 +4,6 @@ import type { H3Event } from "h3";
 import { stripe } from "./client";
 import { serverSupabaseServiceRole } from "#supabase/server";
 import { StripeHandlerContext } from "./context";
-
 import { handleCheckoutSessionCompleted } from "./events/checkout/session";
 import { handleInvoicePaymentSucceeded } from "./events/invoice/payment";
 import {

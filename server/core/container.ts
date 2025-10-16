@@ -10,6 +10,7 @@ import StorageFactory from "~~/shared/providers/storage/storage.factory";
 import AuthFactory from "~~/shared/providers/auth/auth.factory";
 import OcrFactory from "~~/shared/providers/ocr/ocr.factory";
 import EmailFactory from "~~/shared/providers/email/email.factory";
+import PaymentFactory from "~~/shared/providers/payment/payment.factory";
 
 export async function buildRequestScope(
     event: H3Event<EventHandlerRequest>,
@@ -33,6 +34,7 @@ export async function buildRequestScope(
         auth: AuthFactory.getInstance(sc),
         ocr: OcrFactory.getInstance("mindee"),
         email: EmailFactory.getInstance("resend"),
+        payment: PaymentFactory.getInstance("stripe"),
         repos: {
             uploadValidationRepository: getRepository(
                 "uploadValidationRepository",
