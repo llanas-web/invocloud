@@ -9,6 +9,7 @@ import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import StorageFactory from "~~/shared/providers/storage/storage.factory";
 import AuthFactory from "~~/shared/providers/auth/auth.factory";
 import OcrFactory from "~~/shared/providers/ocr/ocr.factory";
+import EmailFactory from "~~/shared/providers/email/email.factory";
 
 export async function buildRequestScope(
     event: H3Event<EventHandlerRequest>,
@@ -31,6 +32,7 @@ export async function buildRequestScope(
         storage: StorageFactory.getInstance(ss),
         auth: AuthFactory.getInstance(sc),
         ocr: OcrFactory.getInstance("mindee"),
+        email: EmailFactory.getInstance("resend"),
         repos: {
             uploadValidationRepository: getRepository(
                 "uploadValidationRepository",
