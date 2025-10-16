@@ -1,6 +1,6 @@
 import { createSharedComposable } from "@vueuse/core";
 import z from "zod";
-import DatabaseFactory from "~~/shared/providers/database/database-factory";
+import DatabaseFactory from "~~/shared/providers/database/database.factory";
 
 const _useInvoiceDetails = () => {
     const route = useRoute();

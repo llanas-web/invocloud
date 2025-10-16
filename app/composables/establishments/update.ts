@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createSharedComposable } from "@vueuse/core";
-import DatabaseFactory from "~~/shared/providers/database/database-factory";
+import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import useAsyncAction from "../core/useAsyncAction";
 
 export const UpdateEstablishmentSchema = z.object({

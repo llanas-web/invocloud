@@ -1,20 +1,11 @@
 import { EventHandlerRequest, getHeader, H3Event } from "h3";
 import { Deps, RequestContext } from "./types";
 import {
-    serverClient,
     serverServiceRole,
     serverUser,
 } from "~~/shared/providers/database/supabase/client";
-import {
-    AdminSupabaseRepository,
-    EstablishmentSupabaseRepository,
-    InvoiceSupabaseRepository,
-    SupplierSupabaseRepository,
-    UploadValidationSupabaseRepository,
-    UserSupabaseRepository,
-} from "~~/shared/providers/database/supabase/repositories";
-import SupabaseAuthRepository from "#shared/providers/auth/supabase/auth.repository";
-import DatabaseFactory from "#shared/providers/database/database-factory";
+import DatabaseFactory from "~~/shared/providers/database/database.factory";
+import StorageFactory from "~~/shared/providers/storage/storage.factory";
 
 export async function buildRequestScope(
     event: H3Event<EventHandlerRequest>,
@@ -24,6 +15,7 @@ export async function buildRequestScope(
 
     const ss = serverServiceRole(event);
     const { getRepository } = DatabaseFactory.getInstance(ss);
+    const storageProvider = StorageFactory.getInstance(ss);
 
     const ctx: RequestContext = {
         requestId,
@@ -33,6 +25,7 @@ export async function buildRequestScope(
     };
 
     const deps: Deps = {
+        storage: storageProvider,
         repos: {
             uploadValidationRepository: getRepository(
                 "uploadValidationRepository",

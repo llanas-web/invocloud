@@ -1,6 +1,6 @@
 import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "./core/useAsyncAction";
-import DatabaseFactory from "~~/shared/providers/database/database-factory";
+import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import type { Database } from "~~/types/providers/database/supabase/database.types";
 import type { UserUpdate } from "~~/types/providers/database";
 import type { UserModel, UserModelUpdate } from "~~/shared/models/user.model";

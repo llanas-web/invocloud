@@ -9,6 +9,7 @@ import { invoiceMapperFromDatabase } from "../mapper/invoice.mapper";
 import { supplierMapperFromDatabase } from "../mapper/supplier.mapper";
 import { SupabaseError } from "../supabase-error";
 import { DomainError } from "~~/shared/errors/domain.error";
+import type { InvoiceModelUpdate } from "~~/shared/models/invoice.model";
 
 export class InvoiceSupabaseRepository implements InvoiceRepository {
     constructor(private supabase: SupabaseClient<Database>) {}
@@ -63,7 +64,7 @@ export class InvoiceSupabaseRepository implements InvoiceRepository {
 
     async updateInvoice(
         invoiceId: string,
-        invoice: InvoiceUpdate,
+        invoice: InvoiceModelUpdate,
     ) {
         const { data, error } = await this.supabase
             .from("invoices")
