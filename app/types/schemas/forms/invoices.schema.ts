@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { InvoiceSource, InvoiceStatus } from "~~/shared/models/invoice.model";
+import {
+    InvoiceSource,
+    InvoiceStatus,
+} from "~~/shared/types/models/invoice.model";
 import { amountField } from "./fields";
 
 export const CreateInvoiceSchema = z.object({

@@ -11,7 +11,7 @@ import { userMapperFromDatabase } from "../mapper/user.mapper";
 import type {
     EstablishmentModelInsert,
     EstablishmentModelUpdate,
-} from "~~/shared/models/establishment.model";
+} from "~~/shared/types/models/establishment.model";
 import { DomainError } from "~~/shared/errors/domain.error";
 import { SupabaseError } from "../supabase-error";
 

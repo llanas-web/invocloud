@@ -2,13 +2,13 @@ import {
     EstablishmentModel,
     type EstablishmentModelInsert,
     type EstablishmentShortModel,
-} from "#shared/models/establishment.model";
+} from "~~/shared/types/models/establishment.model";
 import { fromStringToLocalDate } from "#shared/utils/date.utils";
 import {
     SubscriptionModel,
     SubscriptionProvider,
     SubscriptionStatus,
-} from "~~/shared/models/subscription.model";
+} from "~~/shared/types/models/subscription.model";
 import type {
     Establishment,
     EstablishmentInsert,

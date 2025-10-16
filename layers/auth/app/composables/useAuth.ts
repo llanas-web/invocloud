@@ -1,10 +1,13 @@
 import { createSharedComposable } from "@vueuse/core";
+import useAsyncAction from "~/composables/core/useAsyncAction";
 import SupabaseAuthRepository from "~~/shared/providers/auth/supabase/auth.repository";
+import {
+    AuthEvent,
+    AuthUserModel,
+} from "~~/shared/types/models/auth-user.model";
 
 const _useAuth = () => {
-    const authRepository = new SupabaseAuthRepository(
-        useSupabaseClient(),
-    );
+    const authRepository = inject("authFactory") as SupabaseAuthRepository;
     const supabase = useSupabaseClient();
     const user = useSupabaseUser();
     const session = useSupabaseSession();
@@ -12,75 +15,57 @@ const _useAuth = () => {
     const redirectTo = `${config.public.baseUrl}/auth/callback`;
     const toast = useToast();
 
-    watchEffect(() => {
-        console.log("Auth - user changed:", user.value);
-        supabase.auth.onAuthStateChange((event, session) => {
-            console.log("Auth state changed:", event, session);
-            if (event === "PASSWORD_RECOVERY") {
-                navigateTo("/app/settings/security");
-            }
-        });
-    });
+    const connectedUser = ref<AuthUserModel | null>(null);
 
-    const login = async (email: string, password: string) => {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
-        if (error) {
-            toast.add({
-                title: "Erreur lors de la connexion",
-                color: "error",
-            });
-        } else navigateTo("/app");
-        return { data, error };
+    const handleAuthEvent = (event: AuthEvent, user: AuthUserModel | null) => {
+        switch (event) {
+            case AuthEvent.PASSWORD_RECOVERY:
+                navigateTo("/app/settings/security");
+                break;
+            case AuthEvent.SIGNED_IN:
+                connectedUser.value = user!;
+                navigateTo("/app");
+                break;
+            case AuthEvent.SIGNED_OUT:
+                connectedUser.value = null;
+                navigateTo("/auth/login");
+                break;
+        }
     };
 
-    const signup = async (
+    watchEffect(() => {
+        authRepository.onAuthChange(handleAuthEvent);
+    });
+
+    const login = useAsyncAction(async (email: string, password: string) => {
+        const response = await authRepository.signInWithPassword(
+            email,
+            password,
+        );
+        return response;
+    });
+
+    const signup = useAsyncAction(async (
         email: string,
         password: string,
         establishment_name: string,
         full_name: string,
     ) => {
-        const { data, error } = await supabase.auth.signUp({
-            email: email,
-            password: password,
-            options: {
+        const response = await authRepository.signUpWithPassword(
+            email,
+            password,
+            {
                 emailRedirectTo: redirectTo,
                 data: {
                     full_name,
                     establishment_name,
                 },
             },
-        });
-        if (error) {
-            if (error.code === "user_already_exists") {
-                toast.add({
-                    title: "Utilisateur déjà existant",
-                    description: "Un compte avec cet email existe déjà.",
-                    color: "warning",
-                    actions: [
-                        {
-                            label: "Se connecter",
-                            onClick: (e) => {
-                                login(email, password);
-                                e.preventDefault();
-                            },
-                        },
-                    ],
-                });
-            } else {
-                toast.add({
-                    title: "Erreur lors de l'inscription",
-                    color: "error",
-                });
-            }
-            return null;
-        }
-        return data;
-    };
+        );
+        return response;
+    });
 
-    const resetPassword = async (newPassword: string) => {
+    const resetPassword = useAsyncAction(async (newPassword: string) => {
         const { data, error } = await useFetch("/api/user/reset-password", {
             method: "POST",
             body: {
@@ -88,25 +73,15 @@ const _useAuth = () => {
             },
         });
         if (error.value) {
-            toast.add({
-                title: "Erreur lors de la réinitialisation du mot de passe",
-                color: "error",
-            });
-            return null;
+            throw new Error(error.value.message);
         }
-        toast.add({
-            title: "Mot de passe réinitialisé",
-            color: "success",
-        });
-        return true;
-    };
+        return data;
+    });
 
-    const logout = async () => {
-        const { error } = await supabase.auth.signOut();
+    const logout = useAsyncAction(async () => {
+        await authRepository.signOut();
         localStorage.removeItem("selectedEstablishment");
-        if (!error) navigateTo("/auth/login");
-        else console.error("Error logging out:", error);
-    };
+    });
 
     return {
         user,

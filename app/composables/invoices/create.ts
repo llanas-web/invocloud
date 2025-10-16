@@ -6,7 +6,7 @@ import {
     type CreateInvoiceForm,
     CreateInvoiceSchema,
 } from "~/types/schemas/forms/invoices.schema";
-import { InvoiceStatus } from "~~/shared/models/invoice.model";
+import { InvoiceStatus } from "~~/shared/types/models/invoice.model";
 import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 

@@ -1,6 +1,6 @@
 import { createSharedComposable } from "@vueuse/core";
 import { sub } from "date-fns";
-import { InvoiceStatus } from "~~/shared/models/invoice.model";
+import { InvoiceStatus } from "~~/shared/types/models/invoice.model";
 import type { Range } from "~~/types";
 
 const ACCEPTED_STATUSES = [

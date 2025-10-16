@@ -3,15 +3,18 @@ import type {
     EstablishmentModelInsert,
     EstablishmentModelUpdate,
     EstablishmentShortModel,
-} from "#shared/models/establishment.model";
+} from "~~/shared/types/models/establishment.model";
 import type {
     InvoiceModel,
     InvoiceModelUpdate,
-} from "~~/shared/models/invoice.model";
-import type { MemberModel } from "~~/shared/models/member.model";
-import type SupplierModel from "~~/shared/models/supplier.model";
-import type UserSettingsModel from "~~/shared/models/user-settings.model";
-import type { UserModel, UserModelUpdate } from "~~/shared/models/user.model";
+} from "~~/shared/types/models/invoice.model";
+import type { MemberModel } from "~~/shared/types/models/member.model";
+import type SupplierModel from "~~/shared/types/models/supplier.model";
+import type UserSettingsModel from "~~/shared/types/models/user-settings.model";
+import type {
+    UserModel,
+    UserModelUpdate,
+} from "~~/shared/types/models/user.model";
 import type {
     InvoiceInsert,
     InvoiceUpdate,

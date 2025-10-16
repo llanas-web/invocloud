@@ -4,7 +4,7 @@ import { BlobReader, BlobWriter, TextReader, ZipWriter } from "@zip.js/zip.js";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import * as mime from "mime-types";
 import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
-import type { InvoiceModel } from "~~/shared/models/invoice.model";
+import type { InvoiceModel } from "~~/shared/types/models/invoice.model";
 // if you ever need supabase-js in worker, you can import it here and initialize with the passed keys.
 
 type DownloadMsg = {

@@ -3,7 +3,10 @@ import useAsyncAction from "./core/useAsyncAction";
 import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import type { Database } from "~~/types/providers/database/supabase/database.types";
 import type { UserUpdate } from "~~/types/providers/database";
-import type { UserModel, UserModelUpdate } from "~~/shared/models/user.model";
+import type {
+    UserModel,
+    UserModelUpdate,
+} from "~~/shared/types/models/user.model";
 
 const _useUser = () => {
     const supabaseUser = useSupabaseUser();

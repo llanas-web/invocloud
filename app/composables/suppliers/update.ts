@@ -1,6 +1,6 @@
 import { createSharedComposable } from "@vueuse/core";
 import { z } from "zod";
-import type SupplierModel from "~~/shared/models/supplier.model";
+import type SupplierModel from "~~/shared/types/models/supplier.model";
 import useAsyncAction from "../core/useAsyncAction";
 import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import {

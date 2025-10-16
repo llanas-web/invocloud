@@ -1,4 +1,4 @@
-import UserSettingsModel from "~~/shared/models/user-settings.model";
+import UserSettingsModel from "~~/shared/types/models/user-settings.model";
 import type { UserSettings } from "~~/types/providers/database";
 
 export const userSettingsMapperFromDatabase = (

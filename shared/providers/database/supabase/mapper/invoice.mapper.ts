@@ -2,8 +2,8 @@ import {
     InvoiceModel,
     InvoiceSource,
     InvoiceStatus,
-} from "~~/shared/models/invoice.model";
-import type SupplierModel from "~~/shared/models/supplier.model";
+} from "~~/shared/types/models/invoice.model";
+import type SupplierModel from "~~/shared/types/models/supplier.model";
 import { fromStringToLocalDate } from "~~/shared/utils/date.utils";
 import type { Invoice } from "~~/types/providers/database";
 
