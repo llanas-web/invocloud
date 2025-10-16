@@ -1,7 +1,6 @@
-import { stripe } from "~~/server/lib/stripe/client";
 import { defineEventHandler, readBody } from "h3";
 import { serverSupabaseUser } from "#supabase/server";
-import { createCheckoutSessionSchema } from "~~/server/lib/stripe/schema";
+import { stripe } from "~~/server/lib/providers/payments/stripe/client";
 
 export default defineEventHandler(async (event) => {
     const rawBody = await readBody(event);

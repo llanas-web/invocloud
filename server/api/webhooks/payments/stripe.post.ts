@@ -4,8 +4,8 @@ import {
     getRequestHeaders,
     readRawBody,
 } from "h3";
-import { stripe } from "~~/server/lib/stripe/client";
-import { handleStripeEvent } from "~~/server/lib/stripe/dispatcher";
+import { stripe } from "~~/server/lib/providers/payments/stripe/client";
+import { handleStripeEvent } from "~~/server/lib/providers/payments/stripe/dispatcher";
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
