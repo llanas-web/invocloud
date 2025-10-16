@@ -5,6 +5,7 @@ import {
     AuthEvent,
     AuthUserModel,
 } from "~~/shared/types/models/auth-user.model";
+import type { ApiResetPassword } from "~~/server/types/endpoints";
 
 const _useAuth = () => {
     const authRepository = inject("authFactory") as SupabaseAuthRepository;
@@ -66,12 +67,15 @@ const _useAuth = () => {
     });
 
     const resetPassword = useAsyncAction(async (newPassword: string) => {
-        const { data, error } = await useFetch("/api/user/reset-password", {
-            method: "POST",
-            body: {
-                password: newPassword,
+        const { data, error } = await useFetch<ApiResetPassword>(
+            "/api/user/reset-password",
+            {
+                method: "POST",
+                body: {
+                    password: newPassword,
+                },
             },
-        });
+        );
         if (error.value) {
             throw new Error(error.value.message);
         }

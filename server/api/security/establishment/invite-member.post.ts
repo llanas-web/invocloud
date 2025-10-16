@@ -12,7 +12,7 @@ const schema = z.object({
 
 export default defineEventHandler(async (event) => {
     try {
-        const { ctx, deps } = await buildRequestScope(event);
+        const { deps } = await buildRequestScope(event);
         const {
             authRepository,
         } = deps.repos;
@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
             checkInvitorAuthorization,
             inviteMember,
         } = useInviteMemberService(deps);
+
         const { email, establishmentId, invitorId } = await parseBody(
             event,
             schema,

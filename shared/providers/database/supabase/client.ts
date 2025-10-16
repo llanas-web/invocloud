@@ -4,7 +4,7 @@ import {
     serverSupabaseUser,
 } from "#supabase/server";
 import type { H3Event } from "h3";
-import type { Database } from "~~/types/providers/database/supabase/database.types";
+import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 
 export const serverUser = (event: H3Event) => serverSupabaseUser(event);
 export const serverClient = (event: H3Event) =>

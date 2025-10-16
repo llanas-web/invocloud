@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import type { InvoiceStatus } from '~~/types';
+    import type { InvoiceStatus } from '~/types';
 
     const { invoice, isLoading: loadingDetails } = useInvoiceDetails()
     const { formRef, formState, formStateSchema, isLoading: loadingUpdate, onSubmit } = useInvoiceUpdate()
