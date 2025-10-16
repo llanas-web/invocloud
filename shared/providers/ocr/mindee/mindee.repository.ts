@@ -1,19 +1,18 @@
-import type { OcrProvider } from "../provider";
+import * as mindee from "mindee";
+import type { EventHandlerRequest, H3Event } from "h3";
+import type { OcrProvider } from "../ocr.interface";
 import type {
-    OcrPrediction,
     OcrSubmitOptions,
     OcrSubmitResult,
     OcrWebhookPayload,
-} from "../../../../../types/providers/ocr/mindee/types";
-import * as mindee from "mindee";
-import type { EventHandlerRequest, H3Event } from "h3";
+} from "~~/shared/types/providers/ocr/types";
 
 /**
  * Mindee Invoice API (predict v4)
  * Docs: https://developers.mindee.com/docs/invoice
  * Webhook signature header: `Mindee-Signature: t=...,v1=...`
  */
-export class MindeeProvider implements OcrProvider {
+export class MindeeRepository implements OcrProvider {
     private MINDEE_API_KEY = process.env.MINDEE_API_KEY;
     private MINDEE_MODEL_ID = process.env.MINDEE_MODEL_ID;
     private MINDEE_WEBHOOK_ID = process.env.MINDEE_WEBHOOK_ID;

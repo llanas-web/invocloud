@@ -1,6 +1,7 @@
 import type { AuthInterface } from "./auth.interface";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import SupabaseAuthRepository from "./supabase/auth.repository";
+import AuthError from "./auth.error";
 
 class AuthFactory {
     private static instance: AuthInterface;
@@ -18,7 +19,7 @@ class AuthFactory {
 
     public static getAuthRepository(): AuthInterface {
         if (!AuthFactory.instance) {
-            throw new Error(
+            throw new AuthError(
                 "AuthFactory not initialized. Call getInstance first.",
             );
         }

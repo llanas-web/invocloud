@@ -44,7 +44,7 @@ const _useUser = () => {
     const deleteAccountAction = useAsyncAction(async () => {
         if (!supabaseUser.value?.id) throw new Error("No user id");
         await userRepository.deleteUser(supabaseUser.value.id);
-        await logout();
+        await logout.execute();
         return true;
     });
 

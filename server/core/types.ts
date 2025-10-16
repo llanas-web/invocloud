@@ -8,9 +8,12 @@ import {
     UserRepository,
 } from "~~/shared/providers/database/database.interface";
 import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
+import type { OcrProvider } from "~~/shared/providers/ocr/ocr.interface";
 
 export type Deps = {
     storage: StorageProvider;
+    auth: AuthInterface;
+    ocr: OcrProvider;
     repos: {
         establishmentRepository: EstablishmentRepository;
         invoiceRepository: InvoiceRepository;

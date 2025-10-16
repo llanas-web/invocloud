@@ -1,11 +1,14 @@
 import { EventHandlerRequest, getHeader, H3Event } from "h3";
 import { Deps, RequestContext } from "./types";
 import {
+    serverClient,
     serverServiceRole,
     serverUser,
 } from "~~/shared/providers/database/supabase/client";
 import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import StorageFactory from "~~/shared/providers/storage/storage.factory";
+import AuthFactory from "~~/shared/providers/auth/auth.factory";
+import OcrFactory from "~~/shared/providers/ocr/ocr.factory";
 
 export async function buildRequestScope(
     event: H3Event<EventHandlerRequest>,
@@ -14,8 +17,8 @@ export async function buildRequestScope(
     const requestId = getHeader(event, "x-request-id") ?? crypto.randomUUID();
 
     const ss = serverServiceRole(event);
+    const sc = await serverClient(event);
     const { getRepository } = DatabaseFactory.getInstance(ss);
-    const storageProvider = StorageFactory.getInstance(ss);
 
     const ctx: RequestContext = {
         requestId,
@@ -25,7 +28,9 @@ export async function buildRequestScope(
     };
 
     const deps: Deps = {
-        storage: storageProvider,
+        storage: StorageFactory.getInstance(ss),
+        auth: AuthFactory.getInstance(sc),
+        ocr: OcrFactory.getInstance("mindee"),
         repos: {
             uploadValidationRepository: getRepository(
                 "uploadValidationRepository",
