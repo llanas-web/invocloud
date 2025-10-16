@@ -7,8 +7,10 @@ import {
     UploadValidationRepository,
     UserRepository,
 } from "~~/shared/providers/database/database.interface";
+import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
 
 export type Deps = {
+    storage: StorageProvider;
     repos: {
         establishmentRepository: EstablishmentRepository;
         invoiceRepository: InvoiceRepository;

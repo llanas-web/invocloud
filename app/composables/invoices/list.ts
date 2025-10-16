@@ -1,16 +1,17 @@
 import { createSharedComposable } from "@vueuse/core";
 import { acceptedStatus } from "~~/types/schemas/invoices";
-import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
-import type { Database } from "~~/types/providers/database/supabase/database.types";
-import DatabaseFactory from "~~/shared/providers/database/database-factory";
+import DatabaseFactory from "~~/shared/providers/database/database.factory";
+import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
+import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
+import useAsyncAction from "../core/useAsyncAction";
 
 const _useInvoices = () => {
     const supabaseUser = useSupabaseUser();
     const { getRepository } = inject("databaseFactory") as DatabaseFactory;
+    const storageRepository = inject("storageFactory") as StorageProvider;
     const invoiceRepository = getRepository("invoiceRepository");
 
     const { selectedEstablishment } = useEstablishments();
-    const storageRepository = createStorageRepository(supabaseClient);
 
     const { data: invoices, error, refresh, pending } = useAsyncData(
         "invoices",
@@ -64,27 +65,27 @@ const _useInvoices = () => {
         return success;
     };
 
-    const getInvoliceUrl = async (invoiceId: string) => {
+    const getInvoiceUrl = useAsyncAction(async (invoiceId: string) => {
         if (!invoiceId) {
             console.error("Invoice ID is required to get the invoice URL.");
             return null;
         }
-        const { data, error } = await storageRepository.createSignedUrl(
+        const signedUploadUrl = await storageRepository.createSignedUrl(
+            STORAGE_BUCKETS.INVOICES,
             `${supabaseUser.value!.id}/${invoiceId}`,
             60,
         );
-        if (error || !data) {
-            return null;
-        }
-        return data.signedUrl;
-    };
+        return signedUploadUrl;
+    });
 
     const downloadInvoiceFile = async (filePath: string) => {
         console.log("Downloading invoice file from path:", filePath);
-        const { data: blob, error } = await storageRepository
-            .downloadInvoiceFile(filePath);
+        const blob = await storageRepository.downloadFile(
+            STORAGE_BUCKETS.INVOICES,
+            filePath,
+        );
 
-        if (error || !blob) throw error || new Error("No blob found");
+        if (estce que tu pourrais maider a nommer mes providersblob) throw error || new Error("No blob found");
         return blob;
     };
 

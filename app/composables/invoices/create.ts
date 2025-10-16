@@ -1,5 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import DatabaseFactory from "~~/shared/providers/database/database-factory";
+import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import type { Database } from "~~/types/providers/database/supabase/database.types";
 import useAsyncAction from "../core/useAsyncAction";
 import {
@@ -7,10 +7,14 @@ import {
     CreateInvoiceSchema,
 } from "~/types/schemas/forms/invoices.schema";
 import { InvoiceStatus } from "~~/shared/models/invoice.model";
+import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
+import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 
 const _useInvoiceCreate = () => {
     const { getRepository } = inject("databaseFactory") as DatabaseFactory;
+    const storageRepository = inject("storageFactory") as StorageProvider;
     const invoiceRepository = getRepository("invoiceRepository");
+    const { selectedEstablishment } = useEstablishments();
 
     const formRef = ref();
 
@@ -42,16 +46,16 @@ const _useInvoiceCreate = () => {
                 throw new Error("No invoice file provided.");
             }
             const newInvoiceId = crypto.randomUUID();
-            throw new Error("Not implemented");
-            // await storageRepository.uploadFile({
-            //     file: invoiceFile.value,
-            //     path: `${selectedEstablishment.value!.id}/${newInvoiceId}`,
-            //     type: "invoices",
-            // });
-            // await invoiceRepository.createInvoice(
-            //     parsedInvoice,
-            // );
-            // navigateTo("/app");
+            const uploadResult = await storageRepository.uploadFile(
+                STORAGE_BUCKETS.INVOICES,
+                `${selectedEstablishment.value!.id}/${newInvoiceId}`,
+                invoiceFile.value,
+                { contentType: invoiceFile.value.type, upsert: true },
+            );
+            const newInvoice = await invoiceRepository.createInvoice(
+                parsedInvoice,
+            );
+            navigateTo("/app");
         },
     );
 

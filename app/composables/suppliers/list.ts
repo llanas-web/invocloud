@@ -1,5 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import DatabaseFactory from "~~/shared/providers/database/database-factory";
+import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import type SupplierModel from "~~/shared/models/supplier.model";
 
 const _useSuppliers = () => {
