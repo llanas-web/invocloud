@@ -1,6 +1,6 @@
 import { defineEventHandler, setResponseStatus } from "h3";
 import { serverServiceRole } from "~~/shared/providers/database/supabase/client";
-import { InvoiceInsert } from "~~/types";
+import { InvoiceInsert } from "~/types";
 import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
 import createInvoiceRepository from "~~/shared/providers/database/supabase/repositories/invoice.repository";
 import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";

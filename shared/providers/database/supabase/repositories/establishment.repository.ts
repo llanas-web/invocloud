@@ -1,4 +1,4 @@
-import type { Database } from "~~/types/providers/database/supabase/database.types";
+import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { EstablishmentRepository } from "../../database.interface";
 import {

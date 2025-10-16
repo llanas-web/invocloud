@@ -2,7 +2,7 @@ import type {
     UserSettingsUpdate,
     UserUpdate,
 } from "~~/types/providers/database/index";
-import type { Database } from "~~/types/providers/database/supabase/database.types";
+import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { UserRepository } from "../../database.interface";
 import { userMapperFromDatabase } from "../mapper";

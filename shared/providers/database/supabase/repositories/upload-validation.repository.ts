@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { UploadValidationUpdate } from "~~/types/providers/database/index";
-import type { Database } from "~~/types/providers/database/supabase/database.types";
+import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import { hashCode } from "~/utils/hash";
 import type { UploadValidationRepository } from "../../database.interface";
 import { SupabaseError } from "../supabase-error";

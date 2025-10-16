@@ -1,15 +1,14 @@
 import ServerError from "../core/errors";
 import { HTTPStatus } from "../core/errors/status";
 import { Deps } from "../core/types";
-import { sendEmail } from "../lib/providers/email";
 
 const useInviteMemberService = (deps: Deps) => {
     const {
         establishmentRepository,
         userRepository,
-        authRepository,
         adminRepository,
     } = deps.repos;
+    const { sendEmail } = deps.email;
 
     const checkInvitorAuthorization = async (
         invitorId: string,
@@ -65,17 +64,12 @@ const useInviteMemberService = (deps: Deps) => {
             const establishment = establishments[0];
             await establishmentRepository
                 .addEstablishmentMember(establishmentId, user.id);
-            const emailSend = await sendEmail(
-                [email],
-                "Vous avez été ajouté à un établissement",
-                `Bonjour ${user.fullName || user.email},<br><br>` +
+            await sendEmail({
+                to: [email],
+                subject: "Vous avez été ajouté à un établissement",
+                html: `Bonjour ${user.fullName || user.email},<br><br>` +
                     `Vous avez été ajouté à l'établissement <strong>${establishment.name}</strong>.<br><br>`,
-            );
-            if (!emailSend) {
-                console.error(
-                    "Error sending notification email to existing user",
-                );
-            }
+            });
         }
     };
 

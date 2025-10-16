@@ -1,7 +1,7 @@
 import { createSharedComposable } from "@vueuse/core";
 import { FetchError } from "ofetch";
 import type { EstablishmentModel } from "~~/shared/types/models/establishment.model";
-import type { Database } from "~~/types/providers/database/supabase/database.types";
+import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 
 const _useUploadWizard = () => {
     const toast = useToast();

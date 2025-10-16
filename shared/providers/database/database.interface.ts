@@ -17,12 +17,11 @@ import type {
 } from "~~/shared/types/models/user.model";
 import type {
     InvoiceInsert,
-    InvoiceUpdate,
     SupplierInsert,
     SupplierUpdate,
     UploadValidationUpdate,
     UserSettingsUpdate,
-} from "~~/types/providers/database/index";
+} from "#shared/types/providers/database/index";
 
 type EncapsulatedResult<T> = Promise<T>;
 

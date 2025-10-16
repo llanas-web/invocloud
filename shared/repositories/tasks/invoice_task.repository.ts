@@ -1,6 +1,6 @@
 import type { Database } from "~~/types/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { InvoiceTasksStatus, InvoiceTaskUpdate } from "~~/types";
+import type { InvoiceTasksStatus, InvoiceTaskUpdate } from "~/types";
 
 const createInvoiceTaskRepository = (supabase: SupabaseClient<Database>) => {
     const getInvoiceTasks = async (

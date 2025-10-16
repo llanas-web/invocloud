@@ -2,7 +2,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-import type { Supplier } from '~~/types'
+import type { Supplier } from '~/types'
 
 definePageMeta({
     layout: 'app'
