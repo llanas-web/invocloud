@@ -1,12 +1,13 @@
 import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "./core/useAsyncAction";
 import DatabaseFactory from "~~/shared/providers/database/database.factory";
+import type { ApiMemberInvite } from "~~/server/types/endpoints";
 
 const _useMembers = () => {
     const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const establishmentRepository = getRepository("establishmentRepository");
     const user = useSupabaseUser();
-    const { selectedEstablishment } = useEstablishments();
+    const { selectedEstablishment } = useEstablishmentsList();
 
     const {
         data: members,
@@ -32,7 +33,7 @@ const _useMembers = () => {
 
     const inviteMemberAction = useAsyncAction(async (email: string) => {
         if (!email) throw new Error("Email is required to invite a member.");
-        const { data, error } = await useFetch(
+        const { data, error } = await useFetch<ApiMemberInvite>(
             "/api/members/invite",
             {
                 method: "POST",

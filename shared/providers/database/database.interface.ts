@@ -6,6 +6,7 @@ import type {
 } from "~~/shared/types/models/establishment.model";
 import type {
     InvoiceModel,
+    InvoiceModelInsert,
     InvoiceModelUpdate,
 } from "~~/shared/types/models/invoice.model";
 import type { MemberModel } from "~~/shared/types/models/member.model";
@@ -76,7 +77,7 @@ export interface InvoiceRepository {
         },
     ): EncapsulatedResult<InvoiceModel[]>;
     createInvoice(
-        invoices: InvoiceInsert[],
+        invoices: InvoiceModelInsert[],
     ): EncapsulatedResult<InvoiceModel[]>;
     updateInvoice(
         invoiceId: string,

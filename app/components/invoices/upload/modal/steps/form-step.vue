@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import * as z from 'zod'
+    import * as z from 'zod'
 
-const { isLoading, formState } = useInvoiceUpload()
+    const { isLoading, formState } = useUploadWizard()
 
-const fileFormSchema = z.object({
-    senderEmail: z.string().email('Adresse email invalide'),
-    recipientEmail: z.string().email('Adresse email invalide'),
-    invoiceFile: z.instanceof(File, {
-        message: 'Le fichier doit être un PDF ou une image'
-    }),
-    comment: z.string().optional()
-})
+    const fileFormSchema = z.object({
+        senderEmail: z.email('Adresse email invalide'),
+        recipientEmail: z.email('Adresse email invalide'),
+        invoiceFile: z.instanceof(File, {
+            message: 'Le fichier doit être un PDF ou une image'
+        }),
+        comment: z.string().optional()
+    })
 </script>
 
 <template>

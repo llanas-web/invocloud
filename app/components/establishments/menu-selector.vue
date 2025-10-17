@@ -6,8 +6,8 @@
         collapsed?: boolean
     }>()
 
-    const { establishments, selectedEstablishment, pending } = useEstablishments()
-    const { userSettings, toggleFavorite } = useUserSettings()
+    const { establishments, selectedEstablishment, pending, selectEstablishment } = useEstablishmentsList()
+    const { userSettings, toggleFavorite: { execute, pending: togglePending, error: toggleError, data: toggleData } } = useUserSettings()
 
     const addModel = useTemplateRef<typeof LazyEstablishmentsAddModal>('addModal')
 
@@ -17,9 +17,7 @@
             establishments.value.map(establishment => ({
                 id: establishment.id,
                 label: establishment.name,
-                onSelect() {
-                    selectedEstablishment.value = establishment;
-                },
+                onSelect: () => selectEstablishment(establishment.id),
                 isFavorite: userSettings.value.favorite_establishment_id === establishment.id,
             })), [{
                 label: 'Créer une structure',
@@ -45,7 +43,7 @@
                 <span>{{ item.label }}</span>
                 <UButton v-if="item.id" :class="item.isFavorite ? '' : 'text-gray-400 dark:text-gray-600'"
                     color="warning" variant="ghost" size="xs"
-                    :icon="item.isFavorite ? 'i-lucide-star' : 'i-lucide-star'" @click.stop="toggleFavorite(item.id)">
+                    :icon="item.isFavorite ? 'i-lucide-star' : 'i-lucide-star'" @click.stop="execute(item.id)">
                 </UButton>
             </div>
         </template>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
     import type { TableColumn } from '@nuxt/ui'
 
-    const { pendingInvoices, deleteInvoices } = useInvoices()
+    const { pendingInvoices } = useInvoices()
+    const { error: deleteInvoiceError, selectedInvoices, onSubmit } = useInvoicesDelete()
 
     const UBadge = resolveComponent('UBadge')
     const UButton = resolveComponent('UButton')
@@ -17,7 +18,7 @@
             cell: ({ row, table }) => {
                 return h('div', { class: 'flex items-center gap-3' }, [
                     h('div', undefined, [
-                        h('p', { class: 'font-medium text-highlighted' }, row.original.supplier_name),
+                        h('p', { class: 'font-medium text-highlighted' }, row.original.supplier.name),
                     ])
                 ])
             }
@@ -75,20 +76,20 @@
                         class: 'cursor-pointer',
                         label: 'Refuser',
                         onClick: async () => {
-                            const result = await deleteInvoices([row.original.id])
-                            if (result) {
-                                toast.add({
-                                    title: 'Facture supprimée',
-                                    description: 'La facture a été supprimée.',
-                                    color: 'success'
-                                })
-                            } else {
+                            selectedInvoices.value = [row.original.id]
+                            await onSubmit()
+                            if (deleteInvoiceError.value) {
                                 toast.add({
                                     title: 'Erreur',
                                     description: 'Une erreur est survenue lors de la suppression de la facture.',
                                     color: 'error'
                                 })
                             }
+                            toast.add({
+                                title: 'Facture supprimée',
+                                description: 'La facture a été supprimée.',
+                                color: 'success'
+                            })
                         }
                     }),
                 ])

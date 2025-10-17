@@ -27,9 +27,9 @@ const _useEstablishmentsList = () => {
 
     const {
         data: establishments,
-        pending: pendingFetch,
+        pending,
         refresh,
-        error: errorFetch,
+        error,
     } = useAsyncData(
         key,
         async () => {
@@ -164,8 +164,8 @@ const _useEstablishmentsList = () => {
         selectedEstablishment,
 
         // fetch states
-        pendingFetch,
-        errorFetch,
+        pending,
+        error,
 
         // actions
         refresh,

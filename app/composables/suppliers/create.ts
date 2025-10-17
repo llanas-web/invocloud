@@ -7,7 +7,7 @@ import type { CreateSupplierForm } from "~/types/schemas/forms/suppliers.schema"
 const _useSupplierCreate = () => {
     const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const supplierRepository = getRepository("supplierRepository");
-    const { selectedEstablishment } = useEstablishments();
+    const { selectedEstablishment } = useEstablishmentsList();
     const toast = useToast();
 
     const openModal = ref(false);
@@ -35,25 +35,23 @@ const _useSupplierCreate = () => {
         emailField.value = "";
     };
 
-    const { data: newSupplier, error, pending, execute } = useAsyncAction(
-        async (name: string, emails: string[]) => {
+    const { error, pending, execute } = useAsyncAction(
+        async () => {
             if (!selectedEstablishment.value) {
                 throw new Error("No establishment selected.");
             }
             const _newSupplier = await supplierRepository.createSupplier({
-                name,
+                name: formState.name,
                 establishment_id: selectedEstablishment.value.id,
-                emails,
+                emails: formState.emails,
             });
             openModal.value = false;
             formState.name = "";
             formState.emails = [];
-            return _newSupplier;
         },
     );
 
     return {
-        newSupplier,
         error,
         pending,
         openModal,

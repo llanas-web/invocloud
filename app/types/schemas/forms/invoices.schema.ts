@@ -7,13 +7,14 @@ import { amountField } from "./fields";
 
 export const CreateInvoiceSchema = z.object({
     supplierId: z.uuid("Fournisseur invalide"),
+    createdAt: z.date().default(new Date()),
     amount: amountField,
     filePath: z.string().min(1, "Fichier requis"),
     invoiceNumber: z.string().min(1, "Numéro requis"),
-    name: z.string().nullable().optional(),
-    comment: z.string().nullable().optional(),
-    dueDate: z.date().nullable().optional(), // Date en domaine
-    paidAt: z.date().nullable().optional(),
+    name: z.string().nullable(),
+    comment: z.string().nullable(),
+    dueDate: z.date(),
+    paidAt: z.date().nullable(),
     status: z.enum(InvoiceStatus).default(InvoiceStatus.VALIDATED),
     source: z.enum(InvoiceSource).default(InvoiceSource.APP),
 }).refine((data) => {
@@ -29,10 +30,12 @@ export type CreateInvoiceForm = z.input<typeof CreateInvoiceSchema>;
 export type CreateInvoiceCommand = z.output<typeof CreateInvoiceSchema>;
 
 export const UpdateInvoiceSchema = z.object({
+    invoiceNumber: z.string().default(""),
+    createdAt: z.date().default(new Date()),
+    dueDate: z.date().default(new Date()),
     amount: amountField,
     name: z.string().nullable().optional(),
     comment: z.string().nullable().optional(),
-    dueDate: z.date().nullable().optional(),
     paidAt: z.date().nullable().optional(),
     status: z.enum(InvoiceStatus).default(InvoiceStatus.VALIDATED),
 }).refine((data) => {

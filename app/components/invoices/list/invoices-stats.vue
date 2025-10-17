@@ -12,7 +12,7 @@
         const count = filteredInvoices.value.length;
         const pendingCount = filteredInvoices.value.filter(
             (invoice) =>
-                invoice.overdue,
+                invoice.isOverdue,
         ).length;
         return {
             total,

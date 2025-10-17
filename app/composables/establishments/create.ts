@@ -22,7 +22,7 @@ const _useEstablishmentCreate = () => {
     const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const establishmentRepository = getRepository("establishmentRepository");
     const { establishments, refresh, selectEstablishment } =
-        useEstablishments();
+        useEstablishmentsList();
 
     const formRef = ref();
 

@@ -34,7 +34,7 @@
                 <div class="flex items-center gap-3 min-w-0">
                     <div class="text-sm min-w-0">
                         <p class="text-highlighted font-medium truncate">
-                            {{ member.user?.full_name }}
+                            {{ member.user?.fullName }}
                         </p>
                         <p class="text-muted truncate">
                             {{ member.user?.email }}

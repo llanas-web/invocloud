@@ -18,16 +18,16 @@ export enum InvoiceStatus {
 
 export class InvoiceModel {
     id: string;
-    name?: string | null;
     createdAt: Date;
-    amount: number;
-    dueDate: Date | null;
     updatedAt: Date;
-    paidAt: Date | null;
-    filePath: string | null;
-    invoiceNumber: string | null;
+    invoiceNumber: string;
+    amount: number;
+    dueDate: Date;
+    filePath: string;
     source: InvoiceSource;
     status: InvoiceStatus;
+    name: string | null;
+    paidAt: Date | null;
     comment: string | null;
     supplier: SupplierModel;
 
@@ -36,27 +36,27 @@ export class InvoiceModel {
         name = null,
         createdAt,
         amount,
-        dueDate = null,
+        dueDate,
         updatedAt,
         paidAt = null,
-        filePath = null,
-        invoiceNumber = null,
+        filePath,
+        invoiceNumber,
         source = InvoiceSource.APP,
         status,
         comment = null,
         supplier,
     }: {
         id: string;
-        name: string | null;
         createdAt: Date;
         amount: number;
-        dueDate: Date | null;
+        dueDate: Date;
         updatedAt: Date;
-        paidAt: Date | null;
-        filePath: string | null;
-        invoiceNumber: string | null;
+        filePath: string;
+        invoiceNumber: string;
         source: InvoiceSource;
         status: InvoiceStatus;
+        name: string | null;
+        paidAt: Date | null;
         comment: string | null;
         supplier: SupplierModel;
     }) {
@@ -87,9 +87,10 @@ export class InvoiceModel {
 export type InvoiceModelUpdate = Partial<
     Omit<InvoiceModel, "id" | "createdAt" | "updatedAt" | "supplier">
 >;
+
 export type InvoiceModelInsert =
     & Omit<
         InvoiceModel,
         "id" | "createdAt" | "updatedAt" | "supplier" | "isOverdue" | "source"
     >
-    & { id?: string };
+    & { id?: string; supplierId: string };

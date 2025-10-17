@@ -18,7 +18,7 @@ export type UpdateEstablishmentCommand = z.output<
 const _useEstablishmentUpdate = () => {
     const { getRepository } = inject("databaseFactory") as DatabaseFactory;
     const establishmentRepository = getRepository("establishmentRepository");
-    const { selectedEstablishment, refresh } = useEstablishments();
+    const { selectedEstablishment, refresh } = useEstablishmentsList();
 
     const formRef = ref();
 
@@ -46,21 +46,21 @@ const _useEstablishmentUpdate = () => {
         return JSON.stringify(currentParsed) !== JSON.stringify(initialParsed);
     });
 
-    const { data: updatedEstablishment, error, pending, execute } =
-        useAsyncAction(
-            async () => {
-                const parsedForm = UpdateEstablishmentSchema.parse(formState);
-                if (!selectedEstablishment.value) {
-                    throw new Error("No establishment selected");
-                }
-                const updated = await establishmentRepository
-                    .updateEstablishment(
-                        selectedEstablishment.value!.id,
-                        parsedForm,
-                    );
-                return updated;
-            },
-        );
+    const { error, pending, execute } = useAsyncAction(
+        async () => {
+            const parsedForm = UpdateEstablishmentSchema.parse(formState);
+            if (!selectedEstablishment.value) {
+                throw new Error("No establishment selected");
+            }
+            const updated = await establishmentRepository
+                .updateEstablishment(
+                    selectedEstablishment.value!.id,
+                    parsedForm,
+                );
+            Object.assign(selectedEstablishment.value, updated);
+            await refresh();
+        },
+    );
 
     const checkEmailPrefixAvailable = useAsyncAction(
         async (emailPrefix: string) => {
@@ -77,7 +77,6 @@ const _useEstablishmentUpdate = () => {
         formRef,
         formState,
         isDirty,
-        updatedEstablishment,
         error,
         pending,
         onSubmit: execute,

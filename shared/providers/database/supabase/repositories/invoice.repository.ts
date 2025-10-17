@@ -1,15 +1,18 @@
 import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type {
-    InvoiceInsert,
-    InvoiceUpdate,
-} from "~~/types/providers/database/index";
 import type { InvoiceRepository } from "../../database.interface";
-import { invoiceMapperFromDatabase } from "../mapper/invoice.mapper";
+import {
+    invoiceMapperForInsert,
+    invoiceMapperForUpdate,
+    invoiceMapperFromDatabase,
+} from "../mapper/invoice.mapper";
 import { supplierMapperFromDatabase } from "../mapper/supplier.mapper";
 import { SupabaseError } from "../supabase-error";
 import { DomainError } from "~~/shared/errors/domain.error";
-import type { InvoiceModelUpdate } from "~~/shared/types/models/invoice.model";
+import type {
+    InvoiceModelInsert,
+    InvoiceModelUpdate,
+} from "~~/shared/types/models/invoice.model";
 
 export class InvoiceSupabaseRepository implements InvoiceRepository {
     constructor(private supabase: SupabaseClient<Database>) {}
@@ -43,10 +46,14 @@ export class InvoiceSupabaseRepository implements InvoiceRepository {
         });
     }
 
-    async createInvoice(invoices: InvoiceInsert[]) {
+    async createInvoice(invoices: InvoiceModelInsert[]) {
         const { data, error } = await this.supabase
             .from("invoices")
-            .insert(invoices)
+            .insert(
+                invoices.map((invToInsert) =>
+                    invoiceMapperForInsert(invToInsert)
+                ),
+            )
             .select("*, supplier:suppliers(*)");
         if (error) throw SupabaseError.fromPostgrest(error);
         if (!data?.length) {
@@ -68,7 +75,7 @@ export class InvoiceSupabaseRepository implements InvoiceRepository {
     ) {
         const { data, error } = await this.supabase
             .from("invoices")
-            .update(invoice)
+            .update(invoiceMapperForUpdate(invoice))
             .eq("id", invoiceId)
             .select("*, supplier:suppliers(*)")
             .single();

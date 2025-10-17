@@ -5,8 +5,8 @@
     }>()
 
     const emit = defineEmits<{
-        (e: 'input', value: string | null): void
-        (e: 'change', value: string | null): void
+        (e: 'input', value: Date | null): void
+        (e: 'change', value: Date | null): void
         (e: 'blur'): void
     }>()
 
@@ -18,7 +18,7 @@
         dateStyle: 'short'
     })
 
-    const modelValue = defineModel<string | null>()
+    const modelValue = defineModel<Date | null>()
     const open = ref(false)
 
     const calendarDate = shallowRef<CalendarDate | null>(modelValue.value ? new CalendarDate(
@@ -32,7 +32,7 @@
         console.log('date-picker: calendarDate changed', newDate)
         // This line returns the date in YYYY-MM-DD with 1 day less because of timezone issues
         const val = newDate
-            ? bddDateFormat.format(newDate.toDate(getLocalTimeZone()))
+            ? newDate.toDate(getLocalTimeZone())
             : null
 
         // update outer v-model

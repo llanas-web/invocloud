@@ -1,148 +1,147 @@
 <script setup lang="ts">
-import type { TableColumn } from '@nuxt/ui'
-import { upperFirst } from 'scule'
-import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-import type { Supplier } from '~/types'
+    import type { TableColumn } from '@nuxt/ui'
+    import { getPaginationRowModel, type Row } from '@tanstack/table-core'
+    import type SupplierModel from '~~/shared/types/models/supplier.model';
 
-definePageMeta({
-    layout: 'app'
-})
+    definePageMeta({
+        layout: 'app'
+    })
 
-const { supplier, openModal } = useSupplierEdit();
+    const { supplier, openModal } = useSupplierEdit();
 
-const UAvatar = resolveComponent('UAvatar')
-const UButton = resolveComponent('UButton')
-const UBadge = resolveComponent('UBadge')
-const UDropdownMenu = resolveComponent('UDropdownMenu')
-const UCheckbox = resolveComponent('UCheckbox')
+    const UAvatar = resolveComponent('UAvatar')
+    const UButton = resolveComponent('UButton')
+    const UBadge = resolveComponent('UBadge')
+    const UDropdownMenu = resolveComponent('UDropdownMenu')
+    const UCheckbox = resolveComponent('UCheckbox')
 
-const toast = useToast()
-const table = useTemplateRef('table')
-const { suppliers, pending, deleteSuppliers } = useSuppliers()
-const { openModal: openCreateModal } = useSupplierCreate()
+    const toast = useToast()
+    const table = useTemplateRef('table')
+    const { suppliers, pending, deleteSuppliers } = useSuppliers()
+    const { openModal: openCreateModal } = useSupplierCreate()
 
-const rowSelection = ref()
+    const rowSelection = ref()
 
-function getRowItems(row: Row<Supplier>) {
-    return [
+    function getRowItems(row: Row<SupplierModel>) {
+        return [
+            {
+                type: 'label',
+                label: 'Actions'
+            },
+            {
+                label: 'Modifier le fournisseur',
+                icon: 'i-lucide-edit',
+                onSelect() {
+                    supplier.value = row.original
+                    openModal.value = true
+                }
+            },
+            {
+                type: 'separator'
+            },
+            {
+                label: 'Supprimer le fournisseur',
+                icon: 'i-lucide-trash',
+                color: 'error',
+                async onSelect() {
+                    await deleteSuppliers([row.original.id])
+                    toast.add({
+                        title: 'Fournisseur supprimé',
+                        description: 'Le fournisseur a été supprimé.'
+                    })
+                }
+            }
+        ]
+    }
+
+    const columns: TableColumn<SupplierModel>[] = [
         {
-            type: 'label',
-            label: 'Actions'
+            id: 'select',
+            header: ({ table }) =>
+                h(UCheckbox, {
+                    'modelValue': table.getIsSomePageRowsSelected()
+                        ? 'indeterminate'
+                        : table.getIsAllPageRowsSelected(),
+                    'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
+                        table.toggleAllPageRowsSelected(!!value),
+                    'ariaLabel': 'Select all'
+                }),
+            cell: ({ row }) =>
+                h(UCheckbox, {
+                    'modelValue': row.getIsSelected(),
+                    'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
+                    'ariaLabel': 'Select row'
+                })
         },
         {
-            label: 'Modifier le fournisseur',
-            icon: 'i-lucide-edit',
-            onSelect() {
-                supplier.value = row.original
-                openModal.value = true
+            accessorKey: 'Fournisseur',
+            header: 'Fournisseur',
+            cell: ({ row }) => {
+                return h('div', { class: 'flex items-center gap-3' }, [
+                    h('div', undefined, [
+                        h('p', { class: 'font-medium text-highlighted' }, row.original.name),
+                        h('p', { class: '' }, `@${row.original.name}`)
+                    ])
+                ])
             }
         },
         {
-            type: 'separator'
+            accessorKey: 'emails',
+            header: 'Emails',
+            cell: ({ row }) => {
+                return h('span', { class: 'text-muted' }, row.original.emails.join(', '))
+            }
         },
         {
-            label: 'Supprimer le fournisseur',
-            icon: 'i-lucide-trash',
-            color: 'error',
-            async onSelect() {
-                await deleteSuppliers([row.original.id])
-                toast.add({
-                    title: 'Fournisseur supprimé',
-                    description: 'Le fournisseur a été supprimé.'
-                })
+            id: 'actions',
+            cell: ({ row }) => {
+                return h(
+                    'div',
+                    { class: 'text-right' },
+                    h(
+                        UDropdownMenu,
+                        {
+                            content: {
+                                align: 'end'
+                            },
+                            items: getRowItems(row)
+                        },
+                        () =>
+                            h(UButton, {
+                                icon: 'i-lucide-ellipsis-vertical',
+                                color: 'neutral',
+                                variant: 'ghost',
+                                class: 'ml-auto'
+                            })
+                    )
+                )
             }
         }
     ]
-}
 
-const columns: TableColumn<Supplier>[] = [
-    {
-        id: 'select',
-        header: ({ table }) =>
-            h(UCheckbox, {
-                'modelValue': table.getIsSomePageRowsSelected()
-                    ? 'indeterminate'
-                    : table.getIsAllPageRowsSelected(),
-                'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
-                    table.toggleAllPageRowsSelected(!!value),
-                'ariaLabel': 'Select all'
-            }),
-        cell: ({ row }) =>
-            h(UCheckbox, {
-                'modelValue': row.getIsSelected(),
-                'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
-                'ariaLabel': 'Select row'
-            })
-    },
-    {
-        accessorKey: 'Fournisseur',
-        header: 'Fournisseur',
-        cell: ({ row }) => {
-            return h('div', { class: 'flex items-center gap-3' }, [
-                h('div', undefined, [
-                    h('p', { class: 'font-medium text-highlighted' }, row.original.name),
-                    h('p', { class: '' }, `@${row.original.name}`)
-                ])
-            ])
+    const statusFilter = ref('all')
+
+    watch(() => statusFilter.value, (newVal) => {
+        if (!table?.value?.tableApi) return
+
+        const statusColumn = table.value.tableApi.getColumn('status')
+        if (!statusColumn) return
+
+        if (newVal === 'all') {
+            statusColumn.setFilterValue(undefined)
+        } else {
+            statusColumn.setFilterValue(newVal)
         }
-    },
-    {
-        accessorKey: 'emails',
-        header: 'Emails',
-        cell: ({ row }) => {
-            return h('span', { class: 'text-muted' }, row.original.emails.join(', '))
-        }
-    },
-    {
-        id: 'actions',
-        cell: ({ row }) => {
-            return h(
-                'div',
-                { class: 'text-right' },
-                h(
-                    UDropdownMenu,
-                    {
-                        content: {
-                            align: 'end'
-                        },
-                        items: getRowItems(row)
-                    },
-                    () =>
-                        h(UButton, {
-                            icon: 'i-lucide-ellipsis-vertical',
-                            color: 'neutral',
-                            variant: 'ghost',
-                            class: 'ml-auto'
-                        })
-                )
-            )
-        }
+    })
+
+    const pagination = ref({
+        pageIndex: 0,
+        pageSize: 10
+    })
+
+    const onNewSupplier = () => {
+        openCreateModal.value = true
     }
-]
-
-const statusFilter = ref('all')
-
-watch(() => statusFilter.value, (newVal) => {
-    if (!table?.value?.tableApi) return
-
-    const statusColumn = table.value.tableApi.getColumn('status')
-    if (!statusColumn) return
-
-    if (newVal === 'all') {
-        statusColumn.setFilterValue(undefined)
-    } else {
-        statusColumn.setFilterValue(newVal)
-    }
-})
-
-const pagination = ref({
-    pageIndex: 0,
-    pageSize: 10
-})
-
-const onNewSupplier = () => {
-    openCreateModal.value = true
-}
 </script>
 
 <template>

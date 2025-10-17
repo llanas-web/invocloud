@@ -1,62 +1,62 @@
 <script setup lang="ts">
-import { eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, format } from 'date-fns'
-import { VisXYContainer, VisLine, VisAxis, VisArea, VisCrosshair, VisTooltip } from '@unovis/vue'
-import type { Period, Range } from '~/types'
-import { useElementSize } from '@vueuse/core'
+  import { eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, format } from 'date-fns'
+  import { VisXYContainer, VisLine, VisAxis, VisArea, VisCrosshair, VisTooltip } from '@unovis/vue'
+  import { useElementSize } from '@vueuse/core'
+  import type { Period, Range } from '~/types';
 
-const cardRef = useTemplateRef<HTMLElement | null>('cardRef')
+  const cardRef = useTemplateRef<HTMLElement | null>('cardRef')
 
-const props = defineProps<{
-  period: Period
-  range: Range
-}>()
+  const props = defineProps<{
+    period: Period
+    range: Range
+  }>()
 
-type DataRecord = {
-  date: Date
-  amount: number
-}
-
-const { width } = useElementSize(cardRef)
-
-const data = ref<DataRecord[]>([])
-
-watch([() => props.period, () => props.range], () => {
-  const dates = ({
-    journalier: eachDayOfInterval,
-    hebdomadaire: eachWeekOfInterval,
-    mensuel: eachMonthOfInterval
-  } as Record<Period, typeof eachDayOfInterval>)[props.period](props.range)
-
-  const min = 1000
-  const max = 10000
-
-  data.value = dates.map(date => ({ date, amount: Math.floor(Math.random() * (max - min + 1)) + min }))
-}, { immediate: true })
-
-const x = (_: DataRecord, i: number) => i
-const y = (d: DataRecord) => d.amount
-
-const total = computed(() => data.value.reduce((acc: number, { amount }) => acc + amount, 0))
-
-const formatNumber = new Intl.NumberFormat('en', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format
-
-const formatDate = (date: Date): string => {
-  return ({
-    journalier: format(date, 'd MMM'),
-    hebdomadaire: format(date, 'd MMM'),
-    mensuel: format(date, 'MMM yyy')
-  })[props.period]
-}
-
-const xTicks = (i: number) => {
-  if (i === 0 || i === data.value.length - 1 || !data.value[i]) {
-    return ''
+  type DataRecord = {
+    date: Date
+    amount: number
   }
 
-  return formatDate(data.value[i].date)
-}
+  const { width } = useElementSize(cardRef)
 
-const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amount)}`
+  const data = ref<DataRecord[]>([])
+
+  watch([() => props.period, () => props.range], () => {
+    const dates = ({
+      journalier: eachDayOfInterval,
+      hebdomadaire: eachWeekOfInterval,
+      mensuel: eachMonthOfInterval
+    } as Record<Period, typeof eachDayOfInterval>)[props.period](props.range)
+
+    const min = 1000
+    const max = 10000
+
+    data.value = dates.map(date => ({ date, amount: Math.floor(Math.random() * (max - min + 1)) + min }))
+  }, { immediate: true })
+
+  const x = (_: DataRecord, i: number) => i
+  const y = (d: DataRecord) => d.amount
+
+  const total = computed(() => data.value.reduce((acc: number, { amount }) => acc + amount, 0))
+
+  const formatNumber = new Intl.NumberFormat('en', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format
+
+  const formatDate = (date: Date): string => {
+    return ({
+      journalier: format(date, 'd MMM'),
+      hebdomadaire: format(date, 'd MMM'),
+      mensuel: format(date, 'MMM yyy')
+    })[props.period]
+  }
+
+  const xTicks = (i: number) => {
+    if (i === 0 || i === data.value.length - 1 || !data.value[i]) {
+      return ''
+    }
+
+    return formatDate(data.value[i].date)
+  }
+
+  const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amount)}`
 </script>
 
 <template>
@@ -86,16 +86,16 @@ const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amo
 </template>
 
 <style scoped>
-.unovis-xy-container {
-  --vis-crosshair-line-stroke-color: var(--ui-primary);
-  --vis-crosshair-circle-stroke-color: var(--ui-bg);
+  .unovis-xy-container {
+    --vis-crosshair-line-stroke-color: var(--ui-primary);
+    --vis-crosshair-circle-stroke-color: var(--ui-bg);
 
-  --vis-axis-grid-color: var(--ui-border);
-  --vis-axis-tick-color: var(--ui-border);
-  --vis-axis-tick-label-color: var(--ui-text-dimmed);
+    --vis-axis-grid-color: var(--ui-border);
+    --vis-axis-tick-color: var(--ui-border);
+    --vis-axis-tick-label-color: var(--ui-text-dimmed);
 
-  --vis-tooltip-background-color: var(--ui-bg);
-  --vis-tooltip-border-color: var(--ui-border);
-  --vis-tooltip-text-color: var(--ui-text-highlighted);
-}
+    --vis-tooltip-background-color: var(--ui-bg);
+    --vis-tooltip-border-color: var(--ui-border);
+    --vis-tooltip-text-color: var(--ui-text-highlighted);
+  }
 </style>
