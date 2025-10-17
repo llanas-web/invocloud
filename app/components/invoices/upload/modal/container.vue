@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    const { open, stepIndex, isLoading, onPrev, onValidate } = useInvoiceUpload()
+    const { open, stepIndex, isLoading, onPrev, onValidate } = useUploadWizard()
 
     const props = defineProps<{
         size?: 'sm' | 'md' | 'lg' | 'xl',

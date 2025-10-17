@@ -16,7 +16,7 @@ type DownloadMsg = {
 
 const _useWorker = () => {
   const { public: pub } = useRuntimeConfig();
-  const { selectedEstablishment } = useEstablishments();
+  const { selectedEstablishment } = useEstablishmentsList();
   const { rangeFilter } = useInvoicesTableList();
   const session = useSupabaseSession();
   const worker = shallowRef<Worker | null>(null);

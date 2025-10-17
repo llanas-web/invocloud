@@ -62,7 +62,7 @@ const useInviteMemberService = (deps: Deps) => {
                 );
             }
             const establishment = establishments[0];
-            await establishmentRepository
+            const newMember = await establishmentRepository
                 .addEstablishmentMember(establishmentId, user.id);
             await sendEmail({
                 to: [email],
@@ -70,6 +70,7 @@ const useInviteMemberService = (deps: Deps) => {
                 html: `Bonjour ${user.fullName || user.email},<br><br>` +
                     `Vous avez été ajouté à l'établissement <strong>${establishment.name}</strong>.<br><br>`,
             });
+            return newMember;
         }
     };
 

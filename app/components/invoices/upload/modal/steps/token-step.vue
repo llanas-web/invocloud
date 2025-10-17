@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import * as z from 'zod'
+    import * as z from 'zod'
 
-const { tokenState } = useInvoiceUpload()
-const { currentUser } = useUser();
+    const { tokenState } = useUploadWizard()
+    const { currentUser } = useUser();
 
-const confirmFormSchema = z.object({
-    confirmToken: z.string().array().length(6, 'Invalid token'),
-})
+    const confirmFormSchema = z.object({
+        confirmToken: z.string().array().length(6, 'Invalid token'),
+    })
 </script>
 
 <template>

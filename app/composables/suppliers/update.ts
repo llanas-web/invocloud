@@ -67,11 +67,11 @@ const _useSupplierUpdate = () => {
                 supplier.value.id,
                 parsed,
             );
+            supplier.value = _updatedSupplier;
             openModal.value = false;
             formState.name = "";
             formState.emails = [];
             await refresh();
-            return _updatedSupplier;
         },
     );
 

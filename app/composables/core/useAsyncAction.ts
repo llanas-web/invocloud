@@ -1,10 +1,11 @@
 import { ref } from "vue";
+import { AppError } from "~/core/errors/app.error";
 
 function useAsyncAction<TArgs extends any[], TResult>(
     action: (...args: TArgs) => Promise<TResult>,
 ) {
     const pending = ref(false);
-    const error = ref<unknown>(null);
+    const error = ref<AppError | null>(null);
     const data = ref<TResult | null>(null);
 
     async function execute(...args: TArgs) {
@@ -15,7 +16,13 @@ function useAsyncAction<TArgs extends any[], TResult>(
             data.value = result;
             return result;
         } catch (err) {
-            error.value = err;
+            if (err instanceof Error) {
+                error.value = new AppError(err.message);
+            } else if (typeof err === "string") {
+                error.value = new AppError(err);
+            } else {
+                error.value = new AppError("Oups... Une erreur est survenue.");
+            }
             data.value = null;
             throw err;
         } finally {

@@ -6,6 +6,7 @@
     import { useInvoicesSend } from '~/composables/invoices/send'
     import { useInvoicesDelete } from '~/composables/invoices/delete'
     import { useInvoicesTableList } from '~/composables/invoices/table-list'
+    import type { InvoiceModel } from '~~/shared/types/models/invoice.model'
 
 
     const UButton = resolveComponent('UButton')
@@ -14,18 +15,17 @@
 
     const table = useTemplateRef('table')
 
-    const { acceptedInvoices, pending } = useInvoices()
+    const { pending } = useInvoices()
     const { statusFilter, selectedSuppliers, filteredInvoices } = useInvoicesTableList()
-    const { updateInvoice } = useInvoices()
+    const { onSubmit } = useInvoiceUpdate()
     const { open: isSendModalOpen, selectedInvoices: listInvoicesToSend } = useInvoicesSend()
     const { open: isDeleteModalOpen, selectedInvoices: listInvoicesToDelete } = useInvoicesDelete()
     const { suppliers } = useSuppliers()
-    declare type Invoice = NonNullable<(typeof acceptedInvoices)['value']>[number];
     const { launchDownloadWorker, progress, running } = useWorker();
 
     const rowSelection = ref({})
 
-    function getRowItems(row: Row<Invoice>) {
+    function getRowItems(row: Row<InvoiceModel>) {
         return [
             {
                 type: 'label',
@@ -61,8 +61,8 @@
                         label: 'Marquer comme payé',
                         icon: 'i-lucide-check',
                         iconColor: 'success',
-                        onSelect() {
-                            updateInvoice(row.original.id, {
+                        async onSelect() {
+                            await onSubmit(row.original.id, {
                                 status: 'paid'
                             })
                         }
@@ -103,7 +103,7 @@
     }
 
 
-    const columns: TableColumn<Invoice>[] = [
+    const columns: TableColumn<InvoiceModel>[] = [
         {
             id: 'select',
             header: ({ table }) =>
@@ -127,7 +127,7 @@
             header: 'N°',
             cell: ({ row }) => {
                 return h('div', { class: 'flex items-center gap-3' }, [
-                    h(NuxtLink, { class: 'font-medium text-highlighted hover:underline', to: `/app/invoices/${row.original.id}` }, () => row.original.invoice_number),
+                    h(NuxtLink, { class: 'font-medium text-highlighted hover:underline', to: `/app/invoices/${row.original.id}` }, () => row.original.invoiceNumber),
                 ])
             }
         },
@@ -135,7 +135,7 @@
             accessorKey: 'supplier',
             header: 'Fournisseur',
             cell: ({ row }) => {
-                return h(UButton, { onClick: () => selectedSuppliers.value = [row.original.supplier_id], variant: 'ghost' }, row.original.supplier_name)
+                return h(UButton, { onClick: () => selectedSuppliers.value = [row.original.supplier.id], variant: 'ghost' }, row.original.supplier.name)
             }
         },
         {
@@ -157,7 +157,7 @@
             header: 'Statut',
             cell: ({ row }) => {
                 const color = statusColors[row.original.status as keyof typeof statusColors]
-                if (row.original.overdue) {
+                if (row.original.isOverdue) {
                     return h(UBadge, { class: 'capitalize', variant: 'subtle', color: 'error' }, () =>
                         'En retard'
                     )
@@ -309,7 +309,7 @@
         if (listSelectedInvoices.length === 0) {
             return;
         }
-        launchDownloadWorker(listSelectedInvoices);
+        launchDownloadWorker.execute(listSelectedInvoices);
     }
 </script>
 

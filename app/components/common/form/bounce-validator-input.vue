@@ -1,10 +1,7 @@
 <script lang="ts" setup>
     import { ref, watch, computed } from 'vue'
     import { useDebounceFn } from '@vueuse/core'
-    import type { ZodTypeAny } from 'zod'
-    import { error } from '#build/ui';
-
-    type AsyncValidatorResult = { ok: boolean; message?: string }
+    import type { ZodAny } from 'zod';
 
     const props = withDefaults(defineProps<{
         modelValue: string
@@ -14,12 +11,13 @@
         /**
          * Zod schema for sync validation (format/min length/regex, etc.)
          */
-        schema?: ZodTypeAny
+        schema?: ZodAny
+
         /**
-         * Optional async validator (e.g., uniqueness check).
-         * Called only if sync validation passes.
+         * Async validation action (e.g., uniqueness check).
          */
-        asyncValidate?: (value: string) => Promise<AsyncValidatorResult>
+        action: ReturnType<typeof useAsyncAction<string[], boolean>>
+
         /**
          * Debounce in ms for async validate
          */
@@ -108,21 +106,22 @@
      */
     const debouncedAsyncValidate = useDebounceFn(async (value: string) => {
         emit('checking-change', true)
-        if (!props.asyncValidate) {
+        if (!props.action.execute) {
             status.value = errors.value.length ? 'invalid' : 'valid'
             emit('validity-change', status.value === 'valid')
             emit('errors-change', errors.value)
             return
         }
         status.value = 'checking'
-        const res = await props.asyncValidate(value)
-        if (res.ok) {
+        const { execute, data, error, pending } = props.action;
+        const isCheckOk = await execute(value)
+        if (isCheckOk) {
             status.value = 'valid'
         } else {
             status.value = 'invalid'
-            if (res.message) {
+            if (error.value) {
                 // prepend async error message, keep existing sync errors if any
-                errors.value = [res.message, ...errors.value]
+                errors.value = [error.value.message, ...errors.value]
             } else if (errors.value.length === 0) {
                 errors.value = ['Valeur non valide']
             }
