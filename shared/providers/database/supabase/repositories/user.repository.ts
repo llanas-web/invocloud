@@ -1,7 +1,3 @@
-import type {
-    UserSettingsUpdate,
-    UserUpdate,
-} from "~~/types/providers/database/index";
 import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { UserRepository } from "../../database.interface";
@@ -9,7 +5,8 @@ import { userMapperFromDatabase } from "../mapper";
 import { userSettingsMapperFromDatabase } from "../mapper/user-settings.mapper";
 import { SupabaseError } from "../supabase-error";
 import type { UserModelUpdate } from "~~/shared/types/models/user.model";
-import { DomainError } from "~~/shared/errors/domain.error";
+import { DomainError, DomainErrorCode } from "~~/shared/errors/domain.error";
+import type { UserSettingsUpdate } from "~~/shared/types/providers/database";
 
 export class UserSupabaseRepository implements UserRepository {
     constructor(private supabase: SupabaseClient<Database>) {}
@@ -26,7 +23,10 @@ export class UserSupabaseRepository implements UserRepository {
 
         if (error) throw SupabaseError.fromPostgrest(error);
         if (!data) {
-            throw new DomainError("USER_NOT_FOUND", "Utilisateur non trouvé");
+            throw new DomainError(
+                DomainErrorCode.UESR_NOT_FOUND,
+                "Utilisateur non trouvé",
+            );
         }
         return userMapperFromDatabase(data);
     }

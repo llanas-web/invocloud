@@ -4,11 +4,7 @@ import type {
     EstablishmentModelUpdate,
     EstablishmentShortModel,
 } from "~~/shared/types/models/establishment.model";
-import type {
-    InvoiceModel,
-    InvoiceModelInsert,
-    InvoiceModelUpdate,
-} from "~~/shared/types/models/invoice.model";
+import type { InvoiceModel } from "~~/shared/types/models/invoice.model";
 import type { MemberModel } from "~~/shared/types/models/member.model";
 import type SupplierModel from "~~/shared/types/models/supplier.model";
 import type UserSettingsModel from "~~/shared/types/models/user-settings.model";
@@ -18,8 +14,10 @@ import type {
 } from "~~/shared/types/models/user.model";
 import type {
     InvoiceInsert,
+    InvoiceUpdate,
     SupplierInsert,
     SupplierUpdate,
+    UploadValidation,
     UploadValidationUpdate,
     UserSettingsUpdate,
 } from "#shared/types/providers/database/index";
@@ -55,7 +53,7 @@ export interface EstablishmentRepository {
         emailSender: string,
         recipientEmail: string,
     ): EncapsulatedResult<EstablishmentShortModel[]>;
-    deleteEstablishment(id: string): EncapsulatedResult<boolean>;
+    deleteEstablishment(id: string): Promise<void>;
     getEstablishmentMembers(
         establishmentId: string,
     ): EncapsulatedResult<MemberModel[]>;
@@ -66,7 +64,7 @@ export interface EstablishmentRepository {
     removeEstablishmentMember(
         establishmentId: string,
         userId: string,
-    ): EncapsulatedResult<boolean>;
+    ): Promise<void>;
 }
 
 export interface InvoiceRepository {
@@ -77,11 +75,11 @@ export interface InvoiceRepository {
         },
     ): EncapsulatedResult<InvoiceModel[]>;
     createInvoice(
-        invoices: InvoiceModelInsert[],
-    ): EncapsulatedResult<InvoiceModel[]>;
+        invoice: InvoiceInsert,
+    ): EncapsulatedResult<InvoiceModel>;
     updateInvoice(
         invoiceId: string,
-        invoice: InvoiceModelUpdate,
+        invoice: InvoiceUpdate,
     ): EncapsulatedResult<InvoiceModel>;
     deleteInvoices(invoiceIds: string[]): EncapsulatedResult<boolean>;
 }
@@ -106,7 +104,13 @@ export interface UploadValidationRepository {
         recipientEmail: string,
         token: string,
         uploaderId?: string,
+        establishementsIds?: string[],
     ): EncapsulatedResult<string>;
+    getUploadValidation(
+        uploadValidation: string,
+        hashToken: string,
+        uploaderId: string,
+    ): EncapsulatedResult<UploadValidation>;
     isTokenValid(
         uploadValidationId: string,
         uploaderId: string,
@@ -115,7 +119,7 @@ export interface UploadValidationRepository {
     updateUploadValidation(
         uploadValidationId: string,
         updates: UploadValidationUpdate,
-    ): EncapsulatedResult<boolean>;
+    ): Promise<void>;
 }
 
 export interface UserRepository {
@@ -126,7 +130,7 @@ export interface UserRepository {
         id: string,
         updates: UserModelUpdate,
     ): EncapsulatedResult<UserModel>;
-    deleteUser(id: string): EncapsulatedResult<boolean>;
+    deleteUser(id: string): Promise<void>;
     getUserSettings(
         userId: string,
     ): EncapsulatedResult<UserSettingsModel>;

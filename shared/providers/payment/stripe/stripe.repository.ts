@@ -17,19 +17,14 @@ export class StripeRepository implements PaymentProviderInterface {
         apiVersion: this.STRIPE_API_VERSION,
     });
 
-    onSubscriptionChange(
-        callback: (event: SubscriptionEvent, subscriptionId: string) => void,
-    ) {
-        // Implementation here
-    }
-
     async createSubscription(
-        user: UserModel,
+        userId: string,
+        userEmail: string,
         establishmentId: string,
     ) {
         const checkoutSessionObject = generateCreateCheckoutSessionObject(
-            user.id,
-            user.email,
+            userId,
+            userEmail,
             establishmentId,
         );
         const session = await this.stripeInstance.checkout.sessions.create(

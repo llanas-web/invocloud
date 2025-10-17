@@ -68,4 +68,18 @@ export class StorageSupabaseRepository implements StorageProvider {
         }
         return data.signedUrl;
     }
+
+    async createSignedUrls(
+        bucket: string,
+        filePaths: string[],
+        expiresIn: number,
+    ): Promise<string[]> {
+        const { data, error } = await this.supabase.storage.from(bucket)
+            .createSignedUrls(
+                filePaths,
+                expiresIn,
+            );
+        if (error) throw new StorageError("Error creating signed URLs", error);
+        return data.map((item) => item.signedUrl);
+    }
 }

@@ -34,4 +34,5 @@ export type RequestContext = {
     userId: string;
     ip?: string;
     now: () => Date;
+    authentProtection: (allowAnonyme?: boolean) => void;
 };

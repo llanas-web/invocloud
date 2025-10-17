@@ -1,17 +1,11 @@
 import {
     InvoiceModel,
-    type InvoiceModelInsert,
-    type InvoiceModelUpdate,
     InvoiceSource,
     InvoiceStatus,
 } from "~~/shared/types/models/invoice.model";
 import type SupplierModel from "~~/shared/types/models/supplier.model";
 import { fromStringToLocalDate } from "~~/shared/utils/date.utils";
-import type {
-    Invoice,
-    InvoiceInsert,
-    InvoiceUpdate,
-} from "~~/shared/types/providers/database";
+import type { Invoice } from "~~/shared/types/providers/database";
 
 export const invoiceMapperFromDatabase = (
     invoice: Invoice,
@@ -38,37 +32,4 @@ export const invoiceMapperFromDatabase = (
         comment: invoice.comment,
         supplier: supplier,
     });
-};
-
-export const invoiceMapperForInsert = (
-    invoiceToInsert: InvoiceModelInsert,
-): InvoiceInsert => {
-    return {
-        id: invoiceToInsert.id,
-        name: invoiceToInsert.name,
-        amount: invoiceToInsert.amount,
-        due_date: invoiceToInsert.dueDate
-            ? invoiceToInsert.dueDate.toISOString()
-            : null,
-        paid_at: invoiceToInsert.paidAt
-            ? invoiceToInsert.paidAt.toISOString()
-            : null,
-        file_path: invoiceToInsert.filePath,
-        supplier_id: invoiceToInsert.supplierId,
-    };
-};
-
-export const invoiceMapperForUpdate = (
-    invoiceToUpdate: InvoiceModelUpdate,
-): InvoiceUpdate => {
-    return {
-        name: invoiceToUpdate.name,
-        amount: invoiceToUpdate.amount,
-        due_date: invoiceToUpdate.dueDate
-            ? invoiceToUpdate.dueDate.toISOString()
-            : null,
-        paid_at: invoiceToUpdate.paidAt
-            ? invoiceToUpdate.paidAt.toISOString()
-            : null,
-    };
 };

@@ -1,11 +1,7 @@
 import z from "zod";
 import { hashCode } from "~/utils/hash";
-import {
-    serverServiceRole,
-    serverUser,
-} from "~~/shared/providers/database/supabase/client";
-import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
-import createUploadRepository from "~~/shared/providers/database/supabase/repositories/upload-validation.repository";
+import { buildRequestScope } from "~~/server/core/container";
+import { HTTPStatus } from "~~/server/core/errors/status";
 
 const schema = z.object({
     uploadValidationId: z.string().uuid(),
@@ -13,54 +9,43 @@ const schema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+    const {
+        deps: {
+            auth,
+            repos: {
+                uploadValidationRepository,
+            },
+        },
+    } = await buildRequestScope(event);
+
     const { uploadValidationId, token } = await parseBody(
         event,
         schema,
     );
 
-    const supabase = serverServiceRole(event);
-    const establishmentRepository = createEstablishmentRepository(supabase);
-    const uploadRepository = createUploadRepository(supabase);
-    const supabaseUser = await serverUser(event);
-    if (!supabaseUser) {
+    if (!auth.currentUser) {
         throw createError({
-            status: 401,
-            message: "Utilisateur non authentifié",
+            status: HTTPStatus.FORBIDDEN,
+            message: "MustBeConnected",
         });
     }
 
     const hashedCode = hashCode(token);
-
-    const { data: uploadValidation, error: uploadValidationError } =
-        await uploadRepository.isTokenValid(
+    const uploadValidation = await uploadValidationRepository
+        .getUploadValidation(
             uploadValidationId,
-            supabaseUser.id,
+            auth.currentUser.id,
             hashedCode,
         );
 
-    if (uploadValidationError || !uploadValidation) {
+    if (!uploadValidation) {
         throw createError({
             status: 404,
-            message: uploadValidationError?.message ||
-                "Fichier introuvable ou token expiré",
-        });
-    }
-
-    const { data: possibleEstablishments, error: establishmentsError } =
-        await establishmentRepository.getEstablishmentsByIds(
-            uploadValidation.establishments,
-        );
-
-    if (establishmentsError || !possibleEstablishments) {
-        throw createError({
-            status: 404,
-            message: establishmentsError?.message ||
-                "Établissements non trouvés",
+            message: "Fichier introuvable ou token expiré",
         });
     }
 
     return {
-        uploadValidation,
-        establishments: possibleEstablishments,
+        establishments: uploadValidation.establishments,
     };
 });

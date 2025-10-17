@@ -16,7 +16,9 @@ export interface AuthInterface {
         password: string,
     ): Promise<AuthUserModel>;
 
-    anonymousSignIn(): Promise<AnonymousAuthUserModel>;
+    anonymousSignIn(
+        email: string,
+    ): Promise<AnonymousAuthUserModel>;
 
     signUpWithPassword(
         email: string,
@@ -27,4 +29,14 @@ export interface AuthInterface {
     signOut(): Promise<void>;
 
     sendPasswordResetEmail(email: string): Promise<void>;
+
+    inviteUser(email: string, options: {
+        establishmentId: string;
+        invitorId: string;
+        redirection: string;
+    }): Promise<void>;
+
+    updateUser(userId: string, updates: {
+        password?: string;
+    }): Promise<void>;
 }

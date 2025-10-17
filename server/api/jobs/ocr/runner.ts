@@ -1,9 +1,15 @@
-import { getOcrProvider } from "~~/server/lib/providers/ocr/factory";
-import { serverServiceRole } from "~~/shared/providers/database/supabase/client";
-import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
 import createInvoiceTaskRepository from "#shared/repositories/tasks/invoice_task.repository";
+import { buildRequestScope } from "~~/server/core/container";
+import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 
 export default defineEventHandler(async (event) => {
+    const {
+        deps: {
+            ocr,
+            storage,
+        },
+    } = await buildRequestScope(event);
+
     // SECURITY CHECK
     const cron_token = event.headers.get("authorization") || "";
     console.log("OCR Runner cron_token:", cron_token ? "provided" : "missing");
@@ -16,9 +22,6 @@ export default defineEventHandler(async (event) => {
     }
 
     // INIT
-    const ocrProvider = getOcrProvider("mindee");
-    const supabaseAdmin = serverServiceRole(event);
-    const storageRepository = createStorageRepository(supabaseAdmin);
     const invoiceTaskRepository = createInvoiceTaskRepository(supabaseAdmin);
 
     // GET THE JOBS
@@ -40,7 +43,7 @@ export default defineEventHandler(async (event) => {
         filePath: string,
         attempts: number,
     ) => {
-        const result = await ocrProvider.submitUrl(filePath, {
+        const result = await ocr.submitUrl(filePath, {
             invoiceId: jobId,
         });
         if (!result.jobId) {
@@ -58,34 +61,26 @@ export default defineEventHandler(async (event) => {
         );
     };
 
-    // Getting the signedUrl
-    const { data: signedUrls, error: signedUrlError } = await storageRepository
-        .createSignedUrls(
-            jobs.map((job) => job.invoice!.file_path),
-            60,
-        );
-    if (signedUrlError) {
-        console.error("Error creating signed URLs:", signedUrlError);
-        throw createError({
-            status: 500,
-            message: "Error creating signed URLs",
-        });
-    }
-
     await Promise.all(
-        jobs.map(async (job, index) => {
-            if (!job.invoice?.file_path) {
-                console.error(
-                    `Job ${job.id} has no associated invoice file path.`,
+        jobs.map(
+            async (job, index) => {
+                if (!job.invoice?.file_path) {
+                    console.error(
+                        `Job ${job.id} has no associated invoice file path.`,
+                    );
+                    return Promise.resolve();
+                }
+                const signedUrl = await storage.createSignedUrl(
+                    STORAGE_BUCKETS.INVOICES,
+                    job.invoice?.file_path,
+                    60,
                 );
-                return Promise.resolve(); // Skip this job
-            }
-            return processJob(
-                job.id,
-                signedUrls[index].signedUrl,
-                job.attempts,
-            );
-        }),
+                return processJob(
+                    job.id,
+                    signedUrl,
+                    job.attempts,
+                );
+            },
+        ),
     );
-    return { success: true };
 });

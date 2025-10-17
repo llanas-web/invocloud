@@ -12,7 +12,7 @@ import type {
     EstablishmentModelInsert,
     EstablishmentModelUpdate,
 } from "~~/shared/types/models/establishment.model";
-import { DomainError } from "~~/shared/errors/domain.error";
+import { DomainError, DomainErrorCode } from "~~/shared/errors/domain.error";
 import { SupabaseError } from "../supabase-error";
 
 export class EstablishmentSupabaseRepository
@@ -38,7 +38,7 @@ export class EstablishmentSupabaseRepository
         if (error) throw SupabaseError.fromPostgrest(error);
         else if (!data?.length) {
             throw new DomainError(
-                "NO_ESTABLISHMENT",
+                DomainErrorCode.NO_ESTABLISHMENT,
                 "Aucun établissement trouvé",
                 {
                     filters,
@@ -63,7 +63,7 @@ export class EstablishmentSupabaseRepository
         if (error) throw SupabaseError.fromPostgrest(error);
         else if (!data?.length) {
             throw new DomainError(
-                "NO_ESTABLISHMENT",
+                DomainErrorCode.NO_ESTABLISHMENT,
                 "Aucun établissement trouvé",
                 { uploadId, userId },
             );
@@ -87,7 +87,7 @@ export class EstablishmentSupabaseRepository
         if (error) throw SupabaseError.fromPostgrest(error);
         if (!data?.length) {
             throw new DomainError(
-                "NO_ESTABLISHMENT",
+                DomainErrorCode.NO_ESTABLISHMENT,
                 "Aucun établissement trouvé",
                 { userId },
             );
@@ -106,7 +106,7 @@ export class EstablishmentSupabaseRepository
         if (error) throw SupabaseError.fromPostgrest(error);
         if (!data?.length) {
             throw new DomainError(
-                "NO_ESTABLISHMENT",
+                DomainErrorCode.NO_ESTABLISHMENT,
                 "Aucun établissement trouvé",
                 { establishmentId },
             );
@@ -130,13 +130,6 @@ export class EstablishmentSupabaseRepository
             .select("*, user:users(*)")
             .single();
         if (error) throw SupabaseError.fromPostgrest(error);
-        if (!data) {
-            throw new DomainError(
-                "NO_MEMBER",
-                "Membre non trouvé après insertion",
-                { establishmentId, userId },
-            );
-        }
 
         return memberMapperFromDatabase(
             data,
@@ -155,7 +148,6 @@ export class EstablishmentSupabaseRepository
             .eq("user_id", userId);
 
         if (error) throw SupabaseError.fromPostgrest(error);
-        return true;
     };
 
     createEstablishment = async (
@@ -168,13 +160,6 @@ export class EstablishmentSupabaseRepository
             .insert(establishmentToInsert).select().single();
 
         if (error) throw SupabaseError.fromPostgrest(error);
-        if (!data) {
-            throw new DomainError(
-                "NO_ESTABLISHMENT",
-                "Établissement non trouvé après insertion",
-                { establishmentToInsert },
-            );
-        }
         return establishmentMapperFromDatabase(data);
     };
 
@@ -195,7 +180,7 @@ export class EstablishmentSupabaseRepository
         if (error) throw SupabaseError.fromPostgrest(error);
         if (!data) {
             throw new DomainError(
-                "NO_ESTABLISHMENT",
+                DomainErrorCode.NO_ESTABLISHMENT,
                 "Aucun établissement trouvé",
                 { emailPrefix },
             );
@@ -227,7 +212,7 @@ export class EstablishmentSupabaseRepository
         if (error) throw SupabaseError.fromPostgrest(error);
         if (!data?.length) {
             throw new DomainError(
-                "NO_ESTABLISHMENT",
+                DomainErrorCode.NO_ESTABLISHMENT,
                 "Aucun établissement trouvé",
                 { senderEmail, recipientEmail },
             );
@@ -250,13 +235,6 @@ export class EstablishmentSupabaseRepository
             .single();
 
         if (error) throw SupabaseError.fromPostgrest(error);
-        if (!data) {
-            throw new DomainError(
-                "NO_ESTABLISHMENT",
-                "Établissement non trouvé après mise à jour",
-                { id, updates },
-            );
-        }
         return establishmentMapperFromDatabase(data);
     };
 
@@ -266,6 +244,5 @@ export class EstablishmentSupabaseRepository
             .delete()
             .eq("id", id);
         if (error) throw SupabaseError.fromPostgrest(error);
-        return true;
     };
 }
