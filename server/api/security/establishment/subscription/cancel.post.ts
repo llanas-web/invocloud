@@ -1,41 +1,42 @@
-// server/api/stripe/cancel-subscription.ts
-import { defineEventHandler } from "h3";
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
-import { Database } from "~~/types/database.types";
-import { stripe } from "~~/server/lib/stripe/client";
-import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
+import { z } from "zod";
+import { buildRequestScope } from "~~/server/core/container";
+import { HTTPStatus } from "~~/server/core/errors/status";
+import { SubscriptionStatus } from "~~/shared/types/models/subscription.model";
+
+const schema = z.object({
+    establishmentId: z.uuid(),
+});
 
 export default defineEventHandler(async (event) => {
-    const supabaseClient = await serverSupabaseClient<Database>(event);
-    const establishmentRepository = createEstablishmentRepository(
-        supabaseClient,
-    );
-    const { establishmentId } = await readBody(event);
+    const { deps: { repos: { establishmentRepository }, payment } } =
+        await buildRequestScope(event);
 
-    const { data: establishments } = await establishmentRepository
-        .getEstablishmentsByIds([establishmentId], true);
-    if (!establishments || establishments.length === 0) {
-        return { error: "Établissement non trouvé" };
-    }
+    const { establishmentId } = await parseBody(event, schema);
+
+    const establishments = await establishmentRepository
+        .getAllEstablishments({
+            ids: [establishmentId],
+        });
     const establishment = establishments[0];
 
-    if (!establishment.stripe_subscription_id) {
-        return { error: "Aucun abonnement actif trouvé" };
+    if (!establishment || !establishment.subscription) {
+        throw createError({ status: HTTPStatus.BAD_REQUEST });
     }
 
-    // Cancel subscription at period end
-    if (establishment.subscription_status === "trialing") {
-        await stripe.subscriptions.cancel(establishment.stripe_subscription_id);
-    } else {
-        await stripe.subscriptions.update(
-            establishment.stripe_subscription_id,
-            {
-                cancel_at_period_end: true,
-            },
-        );
+    const { providerSubscriptionId, status } = establishment.subscription!;
+    switch (status) {
+        case SubscriptionStatus.ACTIVE:
+            await payment.cancelSubscription(providerSubscriptionId);
+            break;
+        case SubscriptionStatus.TRIAL:
+            await payment.cancelTrialingPeriod(providerSubscriptionId);
+            break;
+        case SubscriptionStatus.CANCELED:
+        case SubscriptionStatus.INACTIVE:
+        default:
+            throw createError({
+                status: HTTPStatus.BAD_REQUEST,
+                message: "Aucune souscription pour cet établissement",
+            });
     }
-
-    return {
-        success: true,
-    };
 });

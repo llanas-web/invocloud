@@ -1,8 +1,7 @@
-import * as z from "zod";
+import { z } from "zod";
 import { buildRequestScope } from "~~/server/core/container";
-import ServerError from "~~/server/core/errors";
 import { HTTPStatus } from "~~/server/core/errors/status";
-import useInviteMemberService from "~~/server/services/invite-member.service";
+import { DomainError, DomainErrorCode } from "~~/shared/errors/domain.error";
 
 const schema = z.object({
     email: z.email(),
@@ -12,46 +11,71 @@ const schema = z.object({
 
 export default defineEventHandler(async (event) => {
     try {
-        const { deps } = await buildRequestScope(event);
         const {
-            authRepository,
-        } = deps.repos;
-        const {
-            checkInvitorAuthorization,
-            inviteMember,
-        } = useInviteMemberService(deps);
+            deps: {
+                email: emailRepository,
+                auth,
+                repos: { establishmentRepository, userRepository },
+            },
+        } = await buildRequestScope(
+            event,
+        );
 
         const { email, establishmentId, invitorId } = await parseBody(
             event,
             schema,
         );
 
-        if (authRepository?.currentUser?.id !== invitorId) {
-            console.error("User is not authorized to invite members");
-            throw createError({
-                status: 403,
-                message: "Interdit",
+        // Get establishment to check existence
+        const establishments = await establishmentRepository
+            .getAllEstablishments({
+                ids: [establishmentId],
             });
-        }
-        const isAuthorized = await checkInvitorAuthorization(
-            invitorId,
-            establishmentId,
-        );
-        if (!isAuthorized) {
-            throw new ServerError(
-                HTTPStatus.FORBIDDEN,
-                "L'utilisateur n'est pas autorisé à inviter des membres",
-            );
+        if (establishments.length === 0) {
+            throw createError({ status: HTTPStatus.BAD_REQUEST });
         }
 
-        const result = await inviteMember(
+        try {
+            // Get existing user by email
+            const existingUser = await userRepository.getUser({ email: email });
+            const establishment = establishments[0];
+            await establishmentRepository
+                .addEstablishmentMember(
+                    establishmentId,
+                    existingUser.id,
+                );
+            await emailRepository.sendEmail({
+                to: [email],
+                subject: "Vous avez été ajouté à un établissement",
+                html:
+                    `Bonjour ${
+                        existingUser.fullName || existingUser.email
+                    },<br><br>` +
+                    `Vous avez été ajouté à l'établissement <strong>${establishment.name}</strong>.<br><br>`,
+            });
+        } catch (error) {
+            // If user not found, invite user
+            if (
+                error instanceof DomainError &&
+                error.code === DomainErrorCode.UESR_NOT_FOUND
+            ) {
+                const config = useRuntimeConfig();
+                await auth.inviteUser(email, {
+                    establishmentId,
+                    invitorId,
+                    redirection: `${config.public.baseUrl}/auth/callback`,
+                });
+            } else {
+                throw error;
+            }
+        }
+
+        const result = await establishmentRepository.addEstablishmentMember(
             email,
             establishmentId,
-            invitorId,
         );
         return result;
     } catch (error) {
-        // TODO: Catch les erreurs
         console.error("Unexpected error:", error);
         throw createError({
             status: 500,

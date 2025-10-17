@@ -5,11 +5,9 @@ import type {
 } from "~~/shared/types/providers/payment/types";
 
 export interface PaymentProviderInterface {
-    onSubscriptionChange(
-        callback: (event: SubscriptionEvent, subscriptionId: string) => void,
-    ): void;
     createSubscription(
-        user: UserModel,
+        userId: string,
+        userEmail: string,
         establishmentId: string,
     ): Promise<PaymentSession>;
     cancelSubscription(subscriptionId: string): Promise<void>;

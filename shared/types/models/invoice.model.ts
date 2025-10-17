@@ -20,10 +20,10 @@ export class InvoiceModel {
     id: string;
     createdAt: Date;
     updatedAt: Date;
-    invoiceNumber: string;
-    amount: number;
-    dueDate: Date;
     filePath: string;
+    invoiceNumber: string | null;
+    amount: number | null;
+    dueDate: Date | null;
     source: InvoiceSource;
     status: InvoiceStatus;
     name: string | null;
@@ -83,14 +83,3 @@ export class InvoiceModel {
         return false;
     }
 }
-
-export type InvoiceModelUpdate = Partial<
-    Omit<InvoiceModel, "id" | "createdAt" | "updatedAt" | "supplier">
->;
-
-export type InvoiceModelInsert =
-    & Omit<
-        InvoiceModel,
-        "id" | "createdAt" | "updatedAt" | "supplier" | "isOverdue" | "source"
-    >
-    & { id?: string; supplierId: string };

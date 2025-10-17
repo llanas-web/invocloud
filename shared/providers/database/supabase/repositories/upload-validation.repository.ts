@@ -1,19 +1,37 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { UploadValidationUpdate } from "~~/types/providers/database/index";
 import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import { hashCode } from "~/utils/hash";
 import type { UploadValidationRepository } from "../../database.interface";
 import { SupabaseError } from "../supabase-error";
+import type {
+    UploadValidationUpdate,
+} from "~~/shared/types/providers/database";
 
 export class UploadValidationSupabaseRepository
     implements UploadValidationRepository {
     constructor(private supabase: SupabaseClient<Database>) {}
+
+    async getUploadValidation(
+        uploadValidation: string,
+        hashToken: string,
+        uploaderId: string,
+    ) {
+        const { data, error } = await this.supabase.from("upload_validations")
+            .select("*")
+            .eq("id", uploadValidation).eq("hash_token", hashToken).eq(
+                "uploader_id",
+                uploaderId,
+            ).single();
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return data;
+    }
 
     async createUploadValidation(
         senderEmail: string,
         recipientEmail: string,
         token: string,
         uploaderId?: string,
+        establishementsIds?: string[],
     ) {
         const hashedCode = hashCode(token);
         const expiresAt = new Date(Date.now() + 1000 * 60 * 10); // 10 minutes
@@ -26,6 +44,7 @@ export class UploadValidationSupabaseRepository
                 token_hash: hashedCode,
                 token_expires_at: expiresAt.toUTCString(),
                 uploader_id: uploaderId,
+                establishments: establishementsIds,
             })
             .select("id")
             .single();
@@ -60,6 +79,5 @@ export class UploadValidationSupabaseRepository
             .update(updates)
             .eq("id", uploadValidationId);
         if (error) throw SupabaseError.fromPostgrest(error);
-        return true;
     }
 }

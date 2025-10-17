@@ -1,51 +1,32 @@
-import { defineEventHandler, readBody } from "h3";
-import { serverSupabaseUser } from "#supabase/server";
-import { stripe } from "~~/server/lib/providers/payments/stripe/client";
+import { buildRequestScope } from "~~/server/core/container";
+import { z } from "zod";
+import { HTTPStatus } from "~~/server/core/errors/status";
+import { AuthUserModel } from "~~/shared/types/models/auth-user.model";
+
+const schema = z.object({
+    establishmentId: z.uuid(),
+});
 
 export default defineEventHandler(async (event) => {
-    const rawBody = await readBody(event);
+    const {
+        deps: {
+            auth,
+            payment,
+        },
+    } = await buildRequestScope(event);
 
-    const parsed = createCheckoutSessionSchema.safeParse(rawBody);
-    if (!parsed.success) {
-        console.error("❌ Invalid request body", parsed.error.flatten());
-        throw createError({
-            statusCode: 400,
-            statusMessage: "Données de requête invalides",
-        });
+    const { establishmentId } = await parseBody(event, schema);
+    if (auth.currentUser === null || auth.currentUser.isAnonymous === true) {
+        throw createError({ status: HTTPStatus.FORBIDDEN });
     }
 
-    const { establishmentId } = parsed.data;
+    const { email, id } = auth.currentUser as AuthUserModel;
 
-    const user = await serverSupabaseUser(event);
-    if (!user || !user.email) {
-        console.error("❌ User is not authenticated or missing email");
-        throw createError({
-            statusCode: 401,
-            statusMessage: "Non autorisé",
-        });
-    }
+    const session = await payment.createSubscription(
+        id,
+        email,
+        establishmentId,
+    );
 
-    const session = await stripe.checkout.sessions.create({
-        mode: "subscription",
-        customer_email: user.email,
-        payment_method_types: ["card"],
-        line_items: [
-            {
-                price: process.env.STRIPE_PRICE_ID!,
-                quantity: 1,
-            },
-        ],
-        subscription_data: {
-            trial_period_days: 7,
-        },
-        success_url: `${process.env.BASE_URL}/app?subscription_success=true`,
-        cancel_url:
-            `${process.env.BASE_URL}/app/settings/establishments?cancel=true`,
-        metadata: {
-            userId: user.id,
-            establishmentId,
-        },
-    });
-
-    return { url: session.url };
+    return session.url;
 });

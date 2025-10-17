@@ -13,4 +13,9 @@ export interface StorageProvider {
         filePath: string,
         expiresIn: number,
     ): Promise<string>;
+    createSignedUrls(
+        bucket: string,
+        filePaths: string[],
+        expiresIn: number,
+    ): Promise<string[]>;
 }

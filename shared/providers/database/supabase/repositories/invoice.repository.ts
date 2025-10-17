@@ -1,18 +1,14 @@
 import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { InvoiceRepository } from "../../database.interface";
-import {
-    invoiceMapperForInsert,
-    invoiceMapperForUpdate,
-    invoiceMapperFromDatabase,
-} from "../mapper/invoice.mapper";
+import { invoiceMapperFromDatabase } from "../mapper/invoice.mapper";
 import { supplierMapperFromDatabase } from "../mapper/supplier.mapper";
 import { SupabaseError } from "../supabase-error";
-import { DomainError } from "~~/shared/errors/domain.error";
+import { DomainError, DomainErrorCode } from "~~/shared/errors/domain.error";
 import type {
-    InvoiceModelInsert,
-    InvoiceModelUpdate,
-} from "~~/shared/types/models/invoice.model";
+    InvoiceInsert,
+    InvoiceUpdate,
+} from "~~/shared/types/providers/database";
 
 export class InvoiceSupabaseRepository implements InvoiceRepository {
     constructor(private supabase: SupabaseClient<Database>) {}
@@ -31,7 +27,7 @@ export class InvoiceSupabaseRepository implements InvoiceRepository {
         if (error) throw SupabaseError.fromPostgrest(error);
         if (!data?.length) {
             throw new DomainError(
-                "NO_INVOICE",
+                DomainErrorCode.NO_INVOICE,
                 "Aucune facture trouvée",
                 { filters },
             );
@@ -46,36 +42,24 @@ export class InvoiceSupabaseRepository implements InvoiceRepository {
         });
     }
 
-    async createInvoice(invoices: InvoiceModelInsert[]) {
+    async createInvoice(invoice: InvoiceInsert) {
         const { data, error } = await this.supabase
             .from("invoices")
-            .insert(
-                invoices.map((invToInsert) =>
-                    invoiceMapperForInsert(invToInsert)
-                ),
-            )
-            .select("*, supplier:suppliers(*)");
+            .insert(invoice)
+            .select("*, supplier:suppliers(*)")
+            .single();
         if (error) throw SupabaseError.fromPostgrest(error);
-        if (!data?.length) {
-            throw new DomainError(
-                "NO_INVOICE",
-                "Aucune facture créée",
-                { invoices },
-            );
-        }
-        return data.map((invoice) => {
-            const supplierModel = supplierMapperFromDatabase(invoice.supplier);
-            return invoiceMapperFromDatabase(invoice, supplierModel);
-        });
+        const supplierModel = supplierMapperFromDatabase(data.supplier);
+        return invoiceMapperFromDatabase(data, supplierModel);
     }
 
     async updateInvoice(
         invoiceId: string,
-        invoice: InvoiceModelUpdate,
+        invoice: InvoiceUpdate,
     ) {
         const { data, error } = await this.supabase
             .from("invoices")
-            .update(invoiceMapperForUpdate(invoice))
+            .update(invoice)
             .eq("id", invoiceId)
             .select("*, supplier:suppliers(*)")
             .single();

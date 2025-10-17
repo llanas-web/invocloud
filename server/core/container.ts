@@ -11,6 +11,7 @@ import AuthFactory from "~~/shared/providers/auth/auth.factory";
 import OcrFactory from "~~/shared/providers/ocr/ocr.factory";
 import EmailFactory from "~~/shared/providers/email/email.factory";
 import PaymentFactory from "~~/shared/providers/payment/payment.factory";
+import { HTTPStatus } from "./errors/status";
 
 export async function buildRequestScope(
     event: H3Event<EventHandlerRequest>,
@@ -22,11 +23,18 @@ export async function buildRequestScope(
     const sc = await serverClient(event);
     const { getRepository } = DatabaseFactory.getInstance(ss);
 
+    const authentProtection = (allowAnonyme = false) => {
+        if (!user || (!allowAnonyme && user.is_anonymous)) {
+            throw createError({ status: HTTPStatus.FORBIDDEN });
+        }
+    };
+
     const ctx: RequestContext = {
         requestId,
         userId: user?.id ?? "anonymous",
         ip: getRequestIP(event) ?? undefined,
         now: () => new Date(),
+        authentProtection,
     };
 
     const deps: Deps = {

@@ -51,9 +51,11 @@ export default class SupabaseAuthRepository implements AuthInterface {
         );
     }
 
-    async anonymousSignIn(): Promise<AnonymousAuthUserModel> {
+    async anonymousSignIn(email: string) {
         const { data, error } = await this.supabaseClient.auth
-            .signInAnonymously();
+            .signInAnonymously({
+                options: { data: { email } },
+            });
         if (error) throw new AuthError(error.message);
         if (!data.user) {
             throw new AuthError("No user returned from anonymous sign-in");
@@ -86,6 +88,34 @@ export default class SupabaseAuthRepository implements AuthInterface {
     async sendPasswordResetEmail(email: string): Promise<void> {
         const { error } = await this.supabaseClient.auth.resetPasswordForEmail(
             email,
+        );
+        if (error) throw new AuthError(error.message);
+    }
+
+    async inviteUser(email: string, options: {
+        establishmentId: string;
+        invitorId: string;
+        redirection: string;
+    }) {
+        const { error } = await this.supabaseClient.auth.admin
+            .inviteUserByEmail(email, {
+                data: {
+                    establishment_id: options.establishmentId,
+                    invitor_id: options.invitorId,
+                },
+                redirectTo: options.redirection,
+            });
+        if (error) throw new AuthError(error.message);
+    }
+
+    async updateUser(userId: string, updates: {
+        password?: string;
+    }): Promise<void> {
+        const { error } = await this.supabaseClient.auth.admin.updateUserById(
+            userId,
+            {
+                password: updates.password,
+            },
         );
         if (error) throw new AuthError(error.message);
     }
