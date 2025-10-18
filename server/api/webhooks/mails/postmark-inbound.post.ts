@@ -1,10 +1,7 @@
 import { defineEventHandler, setResponseStatus } from "h3";
-import { serverServiceRole } from "~~/shared/providers/database/supabase/client";
-import { InvoiceInsert } from "~/types";
-import createEstablishmentRepository from "~~/shared/providers/database/supabase/repositories/establishment.repository";
-import createInvoiceRepository from "~~/shared/providers/database/supabase/repositories/invoice.repository";
-import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
-import createSupplierRepository from "~~/shared/providers/database/supabase/repositories/supplier.repository";
+import { buildRequestScope } from "~~/server/core/container";
+import { HTTPStatus } from "~~/server/core/errors/status";
+import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 
 type PostmarkInbound = {
     From: string;
@@ -49,10 +46,8 @@ export default defineEventHandler(async (event) => {
         })();
 
     if (!ok) {
-        setResponseStatus(event, 401);
-        return { error: "Unauthorized" };
+        throw createError({ status: HTTPStatus.UNAUTHORIZED });
     }
-    console.log("Inbound auth: successful");
 
     // Postmark sends JSON for inbound
     const {
@@ -79,13 +74,16 @@ export default defineEventHandler(async (event) => {
         })),
     });
 
-    const supabaseServiceRole = serverServiceRole(event);
-    const establishmentRepository = createEstablishmentRepository(
-        supabaseServiceRole,
-    );
-    const invoiceRepository = createInvoiceRepository(supabaseServiceRole);
-    const storageRepository = createStorageRepository(supabaseServiceRole);
-    const supplierRepository = createSupplierRepository(supabaseServiceRole);
+    const {
+        deps: {
+            repos: {
+                establishmentRepository,
+                supplierRepository,
+                invoiceRepository,
+            },
+            storage,
+        },
+    } = await buildRequestScope(event);
 
     const recipientEmail = recipients?.[0]?.Email?.toLowerCase();
     if (!sender?.Email || !recipientEmail) {
@@ -97,29 +95,26 @@ export default defineEventHandler(async (event) => {
     const emailPrefix = localPartFull.split("+")[0];
 
     // 1) Trouver l'établissement par email_prefix
-    const { data: est, error: estErr } = await establishmentRepository
-        .getEstablishmentByPrefix(emailPrefix);
-    if (estErr || !est) {
-        throw createError({ status: 404, message: "Unknown recipient alias" });
+    const establishments = await establishmentRepository.getAllEstablishments({
+        prefixEmails: [emailPrefix],
+    });
+    if (establishments.length === 0) {
+        throw createError({ status: HTTPStatus.FORBIDDEN });
     }
 
-    console.log("Matched establishment:", est.id, est.email_prefix);
-    console.log("sender.Email:", sender.Email);
-    console.log("recipientEmail:", recipientEmail);
+    const est = establishments[0];
+    const suppliers = await supplierRepository
+        .getAllSuppliers({
+            establishmentIds: [est.id],
+            emails: [sender.Email],
+        });
 
-    const { data: supplier, error: supplierError } = await supplierRepository
-        .getSupplierByEmailAndEstablishmentId(
-            est.id,
-            sender.Email,
-        );
-
-    if (!supplierError || !supplier) {
+    if (suppliers.length === 0) {
         throw createError({
             status: 403,
             message: "Sender not authorized for this establishment",
         });
     }
-    console.log("Authorized sender for establishment:", est.id);
 
     const listAttachmentsPdf = attachments.filter((a) =>
         a.ContentType === "application/pdf"
@@ -129,7 +124,7 @@ export default defineEventHandler(async (event) => {
         throw createError({ status: 400, message: "No PDF attachments found" });
     }
 
-    const listUploadedInvoices = await Promise.all(
+    await Promise.all(
         listAttachmentsPdf.map(async (a) => {
             const newInvoiceId = crypto.randomUUID();
             const sanitizedName = (a.Name || "invoice.pdf").replace(
@@ -138,41 +133,24 @@ export default defineEventHandler(async (event) => {
             );
             const path = `${est.id}/${newInvoiceId}/${sanitizedName}`;
 
-            const { error: uploadError } = await storageRepository
-                .uploadInvoiceFile(
-                    Buffer.from(a.Content, "base64") as unknown as File,
+            const url = await storage
+                .uploadFile(
+                    STORAGE_BUCKETS.INVOICES,
                     path,
+                    Buffer.from(a.Content, "base64") as unknown as File,
                     {
                         contentType: a.ContentType ||
                             "application/octet-stream",
                         upsert: false,
                     },
                 );
-            return { id: newInvoiceId, path };
+            await invoiceRepository
+                .createInvoice({
+                    supplier_id: suppliers[0].id,
+                    file_path: path,
+                    comment: subject,
+                    source: "email",
+                });
         }),
     );
-
-    const listNewInvoices: InvoiceInsert[] = listUploadedInvoices.map((
-        { id, path },
-    ) => ({
-        id,
-        supplier_id: supplier.id,
-        file_path: path,
-        comment: subject,
-        source: "email",
-    }));
-
-    const { data: invoices, error: invoiceError } = await invoiceRepository
-        .createInvoice(listNewInvoices);
-
-    if (invoiceError) {
-        console.error("Invoice creation error:", invoiceError);
-        throw createError({ status: 500, message: "Invoice creation failed" });
-    }
-    console.log(
-        "Invoice record created, id:",
-        invoices.map((inv) => inv.id).join(", "),
-    );
-
-    return { ok: true };
 });
