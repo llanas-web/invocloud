@@ -12,7 +12,7 @@ import {
 import type {
     Establishment,
     EstablishmentInsert,
-} from "~~/types/providers/database";
+} from "~~/shared/types/providers/database";
 
 export const establishmentMapperFromDatabase = (
     supabaseEstablishment: Establishment,

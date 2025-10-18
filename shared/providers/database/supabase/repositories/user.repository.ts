@@ -50,7 +50,6 @@ export class UserSupabaseRepository implements UserRepository {
             .delete()
             .eq("id", id);
         if (error) throw SupabaseError.fromPostgrest(error);
-        return true;
     }
 
     async getUserSettings(userId: string) {

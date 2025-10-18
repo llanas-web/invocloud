@@ -71,10 +71,10 @@ export class EstablishmentSupabaseRepository
 
         return data.filter((data) => data.establishments != null).map((
             { establishments },
-        ) => establishmentShortMapper(
-            establishments!.id,
-            establishments!.name,
-        ));
+        ) => ({
+            id: establishments!.id,
+            name: establishments!.name,
+        }));
     };
 
     getEstablishmentsFromMemberId = async (

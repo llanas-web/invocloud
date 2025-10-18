@@ -9,12 +9,10 @@ import type { ApiResetPassword } from "~~/server/types/endpoints";
 
 const _useAuth = () => {
     const authRepository = inject("authFactory") as SupabaseAuthRepository;
-    const supabase = useSupabaseClient();
     const user = useSupabaseUser();
     const session = useSupabaseSession();
     const config = useRuntimeConfig();
     const redirectTo = `${config.public.baseUrl}/auth/callback`;
-    const toast = useToast();
 
     const connectedUser = ref<AuthUserModel | null>(null);
 

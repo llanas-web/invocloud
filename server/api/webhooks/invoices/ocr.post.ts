@@ -1,20 +1,18 @@
-import { serverServiceRole } from "~~/shared/providers/database/supabase/client";
+import { buildRequestScope } from "~~/server/core/container";
 import { OcrProviderName } from "~~/shared/types/providers/ocr/types";
-import { getOcrProvider } from "~~/server/lib/providers/ocr/factory";
-import createInvoiceRepository from "~~/shared/providers/database/supabase/repositories/invoice.repository";
-import createInvoiceTaskRepository from "#shared/repositories/tasks/invoice_task.repository";
 
 export default defineEventHandler(async (event) => {
-    const providerName = (getQuery(event).provider as OcrProviderName) ??
-        "mindee";
-    const provider = getOcrProvider(providerName);
-    const supabaseServiceRole = serverServiceRole(event);
-    const invoiceRepository = createInvoiceRepository(supabaseServiceRole);
-    const invoiceTaskRepository = createInvoiceTaskRepository(
-        supabaseServiceRole,
-    );
+    const {
+        deps: {
+            ocr,
+            repos: {
+                invoiceTaskRepository,
+                invoiceRepository,
+            },
+        },
+    } = await buildRequestScope(event);
 
-    const { isValid, jobId, prediction, raw } = await provider.parseWebhook(
+    const { isValid, jobId, prediction, raw } = await ocr.parseWebhook(
         event,
     );
 
