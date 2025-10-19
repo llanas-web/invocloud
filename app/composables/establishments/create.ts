@@ -19,8 +19,9 @@ function slugify(s: string) {
 
 const _useEstablishmentCreate = () => {
     const supabaseUser = useSupabaseUser();
-    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
-    const establishmentRepository = getRepository("establishmentRepository");
+    const { establishmentRepository } = inject(
+        "databaseFactory",
+    ) as DatabaseFactory;
     const { establishments, refresh, selectEstablishment } =
         useEstablishmentsList();
 

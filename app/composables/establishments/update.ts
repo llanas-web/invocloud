@@ -16,8 +16,9 @@ export type UpdateEstablishmentCommand = z.output<
 >;
 
 const _useEstablishmentUpdate = () => {
-    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
-    const establishmentRepository = getRepository("establishmentRepository");
+    const { establishmentRepository } = inject(
+        "databaseFactory",
+    ) as DatabaseFactory;
     const { selectedEstablishment, refresh } = useEstablishmentsList();
 
     const formRef = ref();

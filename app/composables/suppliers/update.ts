@@ -9,8 +9,7 @@ import {
 } from "~/types/schemas/forms/suppliers.schema";
 
 const _useSupplierUpdate = () => {
-    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
-    const supplierRepository = getRepository("supplierRepository");
+    const { supplierRepository } = inject("databaseFactory") as DatabaseFactory;
 
     const { refresh } = useSuppliers();
     const supplier = ref<SupplierModel | null>(null);

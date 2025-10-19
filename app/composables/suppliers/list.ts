@@ -3,8 +3,7 @@ import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import type SupplierModel from "~~/shared/types/models/supplier.model";
 
 const _useSuppliers = () => {
-    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
-    const supplierRepository = getRepository("supplierRepository");
+    const { supplierRepository } = inject("databaseFactory") as DatabaseFactory;
     const { selectedEstablishment } = useEstablishmentsList();
 
     const { data: suppliers, error, refresh, pending } = useAsyncData<

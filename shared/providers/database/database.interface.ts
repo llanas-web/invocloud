@@ -14,13 +14,21 @@ import type {
 } from "~~/shared/types/models/user.model";
 import type {
     InvoiceInsert,
+    InvoiceTaskUpdate,
     InvoiceUpdate,
+    SubscriptionInsert,
+    SubscriptionUpdate,
     SupplierInsert,
     SupplierUpdate,
     UploadValidation,
     UploadValidationUpdate,
     UserSettingsUpdate,
 } from "#shared/types/providers/database/index";
+import type {
+    InvoiceTaskModel,
+    InvoiceTaskStatus,
+} from "~~/shared/types/models/invoice-task.model";
+import type { SubscriptionModel } from "~~/shared/types/models/subscription.model";
 
 type EncapsulatedResult<T> = Promise<T>;
 
@@ -146,4 +154,46 @@ export interface AdminRepository {
         data: object,
         redirectTo: string,
     ): EncapsulatedResult<boolean>;
+}
+
+export interface InvoiceTaskRepository {
+    getInvoiceTasks(
+        status: InvoiceTaskStatus,
+        maxAttempts?: number,
+        options?: { limit?: number },
+    ): Promise<InvoiceTaskModel[]>;
+
+    updateInvoiceTask(
+        id: string,
+        updates: InvoiceTaskUpdate,
+        idType?: "id" | "job_id",
+    ): Promise<InvoiceTaskModel>;
+}
+
+export interface SubscriptionRepository {
+    createSubscription(
+        subscription: SubscriptionInsert,
+    ): Promise<SubscriptionModel>;
+
+    getSubscriptionById(id: string): Promise<SubscriptionModel>;
+
+    getSubscriptionByCustomerId(
+        customerId: string,
+    ): Promise<SubscriptionModel>;
+
+    updateSubscription(
+        id: string,
+        updates: SubscriptionUpdate,
+    ): Promise<SubscriptionModel>;
+}
+
+export interface DatabaseInterface {
+    establishmentRepository: EstablishmentRepository;
+    invoiceRepository: InvoiceRepository;
+    supplierRepository: SupplierRepository;
+    uploadValidationRepository: UploadValidationRepository;
+    userRepository: UserRepository;
+    adminRepository: AdminRepository;
+    invoiceTaskRepository: InvoiceTaskRepository;
+    subscriptionRepository: SubscriptionRepository;
 }

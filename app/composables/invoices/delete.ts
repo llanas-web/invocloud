@@ -10,8 +10,7 @@ const stateSchema = z.array(z.string()).min(
 type inputSchema = z.input<typeof stateSchema>;
 
 const _useInvoicesDelete = () => {
-    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
-    const invoiceRepository = getRepository("invoiceRepository");
+    const { invoiceRepository } = inject("databaseFactory") as DatabaseFactory;
     const open = ref(false);
     const selectedInvoices = ref<inputSchema>([]);
 

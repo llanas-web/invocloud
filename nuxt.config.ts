@@ -4,10 +4,13 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   css: ["~/assets/css/main.css"],
   nitro: {
-    rollupConfig: { external: ["sharp"] },
+    rollupConfig: { external: ["sharp", "canvas", "pdf-lib", "mindee"] },
     preset: "vercel",
   },
   vite: {
+    optimizeDeps: {
+      exclude: ["canvas"],
+    },
     worker: {
       format: "es",
       rollupOptions: { output: { format: "es" } },

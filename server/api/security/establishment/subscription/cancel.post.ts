@@ -8,7 +8,7 @@ const schema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-    const { deps: { repos: { establishmentRepository }, payment } } =
+    const { deps: { database: { establishmentRepository }, payment } } =
         await buildRequestScope(event);
 
     const { establishmentId } = await parseBody(event, schema);

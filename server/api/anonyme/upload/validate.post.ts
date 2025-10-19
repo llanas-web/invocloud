@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     const {
         deps: {
             auth,
-            repos: {
+            database: {
                 uploadValidationRepository,
             },
         },

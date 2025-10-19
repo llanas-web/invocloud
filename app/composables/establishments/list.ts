@@ -14,8 +14,9 @@ const _useEstablishmentsList = () => {
     const user = useSupabaseUser();
     const { userSettings } = useUserSettings();
 
-    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
-    const establishmentRepository = getRepository("establishmentRepository");
+    const { establishmentRepository } = inject(
+        "databaseFactory",
+    ) as DatabaseFactory;
 
     // --- State
     const selectedId = useLocalStorage<string | null>(

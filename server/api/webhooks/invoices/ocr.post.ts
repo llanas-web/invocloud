@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     const {
         deps: {
             ocr,
-            repos: {
+            database: {
                 invoiceTaskRepository,
                 invoiceRepository,
             },
@@ -30,22 +30,17 @@ export default defineEventHandler(async (event) => {
     console.log("OCR Webhook received for jobId:", jobId);
     if (jobId && prediction) {
         console.log("predictions: ", prediction);
-        const { data: jobData, error: jobError } = await invoiceTaskRepository
+        const updatedTask = await invoiceTaskRepository
             .updateInvoiceTask(jobId, {
                 status: "done",
                 raw_result: typeof raw === "object" ? JSON.stringify(raw) : raw,
             });
-        if (jobError || !jobData) {
-            throw createError({ status: 404, message: "Job not found" });
-        }
-        await invoiceRepository.updateInvoice(jobData?.invoice_id!, {
+
+        await invoiceRepository.updateInvoice(updatedTask.invoiceId, {
             invoice_number: prediction.invoiceNumber ?? undefined,
             amount: prediction.totalTtc ?? undefined,
             due_date: prediction.dueDate ?? undefined,
             status: "pending",
         });
     }
-
-    setResponseStatus(event, 204);
-    return;
 });

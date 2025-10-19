@@ -1,6 +1,6 @@
-import type { AdminRepository } from "../../database.interface";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SupabaseError } from "../supabase-error";
+import type { AdminRepository } from "~~/shared/providers/database/database.interface";
 
 export class AdminSupabaseRepository implements AdminRepository {
     constructor(private supabaseClient: SupabaseClient) {}

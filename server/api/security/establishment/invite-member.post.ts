@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
             deps: {
                 email: emailRepository,
                 auth,
-                repos: { establishmentRepository, userRepository },
+                database: { establishmentRepository, userRepository },
             },
         } = await buildRequestScope(
             event,

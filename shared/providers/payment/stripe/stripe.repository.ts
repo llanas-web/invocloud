@@ -1,6 +1,4 @@
-import type { SubscriptionEvent } from "~~/shared/types/providers/payment/types";
 import type { PaymentProviderInterface } from "../payment.interface";
-import type { UserModel } from "~~/shared/types/models/user.model";
 import Stripe from "stripe";
 import {
     generateCreateCheckoutSessionObject,
@@ -8,11 +6,16 @@ import {
 } from "./mapper/stripe.mapper";
 
 export class StripeRepository implements PaymentProviderInterface {
-    private STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-    private STRIPE_API_VERSION = process.env.STRIPE_API_VERSION ??
+    private STRIPE_SECRET_KEY = import.meta.env.STRIPE_SECRET_KEY;
+    private STRIPE_API_VERSION = import.meta.env.STRIPE_API_VERSION ??
         "2025-09-30.clover";
 
-    private stripeInstance = new Stripe(this.STRIPE_SECRET_KEY!, {
+    constructor() {
+        console.log("Using Stripe API Version:", this.STRIPE_API_VERSION);
+        console.log("Using Stripe Secret Key:", this.STRIPE_SECRET_KEY);
+    }
+
+    public stripeInstance = new Stripe(this.STRIPE_SECRET_KEY!, {
         // @ts-ignore
         apiVersion: this.STRIPE_API_VERSION,
     });

@@ -1,11 +1,6 @@
 import type { AuthInterface } from "~~/shared/providers/auth/auth.interface";
 import {
-    AdminRepository,
-    EstablishmentRepository,
-    InvoiceRepository,
-    SupplierRepository,
-    UploadValidationRepository,
-    UserRepository,
+    DatabaseInterface,
 } from "~~/shared/providers/database/database.interface";
 import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
 import type { OcrProvider } from "~~/shared/providers/ocr/ocr.interface";
@@ -18,15 +13,7 @@ export type Deps = {
     ocr: OcrProvider;
     email: EmailProviderInterface;
     payment: PaymentProviderInterface;
-    repos: {
-        establishmentRepository: EstablishmentRepository;
-        invoiceRepository: InvoiceRepository;
-        supplierRepository: SupplierRepository;
-        userRepository: UserRepository;
-        uploadValidationRepository: UploadValidationRepository;
-        authRepository: AuthInterface;
-        adminRepository: AdminRepository;
-    };
+    database: DatabaseInterface;
 };
 
 export type RequestContext = {

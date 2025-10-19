@@ -5,10 +5,8 @@ import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 import useAsyncAction from "../core/useAsyncAction";
 
 const _useInvoices = () => {
-    const supabaseUser = useSupabaseUser();
-    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
+    const { invoiceRepository } = inject("databaseFactory") as DatabaseFactory;
     const storageRepository = inject("storageFactory") as StorageProvider;
-    const invoiceRepository = getRepository("invoiceRepository");
 
     const { selectedEstablishment } = useEstablishmentsList();
 

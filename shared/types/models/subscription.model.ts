@@ -11,23 +11,35 @@ export enum SubscriptionStatus {
 }
 
 export class SubscriptionModel {
+    id: string;
     establishmentId: string;
     provider: SubscriptionProvider;
     providerSubscriptionId: string;
     providerCustomerId: string;
     status: SubscriptionStatus;
     startedAt: Date;
-    endAt: Date;
+    endAt: Date | null;
 
-    constructor(
-        establishmentId: string,
-        provider: SubscriptionProvider,
-        providerSubscriptionId: string,
-        providerCustomerId: string,
-        status: SubscriptionStatus,
-        startedAt: Date,
-        endAt: Date,
-    ) {
+    constructor({
+        id,
+        establishmentId,
+        provider,
+        providerSubscriptionId,
+        providerCustomerId,
+        status,
+        startedAt,
+        endAt,
+    }: {
+        id: string;
+        establishmentId: string;
+        provider: SubscriptionProvider;
+        providerSubscriptionId: string;
+        providerCustomerId: string;
+        status: SubscriptionStatus;
+        startedAt: Date;
+        endAt: Date | null;
+    }) {
+        this.id = id;
         this.establishmentId = establishmentId;
         this.provider = provider;
         this.providerSubscriptionId = providerSubscriptionId;

@@ -18,10 +18,10 @@ export class UploadValidationSupabaseRepository
     ) {
         const { data, error } = await this.supabase.from("upload_validations")
             .select("*")
-            .eq("id", uploadValidation).eq("hash_token", hashToken).eq(
-                "uploader_id",
-                uploaderId,
-            ).single();
+            .eq("id", uploadValidation)
+            .eq("hash_token", hashToken)
+            .eq("uploader_id", uploaderId)
+            .single();
         if (error) throw SupabaseError.fromPostgrest(error);
         return data;
     }
@@ -30,8 +30,8 @@ export class UploadValidationSupabaseRepository
         senderEmail: string,
         recipientEmail: string,
         token: string,
-        uploaderId?: string,
-        establishementsIds?: string[],
+        uploaderId: string,
+        establishementsIds: string[],
     ) {
         const hashedCode = hashCode(token);
         const expiresAt = new Date(Date.now() + 1000 * 60 * 10); // 10 minutes
@@ -42,7 +42,7 @@ export class UploadValidationSupabaseRepository
                 sender_email: senderEmail,
                 recipient_email: recipientEmail,
                 token_hash: hashedCode,
-                token_expires_at: expiresAt.toUTCString(),
+                token_expires_at: expiresAt.toISOString(),
                 uploader_id: uploaderId,
                 establishments: establishementsIds,
             })

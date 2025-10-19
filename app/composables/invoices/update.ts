@@ -7,8 +7,7 @@ import {
 } from "~/types/schemas/forms/invoices.schema";
 
 const _useInvoiceUpdate = () => {
-    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
-    const invoiceRepository = getRepository("invoiceRepository");
+    const { invoiceRepository } = inject("databaseFactory") as DatabaseFactory;
     const { invoice } = useInvoiceDetails();
 
     const formRef = ref();

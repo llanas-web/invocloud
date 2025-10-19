@@ -1,12 +1,13 @@
-import createInvoiceTaskRepository from "#shared/repositories/tasks/invoice_task.repository";
 import { buildRequestScope } from "~~/server/core/container";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
+import { InvoiceTaskStatus } from "~~/shared/types/models/invoice-task.model";
 
 export default defineEventHandler(async (event) => {
     const {
         deps: {
             ocr,
             storage,
+            database: { invoiceTaskRepository },
         },
     } = await buildRequestScope(event);
 
@@ -21,22 +22,10 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
     }
 
-    // INIT
-    const invoiceTaskRepository = createInvoiceTaskRepository(supabaseAdmin);
-
     // GET THE JOBS
-    const { data: jobs, error } = await invoiceTaskRepository.getInvoiceTasks();
-
-    console.log("Fetched OCR jobs:", jobs);
-
-    if (error) {
-        console.error("Error fetching OCR jobs:", error);
-        throw createError({ status: 500, message: "Error fetching OCR jobs" });
-    }
-    if (!jobs || jobs.length === 0) {
-        console.log("No OCR jobs to process.");
-        return { success: true, message: "No OCR jobs to process." };
-    }
+    const invoiceTasks = await invoiceTaskRepository.getInvoiceTasks(
+        InvoiceTaskStatus.QUEUED,
+    );
 
     const processJob = async (
         jobId: string,
@@ -50,9 +39,9 @@ export default defineEventHandler(async (event) => {
             console.error(`Failed to submit job for invoice ${jobId}`);
             return;
         }
-        const { error: updateError } = await invoiceTaskRepository
+        await invoiceTaskRepository
             .updateInvoiceTask(jobId, {
-                status: "submitted",
+                status: InvoiceTaskStatus.SUBMITTED,
                 job_id: result.jobId,
                 attempts: attempts + 1,
             });
@@ -62,9 +51,9 @@ export default defineEventHandler(async (event) => {
     };
 
     await Promise.all(
-        jobs.map(
+        invoiceTasks.map(
             async (job, index) => {
-                if (!job.invoice?.file_path) {
+                if (!job.invoicePath) {
                     console.error(
                         `Job ${job.id} has no associated invoice file path.`,
                     );
@@ -72,7 +61,7 @@ export default defineEventHandler(async (event) => {
                 }
                 const signedUrl = await storage.createSignedUrl(
                     STORAGE_BUCKETS.INVOICES,
-                    job.invoice?.file_path,
+                    job.invoicePath,
                     60,
                 );
                 return processJob(

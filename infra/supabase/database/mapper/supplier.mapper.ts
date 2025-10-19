@@ -1,5 +1,5 @@
 import SupplierModel from "~~/shared/types/models/supplier.model";
-import type { Supplier } from "~~/types/providers/database";
+import type { Supplier } from "~~/shared/types/providers/database";
 
 export const supplierMapperFromDatabase = (data: Supplier): SupplierModel => {
     return new SupplierModel({

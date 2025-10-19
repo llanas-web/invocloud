@@ -10,9 +10,8 @@ import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 
 const _useInvoiceDetails = () => {
     const route = useRoute();
-    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
+    const { invoiceRepository } = inject("databaseFactory") as DatabaseFactory;
     const storageRepository = inject("storageFactory") as StorageProvider;
-    const invoiceRepository = getRepository("invoiceRepository");
 
     const invoiceId = computed(() => route.params.id as string);
 

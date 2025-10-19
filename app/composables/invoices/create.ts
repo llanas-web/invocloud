@@ -11,9 +11,8 @@ import type { StorageProvider } from "~~/shared/providers/storage/storage.interf
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 
 const _useInvoiceCreate = () => {
-    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
+    const { invoiceRepository } = inject("databaseFactory") as DatabaseFactory;
     const storageRepository = inject("storageFactory") as StorageProvider;
-    const invoiceRepository = getRepository("invoiceRepository");
     const { selectedEstablishment } = useEstablishmentsList();
 
     const formRef = ref();
@@ -53,7 +52,7 @@ const _useInvoiceCreate = () => {
                 { contentType: invoiceFile.value.type, upsert: true },
             );
             const newInvoice = await invoiceRepository.createInvoice(
-                [parsedInvoice],
+                parsedInvoice,
             );
             navigateTo("/app");
         },

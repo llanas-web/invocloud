@@ -30,15 +30,21 @@ export const establishmentMapperFromDatabase = (
     if (supabaseEstablishment.stripe_subscription_id !== null) {
         const subscriptionStatus = supabaseEstablishment
             .subscription_status as SubscriptionStatus;
-        const subscription = new SubscriptionModel(
-            supabaseEstablishment.id,
-            SubscriptionProvider.STRIPE,
-            supabaseEstablishment.stripe_subscription_id,
-            supabaseEstablishment.stripe_customer_id!,
-            subscriptionStatus,
-            fromStringToLocalDate(supabaseEstablishment.subscription_start!),
-            fromStringToLocalDate(supabaseEstablishment.subscription_end!),
-        );
+        const subscription = new SubscriptionModel({
+            id: supabaseEstablishment.id,
+            establishmentId: supabaseEstablishment.id,
+            provider: SubscriptionProvider.STRIPE,
+            providerSubscriptionId:
+                supabaseEstablishment.stripe_subscription_id,
+            providerCustomerId: supabaseEstablishment.stripe_customer_id!,
+            status: subscriptionStatus,
+            startedAt: fromStringToLocalDate(
+                supabaseEstablishment.subscription_start!,
+            ),
+            endAt: fromStringToLocalDate(
+                supabaseEstablishment.subscription_end!,
+            ),
+        });
         newEstablishment.setSubscription(subscription);
     }
 

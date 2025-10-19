@@ -7,8 +7,7 @@ const defaultUserSettings = {
 };
 
 export const _useUserSettings = () => {
-    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
-    const userRepository = getRepository("userRepository");
+    const { userRepository } = inject("databaseFactory") as DatabaseFactory;
     const user = useSupabaseUser();
 
     const { data: userSettings, error, pending, refresh } = useAsyncData(
