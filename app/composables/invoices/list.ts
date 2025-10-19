@@ -2,11 +2,11 @@ import { createSharedComposable } from "@vueuse/core";
 import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
-import useAsyncAction from "../core/useAsyncAction";
 
 const _useInvoices = () => {
-    const { invoiceRepository } = inject("databaseFactory") as DatabaseFactory;
-    const storageRepository = inject("storageFactory") as StorageProvider;
+    const { $databaseFactory, $storageFactory } = useNuxtApp();
+    const { invoiceRepository } = $databaseFactory as DatabaseFactory;
+    const storageRepository = $storageFactory as StorageProvider;
 
     const { selectedEstablishment } = useEstablishmentsList();
 

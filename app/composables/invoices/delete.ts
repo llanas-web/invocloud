@@ -10,7 +10,8 @@ const stateSchema = z.array(z.string()).min(
 type inputSchema = z.input<typeof stateSchema>;
 
 const _useInvoicesDelete = () => {
-    const { invoiceRepository } = inject("databaseFactory") as DatabaseFactory;
+    const { $databaseFactory } = useNuxtApp();
+    const { invoiceRepository } = $databaseFactory as DatabaseFactory;
     const open = ref(false);
     const selectedInvoices = ref<inputSchema>([]);
 

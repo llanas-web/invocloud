@@ -1,47 +1,25 @@
 <script setup lang="ts">
     import type { FormSubmitEvent, NavigationMenuItem } from '@nuxt/ui'
     import { LazyInvoicesUploadModalContainer, LazyCommonConfirmModal } from '#components'
-    import { z } from 'zod'
+    import { SubscriptionStatus } from '~~/shared/types/models/subscription.model'
 
     const route = useRoute()
     const router = useRouter()
-    const { createEstablishment, loaded } = useEstablishments()
-
-    const schema = z.object({
-        name: z.string().min(2, 'Too short'),
-    })
-
-    type Schema = z.output<typeof schema>
-
-    const state = reactive<Partial<Schema>>({
-        name: undefined
-    })
-
-    async function onSubmit(event: FormSubmitEvent<Schema>) {
-        const { name } = event.data
-        const newEstablishment = await createEstablishment(name)
-        if (!newEstablishment) {
-            toast.add({ title: 'Error', description: 'Erreur lors de la création de l\'établissement', color: 'error' })
-            return
-        }
-        toast.add({ title: 'Success', description: `Nouvel établissement ${newEstablishment.name} ajouté`, color: 'success' })
-        open.value = false
-        state.name = undefined
-    }
+    const { formState, pending, onSubmit: createEstablishment } = useEstablishmentCreate()
 
     // get the subscription_success from the query params
     const subscriptionSuccess = route.query.subscription_success === 'true'
     const toast = useToast()
     const open = ref(false)
 
-    const { pending, selectedEstablishment, establishments, subscribeToStripe } = useEstablishments()
+    const { selectedEstablishment, establishments, subscribeToStripe } = useEstablishmentsList()
     const user = useSupabaseUser()
 
     const isEstablishementActive = computed(() => {
         if (router.currentRoute.value.name?.toString().includes('app-settings')) {
             return true;
         }
-        return selectedEstablishment.value?.subscription_status === 'active' || selectedEstablishment.value?.subscription_status === 'trialing'
+        return selectedEstablishment.value?.subscription?.status === SubscriptionStatus.ACTIVE || selectedEstablishment.value?.subscription?.status === SubscriptionStatus.TRIAL;
     })
 
     onMounted(() => {
@@ -280,9 +258,10 @@
                                 </span>
                             </div>
                         </div>
-                        <UForm :schema="schema" :state="state" class="w-full space-y-4" @submit="onSubmit">
+                        <UForm :schema="schema" :state="formState" class="w-full space-y-4"
+                            @submit="createEstablishment">
                             <UFormField label="Nom de l'établissement" placeholder="Nom de l'établissement" name="name">
-                                <UInput v-model="state.name" class="w-full" />
+                                <UInput v-model="formState" class="w-full" />
                             </UFormField>
                             <div class="flex justify-end gap-2">
                                 <UButton label="Annuler" color="neutral" variant="subtle" @click="open = false" />

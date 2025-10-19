@@ -11,7 +11,7 @@
 
     const loading = ref(false)
     const { signup } = useAuth()
-    const { subscribeToStripe, refresh } = useEstablishments()
+    const { subscribeToStripe, refresh } = useEstablishmentsList()
     const user = useSupabaseUser()
 
     const fields: Array<{

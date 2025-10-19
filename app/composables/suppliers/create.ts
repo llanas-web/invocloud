@@ -5,7 +5,8 @@ import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import type { CreateSupplierForm } from "~/types/schemas/forms/suppliers.schema";
 
 const _useSupplierCreate = () => {
-    const { supplierRepository } = inject("databaseFactory") as DatabaseFactory;
+    const { $databaseFactory } = useNuxtApp();
+    const { supplierRepository } = $databaseFactory as DatabaseFactory;
     const { selectedEstablishment } = useEstablishmentsList();
     const toast = useToast();
 

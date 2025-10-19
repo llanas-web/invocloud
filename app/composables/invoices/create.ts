@@ -1,6 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
 import DatabaseFactory from "~~/shared/providers/database/database.factory";
-import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import useAsyncAction from "../core/useAsyncAction";
 import {
     type CreateInvoiceForm,
@@ -9,10 +8,12 @@ import {
 import { InvoiceStatus } from "~~/shared/types/models/invoice.model";
 import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
+import type { InvoiceInsert } from "~~/shared/types/providers/database";
 
 const _useInvoiceCreate = () => {
-    const { invoiceRepository } = inject("databaseFactory") as DatabaseFactory;
-    const storageRepository = inject("storageFactory") as StorageProvider;
+    const { $databaseFactory, $storageFactory } = useNuxtApp();
+    const { invoiceRepository } = $databaseFactory as DatabaseFactory;
+    const storageRepository = $storageFactory as StorageProvider;
     const { selectedEstablishment } = useEstablishmentsList();
 
     const formRef = ref();
@@ -52,7 +53,7 @@ const _useInvoiceCreate = () => {
                 { contentType: invoiceFile.value.type, upsert: true },
             );
             const newInvoice = await invoiceRepository.createInvoice(
-                parsedInvoice,
+                parsedInvoice as unknown as InvoiceInsert,
             );
             navigateTo("/app");
         },

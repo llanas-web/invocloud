@@ -2,7 +2,7 @@
     import { z } from 'zod';
     import type { FormSubmitEvent } from '@nuxt/ui'
 
-    const { openModal } = useInvoiceUpload()
+    const { openModal } = useUploadWizard()
     const config = useRuntimeConfig();
 
     const schema = z.object({

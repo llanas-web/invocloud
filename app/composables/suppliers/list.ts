@@ -3,7 +3,8 @@ import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import type SupplierModel from "~~/shared/types/models/supplier.model";
 
 const _useSuppliers = () => {
-    const { supplierRepository } = inject("databaseFactory") as DatabaseFactory;
+    const { $databaseFactory } = useNuxtApp();
+    const { supplierRepository } = $databaseFactory as DatabaseFactory;
     const { selectedEstablishment } = useEstablishmentsList();
 
     const { data: suppliers, error, refresh, pending } = useAsyncData<

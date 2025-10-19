@@ -1,6 +1,5 @@
 import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { InvoiceRepository } from "../../database.interface";
 import { invoiceMapperFromDatabase } from "../mapper/invoice.mapper";
 import { supplierMapperFromDatabase } from "../mapper/supplier.mapper";
 import { SupabaseError } from "../supabase-error";
@@ -9,6 +8,7 @@ import type {
     InvoiceInsert,
     InvoiceUpdate,
 } from "~~/shared/types/providers/database";
+import type { InvoiceRepository } from "~~/shared/providers/database/database.interface";
 
 export class InvoiceSupabaseRepository implements InvoiceRepository {
     constructor(private supabase: SupabaseClient<Database>) {}

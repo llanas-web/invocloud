@@ -2,7 +2,7 @@
     import { LazyInvoicesUploadModalContainer } from '#components';
     import { fr } from '@nuxt/ui/locale'
 
-    const { openModal } = useInvoiceUpload()
+    const { openModal } = useUploadWizard()
     const user = useSupabaseUser()
 
 </script>

@@ -1,6 +1,6 @@
 import type { StorageProvider } from "./storage.interface";
-import { StorageSupabaseRepository } from "./supabase/repositories/storage.repository";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { StorageSupabaseRepository } from "./supabase/storage.repository";
 
 class StorageFactory {
     private static instance: StorageProvider;

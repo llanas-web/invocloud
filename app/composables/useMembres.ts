@@ -3,9 +3,8 @@ import useAsyncAction from "./core/useAsyncAction";
 import DatabaseFactory from "~~/shared/providers/database/database.factory";
 
 const _useMembers = () => {
-    const { establishmentRepository } = inject(
-        "databaseFactory",
-    ) as DatabaseFactory;
+    const { $databaseFactory } = useNuxtApp();
+    const { establishmentRepository } = $databaseFactory as DatabaseFactory;
     const { user } = useAuth();
     const { selectedEstablishment } = useEstablishmentsList();
 
