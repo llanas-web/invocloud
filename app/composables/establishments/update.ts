@@ -16,9 +16,8 @@ export type UpdateEstablishmentCommand = z.output<
 >;
 
 const _useEstablishmentUpdate = () => {
-    const { establishmentRepository } = inject(
-        "databaseFactory",
-    ) as DatabaseFactory;
+    const { $databaseFactory } = useNuxtApp();
+    const { establishmentRepository } = $databaseFactory as DatabaseFactory;
     const { selectedEstablishment, refresh } = useEstablishmentsList();
 
     const formRef = ref();

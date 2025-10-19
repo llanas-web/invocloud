@@ -7,7 +7,8 @@ import {
 } from "~/types/schemas/forms/invoices.schema";
 
 const _useInvoiceUpdate = () => {
-    const { invoiceRepository } = inject("databaseFactory") as DatabaseFactory;
+    const { $databaseFactory } = useNuxtApp();
+    const { invoiceRepository } = $databaseFactory as DatabaseFactory;
     const { invoice } = useInvoiceDetails();
 
     const formRef = ref();

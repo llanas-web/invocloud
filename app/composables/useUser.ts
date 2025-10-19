@@ -4,10 +4,11 @@ import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import type { UserModelUpdate } from "~~/shared/types/models/user.model";
 
 const _useUser = () => {
+    const { $databaseFactory } = useNuxtApp();
     const supabaseUser = useSupabaseUser();
     const { logout } = useAuth();
 
-    const { userRepository } = inject("databaseFactory") as DatabaseFactory;
+    const { userRepository } = $databaseFactory as DatabaseFactory;
 
     const {
         data: currentUser,
@@ -20,6 +21,7 @@ const _useUser = () => {
         });
     }, {
         deep: true,
+        immediate: true,
     });
 
     const updateUserAction = useAsyncAction(

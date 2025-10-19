@@ -1,6 +1,6 @@
-import StorageError from "../../storage.error";
-import type { StorageProvider } from "../../storage.interface";
 import { SupabaseClient } from "@supabase/supabase-js";
+import type { StorageProvider } from "../storage.interface";
+import StorageError from "../storage.error";
 
 export class StorageSupabaseRepository implements StorageProvider {
     constructor(private supabase: SupabaseClient) {}

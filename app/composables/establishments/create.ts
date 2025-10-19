@@ -19,9 +19,8 @@ function slugify(s: string) {
 
 const _useEstablishmentCreate = () => {
     const supabaseUser = useSupabaseUser();
-    const { establishmentRepository } = inject(
-        "databaseFactory",
-    ) as DatabaseFactory;
+    const { $databaseFactory } = useNuxtApp();
+    const { establishmentRepository } = $databaseFactory as DatabaseFactory;
     const { establishments, refresh, selectEstablishment } =
         useEstablishmentsList();
 

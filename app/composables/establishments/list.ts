@@ -12,11 +12,10 @@ function slugify(s: string) {
 
 const _useEstablishmentsList = () => {
     const user = useSupabaseUser();
+    const { $databaseFactory } = useNuxtApp();
     const { userSettings } = useUserSettings();
 
-    const { establishmentRepository } = inject(
-        "databaseFactory",
-    ) as DatabaseFactory;
+    const { establishmentRepository } = $databaseFactory as DatabaseFactory;
 
     // --- State
     const selectedId = useLocalStorage<string | null>(

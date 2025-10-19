@@ -17,10 +17,10 @@ import {
     SupplierSupabaseRepository,
     UploadValidationSupabaseRepository,
     UserSupabaseRepository,
-} from "../../../infra/supabase/database/repositories";
+} from "./supabase/repositories";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { InvoiceTaskSupabaseRepository } from "../../../infra/supabase/database/repositories/invoice-task.repository";
-import { SubscriptionSupabaseRepository } from "../../../infra/supabase/database/repositories/subscription.repository";
+import { InvoiceTaskSupabaseRepository } from "./supabase/repositories/invoice-task.repository";
+import { SubscriptionSupabaseRepository } from "./supabase/repositories/subscription.repository";
 
 // Typage des repositories
 type RepositoryMap = {};

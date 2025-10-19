@@ -9,7 +9,8 @@ import {
 } from "~/types/schemas/forms/suppliers.schema";
 
 const _useSupplierUpdate = () => {
-    const { supplierRepository } = inject("databaseFactory") as DatabaseFactory;
+    const { $databaseFactory } = useNuxtApp();
+    const { supplierRepository } = $databaseFactory as DatabaseFactory;
 
     const { refresh } = useSuppliers();
     const supplier = ref<SupplierModel | null>(null);

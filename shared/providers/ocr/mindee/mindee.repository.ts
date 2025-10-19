@@ -1,4 +1,3 @@
-import * as mindee from "mindee";
 import type { EventHandlerRequest, H3Event } from "h3";
 import type { OcrProvider } from "../ocr.interface";
 import type {
@@ -82,6 +81,7 @@ export class MindeeRepository implements OcrProvider {
                 message: "OCR service is not configured",
             });
         }
+        const mindee = await import("mindee");
         const mindeeClient = new mindee.ClientV2({
             apiKey: this.MINDEE_API_KEY,
         });
@@ -122,6 +122,7 @@ export class MindeeRepository implements OcrProvider {
         }
 
         // 3) HMAC verify using raw
+        const mindee = await import("mindee");
         const lr = new mindee.LocalResponse(raw);
         await lr.init();
         const ok = lr.isValidHmacSignature(

@@ -7,7 +7,8 @@ const defaultUserSettings = {
 };
 
 export const _useUserSettings = () => {
-    const { userRepository } = inject("databaseFactory") as DatabaseFactory;
+    const { $databaseFactory } = useNuxtApp();
+    const { userRepository } = $databaseFactory as DatabaseFactory;
     const user = useSupabaseUser();
 
     const { data: userSettings, error, pending, refresh } = useAsyncData(

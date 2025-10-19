@@ -7,11 +7,13 @@ import {
 import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
+import type { InvoiceUpdate } from "~~/shared/types/providers/database";
 
 const _useInvoiceDetails = () => {
     const route = useRoute();
-    const { invoiceRepository } = inject("databaseFactory") as DatabaseFactory;
-    const storageRepository = inject("storageFactory") as StorageProvider;
+    const { $databaseFactory, $storageFactory } = useNuxtApp();
+    const { invoiceRepository } = $databaseFactory as DatabaseFactory;
+    const storageRepository = $storageFactory as StorageProvider;
 
     const invoiceId = computed(() => route.params.id as string);
 
@@ -64,7 +66,7 @@ const _useInvoiceDetails = () => {
             const parsed = UpdateInvoiceSchema.parse(formState);
             const _updatedInvoice = await invoiceRepository.updateInvoice(
                 invoice.value.id,
-                parsed,
+                parsed as unknown as InvoiceUpdate,
             );
             Object.assign(invoice.value!, _updatedInvoice);
             navigateTo("/app");
