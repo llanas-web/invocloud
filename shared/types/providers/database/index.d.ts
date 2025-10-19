@@ -53,6 +53,11 @@ export type InvoiceTaskInsert =
     Database["public"]["Tables"]["invoice_jobs"]["Insert"];
 export type InvoiceTaskUpdate =
     Database["public"]["Tables"]["invoice_jobs"]["Update"];
-
 export type InvoiceTasksStatus =
     Database["public"]["Enums"]["invoice_job_status"];
+
+export type Subscription = Database["public"]["Tables"]["subscriptions"]["Row"];
+export type SubscriptionInsert =
+    Database["public"]["Tables"]["subscriptions"]["Insert"];
+export type SubscriptionUpdate =
+    Database["public"]["Tables"]["subscriptions"]["Update"];

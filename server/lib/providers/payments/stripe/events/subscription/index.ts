@@ -1,7 +1,8 @@
 import type Stripe from "stripe";
-import { StripeHandlerContext } from "~~/server/lib/stripe/context";
 import { fromUnix, nowISO } from "~/utils/date";
-import createEstablishmentRepository from "#shared/repositories/establishment.repository";
+import { Deps } from "~~/server/core/types";
+import PaymentError from "~~/shared/providers/payment/payment.error";
+import { SubscriptionStatus } from "~~/shared/types/models/subscription.model";
 
 const getCustomerId = (customer: Stripe.Subscription["customer"]) => {
     if (typeof customer === "string") {
@@ -13,63 +14,53 @@ const getCustomerId = (customer: Stripe.Subscription["customer"]) => {
 };
 
 export async function handleSubscriptionDeleted(
+    stripe: Stripe,
     subscription: Stripe.Subscription,
-    ctx: StripeHandlerContext,
+    deps: Deps,
 ) {
     const customerId = getCustomerId(subscription.customer);
-    const establishmentRepository = createEstablishmentRepository(ctx.supabase);
     if (!customerId) {
-        console.error("❌ Missing customer ID in subscription.deleted");
-        return;
-    }
-
-    const { error } = await establishmentRepository.updateEstablishment(
-        customerId,
-        {
-            subscription_status: "inactive",
-            subscription_end: fromUnix(subscription.ended_at) || nowISO(),
-        },
-    );
-
-    if (error) {
-        console.error("❌ Failed to mark subscription as inactive:", error);
-    } else {
-        console.log(
-            `✅ Subscription marked inactive for customer ${customerId}`,
+        throw new PaymentError(
+            "Missing customer ID in invoice.payment_succeeded",
         );
     }
+    const { subscriptionRepository } = deps.database;
+    const { id } = await subscriptionRepository.getSubscriptionById(
+        customerId,
+    );
+    await subscriptionRepository.updateSubscription(
+        id,
+        {
+            status: SubscriptionStatus.INACTIVE,
+            end_at: fromUnix(subscription.ended_at) || nowISO(),
+        },
+    );
 }
 
 export async function handleSubscriptionUpdated(
     subscription: Stripe.Subscription,
-    ctx: StripeHandlerContext,
+    deps: Deps,
 ) {
     const customerId = getCustomerId(subscription.customer);
-    const establishmentRepository = createEstablishmentRepository(ctx.supabase);
     if (!customerId) {
-        console.error("❌ Missing customer ID in subscription.updated");
-        return;
-    }
-    console.log(subscription);
-
-    const subscriptionStatus = subscription.status === "canceled"
-        ? "canceled"
-        : "active";
-
-    // Update the subscription status and end date
-    const { error } = await establishmentRepository.updateEstablishment(
-        customerId,
-        {
-            subscription_status: subscriptionStatus,
-            subscription_end: fromUnix(subscription.ended_at),
-        },
-    );
-
-    if (error) {
-        console.error("❌ Failed to update subscription status:", error);
-    } else {
-        console.log(
-            `✅ Subscription updated for customer ${customerId}: status=${subscriptionStatus}`,
+        throw new PaymentError(
+            "Missing customer ID in subscription.updated",
         );
     }
+    const { subscriptionRepository } = deps.database;
+
+    const subscriptionStatus = subscription.status === "canceled"
+        ? SubscriptionStatus.CANCELED
+        : SubscriptionStatus.ACTIVE;
+
+    const { id } = await subscriptionRepository.getSubscriptionById(
+        customerId,
+    );
+    await subscriptionRepository.updateSubscription(
+        id,
+        {
+            status: subscriptionStatus,
+            end_at: fromUnix(subscription.ended_at),
+        },
+    );
 }

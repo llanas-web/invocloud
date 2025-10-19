@@ -1,6 +1,5 @@
 import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { EstablishmentRepository } from "../../database.interface";
 import {
     establishmentInsertMapperToDatabase,
     establishmentMapperFromDatabase,
@@ -14,6 +13,7 @@ import type {
 } from "~~/shared/types/models/establishment.model";
 import { DomainError, DomainErrorCode } from "~~/shared/errors/domain.error";
 import { SupabaseError } from "../supabase-error";
+import type { EstablishmentRepository } from "~~/shared/providers/database/database.interface";
 
 export class EstablishmentSupabaseRepository
     implements EstablishmentRepository {
@@ -54,11 +54,21 @@ export class EstablishmentSupabaseRepository
         uploadId: string,
         userId: string,
     ) => {
+        const { data: establishmentIds, error: getEstablishmentsError } =
+            await this.supabase
+                .from("upload_validations")
+                .select("establishments")
+                .eq("upload_id", uploadId)
+                .eq("uploader_id", userId)
+                .single();
+        if (getEstablishmentsError) {
+            throw SupabaseError.fromPostgrest(getEstablishmentsError);
+        }
+
         const { data, error } = await this.supabase
-            .from("upload_validations")
-            .select("establishments(id, name)")
-            .eq("upload_id", uploadId)
-            .eq("uploader_id", userId);
+            .from("establishments")
+            .select("id, name")
+            .in("id", establishmentIds.establishments);
 
         if (error) throw SupabaseError.fromPostgrest(error);
         else if (!data?.length) {
@@ -69,12 +79,9 @@ export class EstablishmentSupabaseRepository
             );
         }
 
-        return data.filter((data) => data.establishments != null).map((
-            { establishments },
-        ) => ({
-            id: establishments!.id,
-            name: establishments!.name,
-        }));
+        return data.map((establishment) =>
+            establishmentShortMapper(establishment.id, establishment.name)
+        );
     };
 
     getEstablishmentsFromMemberId = async (

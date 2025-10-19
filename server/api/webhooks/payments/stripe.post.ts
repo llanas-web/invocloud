@@ -4,14 +4,22 @@ import {
     getRequestHeaders,
     readRawBody,
 } from "h3";
-import { stripe } from "~~/server/lib/providers/payments/stripe/client";
-import { handleStripeEvent } from "~~/server/lib/providers/payments/stripe/dispatcher";
+import Stripe from "stripe";
+import { buildRequestScope } from "~~/server/core/container";
+import { handleCheckoutSessionCompleted } from "~~/server/lib/providers/payments/stripe/events/checkout/session";
+import { handleInvoicePaymentSucceeded } from "~~/server/lib/providers/payments/stripe/events/invoice/payment";
+import {
+    handleSubscriptionDeleted,
+    handleSubscriptionUpdated,
+} from "~~/server/lib/providers/payments/stripe/events/subscription";
+import { StripeRepository } from "~~/shared/providers/payment/stripe/stripe.repository";
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export default defineEventHandler(async (event) => {
     const sig = getRequestHeaders(event)["stripe-signature"] as string;
     const rawBody = await readRawBody(event);
+    const { deps } = await buildRequestScope(event);
 
     if (!sig || !rawBody) {
         throw createError({
@@ -21,33 +29,40 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    let stripeEvent;
-
-    try {
-        stripeEvent = stripe.webhooks.constructEvent(
+    const stripeRepository = new StripeRepository();
+    const { type, data } = stripeRepository.stripeInstance.webhooks
+        .constructEvent(
             rawBody,
             sig,
             endpointSecret,
         );
-    } catch (err: any) {
-        console.error("❌ Webhook signature verification failed:", err.message);
-        throw createError({
-            statusCode: 400,
-            statusMessage: "Signature Stripe invalide",
-        });
+
+    switch (type) {
+        case "checkout.session.completed":
+            return handleCheckoutSessionCompleted(
+                stripeRepository.stripeInstance,
+                data as unknown as Stripe.Checkout.Session,
+                deps,
+            );
+        case "invoice.payment_succeeded":
+            return handleInvoicePaymentSucceeded(
+                data as unknown as Stripe.Invoice,
+                deps,
+            );
+        case "customer.subscription.updated":
+            return handleSubscriptionUpdated(
+                data as unknown as Stripe.Subscription,
+                deps,
+            );
+        case "customer.subscription.deleted":
+        case "invoice.payment_failed":
+            return handleSubscriptionDeleted(
+                stripeRepository.stripeInstance,
+                data as unknown as Stripe.Subscription,
+                deps,
+            );
+
+        default:
+            console.log(`No handler for Stripe event type: ${type}`);
     }
-
-    const { type, data } = stripeEvent;
-
-    try {
-        await handleStripeEvent(type, data.object, event);
-    } catch (err) {
-        console.error(`❌ Error handling Stripe event ${type}:`, err);
-        throw createError({
-            statusCode: 500,
-            statusMessage: "Erreur lors du traitement de l'événement Stripe",
-        });
-    }
-
-    return { received: true };
 });

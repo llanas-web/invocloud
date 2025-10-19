@@ -5,8 +5,7 @@ import {
 } from "~~/shared/types/models/member.model";
 import { UserModel } from "~~/shared/types/models/user.model";
 import { fromStringToLocalDate } from "~~/shared/utils/date.utils";
-import type { EstablishmentMember, User } from "~~/types/providers/database";
-import { userMapperFromDatabase } from "./user.mapper";
+import type { EstablishmentMember } from "~~/shared/types/providers/database";
 
 export const memberMapperFromDatabase = (
     member: EstablishmentMember,

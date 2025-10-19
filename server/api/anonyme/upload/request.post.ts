@@ -12,7 +12,7 @@ const schema = z.object({
 export default defineEventHandler(async (event) => {
     const {
         deps: {
-            repos: {
+            database: {
                 establishmentRepository,
                 uploadValidationRepository,
             },

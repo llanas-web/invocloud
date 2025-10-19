@@ -11,7 +11,7 @@ const schema = z.object({
 export default defineEventHandler(async (event) => {
     const {
         deps: {
-            repos: { invoiceRepository },
+            database: { invoiceRepository },
             storage,
             auth,
             email: emailRepository,

@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     const {
         deps: {
             storage,
-            repos: { uploadValidationRepository, invoiceRepository },
+            database: { uploadValidationRepository, invoiceRepository },
         },
     } = await buildRequestScope(event);
 
@@ -37,7 +37,6 @@ export default defineEventHandler(async (event) => {
         uploadValidationId,
         {
             status: "uploaded",
-            selected_establishment: selectedEstablishmentId,
         },
     );
 

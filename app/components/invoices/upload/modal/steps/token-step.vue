@@ -2,7 +2,6 @@
     import * as z from 'zod'
 
     const { tokenState } = useUploadWizard()
-    const { currentUser } = useUser();
 
     const confirmFormSchema = z.object({
         confirmToken: z.string().array().length(6, 'Invalid token'),

@@ -1,12 +1,12 @@
 import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "./core/useAsyncAction";
 import DatabaseFactory from "~~/shared/providers/database/database.factory";
-import type { ApiMemberInvite } from "~~/server/types/endpoints";
 
 const _useMembers = () => {
-    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
-    const establishmentRepository = getRepository("establishmentRepository");
-    const user = useSupabaseUser();
+    const { establishmentRepository } = inject(
+        "databaseFactory",
+    ) as DatabaseFactory;
+    const { user } = useAuth();
     const { selectedEstablishment } = useEstablishmentsList();
 
     const {

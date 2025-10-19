@@ -1,4 +1,4 @@
-import { defineEventHandler, setResponseStatus } from "h3";
+import { defineEventHandler } from "h3";
 import { buildRequestScope } from "~~/server/core/container";
 import { HTTPStatus } from "~~/server/core/errors/status";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
@@ -76,7 +76,7 @@ export default defineEventHandler(async (event) => {
 
     const {
         deps: {
-            repos: {
+            database: {
                 establishmentRepository,
                 supplierRepository,
                 invoiceRepository,

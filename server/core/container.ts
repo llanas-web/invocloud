@@ -1,10 +1,5 @@
 import { EventHandlerRequest, getHeader, H3Event } from "h3";
 import { Deps, RequestContext } from "./types";
-import {
-    serverClient,
-    serverServiceRole,
-    serverUser,
-} from "~~/shared/providers/database/supabase/client";
 import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import StorageFactory from "~~/shared/providers/storage/storage.factory";
 import AuthFactory from "~~/shared/providers/auth/auth.factory";
@@ -12,16 +7,20 @@ import OcrFactory from "~~/shared/providers/ocr/ocr.factory";
 import EmailFactory from "~~/shared/providers/email/email.factory";
 import PaymentFactory from "~~/shared/providers/payment/payment.factory";
 import { HTTPStatus } from "./errors/status";
+import {
+    serverSupabaseClient,
+    serverSupabaseServiceRole,
+    serverSupabaseUser,
+} from "#supabase/server";
 
 export async function buildRequestScope(
     event: H3Event<EventHandlerRequest>,
 ): Promise<{ ctx: RequestContext; deps: Deps }> {
-    const user = await serverUser(event);
     const requestId = getHeader(event, "x-request-id") ?? crypto.randomUUID();
 
-    const ss = serverServiceRole(event);
-    const sc = await serverClient(event);
-    const { getRepository } = DatabaseFactory.getInstance(ss);
+    const user = await serverSupabaseUser(event);
+    const ss = serverSupabaseServiceRole(event);
+    const sc = await serverSupabaseClient(event);
 
     const authentProtection = (allowAnonyme = false) => {
         if (!user || (!allowAnonyme && user.is_anonymous)) {
@@ -43,17 +42,8 @@ export async function buildRequestScope(
         ocr: OcrFactory.getInstance("mindee"),
         email: EmailFactory.getInstance("resend"),
         payment: PaymentFactory.getInstance("stripe"),
-        repos: {
-            uploadValidationRepository: getRepository(
-                "uploadValidationRepository",
-            ),
-            establishmentRepository: getRepository("establishmentRepository"),
-            invoiceRepository: getRepository("invoiceRepository"),
-            supplierRepository: getRepository("supplierRepository"),
-            userRepository: getRepository("userRepository"),
-            authRepository: getRepository("authRepository"),
-            adminRepository: getRepository("adminRepository"),
-        },
+        database: DatabaseFactory.getInstance(ss),
     };
+
     return { ctx, deps };
 }

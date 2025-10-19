@@ -27,7 +27,6 @@ const _useUploadWizard = () => {
         supplierId: "",
     });
 
-    const supabaseClient = useSupabaseClient<Database>();
     watch(
         () => currentUser.value,
         (newUser) => {
@@ -41,7 +40,7 @@ const _useUploadWizard = () => {
     const submitFormStep = async () => {
         isLoading.value = true;
         if (user.value != null && !user.value.is_anonymous) {
-            const { establishments } = await $fetch<
+            const establishments = await $fetch<
                 ReturnType<
                     typeof import("~~/server/api/security/upload/request.post").default
                 >
@@ -70,7 +69,7 @@ const _useUploadWizard = () => {
             stepIndex.value++;
         } else {
             try {
-                const { invoice_id, success } = await $fetch<
+                const uploadValidationId = await $fetch<
                     ReturnType<
                         typeof import("~~/server/api/anonyme/upload/request.post").default
                     >
@@ -83,7 +82,7 @@ const _useUploadWizard = () => {
                         name: formState.invoiceFile!.name,
                     },
                 });
-                invoiceId.value = invoice_id;
+                invoiceId.value = uploadValidationId;
                 stepIndex.value++;
             } catch (error) {
                 console.error("Error requesting upload:", error);

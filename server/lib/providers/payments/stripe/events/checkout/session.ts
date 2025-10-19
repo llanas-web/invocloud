@@ -1,13 +1,11 @@
 import type Stripe from "stripe";
-import { StripeHandlerContext } from "~~/server/lib/stripe/context";
-import { sessionMetadataSchema } from "~~/server/lib/stripe/schema";
-import { sendEmail } from "~~/server/lib/email";
 import { fromUnix, nowISO } from "~/utils/date";
 
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
-import createEstablishmentRepository from "#shared/repositories/establishment.repository";
-import createUserRepository from "#shared/repositories/user.repository";
+import { Deps } from "~~/server/core/types";
+import { sessionMetadataSchema } from "~~/shared/providers/payment/stripe/schema";
+import { SubscriptionStatus } from "~~/shared/types/models/subscription.model";
 
 const getSubscriptionId = (session: Stripe.Checkout.Session) => {
     const { subscription } = session;
@@ -32,93 +30,64 @@ const getCustomerId = (customer: Stripe.Checkout.Session["customer"]) => {
     return null;
 };
 
-const retrieveSubscription = async (
-    ctx: StripeHandlerContext,
-    subscriptionId: string,
-) => {
-    try {
-        return await ctx.stripe.subscriptions.retrieve(subscriptionId);
-    } catch (error) {
-        console.error("❌ Failed to retrieve subscription:", error);
-        return null;
-    }
-};
-
 export async function handleCheckoutSessionCompleted(
+    stripe: Stripe,
     session: Stripe.Checkout.Session,
-    ctx: StripeHandlerContext,
+    deps: Deps,
 ) {
     const subscriptionId = getSubscriptionId(session);
     const customerId = getCustomerId(session.customer);
-    const userRepository = createUserRepository(ctx.supabase);
-    const establishmentRepository = createEstablishmentRepository(
-        ctx.supabase,
-    );
+    const {
+        database: { subscriptionRepository, userRepository },
+        email: emailRepository,
+    } = deps;
     if (!subscriptionId || !customerId) {
         console.error("❌ Missing subscription or customer ID");
         return;
     }
 
     // ✅ Validate metadata
-    const parseResult = sessionMetadataSchema.safeParse(session.metadata);
-    if (!parseResult.success) {
-        console.error(
-            "❌ Invalid session metadata:",
-            parseResult.error.format(),
-        );
-        return;
-    }
-    const { userId, establishmentId } = parseResult.data;
+    const { userId, establishmentId } = sessionMetadataSchema.parse(
+        session.metadata,
+    );
 
-    const subscription = await retrieveSubscription(ctx, subscriptionId);
-    if (!subscription) {
-        console.error("❌ Subscription not found");
-        return;
-    }
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
     const subscriptionStatus = subscription.status === "trialing"
-        ? "trialing"
-        : "active";
+        ? SubscriptionStatus.TRIAL
+        : SubscriptionStatus.ACTIVE;
 
-    const { error } = await establishmentRepository.updateEstablishment(
-        establishmentId,
+    const newSubscription = await subscriptionRepository.createSubscription(
         {
-            subscription_status: subscriptionStatus,
-            stripe_customer_id: customerId,
-            stripe_subscription_id: subscriptionId,
-            subscription_start: nowISO(),
-            trial_end: fromUnix(subscription.trial_end),
+            provider: "stripe",
+            provider_customer_id: customerId,
+            provider_subscription_id: subscriptionId,
+            started_at: nowISO(),
+            end_at: fromUnix(subscription.trial_end) ?? null,
+            establishment_id: establishmentId,
+            status: subscriptionStatus,
         },
     );
 
-    if (error) {
-        console.error("❌ Failed to update establishment:", error);
-    } else {
-        console.log(
-            `✅ Checkout session completed for ${establishmentId}. Checkout status: ${subscriptionStatus}`,
-        );
+    const { email } = await userRepository.getUser({
+        id: userId,
+    });
 
-        const { data: user, error } = await userRepository.getUserById(userId);
-        if (!user || error) {
-            console.error("❌ No user email found");
-            return;
-        }
-        await sendEmail(
-            [user.email!],
-            "Confirmation abonnement Invocloud",
-            `Bonjour,<br><br>` +
-                `<p>Merci pour votre abonnement à Invocloud ! Votre essai gratuit de 7 jours a commencé. Vous pouvez dès à présent profiter de toutes les fonctionnalités premium.</p>` +
-                `<p>Votre abonnement commencera le ${
-                    format(
-                        fromUnix(subscription.trial_end)!,
-                        "dd/MM/yyyy",
-                        {
-                            locale: fr,
-                        },
-                    )
-                }</p><br><br>` +
-                `<p>Si vous avez des questions, n'hésitez pas à nous contacter: <a href="mailto:contact@invocloud.fr">contact@invocloud.fr</a></p><br>` +
-                `<p>L'équipe InvoCloud</p>`,
-        );
-    }
+    await emailRepository.sendEmail({
+        to: [email],
+        subject: "Confirmation abonnement Invocloud",
+        html: `Bonjour,<br><br>` +
+            `<p>Merci pour votre abonnement à Invocloud ! Votre essai gratuit de 7 jours a commencé. Vous pouvez dès à présent profiter de toutes les fonctionnalités premium.</p>` +
+            `<p>Votre abonnement commencera le ${
+                format(
+                    fromUnix(subscription.trial_end)!,
+                    "dd/MM/yyyy",
+                    {
+                        locale: fr,
+                    },
+                )
+            }</p><br><br>` +
+            `<p>Si vous avez des questions, n'hésitez pas à nous contacter: <a href="mailto:contact@invocloud.fr">contact@invocloud.fr</a></p><br>` +
+            `<p>L'équipe InvoCloud</p>`,
+    });
 }

@@ -4,6 +4,8 @@ import type {
     AdminRepository,
     EstablishmentRepository,
     InvoiceRepository,
+    InvoiceTaskRepository,
+    SubscriptionRepository,
     SupplierRepository,
     UploadValidationRepository,
     UserRepository,
@@ -15,40 +17,46 @@ import {
     SupplierSupabaseRepository,
     UploadValidationSupabaseRepository,
     UserSupabaseRepository,
-} from "./supabase/repositories";
+} from "../../../infra/supabase/database/repositories";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { InvoiceTaskSupabaseRepository } from "../../../infra/supabase/database/repositories/invoice-task.repository";
+import { SubscriptionSupabaseRepository } from "../../../infra/supabase/database/repositories/subscription.repository";
 
 // Typage des repositories
-type RepositoryMap = {
-    establishmentRepository: EstablishmentRepository;
-    invoiceRepository: InvoiceRepository;
-    supplierRepository: SupplierRepository;
-    userRepository: UserRepository;
-    uploadValidationRepository: UploadValidationRepository;
-    authRepository: AuthInterface;
-    adminRepository: AdminRepository;
-};
+type RepositoryMap = {};
 
 class DatabaseFactory {
     private static instance: DatabaseFactory;
-    private repositories: Partial<RepositoryMap> = {};
+
+    public establishmentRepository: EstablishmentRepository;
+    public invoiceRepository: InvoiceRepository;
+    public supplierRepository: SupplierRepository;
+    public userRepository: UserRepository;
+    public uploadValidationRepository: UploadValidationRepository;
+    public authRepository: AuthInterface;
+    public adminRepository: AdminRepository;
+    public invoiceTaskRepository: InvoiceTaskRepository;
+    public subscriptionRepository: SubscriptionRepository;
 
     private constructor(client: SupabaseClient) {
-        this.repositories.establishmentRepository =
-            new EstablishmentSupabaseRepository(
-                client,
-            );
-        this.repositories.invoiceRepository = new InvoiceSupabaseRepository(
+        this.establishmentRepository = new EstablishmentSupabaseRepository(
             client,
         );
-        this.repositories.supplierRepository = new SupplierSupabaseRepository(
+        this.invoiceRepository = new InvoiceSupabaseRepository(
             client,
         );
-        this.repositories.userRepository = new UserSupabaseRepository(client);
-        this.repositories.uploadValidationRepository =
+        this.supplierRepository = new SupplierSupabaseRepository(
+            client,
+        );
+        this.userRepository = new UserSupabaseRepository(client);
+        this.uploadValidationRepository =
             new UploadValidationSupabaseRepository(client);
-        this.repositories.authRepository = new SupabaseAuthRepository(client);
-        this.repositories.adminRepository = new AdminSupabaseRepository(client);
+        this.authRepository = new SupabaseAuthRepository(client);
+        this.adminRepository = new AdminSupabaseRepository(client);
+        this.invoiceTaskRepository = new InvoiceTaskSupabaseRepository(client);
+        this.subscriptionRepository = new SubscriptionSupabaseRepository(
+            client,
+        );
     }
 
     public static getInstance(client: SupabaseClient): DatabaseFactory {
@@ -56,16 +64,6 @@ class DatabaseFactory {
             DatabaseFactory.instance = new DatabaseFactory(client);
         }
         return DatabaseFactory.instance;
-    }
-
-    public getRepository<K extends keyof RepositoryMap>(
-        repositoryName: K,
-    ): RepositoryMap[K] {
-        const repo = this.repositories[repositoryName];
-        if (!repo) {
-            throw new Error(`Repository ${repositoryName} not found`);
-        }
-        return repo;
     }
 }
 

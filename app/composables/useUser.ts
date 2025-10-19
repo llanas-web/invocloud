@@ -7,8 +7,7 @@ const _useUser = () => {
     const supabaseUser = useSupabaseUser();
     const { logout } = useAuth();
 
-    const { getRepository } = inject("databaseFactory") as DatabaseFactory;
-    const userRepository = getRepository("userRepository");
+    const { userRepository } = inject("databaseFactory") as DatabaseFactory;
 
     const {
         data: currentUser,
