@@ -11,9 +11,9 @@ function slugify(s: string) {
 }
 
 const _useEstablishmentsList = () => {
-    const user = useSupabaseUser();
     const { $databaseFactory } = useNuxtApp();
     const { userSettings } = useUserSettings();
+    const { currentUser } = useUser();
 
     const { establishmentRepository } = $databaseFactory as DatabaseFactory;
 
@@ -23,27 +23,31 @@ const _useEstablishmentsList = () => {
         null,
     );
 
-    const key = computed(() => `establishments:${user.value?.id ?? "anon"}`);
+    const key = computed(() =>
+        `establishments:${currentUser.value?.id ?? "anon"}`
+    );
 
     const {
         data: establishments,
         pending,
         refresh,
         error,
+        status,
     } = useAsyncData(
         key,
         async () => {
-            if (!user.value?.id) return [];
-            const establishments = await establishmentRepository
-                .getEstablishmentsFromMemberId(user.value.id);
-            ensureSelection(establishments);
-            return establishments;
+            console.log("Fetching establishments for user:", currentUser.value);
+            if (!currentUser.value?.id) return [];
+            const _establishments = await establishmentRepository
+                .getEstablishmentsFromMemberId(currentUser.value.id);
+            console.log("Fetched establishments:", _establishments);
+            ensureSelection(_establishments);
+            return _establishments;
         },
         {
-            server: false,
             immediate: true,
             default: () => [] as EstablishmentModel[],
-            watch: [() => user.value?.id],
+            watch: [() => currentUser.value?.id],
         },
     );
 
@@ -166,6 +170,7 @@ const _useEstablishmentsList = () => {
         // fetch states
         pending,
         error,
+        status,
 
         // actions
         refresh,

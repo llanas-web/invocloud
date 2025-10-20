@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import { useInvoicesTableList } from '~/composables/invoices/table-list'
+    import { useInvoicesTableList } from '~/composables/invoices/table-list'
 
-const { openModal } = useInvoiceUpload()
+    const { openModal } = useUploadWizard()
 
-definePageMeta({
-    layout: 'app'
-})
+    definePageMeta({
+        layout: 'app'
+    })
 
-const { selectedSuppliers } = useInvoicesTableList();
-const { suppliers } = useSuppliers();
+    const { selectedSuppliers } = useInvoicesTableList();
+    const { suppliers } = useSuppliers();
 
-const items = [[{
-    label: 'Envoyer une facture',
-    icon: 'i-lucide-send',
-    to: '/inbox'
-}, {
-    label: 'Ajouter une facture',
-    icon: 'i-lucide-file-plus',
-    to: '/customers'
-},
-{
-    label: 'Ajouter un fournisseur',
-    icon: 'i-lucide-user-plus',
-    to: '/suppliers'
-}]]
+    const items = [[{
+        label: 'Envoyer une facture',
+        icon: 'i-lucide-send',
+        to: '/inbox'
+    }, {
+        label: 'Ajouter une facture',
+        icon: 'i-lucide-file-plus',
+        to: '/customers'
+    },
+    {
+        label: 'Ajouter un fournisseur',
+        icon: 'i-lucide-user-plus',
+        to: '/suppliers'
+    }]]
 
-const onNewInvoice = () => {
-    navigateTo('/app/invoices/new')
-}
+    const onNewInvoice = () => {
+        navigateTo('/app/invoices/new')
+    }
 </script>
 
 <template>

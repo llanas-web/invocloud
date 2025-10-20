@@ -3,8 +3,9 @@
 import { BlobReader, BlobWriter, TextReader, ZipWriter } from "@zip.js/zip.js";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import * as mime from "mime-types";
-import createStorageRepository from "~~/shared/providers/database/supabase/repositories/storage.repository";
 import type { InvoiceModel } from "~~/shared/types/models/invoice.model";
+import StorageFactory from "~~/shared/providers/storage/storage.factory";
+import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 // if you ever need supabase-js in worker, you can import it here and initialize with the passed keys.
 
 type DownloadMsg = {
@@ -27,7 +28,7 @@ self.onmessage = async (e: MessageEvent<string>) => {
             detectSessionInUrl: false,
         },
     });
-    const storageRepository = createStorageRepository(supabaseClient);
+    const storageRepository = StorageFactory.getInstance(supabaseClient);
     const { data: { session }, error } = await supabaseClient.auth.setSession({
         access_token: data.access_token,
         refresh_token: data.refresh_token,
@@ -53,8 +54,8 @@ self.onmessage = async (e: MessageEvent<string>) => {
                 continue;
             }
             try {
-                const { data: blob, error } = await storageRepository
-                    .downloadInvoiceFile(invoice.filePath!);
+                const blob = await storageRepository
+                    .downloadFile(STORAGE_BUCKETS.INVOICES, invoice.filePath!);
                 if (error) throw error;
                 await zip.add(
                     `${invoice.invoiceNumber}.${

@@ -1,5 +1,5 @@
 import z from "zod";
-import { generateCode } from "~/utils/hash";
+import { generateCode, hashCode } from "~/utils/hash";
 import { buildRequestScope } from "~~/server/core/container";
 
 const schema = z.object({
@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
         .createUploadValidation(
             senderEmail,
             recipientEmail,
-            code,
+            hashCode(code),
             anonymousUser.id,
             establishements.map((establishement) => establishement.id),
         );

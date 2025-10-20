@@ -12,7 +12,6 @@
     const addModel = useTemplateRef<typeof LazyEstablishmentsAddModal>('addModal')
 
     const items = computed<DropdownMenuItem[][]>(() => {
-        console.log(userSettings.value);
         return [
             establishments.value.map(establishment => ({
                 id: establishment.id,

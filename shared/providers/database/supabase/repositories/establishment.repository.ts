@@ -91,6 +91,8 @@ export class EstablishmentSupabaseRepository
             .from("establishment_members")
             .select("establishments(*)")
             .or(`user_id.eq.${userId}`);
+        console.log(data);
+
         if (error) throw SupabaseError.fromPostgrest(error);
         if (!data?.length) {
             throw new DomainError(

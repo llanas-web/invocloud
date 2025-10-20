@@ -2,6 +2,7 @@
     import type { FormSubmitEvent, NavigationMenuItem } from '@nuxt/ui'
     import { LazyInvoicesUploadModalContainer, LazyCommonConfirmModal } from '#components'
     import { SubscriptionStatus } from '~~/shared/types/models/subscription.model'
+    import { CreateEstablishmentSchema } from '~/types/schemas/forms/establishments.schema'
 
     const route = useRoute()
     const router = useRouter()
@@ -12,7 +13,7 @@
     const toast = useToast()
     const open = ref(false)
 
-    const { selectedEstablishment, establishments, subscribeToStripe } = useEstablishmentsList()
+    const { selectedEstablishment, establishments, subscribeToStripe, status } = useEstablishmentsList()
     const user = useSupabaseUser()
 
     const isEstablishementActive = computed(() => {
@@ -152,8 +153,6 @@
         await subscribeToStripe()
     }
 
-    const isModalOpen = ref(true)
-
 </script>
 
 <template>
@@ -171,12 +170,6 @@
 
             <template #default="{ collapsed }">
                 <UNavigationMenu :collapsed="collapsed" :items="links[0]" orientation="vertical">
-                    <!-- <template #invoices-trailing>
-                        <UTooltip :text="`You have ${pendingInvoices.length ?? 0} pending invoices`" placement="right">
-                            <UBadge :label="`${pendingInvoices.length}`" size="sm"
-                            :color="pendingInvoices.length ? 'primary' : 'neutral'" />
-                        </UTooltip>
-                    </template> -->
                 </UNavigationMenu>
 
 
@@ -187,7 +180,9 @@
                 <UserMenu :collapsed="collapsed" />
             </template>
         </UDashboardSidebar>
-        <template v-if="!pending && establishments.length > 0">
+        <UProgress class="w-full" v-if="status === 'idle' || pending"
+            :ui="{ base: 'rounded-none', indicator: 'rounded-none' }" />
+        <template v-else-if="establishments.length > 0">
             <template v-if="isEstablishementActive">
                 <LazyInvoicesUploadModalContainer size="md" variant="ghost" />
                 <slot />
@@ -239,7 +234,7 @@
                 </UDashboardPanel>
             </template>
         </template>
-        <template v-else-if="loaded && !pending && establishments.length === 0">
+        <template v-else>
             <UDashboardPanel id="invoices">
                 <template #header>
                     <UDashboardNavbar title="Aucun établissement" :ui="{ title: 'text-muted' }" />
@@ -258,10 +253,10 @@
                                 </span>
                             </div>
                         </div>
-                        <UForm :schema="schema" :state="formState" class="w-full space-y-4"
+                        <UForm :schema="CreateEstablishmentSchema" :state="formState" class="w-full space-y-4"
                             @submit="createEstablishment">
                             <UFormField label="Nom de l'établissement" placeholder="Nom de l'établissement" name="name">
-                                <UInput v-model="formState" class="w-full" />
+                                <UInput v-model="formState.name" class="w-full" />
                             </UFormField>
                             <div class="flex justify-end gap-2">
                                 <UButton label="Annuler" color="neutral" variant="subtle" @click="open = false" />
@@ -272,6 +267,5 @@
                 </template>
             </UDashboardPanel>
         </template>
-        <UProgress class="w-full" v-else :ui="{ base: 'rounded-none', indicator: 'rounded-none' }" />
     </UDashboardGroup>
 </template>
