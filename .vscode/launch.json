@@ -5,14 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            // Run nuxt dev 'npm run dev' server debugger
+            "type": "node",
             "request": "launch",
-            "name": "Deno Nuxt Dev",
-            "runtimeExecutable": "node",
+            "name": "Nuxt Dev (Staging)",
+            "runtimeExecutable": "npm",
             "runtimeArgs": [
                 "run",
-                "dev"
+                "dev",
+                "--",
+                "--dotenv",
+                ".env.staging"
             ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
         }
     ]
 }

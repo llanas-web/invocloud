@@ -110,7 +110,7 @@ export interface UploadValidationRepository {
     createUploadValidation(
         senderEmail: string,
         recipientEmail: string,
-        token: string,
+        hashToken: string,
         uploaderId?: string,
         establishementsIds?: string[],
     ): EncapsulatedResult<string>;
@@ -122,7 +122,7 @@ export interface UploadValidationRepository {
     isTokenValid(
         uploadValidationId: string,
         uploaderId: string,
-        token: string,
+        hashToken: string,
     ): EncapsulatedResult<boolean>;
     updateUploadValidation(
         uploadValidationId: string,

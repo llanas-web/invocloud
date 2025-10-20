@@ -3,7 +3,9 @@ import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import useAsyncAction from "../core/useAsyncAction";
 import { createSharedComposable } from "@vueuse/core";
 
-export const CreateEstablishmentSchema = z.string().min(1, "Name is required");
+export const CreateEstablishmentSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+});
 
 export type CreateEstablishmentForm = z.input<typeof CreateEstablishmentSchema>;
 export type CreateEstablishmentCommand = z.output<
@@ -26,12 +28,8 @@ const _useEstablishmentCreate = () => {
 
     const formRef = ref();
 
-    const formState = ref<CreateEstablishmentForm>("");
-
-    const initialParsed = CreateEstablishmentSchema.parse(formState);
-    const isDirty = computed(() => {
-        const currentParsed = CreateEstablishmentSchema.parse(formState);
-        return JSON.stringify(currentParsed) !== JSON.stringify(initialParsed);
+    const formState = ref<CreateEstablishmentForm>({
+        name: "",
     });
 
     const { data: newEstablishment, error, pending, execute } = useAsyncAction(
@@ -41,9 +39,9 @@ const _useEstablishmentCreate = () => {
             );
             const newEstablishment = await establishmentRepository
                 .createEstablishment({
-                    name: parsedEstablishment,
+                    name: parsedEstablishment.name,
                     creatorId: supabaseUser.value!.id,
-                    emailPrefix: slugify(parsedEstablishment),
+                    emailPrefix: slugify(parsedEstablishment.name),
                 });
             establishments.value.push(newEstablishment);
             selectEstablishment(newEstablishment.id);
@@ -54,7 +52,6 @@ const _useEstablishmentCreate = () => {
     return {
         formRef,
         formState,
-        isDirty,
         newEstablishment,
         error,
         pending,

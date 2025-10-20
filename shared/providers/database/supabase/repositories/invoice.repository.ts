@@ -21,7 +21,7 @@ export class InvoiceSupabaseRepository implements InvoiceRepository {
             .select("*, supplier:suppliers(*)");
         if (filters?.ids) request.in("id", filters.ids);
         if (filters?.establishmentIds) {
-            request.in("establishment_id", filters.establishmentIds);
+            request.in("supplier.establishment_id", filters.establishmentIds);
         }
         const { data, error } = await request;
         if (error) throw SupabaseError.fromPostgrest(error);
