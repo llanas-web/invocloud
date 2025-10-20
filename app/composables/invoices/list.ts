@@ -35,9 +35,9 @@ const _useInvoices = () => {
     const sendInvoice = async (invoicesId: string[], email: string) => {
         if (!invoicesId || invoicesId.length === 0) {
             console.error("Invoice IDDs are required to send invoices.");
-            return null;
+            return;
         }
-        const { message, success } = await $fetch<
+        await $fetch<
             ReturnType<
                 typeof import("~~/server/api/security/invoice/send.post").default
             >
@@ -51,11 +51,6 @@ const _useInvoices = () => {
                 },
             },
         );
-        if (!success) {
-            console.error("Error sending invoices:", message);
-            return null;
-        }
-        return success;
     };
 
     const downloadInvoiceFile = async (filePath: string) => {

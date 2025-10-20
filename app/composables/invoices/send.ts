@@ -18,21 +18,10 @@ const _useInvoicesSend = () => {
 
     const onSubmit = async () => {
         loading.value = true;
-        const result = await sendInvoice(
+        await sendInvoice(
             selectedInvoices.value,
             formState.email,
         );
-        if (!result) {
-            console.error("Failed to send invoices");
-            toast.add({
-                title: "Erreur",
-                description:
-                    "Une erreur est survenue lors de l'envoi des factures.",
-                color: "error",
-            });
-            loading.value = false;
-            return;
-        }
         toast.add({
             title: "Factures envoyées",
             description: "Les factures ont été envoyées avec succès.",
