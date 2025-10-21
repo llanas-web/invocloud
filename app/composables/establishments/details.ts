@@ -1,11 +1,38 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { EstablishmentVM } from "~/ui/presenters/establishment.presenter";
+import {
+    type EstablishmentDetailsVM,
+    presentEstablishmentDetails,
+} from "~/ui/presenters/establishment.presenter";
 import useAsyncAction from "../core/useAsyncAction";
 import { AppError } from "~/core/errors/app.error";
 
 const _useEstablishmentDetails = () => {
     const { $usecases } = useNuxtApp();
-    const { selectedEstablishment, refresh } = useEstablishmentsList();
+    const { selectedEstablishment, refresh: refreshListEstablishments } =
+        useEstablishmentsList();
+
+    const {
+        data: raw,
+        error,
+        pending,
+    } = useAsyncData(
+        async () => {
+            if (!selectedEstablishment.value) return null;
+            return await $usecases.establishments.details.execute(
+                selectedEstablishment.value.id,
+            );
+        },
+        {
+            immediate: true,
+            default: () => null,
+            watch: [selectedEstablishment],
+        },
+    );
+
+    const establishment = computed<EstablishmentDetailsVM | null>(() => {
+        if (!raw.value) return null;
+        return presentEstablishmentDetails(raw.value);
+    });
 
     const id = computed(() => selectedEstablishment.value?.id ?? null);
     const isSelected = computed(() => !!id.value);
@@ -13,7 +40,7 @@ const _useEstablishmentDetails = () => {
     const deleteEstablishment = useAsyncAction(async () => {
         if (!id.value) throw new AppError("Aucun établissement sélectionné");
         await $usecases.establishments.delete.execute([id.value]);
-        await refresh();
+        await refreshListEstablishments();
     });
 
     // Stripe actions
@@ -60,9 +87,10 @@ const _useEstablishmentDetails = () => {
 
     return {
         id,
-        establishment: selectedEstablishment as Ref<EstablishmentVM | null>,
         isSelected,
-        refresh,
+        establishment,
+        pending,
+        error,
         actions: {
             deleteEstablishment,
         },

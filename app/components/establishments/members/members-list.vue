@@ -1,8 +1,8 @@
 <script setup lang="ts">
     import type { DropdownMenuItem } from '@nuxt/ui'
+    import { useMembersList } from '~/composables/establishments/members/list'
 
-    const toast = useToast()
-    const { members } = useMembers()
+    const { members } = useMembersList()
     const q = ref('')
 
     const items = [{
@@ -34,10 +34,10 @@
                 <div class="flex items-center gap-3 min-w-0">
                     <div class="text-sm min-w-0">
                         <p class="text-highlighted font-medium truncate">
-                            {{ member.user?.fullName }}
+                            {{ member.fullName }}
                         </p>
                         <p class="text-muted truncate">
-                            {{ member.user?.email }}
+                            {{ member.email }}
                         </p>
                     </div>
                 </div>

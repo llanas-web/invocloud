@@ -1,5 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
-import { invoicesApi } from "~/services/invoices.api";
+import { invoicesApi } from "~/services/api/invoices.api";
 
 const _useInvoicesSend = () => {
     const open = ref(false);

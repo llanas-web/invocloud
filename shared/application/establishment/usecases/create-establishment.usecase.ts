@@ -1,5 +1,5 @@
 import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
-import { CreateEstablishmentCommandSchema } from "../command";
+import { CreateEstablishmentCommandSchema } from "../commands";
 import { EstablishmentModel } from "~~/shared/domain/establishment/establishment.model";
 
 export class CreateEstablishmentUsecase {
@@ -19,6 +19,6 @@ export class CreateEstablishmentUsecase {
         const newEstablishment = await this.establishmentRepository.create(
             entity,
         );
-        return newEstablishment;
+        return newEstablishment.id;
     }
 }

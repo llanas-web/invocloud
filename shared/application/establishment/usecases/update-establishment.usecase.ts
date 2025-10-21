@@ -1,5 +1,5 @@
 import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
-import { UpdateEstablishmentCommandSchema } from "../command";
+import { UpdateEstablishmentCommandSchema } from "../commands";
 
 export class UpdateEstablishmentUsecase {
     constructor(
@@ -17,6 +17,6 @@ export class UpdateEstablishmentUsecase {
             phone: cmd.phone ?? undefined,
         });
         await this.establishmentRepository.update(next);
-        return next;
+        return next.id;
     }
 }

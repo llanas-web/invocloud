@@ -10,7 +10,7 @@ export function makeUseCases(
     const invoicesRepo = repositoryFactory.invoices();
     const invoiceListQuery = queryFactory.invoiceListQuery();
     const establishmentsRepo = repositoryFactory.establishments();
-    const establishmentListQuery = queryFactory.establishmentListQuery();
+    const establishmentQuery = queryFactory.establishmentQuery();
 
     return {
         invoices: {
@@ -29,13 +29,25 @@ export function makeUseCases(
                 establishmentsRepo,
             ),
             list: new establishmentUC.ListEstablishmentsUsecase(
-                establishmentListQuery,
+                establishmentQuery,
             ),
             update: new establishmentUC.UpdateEstablishmentUsecase(
                 establishmentsRepo,
             ),
             delete: new establishmentUC.DeleteEstablishmentUsecase(
                 establishmentsRepo,
+            ),
+            details: new establishmentUC.GetEstablishmentDetailsUsecase(
+                establishmentQuery,
+            ),
+            inviteMember: new establishmentUC.InviteMemberUseCase(
+                establishmentsRepo,
+                // establishmentQuery,
+                // emailPrefixAvailable,
+            ),
+            emailPrefixAvailable: new establishmentUC
+                .EmailPrefixAvailableUsecase(
+                establishmentQuery,
             ),
         },
     } as const;

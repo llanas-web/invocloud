@@ -3,7 +3,7 @@ import {
     type EstablishmentVM,
     presentEstablishments,
 } from "~/ui/presenters/establishment.presenter";
-import type { EstablishmentListItemDTO } from "~~/shared/application/establishment/queries/establishment-list.query";
+import type { EstablishmentListItemDTO } from "~~/shared/application/establishment/dto";
 
 const _useEstablishmentsList = () => {
     const { $usecases } = useNuxtApp();

@@ -1,13 +1,14 @@
 <script setup lang="ts">
     import * as z from 'zod'
     import type { FormSubmitEvent } from '@nuxt/ui'
+    import { useMembersList } from '~/composables/establishments/members/list'
 
     const toast = useToast()
-    const { inviteMember: { execute, data, error, pending } } = useMembers()
+    const { actions: { inviteMember } } = useMembersList()
 
 
     const invitationSchema = z.object({
-        email: z.string().email('Invalid email address').min(1, 'Email is required'),
+        email: z.email('Invalid email address').min(1, 'Email is required'),
     })
 
     const invitationState = reactive({
@@ -16,18 +17,18 @@
 
     const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof invitationSchema>>) => {
         const { email } = payload.data
-        const data = await execute(email)
-        if (data) {
-            toast.add({
-                title: 'Member invited successfully',
-                color: 'success',
-            })
-        } else {
+        await inviteMember.execute(email)
+        if (inviteMember.error.value) {
             toast.add({
                 title: 'Failed to invite member',
                 color: 'error',
             })
+            return;
         }
+        toast.add({
+            title: 'Member invited successfully',
+            color: 'success',
+        })
     }
 </script>
 
