@@ -2,11 +2,7 @@ import z from "zod";
 import { hashCode } from "~/utils/hash";
 import { buildRequestScope } from "~~/server/core/container";
 import { HTTPStatus } from "~~/server/core/errors/status";
-
-const schema = z.object({
-    uploadValidationId: z.string().uuid(),
-    token: z.string().min(6).max(6),
-});
+import { ValidateUploadInvoiceRequestSchema } from "~~/shared/contracts/api/security/upload/validate.contract";
 
 export default defineEventHandler(async (event) => {
     const {
@@ -20,7 +16,7 @@ export default defineEventHandler(async (event) => {
 
     const { uploadValidationId, token } = await parseBody(
         event,
-        schema,
+        ValidateUploadInvoiceRequestSchema,
     );
 
     if (!auth.currentUser) {

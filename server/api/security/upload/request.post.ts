@@ -1,20 +1,14 @@
 import { z } from "zod";
 import { buildRequestScope } from "~~/server/core/container";
 import { HTTPStatus } from "~~/server/core/errors/status";
-
-const schema = z.object({
-    senderEmail: z.email(),
-    recipientEmail: z.email(),
-    comment: z.string().optional(),
-    name: z.string().min(1, "File name is required"),
-});
+import { RequestUploadInvoiceRequestSchema } from "~~/shared/contracts/api/security/upload/request.contract";
 
 export default defineEventHandler(async (event) => {
     const { deps: { database: { establishmentRepository } } } =
         await buildRequestScope(event);
     const { senderEmail, recipientEmail } = await parseBody(
         event,
-        schema,
+        RequestUploadInvoiceRequestSchema,
     );
 
     const establishments = await establishmentRepository

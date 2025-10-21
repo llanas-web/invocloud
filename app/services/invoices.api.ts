@@ -1,19 +1,112 @@
 import { AppError } from "~/core/errors/app.error";
-import type {
-    SendInvoicesBody,
-    SendInvoicesResponse,
-} from "~~/shared/contracts/api/invoices/send.contract";
+import {
+    type RequestUploadInvoiceBody,
+    RequestUploadInvoiceRequestSchema,
+    type RequestUploadInvoiceResponse,
+} from "~~/shared/contracts/api/security/upload/request.contract";
+import {
+    type SendInvoicesBody,
+    SendInvoicesBodySchema,
+    type SendInvoicesResponse,
+} from "~~/shared/contracts/api/security/invoices/send.contract";
+import {
+    type ValidateUploadInvoiceBody,
+    ValidateUploadInvoiceRequestSchema,
+    type ValidateUploadInvoiceResponse,
+} from "~~/shared/contracts/api/security/upload/validate.contract";
+import {
+    type SendUploadInvoiceBody,
+    SendUploadInvoiceRequestSchema,
+    type SendUploadInvoiceResponse,
+} from "~~/shared/contracts/api/security/upload/send.contract";
+import { z } from "zod";
+
+const parseBody = (schema: z.ZodObject, body: any) => {
+    const { success, data, error } = schema.safeParse(body);
+    if (!success) {
+        throw new AppError("Invalid request body", {
+            details: error,
+        });
+    }
+    return data;
+};
 
 export const invoicesApi = {
     send(body: SendInvoicesBody) {
-        if (!body.invoices || body.invoices.length === 0) {
-            throw new AppError(
-                "At least one invoice ID is required to send invoices.",
-            );
-        }
-        return $fetch<SendInvoicesResponse>("/api/invoices/send", {
+        return $fetch<SendInvoicesResponse>("/api/security/invoice/send", {
             method: "POST",
-            body,
+            body: parseBody(SendInvoicesBodySchema, body),
+        });
+    },
+    requestUploadAnonymous(body: RequestUploadInvoiceBody) {
+        return $fetch<RequestUploadInvoiceResponse>(
+            "/api/anonyme/invoices/request",
+            {
+                method: "POST",
+                body: parseBody(RequestUploadInvoiceRequestSchema, body),
+            },
+        );
+    },
+    requestUpload(body: RequestUploadInvoiceBody) {
+        return $fetch<RequestUploadInvoiceResponse>(
+            "/api/upload/request",
+            {
+                method: "POST",
+                body: parseBody(RequestUploadInvoiceRequestSchema, body),
+            },
+        );
+    },
+    validateUpload(body: ValidateUploadInvoiceBody) {
+        return $fetch<ValidateUploadInvoiceResponse>(
+            "/api/anonyme/upload/validate",
+            {
+                method: "POST",
+                body: parseBody(
+                    ValidateUploadInvoiceRequestSchema,
+                    body,
+                ),
+            },
+        );
+    },
+    sendUploadAnonymous(body: SendUploadInvoiceBody) {
+        return $fetch<SendUploadInvoiceResponse>(
+            "/api/anonyme/upload/send",
+            {
+                method: "POST",
+                body: parseBody(SendUploadInvoiceRequestSchema, body),
+            },
+        );
+    },
+    sendUpload(body: SendUploadInvoiceBody) {
+        return $fetch<SendUploadInvoiceResponse>(
+            "/api/security/upload/send",
+            {
+                method: "POST",
+                body: parseBody(SendUploadInvoiceRequestSchema, body),
+            },
+        );
+    },
+    uploadFile(uploadUrl: string, file: File) {
+        const { success: urlSuccess, error: urlError, data: urlData } = z.url()
+            .safeParse(uploadUrl);
+        const { success: fileSuccess, error: fileError, data: fileData } = z
+            .instanceof(File).safeParse(file);
+
+        if (!urlSuccess || !fileSuccess) {
+            throw new AppError("Invalid upload parameters", {
+                details: {
+                    url: urlError,
+                    file: fileError,
+                },
+            });
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("path", uploadUrl);
+        return fetch(urlData, {
+            method: "PUT",
+            body: fileData,
         });
     },
 };

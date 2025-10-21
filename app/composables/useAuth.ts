@@ -2,6 +2,7 @@ import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "~/composables/core/useAsyncAction";
 import SupabaseAuthRepository from "~~/shared/providers/auth/supabase/auth.repository";
 import {
+    AnonymousAuthUserModel,
     AuthEvent,
     AuthUserModel,
 } from "~~/shared/types/models/auth-user.model";
@@ -13,7 +14,9 @@ const _useAuth = () => {
     const config = useRuntimeConfig();
     const redirectTo = `${config.public.baseUrl}/auth/callback`;
 
-    const connectedUser = ref<AuthUserModel | null>(null);
+    const connectedUser = ref<AuthUserModel | AnonymousAuthUserModel | null>(
+        null,
+    );
 
     const handleAuthEvent = (event: AuthEvent, user: AuthUserModel | null) => {
         switch (event) {
