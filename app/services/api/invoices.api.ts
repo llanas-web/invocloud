@@ -21,16 +21,6 @@ import {
 } from "~~/shared/contracts/api/security/upload/send.contract";
 import { z } from "zod";
 
-const parseBody = (schema: z.ZodObject, body: any) => {
-    const { success, data, error } = schema.safeParse(body);
-    if (!success) {
-        throw new AppError("Invalid request body", {
-            details: error,
-        });
-    }
-    return data;
-};
-
 export const invoicesApi = {
     send(body: SendInvoicesBody) {
         return $fetch<SendInvoicesResponse>("/api/security/invoice/send", {

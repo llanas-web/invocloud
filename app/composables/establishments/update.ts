@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { createSharedComposable } from "@vueuse/core";
-import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import useAsyncAction from "../core/useAsyncAction";
 
 export const UpdateEstablishmentSchema = z.object({
@@ -16,9 +15,9 @@ export type UpdateEstablishmentCommand = z.output<
 >;
 
 const _useEstablishmentUpdate = () => {
-    const { $databaseFactory } = useNuxtApp();
-    const { establishmentRepository } = $databaseFactory as DatabaseFactory;
-    const { selectedEstablishment, refresh } = useEstablishmentsList();
+    const { $usecases } = useNuxtApp();
+    const { refresh } = useEstablishmentsList();
+    const { establishment } = useEstablishmentDetails();
 
     const formRef = ref();
 
@@ -30,7 +29,7 @@ const _useEstablishmentUpdate = () => {
     });
 
     watch(
-        () => selectedEstablishment.value,
+        () => establishment.value,
         (newEstablishment) => {
             if (newEstablishment) {
                 formState.name = newEstablishment.name;
@@ -44,34 +43,29 @@ const _useEstablishmentUpdate = () => {
     const { error, pending, execute } = useAsyncAction(
         async () => {
             const parsedForm = UpdateEstablishmentSchema.parse(formState);
-            if (!selectedEstablishment.value) {
-                throw new Error("No establishment selected");
-            }
-            const updated = await establishmentRepository
-                .updateEstablishment(
-                    selectedEstablishment.value!.id,
-                    parsedForm,
-                );
-            Object.assign(selectedEstablishment.value, updated);
+            await $usecases.establishments.update
+                .execute({
+                    id: establishment.value?.id,
+                    ...parsedForm,
+                });
             await refresh();
         },
     );
 
     const checkEmailPrefixAvailable = useAsyncAction(
         async (emailPrefix: string) => {
-            const isAvailable = await establishmentRepository
-                .isEmailPrefixAvailable(
+            return await $usecases.establishments
+                .emailPrefixAvailable
+                .execute({
                     emailPrefix,
-                    selectedEstablishment.value?.id,
-                );
-            return isAvailable;
+                    excludeId: establishment.value?.id,
+                });
         },
     );
 
     return {
         formRef,
         formState,
-        isDirty,
         error,
         pending,
         onSubmit: execute,

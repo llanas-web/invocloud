@@ -2,8 +2,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import type { InvoiceListQuery } from "~~/shared/application/invoice/queries/invoice-list.query";
 import { InvoiceSupabaseQuery } from "~~/shared/infra/invoice/supabase/invoice.supabase.query";
-import type { EstablishmentListQuery } from "~~/shared/application/establishment/queries/establishment-list.query";
-import { EstablishmentSupabaseQuery } from "../../establishment/establishment.supabase.query";
+import { EstablishmentSupabaseQuery } from "../../establishment/supabase/establishment.supabase.query";
+import type { EstablishmentQuery } from "~~/shared/application/establishment/establishment.query";
 
 export class SupabaseQueryFactory {
     constructor(private readonly supabase: SupabaseClient<Database>) {}
@@ -12,7 +12,7 @@ export class SupabaseQueryFactory {
         return new InvoiceSupabaseQuery(this.supabase);
     }
 
-    establishmentListQuery(): EstablishmentListQuery {
+    establishmentQuery(): EstablishmentQuery {
         return new EstablishmentSupabaseQuery(this.supabase);
     }
 }

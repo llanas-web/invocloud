@@ -1,5 +1,4 @@
 import { z } from "zod";
-import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import useAsyncAction from "../core/useAsyncAction";
 import { createSharedComposable } from "@vueuse/core";
 
@@ -21,8 +20,7 @@ function slugify(s: string) {
 
 const _useEstablishmentCreate = () => {
     const supabaseUser = useSupabaseUser();
-    const { $databaseFactory } = useNuxtApp();
-    const { establishmentRepository } = $databaseFactory as DatabaseFactory;
+    const { $usecases } = useNuxtApp();
     const { establishments, refresh, selectEstablishment } =
         useEstablishmentsList();
 
@@ -37,15 +35,14 @@ const _useEstablishmentCreate = () => {
             const parsedEstablishment = CreateEstablishmentSchema.parse(
                 formState,
             );
-            const newEstablishment = await establishmentRepository
-                .createEstablishment({
+            const newEstablishmentId = await $usecases.establishments.create
+                .execute({
                     name: parsedEstablishment.name,
                     creatorId: supabaseUser.value!.id,
                     emailPrefix: slugify(parsedEstablishment.name),
                 });
-            establishments.value.push(newEstablishment);
-            selectEstablishment(newEstablishment.id);
             await refresh();
+            selectEstablishment(newEstablishmentId);
         },
     );
 

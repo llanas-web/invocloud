@@ -2,7 +2,6 @@ import type { AuthInterface } from "../auth/auth.interface";
 import SupabaseAuthRepository from "../auth/supabase/auth.repository";
 import type {
     AdminRepository,
-    EstablishmentRepository,
     InvoiceTaskRepository,
     SubscriptionRepository,
     SupplierRepository,

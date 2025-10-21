@@ -7,7 +7,6 @@ export const CreateEstablishmentCommandSchema = z.object({
     address: z.string().min(1).max(500).optional(),
     phone: z.string().min(1).max(20).optional(),
 });
-
 export type CreateEstablishmentCommand = z.infer<
     typeof CreateEstablishmentCommandSchema
 >;
@@ -19,7 +18,6 @@ export const UpdateEstablishmentCommandSchema = z.object({
     address: z.string().min(1).max(500).optional(),
     phone: z.string().min(1).max(20).optional(),
 });
-
 export type UpdateEstablishmentCommand = z.infer<
     typeof UpdateEstablishmentCommandSchema
 >;
@@ -27,7 +25,15 @@ export type UpdateEstablishmentCommand = z.infer<
 export const DeleteEstablishmentsCommandSchema = z
     .array(z.uuid())
     .nonempty();
-
 export type DeleteEstablishmentsCommand = z.infer<
     typeof DeleteEstablishmentsCommandSchema
+>;
+
+export const InviteMemberCommandSchema = z.object({
+    establishmentId: z.uuid(),
+    email: z.email().max(255),
+    role: z.enum(["admin", "member"]),
+});
+export type InviteMemberCommand = z.infer<
+    typeof InviteMemberCommandSchema
 >;

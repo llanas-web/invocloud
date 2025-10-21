@@ -1,5 +1,9 @@
-import type { EstablishmentListItemDTO } from "~~/shared/application/establishment/queries/establishment-list.query";
+import type {
+    EstablishmentDetailsDTO,
+    EstablishmentListItemDTO,
+} from "~~/shared/application/establishment/dto";
 import { fmtDate } from "./format";
+import { type MemberVM, presentMember } from "./member.presenter";
 
 export type EstablishmentVM = {
     id: string;
@@ -8,8 +12,6 @@ export type EstablishmentVM = {
     emailPrefix: string;
     createdAtLabel: string;
     updatedAtLabel: string;
-    address: string | null;
-    phone: string | null;
 };
 
 export function presentEstablishment(
@@ -24,8 +26,6 @@ export function presentEstablishment(
         emailPrefix: e.emailPrefix,
         createdAtLabel: fmtDate(e.createdAt, locale),
         updatedAtLabel: fmtDate(e.updatedAt, locale),
-        address: e.address,
-        phone: e.phone,
     };
 }
 
@@ -34,4 +34,23 @@ export function presentEstablishments(
     opts?: { locale?: string },
 ): EstablishmentVM[] {
     return establishments.map((e) => presentEstablishment(e, opts));
+}
+
+export type EstablishmentDetailsVM = EstablishmentVM & {
+    address: string | null;
+    phone: string | null;
+    members: Array<MemberVM>;
+};
+
+export function presentEstablishmentDetails(
+    e: EstablishmentDetailsDTO,
+    opts?: { locale?: string },
+): EstablishmentDetailsVM {
+    const locale = opts?.locale ?? "fr-FR";
+    return {
+        ...presentEstablishment(e, { locale }),
+        address: e.address,
+        phone: e.phone,
+        members: e.members.map((m) => presentMember(m, { locale })),
+    };
 }

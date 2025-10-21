@@ -1,6 +1,6 @@
 import { createSharedComposable } from "@vueuse/core";
 import { FetchError } from "ofetch";
-import { invoicesApi } from "~/services/invoices.api";
+import { invoicesApi } from "~/services/api/invoices.api";
 import type { EstablishmentModel } from "~~/shared/types/models/establishment.model";
 
 const _useUploadWizard = () => {

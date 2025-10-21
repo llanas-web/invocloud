@@ -1,13 +1,10 @@
-import type {
-    EstablishmentListFilter,
-    EstablishmentListItemDTO,
-    EstablishmentListQuery,
-} from "../queries/establishment-list.query";
-import { EstablishementListQuerySchema } from "../query";
+import type { EstablishmentListItemDTO } from "../dto";
+import type { EstablishmentQuery } from "../establishment.query";
+import { ListEstablishmentQueryFilterSchema } from "../queries";
 
 export class ListEstablishmentsUsecase {
     constructor(
-        private readonly establishmentListQuery: EstablishmentListQuery,
+        private readonly establishmentQuery: EstablishmentQuery,
     ) {}
 
     async execute(
@@ -15,7 +12,7 @@ export class ListEstablishmentsUsecase {
     ): Promise<EstablishmentListItemDTO[]> {
         const _filters = filters === undefined
             ? undefined
-            : EstablishementListQuerySchema.parse(filters);
-        return this.establishmentListQuery.execute(_filters);
+            : ListEstablishmentQueryFilterSchema.parse(filters);
+        return this.establishmentQuery.listEstablishments(_filters);
     }
 }

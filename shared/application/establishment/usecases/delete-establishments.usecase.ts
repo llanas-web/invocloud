@@ -1,5 +1,5 @@
 import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
-import { DeleteEstablishmentsCommandSchema } from "../command";
+import { DeleteEstablishmentsCommandSchema } from "../commands";
 
 export class DeleteEstablishmentUsecase {
     constructor(

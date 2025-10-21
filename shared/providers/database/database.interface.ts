@@ -1,10 +1,3 @@
-import type {
-    EstablishmentModel,
-    EstablishmentModelInsert,
-    EstablishmentModelUpdate,
-    EstablishmentShortModel,
-} from "~~/shared/types/models/establishment.model";
-import type { MemberModel } from "~~/shared/types/models/member.model";
 import type SupplierModel from "~~/shared/types/models/supplier.model";
 import type UserSettingsModel from "~~/shared/types/models/user-settings.model";
 import type {
@@ -28,49 +21,6 @@ import type {
 import type { SubscriptionModel } from "~~/shared/types/models/subscription.model";
 
 type EncapsulatedResult<T> = Promise<T>;
-
-export interface EstablishmentRepository {
-    getAllEstablishments(
-        filters: {
-            ids?: string[];
-            prefixEmails?: string[];
-        },
-    ): EncapsulatedResult<EstablishmentModel[]>;
-    getEstablishmentsShortFromUploadId(
-        uploadId: string,
-        userId: string,
-    ): EncapsulatedResult<EstablishmentShortModel[]>;
-    getEstablishmentsFromMemberId(
-        userId: string,
-    ): EncapsulatedResult<EstablishmentModel[]>;
-    isEmailPrefixAvailable(
-        emailPrefix: string,
-        excludeEstablishmentId?: string,
-    ): EncapsulatedResult<boolean>;
-    createEstablishment(
-        establishment: EstablishmentModelInsert,
-    ): EncapsulatedResult<EstablishmentModel>;
-    updateEstablishment(
-        id: string,
-        establishment: EstablishmentModelUpdate,
-    ): EncapsulatedResult<EstablishmentModel>;
-    getEstablishmentsShortFromEmails(
-        emailSender: string,
-        recipientEmail: string,
-    ): EncapsulatedResult<EstablishmentShortModel[]>;
-    deleteEstablishment(id: string): Promise<void>;
-    getEstablishmentMembers(
-        establishmentId: string,
-    ): EncapsulatedResult<MemberModel[]>;
-    addEstablishmentMember(
-        establishmentId: string,
-        userId: string,
-    ): EncapsulatedResult<MemberModel>;
-    removeEstablishmentMember(
-        establishmentId: string,
-        userId: string,
-    ): Promise<void>;
-}
 
 export interface SupplierRepository {
     getAllSuppliers(
@@ -168,7 +118,6 @@ export interface SubscriptionRepository {
 }
 
 export interface DatabaseInterface {
-    establishmentRepository: EstablishmentRepository;
     supplierRepository: SupplierRepository;
     uploadValidationRepository: UploadValidationRepository;
     userRepository: UserRepository;
