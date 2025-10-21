@@ -10,8 +10,7 @@ const stateSchema = z.array(z.string()).min(
 type inputSchema = z.input<typeof stateSchema>;
 
 const _useInvoicesDelete = () => {
-    const { $databaseFactory } = useNuxtApp();
-    const { invoiceRepository } = $databaseFactory as DatabaseFactory;
+    const { $usecases } = useNuxtApp();
     const open = ref(false);
     const selectedInvoices = ref<inputSchema>([]);
 
@@ -22,7 +21,7 @@ const _useInvoicesDelete = () => {
     const { error, pending, execute } = useAsyncAction(
         async () => {
             const parsed = stateSchema.parse(selectedInvoices.value);
-            await invoiceRepository.deleteInvoices(parsed);
+            await $usecases.invoices.delete.execute(parsed);
             resetForm();
         },
     );

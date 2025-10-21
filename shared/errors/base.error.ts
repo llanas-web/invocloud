@@ -1,5 +1,10 @@
 // ~/shared/errors/BaseError.ts
-export type ErrorKind = "domain" | "infra" | "auth" | "validation" | "app";
+export type ErrorKind =
+    | "infra"
+    | "domain"
+    | "application"
+    | "auth"
+    | "ui";
 
 export abstract class BaseError extends Error {
     constructor(

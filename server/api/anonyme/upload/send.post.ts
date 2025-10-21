@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { buildRequestScope } from "~~/server/core/container";
+import { useServerUsecases } from "~~/server/plugins/usecases.server";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 
 const schema = z.object({
@@ -13,9 +14,10 @@ export default defineEventHandler(async (event) => {
     const {
         deps: {
             storage,
-            database: { uploadValidationRepository, invoiceRepository },
+            database: { uploadValidationRepository },
         },
     } = await buildRequestScope(event);
+    const { usecases } = { usecases: useServerUsecases(event) };
 
     const { uploadValidationId, selectedEstablishmentId, comment, fileName } =
         await parseBody(
@@ -25,12 +27,12 @@ export default defineEventHandler(async (event) => {
 
     const filePath = `${selectedEstablishmentId}/${uploadValidationId}`;
 
-    await invoiceRepository.createInvoice({
-        id: uploadValidationId,
-        file_path: filePath,
-        supplier_id: selectedEstablishmentId,
+    await usecases.invoices.create.execute({
+        filePath,
+        supplierId: selectedEstablishmentId,
         comment,
         name: fileName,
+        source: "upload",
     });
 
     await uploadValidationRepository.updateUploadValidation(

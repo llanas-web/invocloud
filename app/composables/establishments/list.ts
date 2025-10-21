@@ -45,6 +45,7 @@ const _useEstablishmentsList = () => {
             return _establishments;
         },
         {
+            server: false,
             immediate: true,
             default: () => [] as EstablishmentModel[],
             watch: [() => currentUser.value?.id],

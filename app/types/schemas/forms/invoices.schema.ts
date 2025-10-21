@@ -1,9 +1,9 @@
 import { z } from "zod";
+import { amountField } from "./fields";
 import {
     InvoiceSource,
     InvoiceStatus,
-} from "~~/shared/types/models/invoice.model";
-import { amountField } from "./fields";
+} from "~~/shared/domain/invoice/invoice.model";
 
 export const CreateInvoiceSchema = z.object({
     supplierId: z.uuid("Fournisseur invalide"),
@@ -27,11 +27,11 @@ export const CreateInvoiceSchema = z.object({
 });
 
 export type CreateInvoiceForm = z.input<typeof CreateInvoiceSchema>;
-export type CreateInvoiceCommand = z.output<typeof CreateInvoiceSchema>;
 
 export const UpdateInvoiceSchema = z.object({
+    id: z.uuid("Identifiant de facture invalide"),
     invoiceNumber: z.string().default(""),
-    createdAt: z.date().default(new Date()),
+    emitDate: z.date().default(new Date()),
     dueDate: z.date().default(new Date()),
     amount: amountField,
     name: z.string().nullable().optional(),
@@ -48,4 +48,3 @@ export const UpdateInvoiceSchema = z.object({
 });
 
 export type UpdateInvoiceForm = z.input<typeof UpdateInvoiceSchema>;
-export type UpdateInvoiceCommand = z.output<typeof UpdateInvoiceSchema>;

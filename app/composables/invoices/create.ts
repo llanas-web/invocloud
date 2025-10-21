@@ -1,33 +1,33 @@
 import { createSharedComposable } from "@vueuse/core";
 import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import useAsyncAction from "../core/useAsyncAction";
-import {
-    type CreateInvoiceForm,
-    CreateInvoiceSchema,
-} from "~/types/schemas/forms/invoices.schema";
-import { InvoiceStatus } from "~~/shared/types/models/invoice.model";
 import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 import type { InvoiceInsert } from "~~/shared/types/providers/database";
+import {
+    type CreateInvoiceCommand,
+    CreateInvoiceSchema,
+} from "~~/shared/application/invoice/command";
 
 const _useInvoiceCreate = () => {
-    const { $databaseFactory, $storageFactory } = useNuxtApp();
+    const { $databaseFactory, $storageFactory, $usecases } = useNuxtApp();
     const { invoiceRepository } = $databaseFactory as DatabaseFactory;
     const storageRepository = $storageFactory as StorageProvider;
     const { selectedEstablishment } = useEstablishmentsList();
 
     const formRef = ref();
 
-    const formState = reactive<CreateInvoiceForm>({
+    const formState = reactive<CreateInvoiceCommand>({
         filePath: "",
         supplierId: "",
         amount: 0,
         comment: "",
         name: null,
-        dueDate: new Date(),
+        dueDate: null,
         invoiceNumber: "",
         paidAt: null,
-        status: InvoiceStatus.VALIDATED,
+        status: "pending",
+        source: "app",
     });
 
     const invoiceFile = ref<File | null>(null);
@@ -52,8 +52,8 @@ const _useInvoiceCreate = () => {
                 invoiceFile.value,
                 { contentType: invoiceFile.value.type, upsert: true },
             );
-            const newInvoice = await invoiceRepository.createInvoice(
-                parsedInvoice as unknown as InvoiceInsert,
+            const newInvoice = await $usecases.invoices.create.execute(
+                parsedInvoice,
             );
             navigateTo("/app");
         },

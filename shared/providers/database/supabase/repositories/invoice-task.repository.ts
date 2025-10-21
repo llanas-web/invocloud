@@ -1,7 +1,4 @@
-import {
-    InvoiceTaskModel,
-    InvoiceTaskStatus,
-} from "~~/shared/types/models/invoice-task.model";
+import { InvoiceTaskStatus } from "~~/shared/types/models/invoice-task.model";
 import type { InvoiceTaskRepository } from "../../database.interface";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
