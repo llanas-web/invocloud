@@ -1,13 +1,8 @@
-import { z } from "zod";
 import { buildRequestScope } from "~~/server/core/container";
 import { useServerUsecases } from "~~/server/plugins/usecases.server";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 import { AuthUserModel } from "~~/shared/types/models/auth-user.model";
-
-const schema = z.object({
-    invoiceIds: z.array(z.uuid()),
-    email: z.email(),
-});
+import { SendInvoicesBodySchema } from "~~/shared/contracts/api/security/invoices/send.contract";
 
 export default defineEventHandler(async (event) => {
     const {
@@ -20,7 +15,10 @@ export default defineEventHandler(async (event) => {
     } = await buildRequestScope(event);
     const { usecases } = { usecases: useServerUsecases(event) };
 
-    const { invoiceIds, email } = await parseBody(event, schema);
+    const { invoices: invoiceIds, email } = await parseBody(
+        event,
+        SendInvoicesBodySchema,
+    );
 
     if (!userId || userId === "anonymous") {
         throw createError({

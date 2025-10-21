@@ -1,14 +1,8 @@
 import { z } from "zod";
 import { buildRequestScope } from "~~/server/core/container";
 import { useServerUsecases } from "~~/server/plugins/usecases.server";
+import { SendUploadInvoiceRequestSchema } from "~~/shared/contracts/api/security/upload/send.contract";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
-
-const schema = z.object({
-    uploadValidationId: z.uuid(),
-    selectedEstablishmentId: z.uuid(),
-    comment: z.string().optional(),
-    fileName: z.string().optional(),
-});
 
 export default defineEventHandler(async (event) => {
     const {
@@ -22,7 +16,7 @@ export default defineEventHandler(async (event) => {
     const { uploadValidationId, selectedEstablishmentId, comment, fileName } =
         await parseBody(
             event,
-            schema,
+            SendUploadInvoiceRequestSchema,
         );
 
     const filePath = `${selectedEstablishmentId}/${uploadValidationId}`;
