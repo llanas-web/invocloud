@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { buildRequestScope } from "~~/server/core/container";
 import { HTTPStatus } from "~~/server/core/errors/status";
+import { useServerUsecases } from "~~/server/plugins/usecases.server";
 import {
     DomainError,
     DomainErrorCode,
@@ -23,6 +24,7 @@ export default defineEventHandler(async (event) => {
         } = await buildRequestScope(
             event,
         );
+        const usecases = useServerUsecases(event);
 
         const { email, establishmentId, invitorId } = await parseBody(
             event,
@@ -30,10 +32,9 @@ export default defineEventHandler(async (event) => {
         );
 
         // Get establishment to check existence
-        const establishments = await establishmentRepository
-            .getAllEstablishments({
-                ids: [establishmentId],
-            });
+        const establishments = await usecases.establishments.list.execute({
+            ids: [establishmentId],
+        });
         if (establishments.length === 0) {
             throw createError({ status: HTTPStatus.BAD_REQUEST });
         }

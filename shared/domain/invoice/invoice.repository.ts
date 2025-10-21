@@ -7,5 +7,5 @@ export interface InvoiceRepository {
     getById(id: string): Promise<InvoiceModel | null>;
     create(entity: DraftInvoice): Promise<InvoiceModel>;
     update(entity: InvoiceModel): Promise<InvoiceModel>;
-    deleteInvoices(invoiceIds: string[]): Promise<void>;
+    deleteMany(invoiceIds: string[]): Promise<void>;
 }

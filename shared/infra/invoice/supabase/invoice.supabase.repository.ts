@@ -1,22 +1,17 @@
-import {
-    type DraftInvoice,
-    InvoiceModel,
-} from "~~/shared/domain/invoice/invoice.model";
 import type {
     InvoiceRepository,
 } from "~~/shared/domain/invoice/invoice.repository";
 import { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import { SupabaseError } from "../../common/errors/supabase.error";
+import {
+    type DraftInvoice,
+    InvoiceModel,
+} from "~~/shared/domain/invoice/invoice.model";
 
-type Row = Database["public"]["Tables"]["invoices"]["Row"] & {
-    suppliers: {
-        name: string;
-    };
-};
-type Upsert =
-    | Database["public"]["Tables"]["invoices"]["Insert"]
-    | Database["public"]["Tables"]["invoices"]["Update"];
+type Row = Database["public"]["Tables"]["invoices"]["Row"];
+type Insert = Database["public"]["Tables"]["invoices"]["Insert"];
+type Update = Database["public"]["Tables"]["invoices"]["Update"];
 
 const fromRow = (row: Row): InvoiceModel =>
     InvoiceModel.create({
@@ -35,20 +30,34 @@ const fromRow = (row: Row): InvoiceModel =>
         supplierId: row.supplier_id,
     });
 
-const toUpsert = (entity: DraftInvoice): Upsert => ({
+const toInsert = (entity: DraftInvoice): Insert => ({
     supplier_id: entity.supplierId,
     file_path: entity.filePath,
-    amount: entity.amount ?? undefined,
-    invoice_number: entity.number,
     source: entity.source,
     status: entity.status,
+    invoice_number: entity.number,
+    amount: entity.amount ?? undefined,
+    paid_at: entity.paidAt?.toISOString() ?? null,
+    due_date: entity.dueDate?.toISOString() ?? null,
+    comment: entity.comment,
+});
+
+const toUpsert = (
+    entity: InvoiceModel,
+): Update => ({
+    supplier_id: entity.supplierId,
+    file_path: entity.filePath,
+    source: entity.source,
+    status: entity.status,
+    invoice_number: entity.number,
+    amount: entity.amount ?? undefined,
     paid_at: entity.paidAt?.toISOString() ?? null,
     due_date: entity.dueDate?.toISOString() ?? null,
     comment: entity.comment,
 });
 
 export class InvoiceSupabaseRepository implements InvoiceRepository {
-    constructor(private supabaseClient: SupabaseClient) {}
+    constructor(private supabaseClient: SupabaseClient<Database>) {}
 
     async getById(id: string): Promise<InvoiceModel | null> {
         const { data, error } = await this.supabaseClient
@@ -61,9 +70,12 @@ export class InvoiceSupabaseRepository implements InvoiceRepository {
     }
 
     async create(invoice: DraftInvoice): Promise<InvoiceModel> {
-        const payload = toUpsert(invoice);
-        const { data, error } = await this.supabaseClient.from("invoices")
-            .insert(payload).single();
+        const payload = toInsert(invoice);
+        const { data, error } = await this.supabaseClient
+            .from("invoices")
+            .insert(payload)
+            .select("*")
+            .single();
         if (error) throw SupabaseError.fromPostgrest(error);
         return fromRow(data);
     }
@@ -72,20 +84,13 @@ export class InvoiceSupabaseRepository implements InvoiceRepository {
         const { data, error } = await this.supabaseClient.from("invoices")
             .update(payload)
             .eq("id", entity.id)
+            .select("*")
             .single();
         if (error) throw SupabaseError.fromPostgrest(error);
         return fromRow(data);
     }
 
-    async save(entity: DraftInvoice): Promise<void> {
-        const payload = toUpsert(entity);
-        const { error } = await this.supabaseClient.from("invoices").upsert(
-            payload,
-        );
-        if (error) throw SupabaseError.fromPostgrest(error);
-    }
-
-    async deleteInvoices(invoiceIds: string[]): Promise<void> {
+    async deleteMany(invoiceIds: string[]): Promise<void> {
         const { error } = await this.supabaseClient
             .from("invoices")
             .delete()

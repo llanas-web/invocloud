@@ -3,7 +3,6 @@ import type {
     InvoiceStatus,
 } from "~~/shared/domain/invoice/invoice.model";
 
-// DTO de lecture (optimisé pour l'affichage)
 export type InvoiceListItemDTO = {
     id: string;
     supplierId: string;
@@ -24,7 +23,6 @@ export type InvoiceListItemDTO = {
     comment: string | null;
 };
 
-// Filtres (réutilisez celui du domain si vous en avez un)
 export type InvoiceListFilter = {
     ids?: string[];
     supplierIds?: string[];
@@ -35,7 +33,6 @@ export type InvoiceListFilter = {
     search?: string;
 };
 
-// Interface de lecture (pas de dépendance à Supabase)
 export interface InvoiceListQuery {
     execute(filters?: InvoiceListFilter): Promise<InvoiceListItemDTO[]>;
 }

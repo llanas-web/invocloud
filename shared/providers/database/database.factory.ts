@@ -11,7 +11,6 @@ import type {
 } from "./database.interface";
 import {
     AdminSupabaseRepository,
-    EstablishmentSupabaseRepository,
     SupplierSupabaseRepository,
     UploadValidationSupabaseRepository,
     UserSupabaseRepository,
@@ -26,7 +25,6 @@ type RepositoryMap = {};
 class DatabaseFactory {
     private static instance: DatabaseFactory;
 
-    public establishmentRepository: EstablishmentRepository;
     public supplierRepository: SupplierRepository;
     public userRepository: UserRepository;
     public uploadValidationRepository: UploadValidationRepository;
@@ -36,9 +34,6 @@ class DatabaseFactory {
     public subscriptionRepository: SubscriptionRepository;
 
     private constructor(client: SupabaseClient) {
-        this.establishmentRepository = new EstablishmentSupabaseRepository(
-            client,
-        );
         this.supplierRepository = new SupplierSupabaseRepository(
             client,
         );

@@ -24,7 +24,6 @@ export const statusMeta: Record<
 };
 
 export type InvoiceVM = {
-    // Raw (safe to render)
     id: string;
     supplierId: string;
     status: InvoiceModel["status"];
