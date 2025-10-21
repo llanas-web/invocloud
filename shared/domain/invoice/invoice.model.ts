@@ -1,4 +1,5 @@
 import { DomainError, DomainErrorCode } from "../common/errors/domain.error";
+import { PayloadModel } from "../common/payload.model";
 
 export const InvoiceStatus = {
     OCR: "ocr",
@@ -44,8 +45,10 @@ export type DraftInvoice = Omit<
     "id" | "createdAt" | "updatedAt"
 >;
 
-export class InvoiceModel {
+export class InvoiceModel extends PayloadModel {
+    static override payloadType: string = "InvoiceModel";
     private constructor(readonly props: InvoiceModelProps) {
+        super();
         this.props = props;
     }
 
@@ -163,5 +166,47 @@ export class InvoiceModel {
             paidAt: patch.paidAt ?? this.props.paidAt ?? null,
             updatedAt: new Date(),
         });
+    }
+
+    override toPayload(): object {
+        return {
+            id: this.id,
+            supplierId: this.supplierId,
+            status: this.status,
+            source: this.source,
+            filePath: this.filePath,
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt,
+            name: this.name,
+            emitDate: this.emitDate,
+            paidAt: this.paidAt,
+            comment: this.comment,
+            amount: this.amount,
+            dueDate: this.dueDate,
+            number: this.number,
+        };
+    }
+
+    static fromPayload(data: any): InvoiceModel {
+        return InvoiceModel.create({
+            id: data.id,
+            supplierId: data.supplierId,
+            status: data.status,
+            source: data.source,
+            filePath: data.filePath,
+            createdAt: new Date(data.createdAt),
+            updatedAt: new Date(data.updatedAt),
+            name: data.name ?? null,
+            emitDate: data.emitDate ? new Date(data.emitDate) : null,
+            paidAt: data.paidAt ? new Date(data.paidAt) : null,
+            comment: data.comment ?? null,
+            amount: data.amount ?? null,
+            dueDate: data.dueDate ? new Date(data.dueDate) : null,
+            number: data.number ?? null,
+        });
+    }
+
+    override fromPayload(data: any): this {
+        return InvoiceModel.fromPayload(data) as this;
     }
 }
