@@ -1,8 +1,7 @@
 <script setup lang="ts">
-    import type { FormSubmitEvent, NavigationMenuItem } from '@nuxt/ui'
+    import type { NavigationMenuItem } from '@nuxt/ui'
     import { LazyInvoicesUploadModalContainer, LazyCommonConfirmModal } from '#components'
     import { SubscriptionStatus } from '~~/shared/types/models/subscription.model'
-    import { CreateEstablishmentSchema } from '~/types/schemas/forms/establishments.schema'
 
     const route = useRoute()
     const router = useRouter()
@@ -13,7 +12,8 @@
     const toast = useToast()
     const open = ref(false)
 
-    const { selectedEstablishment, establishments, subscribeToStripe, status } = useEstablishmentsList()
+    const { establishments, status } = useEstablishmentsList()
+    const { establishment: selectedEstablishment, subscribeToStripe } = useEstablishmentDetails()
     const user = useSupabaseUser()
 
     const isEstablishementActive = computed(() => {

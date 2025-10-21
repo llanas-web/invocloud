@@ -2,9 +2,10 @@
   import { EstablishmentsMembersInviteForm } from '#components'
 
   const { confirm } = useConfirmModal()
-  const { selectedEstablishment, deleteEstablishment } = useEstablishmentsList()
+  const { establishment: selectedEstablishment, actions: { deleteEstablishment } } = useEstablishmentDetails()
 
   const onDeleteEstablishment = async () => {
+    const { execute, pending, error } = deleteEstablishment;
 
     const confirmResult = await confirm({
       title: 'Suppression de l\'établissement',
@@ -14,8 +15,8 @@
       danger: true,
     });
     if (!confirmResult) return;
-    const response = await deleteEstablishment()
-    if (response) {
+    await execute()
+    if (error.value) {
       useToast().add({
         title: "L'établissement a été supprimé avec succès.",
         color: "success",

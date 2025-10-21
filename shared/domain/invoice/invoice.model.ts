@@ -1,3 +1,4 @@
+import type { ModelCommonUpdateProps } from "../common/common.interface";
 import { DomainError, DomainErrorCode } from "../common/errors/domain.error";
 import { PayloadModel } from "../common/payload.model";
 
@@ -20,17 +21,19 @@ export const InvoiceSource = {
 
 export type InvoiceSource = typeof InvoiceSource[keyof typeof InvoiceSource];
 
-export type InvoiceModelProps = {
-    id: string;
+export type InvoiceModelProps =
+    & ModelCommonUpdateProps
+    & InvoiceRequiredProps
+    & InvoiceMutableProps;
+
+export type InvoiceRequiredProps = {
     supplierId: string;
     filePath: string;
     status: InvoiceStatus;
     source: InvoiceSource;
-    createdAt: Date;
-    updatedAt: Date;
-} & InvoiceDetailsPatch;
+};
 
-export type InvoiceDetailsPatch = {
+export type InvoiceMutableProps = {
     name?: string | null;
     amount?: number | null;
     emitDate?: Date | null;
@@ -66,6 +69,17 @@ export class InvoiceModel extends PayloadModel {
     get id() {
         return this.props.id;
     }
+    get createdAt() {
+        return this.props.createdAt;
+    }
+    get updatedAt() {
+        return this.props.updatedAt;
+    }
+
+    // ─── Required fields ───
+    get filePath() {
+        return this.props.filePath;
+    }
     get supplierId() {
         return this.props.supplierId;
     }
@@ -75,17 +89,8 @@ export class InvoiceModel extends PayloadModel {
     get source() {
         return this.props.source;
     }
-    get filePath() {
-        return this.props.filePath;
-    }
-    get createdAt() {
-        return this.props.createdAt;
-    }
-    get updatedAt() {
-        return this.props.updatedAt;
-    }
 
-    // ─── Optional fields (read-only) ───
+    // ─── Optional fields ───
     get name() {
         return this.props.name ?? null;
     }
@@ -148,7 +153,7 @@ export class InvoiceModel extends PayloadModel {
         });
     }
 
-    withDetails(patch: InvoiceDetailsPatch): InvoiceModel {
+    withDetails(patch: InvoiceMutableProps): InvoiceModel {
         if (patch.amount != null && patch.amount! < 0) {
             throw new DomainError(
                 DomainErrorCode.ERROR_UPDATING,
@@ -168,7 +173,7 @@ export class InvoiceModel extends PayloadModel {
         });
     }
 
-    override toPayload(): object {
+    override toPayload(): Record<string, any> {
         return {
             id: this.id,
             supplierId: this.supplierId,

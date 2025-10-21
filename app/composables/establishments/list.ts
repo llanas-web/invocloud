@@ -1,30 +1,22 @@
 import { createSharedComposable, useLocalStorage } from "@vueuse/core";
-import type { EstablishmentModel } from "~~/shared/types/models/establishment.model";
-import DatabaseFactory from "~~/shared/providers/database/database.factory";
-import useAsyncAction from "../core/useAsyncAction";
-
-function slugify(s: string) {
-    return s.trim().toLowerCase().replace(/\s+/g, "-").replace(
-        /[^a-z0-9-]/g,
-        "",
-    );
-}
+import {
+    type EstablishmentVM,
+    presentEstablishments,
+} from "~/ui/presenters/establishment.presenter";
+import type { EstablishmentListItemDTO } from "~~/shared/application/establishment/queries/establishment-list.query";
 
 const _useEstablishmentsList = () => {
-    const { $databaseFactory } = useNuxtApp();
+    const { $usecases } = useNuxtApp();
     const { userSettings } = useUserSettings();
     const { user } = useAuth();
 
-    const { establishmentRepository } = $databaseFactory as DatabaseFactory;
-
-    // --- State
     const selectedId = useLocalStorage<string | null>(
         "selectedEstablishmentId",
         null,
     );
 
     const {
-        data: establishments,
+        data: raw,
         pending,
         refresh,
         error,
@@ -32,31 +24,40 @@ const _useEstablishmentsList = () => {
     } = useAsyncData(
         async () => {
             if (!user.value?.id) return [];
-            const _establishments = await establishmentRepository
-                .getEstablishmentsFromMemberId(user.value.id);
-            ensureSelection(_establishments);
-            return _establishments;
+            const list = await $usecases.establishments.list.execute(
+                { memberIds: [user.value.id] },
+            );
+            ensureSelection(list);
+            return list;
         },
         {
             immediate: true,
-            default: () => [] as EstablishmentModel[],
+            default: () => [] as EstablishmentListItemDTO[],
             watch: [() => user.value?.id],
         },
     );
 
-    // Sélection dérivée (pas de double source de vérité)
-    const selectedEstablishment = computed<EstablishmentModel | null>(() => {
-        if (!selectedId.value) return null;
-        return establishments.value.find((e) => e.id === selectedId.value) ??
-            null;
-    });
+    const establishments = computed<EstablishmentVM[]>(() =>
+        presentEstablishments(raw.value)
+    );
+
+    // Sélection dérivée (source unique = selectedId)
+    const selectedEstablishment = computed<EstablishmentVM | null>(
+        () => {
+            if (!selectedId.value) return null;
+            return establishments.value.find((e) =>
+                e.id === selectedId.value
+            ) ?? null;
+        },
+    );
 
     // --- Helpers sélection
     function exists(id?: string | null) {
         return !!id && establishments.value.some((e) => e.id === id);
     }
 
-    function ensureSelection(list: EstablishmentModel[]) {
+    // Accepte n’importe quelle liste avec un champ id
+    function ensureSelection(list: { id: string }[]) {
         // ordre: selectedId → favori user → premier → null
         const candidate =
             (exists(selectedId.value)
@@ -68,7 +69,7 @@ const _useEstablishmentsList = () => {
         selectedId.value = candidate;
     }
 
-    /** Sélectionne explicitement un établissement (id) */
+    /** Sélection explicite (id) */
     function selectEstablishment(id: string | null) {
         selectedId.value = exists(id) ? id : null;
         if (!selectedId.value) ensureSelection(establishments.value);
@@ -79,98 +80,14 @@ const _useEstablishmentsList = () => {
         if (!exists(selectedId.value)) ensureSelection(list);
     });
 
-    const deleteEstablishmentAction = useAsyncAction(
-        async (id: string) => {
-            await establishmentRepository
-                .deleteEstablishment(
-                    id,
-                );
-            establishments.value = establishments.value.filter((e) =>
-                e.id !== id
-            );
-            if (selectedId.value === id) selectedId.value = null;
-            refresh();
-            return true;
-        },
-    );
-
-    const subscribeToStripe = async () => {
-        const { url }: { url: string } = await $fetch(
-            "/api/stripe/subscription/create",
-            {
-                method: "POST",
-                body: {
-                    establishmentId: selectedEstablishment.value?.id,
-                },
-            },
-        );
-        if (!url) {
-            console.error(
-                "Error creating Stripe subscription:",
-            );
-            return null;
-        }
-        window.location.href = url;
-        return null;
-    };
-
-    const cancelStripeTrial = async () => {
-        const { success, message }: { success: boolean; message: string } =
-            await $fetch(
-                "/api/stripe/trial/cancel",
-                {
-                    method: "POST",
-                    body: {
-                        establishmentId: selectedEstablishment.value?.id,
-                    },
-                },
-            );
-        if (!success) {
-            console.error("Error canceling Stripe trial:", message);
-        }
-        return { success, message };
-    };
-
-    const cancelStripeSubscription = async () => {
-        const { success, message }: { success: boolean; message: string } =
-            await $fetch(
-                "/api/stripe/subscription/cancel",
-                {
-                    method: "POST",
-                    body: {
-                        establishmentId: selectedEstablishment.value?.id,
-                    },
-                },
-            );
-        if (!success) {
-            console.error(
-                "Error canceling Stripe subscription:",
-                message,
-            );
-        }
-        return { success, message };
-    };
-
     return {
-        // data
         establishments,
         selectedEstablishment,
-
-        // fetch states
         pending,
         error,
         status,
-
-        // actions
         refresh,
         selectEstablishment,
-
-        // CRUD actions
-        deleteEstablishment: deleteEstablishmentAction,
-
-        subscribeToStripe,
-        cancelStripeTrial,
-        cancelStripeSubscription,
     };
 };
 

@@ -6,6 +6,7 @@ export * from "./core/useAsyncAction";
 export * from "./establishments/create";
 export * from "./establishments/list";
 export * from "./establishments/update";
+export * from "./establishments/details";
 
 export * from "./invoices/create";
 export * from "./invoices/delete";

@@ -1,9 +1,7 @@
 import type { RepositoryFactory } from "~~/shared/domain/common/repository.factory";
-import { CreateInvoiceUsecase } from "../invoice/usecases/create-invoice.usecase";
-import { ListInvoicesUsecase } from "../invoice/usecases/list-invoices.usecase";
 import type { QueryFactory } from "~~/shared/infra/common/query.factory";
-import { UpdateInvoiceDetailsUsecase } from "../invoice/usecases/update-invoice-details.usecase";
-import { ChangeInvoiceStatusUsecase } from "../invoice/usecases/change-invoice-status.usecase";
+import * as invoiceUC from "../invoice/usecases";
+import * as establishmentUC from "../establishment/usecases";
 
 export function makeUseCases(
     repositoryFactory: RepositoryFactory,
@@ -11,14 +9,34 @@ export function makeUseCases(
 ) {
     const invoicesRepo = repositoryFactory.invoices();
     const invoiceListQuery = queryFactory.invoiceListQuery();
+    const establishmentsRepo = repositoryFactory.establishments();
+    const establishmentListQuery = queryFactory.establishmentListQuery();
 
     return {
         invoices: {
-            create: new CreateInvoiceUsecase(invoicesRepo),
-            list: new ListInvoicesUsecase(invoiceListQuery),
-            updateDetails: new UpdateInvoiceDetailsUsecase(invoicesRepo),
-            updateStatus: new ChangeInvoiceStatusUsecase(invoicesRepo),
-            delete: new ChangeInvoiceStatusUsecase(invoicesRepo),
+            create: new invoiceUC.CreateInvoiceUsecase(invoicesRepo),
+            list: new invoiceUC.ListInvoicesUsecase(invoiceListQuery),
+            updateDetails: new invoiceUC.UpdateInvoiceDetailsUsecase(
+                invoicesRepo,
+            ),
+            updateStatus: new invoiceUC.ChangeInvoiceStatusUsecase(
+                invoicesRepo,
+            ),
+            delete: new invoiceUC.DeleteInvoicesUsecase(invoicesRepo),
+        },
+        establishments: {
+            create: new establishmentUC.CreateEstablishmentUsecase(
+                establishmentsRepo,
+            ),
+            list: new establishmentUC.ListEstablishmentsUsecase(
+                establishmentListQuery,
+            ),
+            update: new establishmentUC.UpdateEstablishmentUsecase(
+                establishmentsRepo,
+            ),
+            delete: new establishmentUC.DeleteEstablishmentUsecase(
+                establishmentsRepo,
+            ),
         },
     } as const;
 }

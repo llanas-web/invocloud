@@ -3,7 +3,7 @@
     import { format } from 'date-fns';
     import { SubscriptionStatus } from '~~/shared/types/models/subscription.model';
 
-    const { selectedEstablishment, subscribeToStripe, cancelStripeSubscription, cancelStripeTrial } = useEstablishmentsList()
+    const { establishment: selectedEstablishment, subscribeToStripe, cancelStripeSubscription, cancelStripeTrial } = useEstablishmentDetails()
 
     const subscriptionStatus = computed(() => selectedEstablishment.value?.subscription?.status ?? null)
 

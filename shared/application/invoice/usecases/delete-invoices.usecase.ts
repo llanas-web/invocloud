@@ -8,10 +8,6 @@ export class DeleteInvoicesUsecase {
 
     async execute(raw: unknown): Promise<void> {
         const invoiceIds = DeleteInvoicesSchema.parse(raw);
-        for (const id of invoiceIds) {
-            const invoice = await this.invoiceRepository.getById(id);
-            if (!invoice) continue;
-            await this.invoiceRepository.deleteInvoices([id]);
-        }
+        await this.invoiceRepository.deleteMany(invoiceIds);
     }
 }
