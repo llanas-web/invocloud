@@ -1,29 +1,42 @@
 import { createSharedComposable } from "@vueuse/core";
-import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import useAsyncAction from "../core/useAsyncAction";
 import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
-import type { InvoiceInsert } from "~~/shared/types/providers/database";
-import {
-    type CreateInvoiceCommand,
-    CreateInvoiceSchema,
-} from "~~/shared/application/invoice/command";
+import type { z } from "zod";
+import { CreateInvoiceSchema } from "~/types/schemas/forms/invoices.schema";
+import type { CreateInvoiceCommand } from "~~/shared/application/invoice/command";
+
+const toCreateInvoiceCommand = (
+    parsed: z.output<typeof CreateInvoiceSchema>,
+): CreateInvoiceCommand => ({
+    supplierId: parsed.supplierId,
+    filePath: parsed.filePath,
+    source: parsed.source,
+    status: parsed.status,
+    // optional fields
+    name: parsed.name,
+    invoiceNumber: parsed.invoiceNumber,
+    amount: parsed.amount,
+    comment: parsed.comment,
+    emitDate: parsed.emitDate,
+    paidAt: parsed.paidAt,
+    dueDate: parsed.dueDate,
+});
 
 const _useInvoiceCreate = () => {
-    const { $databaseFactory, $storageFactory, $usecases } = useNuxtApp();
-    const { invoiceRepository } = $databaseFactory as DatabaseFactory;
+    const { $storageFactory, $usecases } = useNuxtApp();
     const storageRepository = $storageFactory as StorageProvider;
     const { selectedEstablishment } = useEstablishmentsList();
 
     const formRef = ref();
 
-    const formState = reactive<CreateInvoiceCommand>({
+    const formState = reactive<Partial<z.input<typeof CreateInvoiceSchema>>>({
         filePath: "",
         supplierId: "",
         amount: 0,
         comment: "",
         name: null,
-        dueDate: null,
+        dueDate: undefined,
         invoiceNumber: "",
         paidAt: null,
         status: "pending",
@@ -32,19 +45,13 @@ const _useInvoiceCreate = () => {
 
     const invoiceFile = ref<File | null>(null);
 
-    const initialParsed = CreateInvoiceSchema.parse(formState);
-
-    const isDirty = computed(() => {
-        const currentParsed = CreateInvoiceSchema.parse(formState);
-        return JSON.stringify(currentParsed) !== JSON.stringify(initialParsed);
-    });
-
     const { data: newInvoice, error, pending, execute } = useAsyncAction(
         async () => {
-            const parsedInvoice = CreateInvoiceSchema.parse(formState);
+            const parsed = CreateInvoiceSchema.parse(formState);
             if (!invoiceFile.value) {
                 throw new Error("No invoice file provided.");
             }
+            const command = toCreateInvoiceCommand(parsed);
             const newInvoiceId = crypto.randomUUID();
             const uploadResult = await storageRepository.uploadFile(
                 STORAGE_BUCKETS.INVOICES,
@@ -53,7 +60,7 @@ const _useInvoiceCreate = () => {
                 { contentType: invoiceFile.value.type, upsert: true },
             );
             const newInvoice = await $usecases.invoices.create.execute(
-                parsedInvoice,
+                command,
             );
             navigateTo("/app");
         },
@@ -62,7 +69,6 @@ const _useInvoiceCreate = () => {
     return {
         formRef,
         formState,
-        isDirty,
         invoiceFile,
         onSubmit: execute,
         newInvoice,

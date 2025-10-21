@@ -1,4 +1,3 @@
-import type { SubscriptionModel } from "~~/shared/types/models/subscription.model";
 import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SupabaseError } from "../supabase-error";

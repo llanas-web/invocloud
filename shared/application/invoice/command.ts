@@ -4,7 +4,7 @@ import {
     InvoiceStatus,
 } from "~~/shared/domain/invoice/invoice.model";
 
-export const CreateInvoiceSchema = z.object({
+export const CreateInvoiceCommandSchema = z.object({
     supplierId: z.uuid(),
     filePath: z.string().min(1),
     source: z.enum(InvoiceSource).default(InvoiceSource.APP),
@@ -13,14 +13,14 @@ export const CreateInvoiceSchema = z.object({
     // optional fields
     name: z.string().trim().nullable().optional(),
     invoiceNumber: z.string().trim().nullable().optional(),
-    amount: z.number().int().nonnegative().nullable().optional(),
+    amount: z.number().nullable().optional(),
     emitDate: z.coerce.date().nullable().optional(),
     dueDate: z.coerce.date().nullable().optional(),
     paidAt: z.coerce.date().nullable().optional(),
     comment: z.string().trim().nullable().optional(),
 });
 
-export type CreateInvoiceCommand = z.infer<typeof CreateInvoiceSchema>;
+export type CreateInvoiceCommand = z.infer<typeof CreateInvoiceCommandSchema>;
 
 export const UpdateInvoiceDetailsSchema = z.object({
     id: z.uuid(),

@@ -15,7 +15,11 @@ const _useInvoices = () => {
 
     const searchQuery = ref<string>("");
     const statusFilter = ref<InvoiceStatus | undefined>(undefined);
-    const supplierFilter = ref<string>("");
+    const supplierFilter = ref<string[]>([]);
+    const rangeFilter = ref<{ start: Date; end: Date }>({
+        start: new Date(new Date().setDate(new Date().getDate() - 30)),
+        end: new Date(),
+    });
 
     const { data: raw, error, refresh, pending } = useAsyncData(
         "invoices",
@@ -23,7 +27,9 @@ const _useInvoices = () => {
             if (!selectedEstablishment.value) return [];
             return await $usecases.invoices.list.execute({
                 establishmentIds: [selectedEstablishment.value.id],
-                supplierIds: [supplierFilter.value],
+                supplierIds: supplierFilter.value.length > 0
+                    ? supplierFilter.value
+                    : undefined,
                 status: statusFilter.value ? [statusFilter.value] : undefined,
                 search: searchQuery.value,
             });
@@ -89,6 +95,7 @@ const _useInvoices = () => {
         searchQuery,
         statusFilter,
         supplierFilter,
+        rangeFilter,
         actions: {
             updateStatus: updateStatusAction,
             send: sendAction,

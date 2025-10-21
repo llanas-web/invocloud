@@ -1,9 +1,9 @@
 // composables/useWorker.ts
 import { createSharedComposable } from "@vueuse/core";
-import { useInvoicesTableList } from "./invoices/table-list";
 import { format } from "date-fns";
 import useAsyncAction from "./core/useAsyncAction";
-import type { InvoiceModel } from "~~/shared/types/models/invoice.model";
+import type { InvoiceModel } from "~~/shared/domain/invoice/invoice.model";
+import type { InvoiceVM } from "~/ui/presenters/invoice.presenter";
 
 type DownloadMsg = {
   type: "download";
@@ -17,7 +17,6 @@ type DownloadMsg = {
 const _useWorker = () => {
   const { public: pub } = useRuntimeConfig();
   const { selectedEstablishment } = useEstablishmentsList();
-  const { rangeFilter } = useInvoicesTableList();
   const session = useSupabaseSession();
   const worker = shallowRef<Worker | null>(null);
   const ready = computed(() => !!worker.value);
@@ -47,8 +46,6 @@ const _useWorker = () => {
           a.href = url;
           a.download = `${
             selectedEstablishment.value?.name.replace(/\s+/g, "_")
-          }-${format(rangeFilter.value.start, "dd/MM/yyyy")}-${
-            format(rangeFilter.value.end, "dd/MM/yyyy")
           }.zip`;
           document.body.appendChild(a);
           a.click();
@@ -81,7 +78,7 @@ const _useWorker = () => {
   }
 
   const launchDownloadWorkerAction = useAsyncAction(
-    async (invoices: InvoiceModel[]) => {
+    async (invoices: InvoiceVM[]) => {
       if (!invoices?.length) throw new Error("Aucune facture à télécharger");
       running.value = true;
       const msg: DownloadMsg = {

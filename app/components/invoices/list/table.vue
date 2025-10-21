@@ -9,7 +9,7 @@
     const UDropdownMenu = resolveComponent('UDropdownMenu')
     const UButton = resolveComponent('UButton')
 
-    const { invoices, pending, statusFilter, actions } = useInvoices();
+    const { invoices, pending, statusFilter, supplierFilter, actions } = useInvoices();
     const { open: isSendModalOpen, selectedInvoices: listInvoicesToSend } = useInvoicesSend();
     const { open: isDeleteModalOpen, selectedInvoices: listInvoicesToDelete } = useInvoicesDelete();
     const { launchDownloadWorker, progress, running } = useWorker();
@@ -41,7 +41,7 @@
     // Columns avec actions intégrées
     const columns = [
         ...createInvoiceColumns((supplierId) => {
-            // Handle supplier filter
+            supplierFilter.value = [supplierId];
         }),
         {
             id: 'actions',

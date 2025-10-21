@@ -1,6 +1,6 @@
 <script lang="ts" setup>
     import { ref, watch } from 'vue'
-    import type { InvoiceModel } from '~~/shared/types/models/invoice.model';
+    import type { InvoiceModel } from '~~/shared/domain/invoice/invoice.model';
 
     const { actions: { download: { execute, pending, data, error } } } = useInvoiceDetails();
 

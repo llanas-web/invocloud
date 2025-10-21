@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import type { UForm } from '#components';
     import { CreateInvoiceSchema } from '~/types/schemas/forms/invoices.schema';
-    import { InvoiceStatus } from '~~/shared/types/models/invoice.model';
+    import { InvoiceStatus } from '~~/shared/domain/invoice/invoice.model';
 
     const { formRef, formState, pending, onSubmit } = useInvoiceCreate()
     const { suppliers } = useSuppliers()
@@ -30,7 +30,7 @@
         :loading="pending" :schema="CreateInvoiceSchema" :validate-on="['input', 'change', 'blur']">
         <UFormField name="createdAt" label="Date de facture" required
             class="flex flex-row justify-between items-center gap-4">
-            <CommonFormDatePicker v-model="formState.createdAt" label="Date de la facture" />
+            <CommonFormDatePicker v-model="formState.emitDate" label="Date de la facture" />
         </UFormField>
         <UFormField name="supplierId" label="Fournisseur" required>
             <UInputMenu v-model="formState.supplierId" :items="suppliers" class="w-full" value-key="id" create-item

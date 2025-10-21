@@ -3,7 +3,6 @@ import SupabaseAuthRepository from "../auth/supabase/auth.repository";
 import type {
     AdminRepository,
     EstablishmentRepository,
-    InvoiceRepository,
     InvoiceTaskRepository,
     SubscriptionRepository,
     SupplierRepository,
@@ -13,7 +12,6 @@ import type {
 import {
     AdminSupabaseRepository,
     EstablishmentSupabaseRepository,
-    InvoiceSupabaseRepository,
     SupplierSupabaseRepository,
     UploadValidationSupabaseRepository,
     UserSupabaseRepository,
@@ -29,7 +27,6 @@ class DatabaseFactory {
     private static instance: DatabaseFactory;
 
     public establishmentRepository: EstablishmentRepository;
-    public invoiceRepository: InvoiceRepository;
     public supplierRepository: SupplierRepository;
     public userRepository: UserRepository;
     public uploadValidationRepository: UploadValidationRepository;
@@ -40,9 +37,6 @@ class DatabaseFactory {
 
     private constructor(client: SupabaseClient) {
         this.establishmentRepository = new EstablishmentSupabaseRepository(
-            client,
-        );
-        this.invoiceRepository = new InvoiceSupabaseRepository(
             client,
         );
         this.supplierRepository = new SupplierSupabaseRepository(

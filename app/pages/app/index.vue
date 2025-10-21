@@ -1,5 +1,6 @@
 <script setup lang="ts">
-    import { useInvoicesTableList } from '~/composables/invoices/table-list'
+    import { InvoicesListStats } from '#components';
+
 
     const { openModal } = useUploadWizard()
 
@@ -7,7 +8,7 @@
         layout: 'app'
     })
 
-    const { selectedSuppliers } = useInvoicesTableList();
+    const { supplierFilter } = useInvoices();
     const { suppliers } = useSuppliers();
 
     const items = [[{
@@ -66,7 +67,7 @@
                     <HomeDateRangePicker class="-ms-1" />
                 </template>
                 <template #right>
-                    <UInputMenu v-model="selectedSuppliers" :items="suppliers" class="w-full hidden md:block"
+                    <UInputMenu v-model="supplierFilter" :items="suppliers" class="w-full hidden md:block"
                         variant="outline" value-key="id" label-key="name" placeholder="Recherche fournisseur" multiple
                         delete-icon="i-lucide-x" :ui="{
                             content: 'min-w-fit',
@@ -78,9 +79,8 @@
             <UDashboardToolbar :ui="{
                 root: ' block md:hidden p-2'
             }">
-                <UInputMenu v-model="selectedSuppliers" :items="suppliers" class="w-full" variant="outline"
-                    value-key="id" label-key="name" placeholder="Recherche fournisseur" multiple
-                    delete-icon="i-lucide-x" :ui="{
+                <UInputMenu v-model="supplierFilter" :items="suppliers" class="w-full" variant="outline" value-key="id"
+                    label-key="name" placeholder="Recherche fournisseur" multiple delete-icon="i-lucide-x" :ui="{
                         content: 'min-w-fit'
                     }">
                 </UInputMenu>
@@ -88,7 +88,7 @@
         </template>
 
         <template #body>
-            <InvoicesListInvoicesStats />
+            <InvoicesListStats />
             <InvoicesUploadTable />
             <InvoicesListTable />
         </template>

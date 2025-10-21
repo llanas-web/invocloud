@@ -40,11 +40,6 @@ const _useEstablishmentUpdate = () => {
             }
         },
     );
-    const initialParsed = UpdateEstablishmentSchema.parse(formState);
-    const isDirty = computed(() => {
-        const currentParsed = UpdateEstablishmentSchema.parse(formState);
-        return JSON.stringify(currentParsed) !== JSON.stringify(initialParsed);
-    });
 
     const { error, pending, execute } = useAsyncAction(
         async () => {
