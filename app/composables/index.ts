@@ -11,9 +11,8 @@ export * from "./invoices/create";
 export * from "./invoices/delete";
 export * from "./invoices/details";
 export * from "./invoices/list";
-export * from "./invoices/send";
 export * from "./invoices/update";
-export * from "./invoices/table-list";
+export * from "./invoices/send";
 export * from "./invoices/upload/wizard";
 
 export * from "./suppliers/create";

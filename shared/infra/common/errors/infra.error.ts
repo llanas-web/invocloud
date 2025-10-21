@@ -1,4 +1,5 @@
-import { BaseError } from "./base.error";
+import { BaseError } from "#shared/errors/base.error";
+
 export class InfraError extends BaseError {
     constructor(
         code: string,

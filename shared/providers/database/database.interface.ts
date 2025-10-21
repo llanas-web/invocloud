@@ -4,7 +4,6 @@ import type {
     EstablishmentModelUpdate,
     EstablishmentShortModel,
 } from "~~/shared/types/models/establishment.model";
-import type { InvoiceModel } from "~~/shared/types/models/invoice.model";
 import type { MemberModel } from "~~/shared/types/models/member.model";
 import type SupplierModel from "~~/shared/types/models/supplier.model";
 import type UserSettingsModel from "~~/shared/types/models/user-settings.model";
@@ -73,23 +72,6 @@ export interface EstablishmentRepository {
         establishmentId: string,
         userId: string,
     ): Promise<void>;
-}
-
-export interface InvoiceRepository {
-    getAllInvoices(
-        filters?: {
-            ids?: string[];
-            establishmentIds?: string[];
-        },
-    ): EncapsulatedResult<InvoiceModel[]>;
-    createInvoice(
-        invoice: InvoiceInsert,
-    ): EncapsulatedResult<InvoiceModel>;
-    updateInvoice(
-        invoiceId: string,
-        invoice: InvoiceUpdate,
-    ): EncapsulatedResult<InvoiceModel>;
-    deleteInvoices(invoiceIds: string[]): EncapsulatedResult<boolean>;
 }
 
 export interface SupplierRepository {
@@ -189,7 +171,6 @@ export interface SubscriptionRepository {
 
 export interface DatabaseInterface {
     establishmentRepository: EstablishmentRepository;
-    invoiceRepository: InvoiceRepository;
     supplierRepository: SupplierRepository;
     uploadValidationRepository: UploadValidationRepository;
     userRepository: UserRepository;

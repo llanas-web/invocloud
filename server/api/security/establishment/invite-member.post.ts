@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { buildRequestScope } from "~~/server/core/container";
 import { HTTPStatus } from "~~/server/core/errors/status";
-import { DomainError, DomainErrorCode } from "~~/shared/errors/domain.error";
+import {
+    DomainError,
+    DomainErrorCode,
+} from "~~/shared/domain/common/errors/domain.error";
 
 const schema = z.object({
     email: z.email(),

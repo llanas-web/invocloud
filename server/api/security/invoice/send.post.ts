@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { buildRequestScope } from "~~/server/core/container";
+import { useServerUsecases } from "~~/server/plugins/usecases.server";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 import { AuthUserModel } from "~~/shared/types/models/auth-user.model";
 
@@ -11,13 +12,13 @@ const schema = z.object({
 export default defineEventHandler(async (event) => {
     const {
         deps: {
-            database: { invoiceRepository },
             storage,
             auth,
             email: emailRepository,
         },
         ctx: { userId },
     } = await buildRequestScope(event);
+    const { usecases } = { usecases: useServerUsecases(event) };
 
     const { invoiceIds, email } = await parseBody(event, schema);
 
@@ -28,10 +29,9 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    const invoices = await invoiceRepository
-        .getAllInvoices({
-            ids: invoiceIds,
-        });
+    const invoices = await usecases.invoices.list.execute({
+        ids: invoiceIds,
+    });
 
     const signedUrls = await storage.createSignedUrls(
         STORAGE_BUCKETS.INVOICES,

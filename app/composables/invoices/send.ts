@@ -1,44 +1,33 @@
 import { createSharedComposable } from "@vueuse/core";
+import { invoicesApi } from "~/services/invoices.api";
 
 const _useInvoicesSend = () => {
-    const toast = useToast();
-
     const open = ref(false);
-    const loading = ref(false);
     const selectedInvoices = ref<string[]>([]);
     const formState = reactive({
         email: "",
     });
-    const { sendInvoice } = useInvoices();
 
     const resetForm = () => {
         formState.email = "";
         selectedInvoices.value = [];
     };
 
-    const onSubmit = async () => {
-        loading.value = true;
-        await sendInvoice(
-            selectedInvoices.value,
-            formState.email,
-        );
-        toast.add({
-            title: "Factures envoyées",
-            description: "Les factures ont été envoyées avec succès.",
-            color: "success",
+    const action = useAsyncAction(async () => {
+        await invoicesApi.send({
+            invoices: selectedInvoices.value,
+            email: formState.email,
         });
-        open.value = false;
-        loading.value = false;
         resetForm();
-    };
+        open.value = false;
+    });
 
     return {
         formState,
         open,
-        loading,
         selectedInvoices,
         resetForm,
-        onSubmit,
+        action,
     };
 };
 

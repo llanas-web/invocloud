@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { buildRequestScope } from "~~/server/core/container";
 import { HTTPStatus } from "~~/server/core/errors/status";
+import { useServerUsecases } from "~~/server/plugins/usecases.server";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 import { AuthUserModel } from "~~/shared/types/models/auth-user.model";
 
@@ -16,10 +17,11 @@ export default defineEventHandler(async (event) => {
         deps: {
             auth,
             storage,
-            database: { invoiceRepository, supplierRepository },
+            database: { supplierRepository },
         },
         ctx: { userId },
     } = await buildRequestScope(event);
+    const { usecases } = { usecases: useServerUsecases(event) };
 
     if (!userId || userId === "anonymous") {
         throw createError({ status: HTTPStatus.FORBIDDEN });
@@ -43,12 +45,12 @@ export default defineEventHandler(async (event) => {
             establishmentIds: [selectedEstablishmentId],
         });
 
-    await invoiceRepository.createInvoice({
-        id: invoiceId,
-        file_path: `${selectedEstablishmentId}/${invoiceId}`,
-        supplier_id: suppliers[0].id,
+    await usecases.invoices.create.execute({
+        filePath: `${selectedEstablishmentId}/${invoiceId}`,
+        supplierId: suppliers[0].id,
         comment,
         name: fileName,
+        source: "upload",
     });
 
     return signedUrl;

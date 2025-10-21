@@ -1,25 +1,19 @@
 <script setup lang="ts">
-    import { useInvoicesTableList } from '~/composables/invoices/table-list';
 
-    const { pending: invoicePending } = useInvoices();
-    const { statusFilter, filteredInvoices } = useInvoicesTableList();
+    const { invoices, pending, statusFilter } = useInvoices();
 
-    const invoicesStats = computed(() => {
-        const total = filteredInvoices.value.reduce(
+    const pendingInvoices = computed(() =>
+        invoices.value?.filter((i) =>
+            i.status === "pending" || i.status === "ocr"
+        ) || []
+    );
+
+    const total = computed(() =>
+        invoices.value.reduce(
             (sum, invoice) => sum + (invoice.amount ?? 0),
             0,
-        );
-        const count = filteredInvoices.value.length;
-        const pendingCount = filteredInvoices.value.filter(
-            (invoice) =>
-                invoice.isOverdue,
-        ).length;
-        return {
-            total,
-            count,
-            pendingCount,
-        };
-    })
+        )
+    );
 
     function formatCurrency(value: number): string {
         return value.toLocaleString('fr-FR', {
@@ -31,7 +25,7 @@
 
     const onPendingInvoiceClick = () => {
         if (statusFilter.value === 'error') {
-            statusFilter.value = 'all'
+            statusFilter.value = undefined
         } else {
             statusFilter.value = 'error'
         }
@@ -47,12 +41,12 @@
             title: 'font-normal text-muted text-xs uppercase'
         }" class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1">
             <div class="flex items-center justify-center md:justify-start gap-2">
-                <template v-if="invoicePending">
+                <template v-if="pending">
                     <USkeleton class="w-24 h-8" />
                 </template>
                 <template v-else>
                     <span class="text-lg lg:text-2xl font-semibold text-highlighted">
-                        {{ formatCurrency(invoicesStats.total) }}
+                        {{ formatCurrency(total) }}
                     </span>
                 </template>
             </div>
@@ -64,12 +58,12 @@
             title: 'font-normal text-muted text-xs uppercase'
         }" class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1">
             <div class="flex items-center justify-center md:justify-start gap-2">
-                <template v-if="invoicePending">
+                <template v-if="pending">
                     <USkeleton class="w-24 h-8" />
                 </template>
                 <template v-else>
                     <span class="text-lg lg:text-2xl font-semibold text-highlighted">
-                        {{ invoicesStats.count }}
+                        {{ invoices.length }}
                     </span>
                 </template>
             </div>
@@ -82,12 +76,12 @@
         }" class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1 cursor-pointer"
             @click="onPendingInvoiceClick">
             <div class="flex items-center justify-center md:justify-start gap-2">
-                <template v-if="invoicePending">
+                <template v-if="pending">
                     <USkeleton class="w-24 h-8" />
                 </template>
                 <template v-else>
                     <span class="text-lg lg:text-2xl font-semibold text-highlighted">
-                        {{ invoicesStats.pendingCount }}
+                        {{ pendingInvoices.length }}
                     </span>
                 </template>
             </div>
