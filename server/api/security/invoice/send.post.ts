@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
         },
         ctx: { userId },
     } = await buildRequestScope(event);
-    const { usecases } = { usecases: useServerUsecases(event) };
+    const usecases = useServerUsecases(event);
 
     const { invoices: invoiceIds, email } = await parseBody(
         event,

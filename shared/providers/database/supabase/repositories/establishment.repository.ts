@@ -11,9 +11,12 @@ import type {
     EstablishmentModelInsert,
     EstablishmentModelUpdate,
 } from "~~/shared/types/models/establishment.model";
-import { DomainError, DomainErrorCode } from "~~/shared/errors/domain.error";
 import { SupabaseError } from "../supabase-error";
 import type { EstablishmentRepository } from "~~/shared/providers/database/database.interface";
+import {
+    DomainError,
+    DomainErrorCode,
+} from "~~/shared/domain/common/errors/domain.error";
 
 export class EstablishmentSupabaseRepository
     implements EstablishmentRepository {
@@ -91,7 +94,6 @@ export class EstablishmentSupabaseRepository
             .from("establishment_members")
             .select("establishments(*)")
             .or(`user_id.eq.${userId}`);
-        console.log(data);
 
         if (error) throw SupabaseError.fromPostgrest(error);
         if (!data?.length) {

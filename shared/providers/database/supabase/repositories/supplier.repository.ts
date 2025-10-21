@@ -1,12 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type {
-    SupplierInsert,
-    SupplierUpdate,
-} from "~~/types/providers/database/index";
 import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import type { SupplierRepository } from "../../database.interface";
 import { supplierMapperFromDatabase } from "../mapper/supplier.mapper";
 import { SupabaseError } from "../supabase-error";
+import type {
+    SupplierInsert,
+    SupplierUpdate,
+} from "~~/shared/types/providers/database";
 
 export class SupplierSupabaseRepository implements SupplierRepository {
     constructor(private supabase: SupabaseClient<Database>) {}

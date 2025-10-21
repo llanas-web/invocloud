@@ -5,8 +5,11 @@ import { userMapperFromDatabase } from "../mapper";
 import { userSettingsMapperFromDatabase } from "../mapper/user-settings.mapper";
 import { SupabaseError } from "../supabase-error";
 import type { UserModelUpdate } from "~~/shared/types/models/user.model";
-import { DomainError, DomainErrorCode } from "~~/shared/errors/domain.error";
 import type { UserSettingsUpdate } from "~~/shared/types/providers/database";
+import {
+    DomainError,
+    DomainErrorCode,
+} from "~~/shared/domain/common/errors/domain.error";
 
 export class UserSupabaseRepository implements UserRepository {
     constructor(private supabase: SupabaseClient<Database>) {}

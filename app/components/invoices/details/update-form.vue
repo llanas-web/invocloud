@@ -1,6 +1,6 @@
 <script setup lang="ts">
     import { UpdateInvoiceSchema } from '~/types/schemas/forms/invoices.schema'
-    import { InvoiceStatus } from '~~/shared/types/models/invoice.model'
+    import { InvoiceStatus } from '~~/shared/domain/invoice/invoice.model'
 
     const { invoice, pending: loadingDetails } = useInvoiceDetails()
     const { formRef, formState, pending: loadingUpdate, onSubmit } = useInvoiceUpdate()
@@ -23,11 +23,11 @@
         :loading="isLoading" :schema="UpdateInvoiceSchema">
         <UFormField name="created_at" label="Date de facture" required
             class="flex flex-row justify-between items-center gap-4">
-            <CommonFormDatePicker v-model="formState.createdAt" label="Date de la facture" />
+            <CommonFormDatePicker v-model="formState.emitDate" label="Date de la facture" />
         </UFormField>
         <UFormField label="Fournisseur">
             <USkeleton v-if="!invoice" class="h-8" />
-            <UInput v-else :model-value="invoice.supplier.name" icon="i-lucide-user" class="w-full" disabled />
+            <UInput v-else :model-value="invoice.supplierName" icon="i-lucide-user" class="w-full" disabled />
         </UFormField>
         <UFormField label="Commentaire" name="comment">
             <USkeleton v-if="!invoice" class="h-8" />

@@ -13,7 +13,7 @@ function slugify(s: string) {
 const _useEstablishmentsList = () => {
     const { $databaseFactory } = useNuxtApp();
     const { userSettings } = useUserSettings();
-    const { currentUser } = useUser();
+    const { user } = useAuth();
 
     const { establishmentRepository } = $databaseFactory as DatabaseFactory;
 
@@ -23,10 +23,6 @@ const _useEstablishmentsList = () => {
         null,
     );
 
-    const key = computed(() =>
-        `establishments:${currentUser.value?.id ?? "anon"}`
-    );
-
     const {
         data: establishments,
         pending,
@@ -34,21 +30,17 @@ const _useEstablishmentsList = () => {
         error,
         status,
     } = useAsyncData(
-        key,
         async () => {
-            console.log("Fetching establishments for user:", currentUser.value);
-            if (!currentUser.value?.id) return [];
+            if (!user.value?.id) return [];
             const _establishments = await establishmentRepository
-                .getEstablishmentsFromMemberId(currentUser.value.id);
-            console.log("Fetched establishments:", _establishments);
+                .getEstablishmentsFromMemberId(user.value.id);
             ensureSelection(_establishments);
             return _establishments;
         },
         {
-            server: false,
             immediate: true,
             default: () => [] as EstablishmentModel[],
-            watch: [() => currentUser.value?.id],
+            watch: [() => user.value?.id],
         },
     );
 
@@ -103,10 +95,6 @@ const _useEstablishmentsList = () => {
     );
 
     const subscribeToStripe = async () => {
-        console.log(
-            "Subscribing to Stripe for establishment:",
-            selectedEstablishment.value,
-        );
         const { url }: { url: string } = await $fetch(
             "/api/stripe/subscription/create",
             {

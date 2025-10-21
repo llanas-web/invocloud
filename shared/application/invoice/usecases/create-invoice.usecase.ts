@@ -1,16 +1,15 @@
 import type { InvoiceRepository } from "~~/shared/domain/invoice/invoice.repository";
-import { CreateInvoiceSchema } from "../command";
+import { CreateInvoiceCommandSchema } from "../command";
 import {
     InvoiceModel,
     InvoiceStatus,
 } from "~~/shared/domain/invoice/invoice.model";
-import type { z } from "zod";
 
 export class CreateInvoiceUsecase {
     constructor(private repo: InvoiceRepository) {}
 
     async execute(raw: unknown) {
-        const input = CreateInvoiceSchema.parse(raw);
+        const input = CreateInvoiceCommandSchema.parse(raw);
         const entity = InvoiceModel.createDraft({
             status: InvoiceStatus.PENDING,
             supplierId: input.supplierId,

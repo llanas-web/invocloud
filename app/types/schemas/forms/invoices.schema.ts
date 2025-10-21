@@ -7,7 +7,7 @@ import {
 
 export const CreateInvoiceSchema = z.object({
     supplierId: z.uuid("Fournisseur invalide"),
-    createdAt: z.date().default(new Date()),
+    emitDate: z.date().default(new Date()),
     amount: amountField,
     filePath: z.string().min(1, "Fichier requis"),
     invoiceNumber: z.string().min(1, "Numéro requis"),

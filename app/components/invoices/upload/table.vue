@@ -1,24 +1,26 @@
 <script setup lang="ts">
     import type { TableColumn } from '@nuxt/ui'
+    import type { InvoiceVM } from '~/ui/presenters/invoice.presenter'
 
-    const { pendingInvoices } = useInvoices()
+    const { invoices } = useInvoices()
     const { error: deleteInvoiceError, selectedInvoices, onSubmit } = useInvoicesDelete()
 
     const UBadge = resolveComponent('UBadge')
     const UButton = resolveComponent('UButton')
     const toast = useToast()
 
-    // Use the type of the items inside the pendingInvoices ref's value
-    type PendingInvoices = NonNullable<(typeof pendingInvoices)['value']>[number]
+    const pendingInvoices = computed(() =>
+        invoices.value.filter((invoice) => invoice.status === 'pending')
+    )
 
-    const columns: TableColumn<PendingInvoices>[] = [
+    const columns: TableColumn<InvoiceVM>[] = [
         {
             accessorKey: 'supplier',
             header: 'Fournisseur',
             cell: ({ row, table }) => {
                 return h('div', { class: 'flex items-center gap-3' }, [
                     h('div', undefined, [
-                        h('p', { class: 'font-medium text-highlighted' }, row.original.supplier.name),
+                        h('p', { class: 'font-medium text-highlighted' }, row.original.supplierName),
                     ])
                 ])
             }
