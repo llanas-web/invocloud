@@ -1,11 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
-import type {
-    InvoiceListFilter,
-    InvoiceListItemDTO,
-    InvoiceListQuery,
-} from "~~/shared/application/invoice/queries/invoice-list.query";
+import type { InvoiceQuery } from "~~/shared/application/invoice/invoice.query";
 import { SupabaseError } from "~~/shared/infra/common/errors/supabase.error";
+import type { InvoiceListItemDTO } from "~~/shared/application/invoice/dto";
+import type { InvoiceListQuery } from "~~/shared/application/invoice/query";
 
 type Row = Database["public"]["Tables"]["invoices"]["Row"] & {
     suppliers: { name: string };
@@ -29,10 +27,12 @@ const fromRow = (row: Row): InvoiceListItemDTO => ({
     comment: row.comment ?? null,
 });
 
-export class InvoiceSupabaseQuery implements InvoiceListQuery {
+export class InvoiceSupabaseQuery implements InvoiceQuery {
     constructor(private readonly supabase: SupabaseClient<Database>) {}
 
-    async execute(filters?: InvoiceListFilter): Promise<InvoiceListItemDTO[]> {
+    async listInvoices(
+        filters?: InvoiceListQuery,
+    ): Promise<InvoiceListItemDTO[]> {
         const req = this.supabase
             .from("invoices")
             .select("*, suppliers(name)")

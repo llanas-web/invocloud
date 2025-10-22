@@ -11,8 +11,6 @@ export class MemberViewModel {
         switch (this.member.role) {
             case MemberRole.ADMIN:
                 return "Administrator";
-            case MemberRole.MEMBER:
-                return "Membre";
             case MemberRole.CREATOR:
                 return "Créateur";
             default:

@@ -1,5 +1,5 @@
 import type { InvoiceRepository } from "~~/shared/domain/invoice/invoice.repository";
-import { CreateInvoiceCommandSchema } from "../command";
+import { CreateInvoiceCommandSchema } from "../commands";
 import {
     InvoiceModel,
     InvoiceStatus,

@@ -1,28 +1,26 @@
 import { createSharedComposable } from "@vueuse/core";
-import DatabaseFactory from "~~/shared/providers/database/database.factory";
-import type SupplierModel from "~~/shared/types/models/supplier.model";
+import { SupplierListItemViewModel } from "~/viewmodels/supplier/supplier-list-item.vm";
 
 const _useSuppliers = () => {
-    const { $databaseFactory } = useNuxtApp();
-    const { supplierRepository } = $databaseFactory as DatabaseFactory;
-    const { selectedEstablishment } = useEstablishmentsList();
+    const { $usecases } = useNuxtApp();
+    const { selectedId } = useEstablishmentsList();
 
-    const { data: suppliers, error, refresh, pending } = useAsyncData<
-        SupplierModel[]
-    >(
+    const { data: dtos, error, refresh, pending } = useAsyncData(
         "suppliers",
         async () => {
-            const suppliers = await supplierRepository
-                .getAllSuppliers({
-                    establishmentIds: [selectedEstablishment.value!.id],
-                });
-            return suppliers;
+            return await $usecases.suppliers.list.execute({
+                establishmentIds: [selectedId.value],
+            });
         },
         {
             default: () => [],
             lazy: true,
-            watch: [selectedEstablishment],
+            watch: [selectedId],
         },
+    );
+
+    const suppliers = computed(() =>
+        dtos.value.map((dto) => SupplierListItemViewModel.fromDTO(dto))
     );
 
     return {

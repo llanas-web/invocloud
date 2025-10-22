@@ -2,7 +2,7 @@ import type { RepositoryFactory } from "~~/shared/domain/common/repository.facto
 import type { QueryFactory } from "~~/shared/infra/common/query.factory";
 import * as invoiceUC from "../invoice/usecases";
 import * as establishmentUC from "../establishment/usecases";
-import type { PaymentRepository } from "~~/shared/application/common/providers/payment/payment.repository";
+import * as supplierUC from "../supplier/usecases";
 
 export function makeUseCasesClient(
     repositoryFactory: RepositoryFactory,
@@ -12,6 +12,8 @@ export function makeUseCasesClient(
     const invoiceListQuery = queryFactory.invoiceListQuery();
     const establishmentsRepo = repositoryFactory.establishments();
     const establishmentQuery = queryFactory.establishmentQuery();
+    const suppliersRepo = repositoryFactory.suppliers();
+    const suppliersQuery = queryFactory.suppliersQuery();
 
     return {
         invoices: {
@@ -45,6 +47,20 @@ export function makeUseCasesClient(
             emailPrefixAvailable: new establishmentUC
                 .EmailPrefixAvailableUsecase(
                 establishmentQuery,
+            ),
+        },
+        suppliers: {
+            create: new supplierUC.CreateSupplierUsecase(
+                suppliersRepo,
+            ),
+            list: new supplierUC.ListSuppliersUsecase(
+                suppliersQuery,
+            ),
+            details: new supplierUC.GetSupplierDetailsUsecase(
+                suppliersRepo,
+            ),
+            update: new supplierUC.UpdateSupplierUsecase(
+                suppliersRepo,
             ),
         },
     } as const;

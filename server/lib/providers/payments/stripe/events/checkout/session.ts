@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import { Deps } from "~~/server/core/types";
 import { sessionMetadataSchema } from "~~/server/lib/providers/payments/stripe/schema";
-import { SubscriptionStatus } from "~~/shared/types/models/subscription.model";
+import { SubscriptionStatus } from "~~/shared/domain/establishment/subscription.entity";
 
 const getSubscriptionId = (session: Stripe.Checkout.Session) => {
     const { subscription } = session;
@@ -57,7 +57,7 @@ export async function handleCheckoutSessionCompleted(
         ? SubscriptionStatus.TRIAL
         : SubscriptionStatus.ACTIVE;
 
-    const newSubscription = await subscriptionRepository.createSubscription(
+    await subscriptionRepository.createSubscription(
         {
             provider: "stripe",
             provider_customer_id: customerId,

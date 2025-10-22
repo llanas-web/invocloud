@@ -5,9 +5,9 @@ import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import type { CreateSupplierForm } from "~/types/schemas/forms/suppliers.schema";
 
 const _useSupplierCreate = () => {
-    const { $databaseFactory } = useNuxtApp();
-    const { supplierRepository } = $databaseFactory as DatabaseFactory;
-    const { selectedEstablishment } = useEstablishmentsList();
+    const { $usecases } = useNuxtApp();
+    const { selectedId } = useEstablishmentsList();
+    const { refresh } = useSuppliers();
     const toast = useToast();
 
     const openModal = ref(false);
@@ -16,6 +16,11 @@ const _useSupplierCreate = () => {
         name: "",
         emails: [],
     });
+
+    const resetForm = () => {
+        formState.name = "";
+        formState.emails = [];
+    };
 
     const emailField = ref("");
 
@@ -37,17 +42,17 @@ const _useSupplierCreate = () => {
 
     const { error, pending, execute } = useAsyncAction(
         async () => {
-            if (!selectedEstablishment.value) {
+            if (!selectedId.value) {
                 throw new Error("No establishment selected.");
             }
-            const _newSupplier = await supplierRepository.createSupplier({
+            const _newSupplier = await $usecases.suppliers.create.execute({
                 name: formState.name,
-                establishment_id: selectedEstablishment.value.id,
+                establishment_id: selectedId.value,
                 emails: formState.emails,
             });
             openModal.value = false;
-            formState.name = "";
-            formState.emails = [];
+            resetForm();
+            await refresh();
         },
     );
 

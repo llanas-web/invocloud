@@ -1,7 +1,9 @@
 import type { EstablishmentQuery } from "~~/shared/application/establishment/establishment.query";
-import type { InvoiceListQuery } from "~~/shared/application/invoice/queries/invoice-list.query";
+import type { InvoiceQuery } from "~~/shared/application/invoice/invoice.query";
+import type { SupplierQuery } from "~~/shared/application/supplier/supplier.query";
 
 export interface QueryFactory {
-    invoiceListQuery(): InvoiceListQuery;
+    invoiceListQuery(): InvoiceQuery;
     establishmentQuery(): EstablishmentQuery;
+    suppliersQuery(): SupplierQuery;
 }

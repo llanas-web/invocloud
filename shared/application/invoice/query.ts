@@ -18,3 +18,5 @@ export const InvoiceListQuerySchema = z.object({
         }
         return q;
     });
+
+export type InvoiceListQuery = z.infer<typeof InvoiceListQuerySchema>;

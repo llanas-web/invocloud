@@ -5,9 +5,14 @@ import type { Database } from "~~/shared/types/providers/database/supabase/datab
 import { InvoiceSupabaseRepository } from "../../invoice/supabase/invoice.supabase.repository";
 import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
 import { EstablishmentSupabaseRepository } from "../../establishment/supabase/establishment.supabase.repository";
+import type { SupplierRepository } from "~~/shared/domain/supplier/supplier.repository";
+import { SupplierSupabaseRepository } from "../../supplier/supplier.supabase.repository";
 
 export class SupabaseRepositoryFactory implements RepositoryFactory {
     constructor(private readonly supabaseInstance: SupabaseClient<Database>) {}
+    suppliers(): SupplierRepository {
+        return new SupplierSupabaseRepository(this.supabaseInstance);
+    }
 
     invoices(): InvoiceRepository {
         return new InvoiceSupabaseRepository(this.supabaseInstance);

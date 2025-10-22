@@ -2,7 +2,7 @@ import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "../core/useAsyncAction";
 import { UpdateInvoiceSchema } from "~/types/schemas/forms/invoices.schema";
 import type { z } from "zod";
-import type { UpdateInvoiceDetailsCommand } from "~~/shared/application/invoice/command";
+import type { UpdateInvoiceDetailsCommand } from "~~/shared/application/invoice/commands";
 import { AppError } from "~/core/errors/app.error";
 
 // Mapping UI → Application command

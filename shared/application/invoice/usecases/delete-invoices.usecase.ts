@@ -1,5 +1,5 @@
 import type { InvoiceRepository } from "~~/shared/domain/invoice/invoice.repository";
-import { DeleteInvoicesSchema } from "../command";
+import { DeleteInvoicesSchema } from "../commands";
 
 export class DeleteInvoicesUsecase {
     constructor(

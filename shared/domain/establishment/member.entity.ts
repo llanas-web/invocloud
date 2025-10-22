@@ -10,7 +10,6 @@ export enum MemberStatus {
 export enum MemberRole {
     CREATOR = "creator",
     ADMIN = "admin",
-    MEMBER = "member",
 }
 
 export type MemberEntityProps = {
@@ -34,7 +33,7 @@ export class MemberEntity {
     static createPending(userId: string): MemberEntity {
         return new MemberEntity({
             userId,
-            role: MemberRole.MEMBER,
+            role: MemberRole.ADMIN,
             status: MemberStatus.PENDING,
             createdAt: new Date(),
         });
@@ -46,7 +45,7 @@ export class MemberEntity {
     ): MemberEntity {
         return new MemberEntity({
             userId: user.id,
-            role: MemberRole.MEMBER,
+            role: MemberRole.ADMIN,
             status,
         });
     }

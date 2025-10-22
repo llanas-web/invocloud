@@ -1,5 +1,5 @@
 import type { InvoiceRepository } from "~~/shared/domain/invoice/invoice.repository";
-import { UpdateInvoiceDetailsSchema } from "../command";
+import { UpdateInvoiceDetailsSchema } from "../commands";
 
 export class UpdateInvoiceDetailsUsecase {
     constructor(private readonly repo: InvoiceRepository) {}

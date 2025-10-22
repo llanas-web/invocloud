@@ -4,7 +4,7 @@ import type { StorageProvider } from "~~/shared/providers/storage/storage.interf
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 import type { z } from "zod";
 import { CreateInvoiceSchema } from "~/types/schemas/forms/invoices.schema";
-import type { CreateInvoiceCommand } from "~~/shared/application/invoice/command";
+import type { CreateInvoiceCommand } from "~~/shared/application/invoice/commands";
 
 const toCreateInvoiceCommand = (
     parsed: z.output<typeof CreateInvoiceSchema>,
