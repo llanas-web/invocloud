@@ -4,7 +4,7 @@ import { MemberRole } from "~~/shared/domain/establishment/member.entity";
 export const InviteMemberBodySchema = z.object({
     establishmentId: z.uuid(),
     email: z.email().max(255),
-    role: z.enum(MemberRole),
+    invitorId: z.uuid(),
 });
 
 export const InviteMemberResponseSchema = z.undefined();

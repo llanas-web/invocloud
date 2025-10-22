@@ -28,13 +28,6 @@ const _useEstablishmentDetails = () => {
         },
     );
 
-    const getSelectedId = () => {
-        if (!selectedId.value) {
-            throw new AppError("Aucun établissement sélectionné");
-        }
-        return selectedId.value;
-    };
-
     const establishment = computed<EstablishmentViewModel | null>(() => {
         if (!model.value) return null;
         return new EstablishmentViewModel(model.value);
@@ -43,15 +36,19 @@ const _useEstablishmentDetails = () => {
     const isSelected = computed(() => !!selectedId.value);
 
     const deleteAction = useAsyncAction(async () => {
-        await $usecases.establishments.delete.execute([getSelectedId()]);
+        if (!selectedId.value) throw new AppError("No establishment selected");
+        await $usecases.establishments.delete.execute([selectedId.value]);
         await refreshListEstablishments();
     });
 
     const createCheckoutSessionAction = useAsyncAction(
         async () => {
+            if (!selectedId.value) {
+                throw new AppError("No establishment selected");
+            }
             window.location.href = await establishmentApi.subscription
                 .createCheckoutSession({
-                    establishmentId: getSelectedId(),
+                    establishmentId: selectedId.value,
                     userId: user.value!.id,
                 });
         },
