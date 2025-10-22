@@ -1,19 +1,17 @@
 import { createSharedComposable } from "@vueuse/core";
 import { z } from "zod";
-import type SupplierModel from "~~/shared/types/models/supplier.model";
 import useAsyncAction from "../core/useAsyncAction";
-import DatabaseFactory from "~~/shared/providers/database/database.factory";
 import {
     type UpdateSupplierForm,
     UpdateSupplierSchema,
 } from "~/types/schemas/forms/suppliers.schema";
+import { useSupplierDetails } from "./details";
 
 const _useSupplierUpdate = () => {
-    const { $databaseFactory } = useNuxtApp();
-    const { supplierRepository } = $databaseFactory as DatabaseFactory;
+    const { $usecases } = useNuxtApp();
+    const { supplier, selectedId } = useSupplierDetails();
 
     const { refresh } = useSuppliers();
-    const supplier = ref<SupplierModel | null>(null);
     const toast = useToast();
 
     const openModal = ref(false);
@@ -23,19 +21,15 @@ const _useSupplierUpdate = () => {
         emails: [],
     });
 
-    watch(
-        () => supplier.value,
-        (newSupplier) => {
-            if (newSupplier) {
-                formState.name = newSupplier.name;
-                formState.emails = newSupplier.emails || [];
-            } else {
-                formState.name = "";
-                formState.emails = [];
-            }
-        },
-        { immediate: true },
-    );
+    const resetForm = () => {
+        formState.name = "";
+        formState.emails = [];
+    };
+
+    watch(supplier, (newSupplier) => {
+        formState.name = newSupplier?.name || "";
+        formState.emails = newSupplier?.emails || [];
+    });
 
     const emailField = ref("");
 
@@ -63,14 +57,18 @@ const _useSupplierUpdate = () => {
                 throw new Error("No supplier selected.");
             }
             const parsed = UpdateSupplierSchema.parse(formState);
-            const _updatedSupplier = await supplierRepository.updateSupplier(
-                supplier.value.id,
-                parsed,
-            );
-            supplier.value = _updatedSupplier;
+            await $usecases.suppliers.update.execute({
+                id: supplier.value.id,
+                ...parsed,
+            });
             openModal.value = false;
-            formState.name = "";
-            formState.emails = [];
+            toast.add({
+                title: "Succès",
+                description: "Fournisseur mis à jour avec succès",
+                color: "success",
+            });
+            resetForm();
+            selectedId.value = null;
             await refresh();
         },
     );

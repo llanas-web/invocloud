@@ -1,4 +1,4 @@
-import type SupplierModel from "~~/shared/types/models/supplier.model";
+import type SupplierModel from "~~/shared/domain/supplier/supplier.model";
 import type UserSettingsModel from "~~/shared/types/models/user-settings.model";
 import type {
     UserModel,

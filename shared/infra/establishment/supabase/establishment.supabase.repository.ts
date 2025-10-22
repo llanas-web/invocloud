@@ -5,10 +5,12 @@ import {
 import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
 import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { MemberEntity } from "~~/shared/domain/establishment/member.entity";
+import {
+    MemberEntity,
+    MemberRole,
+} from "~~/shared/domain/establishment/member.entity";
 import { SupabaseError } from "../../common/errors/supabase.error";
 import type { SubscriptionEntity } from "~~/shared/domain/establishment/subscription.entity";
-import { MemberRole } from "~~/shared/types/models/member.model";
 
 type EstablishmentRow = Database["public"]["Tables"]["establishments"]["Row"];
 type EstablishmentInsert =

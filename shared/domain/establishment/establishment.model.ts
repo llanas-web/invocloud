@@ -3,6 +3,7 @@ import type { ModelCommonUpdateProps } from "../common/common.interface";
 import { PayloadModel } from "../common/payload.model";
 import { MemberEntity, MemberStatus } from "./member.entity";
 import { SubscriptionEntity } from "./subscription.entity";
+import { DomainError, DomainErrorCode } from "../common/errors/domain.error";
 
 export type EstablishmentModelProps =
     & ModelCommonUpdateProps
@@ -100,7 +101,8 @@ export class EstablishmentModel extends PayloadModel {
     inviteMember(userId: string, user: UserModel): EstablishmentModel {
         // Vérifier que l'utilisateur n'est pas déjà membre
         if (this.hasMember(userId)) {
-            throw new Error(
+            throw new DomainError(
+                DomainErrorCode.ENTITY_ALREADY_EXISTS,
                 `L'utilisateur ${userId} est déjà membre de cet établissement`,
             );
         }
