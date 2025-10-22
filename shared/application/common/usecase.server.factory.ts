@@ -4,7 +4,7 @@ import * as invoiceUC from "../invoice/usecases";
 import * as establishmentUC from "../establishment/usecases";
 import type { PaymentRepository } from "~~/shared/application/common/providers/payment/payment.repository";
 
-export function makeUseCases(
+export function makeUseCasesServer(
     repositoryFactory: RepositoryFactory,
     queryFactory: QueryFactory,
     paymentFactory: PaymentRepository,
