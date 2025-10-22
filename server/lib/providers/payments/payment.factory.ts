@@ -1,17 +1,17 @@
-import type { PaymentProviderInterface } from "./payment.interface";
-import { StripeRepository } from "./stripe/stripe.repository";
+import type { PaymentRepository } from "../../../../shared/application/common/providers/payment/payment.repository";
+import { PaymentStripeRepository } from "./stripe/payment.stripe.repository";
 
 class PaymentFactory {
-    private static instance: PaymentProviderInterface;
+    private static instance: PaymentRepository;
 
     private constructor(providerName: string) {
         PaymentFactory.instance = this.createProvider(providerName);
     }
 
-    private createProvider(name: string): PaymentProviderInterface {
+    private createProvider(name: string): PaymentRepository {
         switch (name) {
             case "stripe":
-                return new StripeRepository();
+                return new PaymentStripeRepository();
             // case "paypal":
             //     return new PaypalProvider();
             default:
@@ -19,7 +19,7 @@ class PaymentFactory {
         }
     }
 
-    public static getInstance(providerName: string): PaymentProviderInterface {
+    public static getInstance(providerName: string): PaymentRepository {
         if (!PaymentFactory.instance) {
             new PaymentFactory(providerName);
         }

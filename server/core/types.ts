@@ -5,14 +5,14 @@ import {
 import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
 import type { OcrProvider } from "~~/shared/providers/ocr/ocr.interface";
 import type { EmailProviderInterface } from "~~/shared/providers/email/email.interface";
-import type { PaymentProviderInterface } from "~~/shared/providers/payment/payment.interface";
+import type { PaymentRepository } from "~~/shared/application/common/providers/payment/payment.repository";
 
 export type Deps = {
     storage: StorageProvider;
     auth: AuthInterface;
     ocr: OcrProvider;
     email: EmailProviderInterface;
-    payment: PaymentProviderInterface;
+    payment: PaymentRepository;
     database: DatabaseInterface;
 };
 

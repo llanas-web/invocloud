@@ -2,10 +2,12 @@ import type { RepositoryFactory } from "~~/shared/domain/common/repository.facto
 import type { QueryFactory } from "~~/shared/infra/common/query.factory";
 import * as invoiceUC from "../invoice/usecases";
 import * as establishmentUC from "../establishment/usecases";
+import type { PaymentRepository } from "~~/shared/application/common/providers/payment/payment.repository";
 
 export function makeUseCases(
     repositoryFactory: RepositoryFactory,
     queryFactory: QueryFactory,
+    paymentFactory: PaymentRepository,
 ) {
     const invoicesRepo = repositoryFactory.invoices();
     const invoiceListQuery = queryFactory.invoiceListQuery();
@@ -41,15 +43,34 @@ export function makeUseCases(
             details: new establishmentUC.GetEstablishmentDetailsUsecase(
                 establishmentsRepo,
             ),
-            inviteMember: new establishmentUC.InviteMemberUseCase(
-                establishmentsRepo,
-                // establishmentQuery,
-                // emailPrefixAvailable,
-            ),
             emailPrefixAvailable: new establishmentUC
                 .EmailPrefixAvailableUsecase(
                 establishmentQuery,
             ),
+            member: {
+                invite: new establishmentUC.InviteMemberUsecase(
+                    establishmentsRepo,
+                    // establishmentQuery,
+                    // emailPrefixAvailable,
+                ),
+            },
+            subscription: {
+                createCheckoutSession: new establishmentUC
+                    .CreateCheckoutSessionUsecase(
+                    establishmentsRepo,
+                    paymentFactory,
+                ),
+                createSubscription: new establishmentUC
+                    .CreateSubscriptionUsecase(
+                    establishmentsRepo,
+                    paymentFactory,
+                ),
+                cancelSubscription: new establishmentUC
+                    .CancelSubscriptionUsecase(
+                    establishmentsRepo,
+                    paymentFactory,
+                ),
+            },
         },
     } as const;
 }

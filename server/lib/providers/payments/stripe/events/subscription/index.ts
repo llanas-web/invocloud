@@ -1,7 +1,7 @@
 import type Stripe from "stripe";
 import { fromUnix, nowISO } from "~/utils/date";
 import { Deps } from "~~/server/core/types";
-import PaymentError from "~~/shared/providers/payment/payment.error";
+import PaymentError from "~~/shared/application/common/providers/payment/payment.error";
 import { SubscriptionStatus } from "~~/shared/types/models/subscription.model";
 
 const getCustomerId = (customer: Stripe.Subscription["customer"]) => {

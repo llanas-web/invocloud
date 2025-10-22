@@ -30,3 +30,11 @@ export const InviteMemberCommandSchema = z.object({
 export type InviteMemberCommand = z.infer<
     typeof InviteMemberCommandSchema
 >;
+
+export const CreateCheckoutSessionCommandSchema = z.object({
+    establishmentId: z.uuid(),
+    userId: z.uuid(),
+});
+export type CreateCheckoutSessionCommand = z.infer<
+    typeof CreateCheckoutSessionCommandSchema
+>;

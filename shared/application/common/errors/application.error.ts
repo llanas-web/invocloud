@@ -2,10 +2,9 @@ import { BaseError } from "#shared/errors/base.error";
 
 export class ApplicationError extends BaseError {
     constructor(
-        code: string,
         message: string,
         details?: unknown,
     ) {
-        super(message, "application", code, details);
+        super(message, "application", "APPLICATION_ERROR", details);
     }
 }

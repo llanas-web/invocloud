@@ -1,7 +1,7 @@
 import type Stripe from "stripe";
 import { fromUnix } from "~/utils/date";
 import { Deps } from "~~/server/core/types";
-import PaymentError from "~~/shared/providers/payment/payment.error";
+import PaymentError from "~~/shared/application/common/providers/payment/payment.error";
 
 const getCustomerId = (customer: Stripe.Invoice["customer"]) => {
     if (typeof customer === "string") {

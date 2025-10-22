@@ -5,7 +5,7 @@ import StorageFactory from "~~/shared/providers/storage/storage.factory";
 import AuthFactory from "~~/shared/providers/auth/auth.factory";
 import OcrFactory from "~~/shared/providers/ocr/ocr.factory";
 import EmailFactory from "~~/shared/providers/email/email.factory";
-import PaymentFactory from "~~/shared/providers/payment/payment.factory";
+import PaymentFactory from "~~/server/lib/providers/payments/payment.factory";
 import { HTTPStatus } from "./errors/status";
 import {
     serverSupabaseClient,

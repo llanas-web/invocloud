@@ -1,8 +1,7 @@
 import type Stripe from "stripe";
-import PaymentError from "../../payment.error";
+import PaymentError from "../../../../../../shared/application/common/providers/payment/payment.error";
 
 export const generateCreateCheckoutSessionObject = (
-    userId: string,
     userEmail: string,
     establishmentId: string,
 ): Stripe.Checkout.SessionCreateParams => {
@@ -29,7 +28,6 @@ export const generateCreateCheckoutSessionObject = (
         success_url: `${baseUrl}/app?subscription_success=true`,
         cancel_url: `${baseUrl}/app/settings/establishments?cancel=true`,
         metadata: {
-            userId,
             establishmentId,
         },
     };

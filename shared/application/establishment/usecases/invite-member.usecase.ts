@@ -6,7 +6,7 @@ export type InviteMemberInput = {
     invitorId: string;
 };
 
-export class InviteMemberUseCase {
+export class InviteMemberUsecase {
     constructor(
         private establishmentRepo: EstablishmentRepository,
         // private userRepo: UserRepository,

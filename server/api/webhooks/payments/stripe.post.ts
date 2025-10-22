@@ -12,7 +12,7 @@ import {
     handleSubscriptionDeleted,
     handleSubscriptionUpdated,
 } from "~~/server/lib/providers/payments/stripe/events/subscription";
-import { StripeRepository } from "~~/shared/providers/payment/stripe/stripe.repository";
+import { PaymentStripeRepository } from "~~/server/lib/providers/payments/stripe/payment.stripe.repository";
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    const stripeRepository = new StripeRepository();
+    const stripeRepository = new PaymentStripeRepository();
     const { type, data } = stripeRepository.stripeInstance.webhooks
         .constructEvent(
             rawBody,

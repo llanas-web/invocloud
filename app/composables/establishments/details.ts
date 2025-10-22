@@ -2,11 +2,13 @@ import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "../core/useAsyncAction";
 import { AppError } from "~/core/errors/app.error";
 import { EstablishmentViewModel } from "~/viewmodels/establishment/establishment.vm";
+import { establishmentApi } from "~/services/api/establishment.api";
 
 const _useEstablishmentDetails = () => {
     const { $usecases } = useNuxtApp();
     const { selectedId, refresh: refreshListEstablishments } =
         useEstablishmentsList();
+    const { user } = useAuth();
 
     const {
         data: model,
@@ -26,6 +28,13 @@ const _useEstablishmentDetails = () => {
         },
     );
 
+    const getSelectedId = () => {
+        if (!selectedId.value) {
+            throw new AppError("Aucun établissement sélectionné");
+        }
+        return selectedId.value;
+    };
+
     const establishment = computed<EstablishmentViewModel | null>(() => {
         if (!model.value) return null;
         return new EstablishmentViewModel(model.value);
@@ -33,33 +42,20 @@ const _useEstablishmentDetails = () => {
 
     const isSelected = computed(() => !!selectedId.value);
 
-    const deleteEstablishment = useAsyncAction(async () => {
-        if (!selectedId.value) {
-            throw new AppError("Aucun établissement sélectionné");
-        }
-        await $usecases.establishments.delete.execute([selectedId.value]);
+    const deleteAction = useAsyncAction(async () => {
+        await $usecases.establishments.delete.execute([getSelectedId()]);
         await refreshListEstablishments();
     });
 
-    // Stripe actions
-    const subscribeToStripe = async () => {
-        if (!selectedId.value) {
-            throw new AppError("Aucun établissement sélectionné");
-        }
-        const { url }: { url: string } = await $fetch(
-            "/api/stripe/subscription/create",
-            {
-                method: "POST",
-                body: { establishmentId: selectedId.value },
-            },
-        );
-        if (!url) {
-            console.error("Error creating Stripe subscription:");
-            return null;
-        }
-        window.location.href = url;
-        return null;
-    };
+    const createCheckoutSessionAction = useAsyncAction(
+        async () => {
+            window.location.href = await establishmentApi.subscription
+                .createCheckoutSession({
+                    establishmentId: getSelectedId(),
+                    userId: user.value!.id,
+                });
+        },
+    );
 
     const cancelStripeTrial = async () => {
         if (!selectedId.value) {
@@ -96,9 +92,9 @@ const _useEstablishmentDetails = () => {
         pending,
         error,
         actions: {
-            deleteEstablishment,
+            delete: deleteAction,
+            createCheckoutSession: createCheckoutSessionAction,
         },
-        subscribeToStripe,
         cancelStripeTrial,
         cancelStripeSubscription,
     };
