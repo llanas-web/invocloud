@@ -3,6 +3,10 @@ import {
     InviteMemberBodySchema,
     type InviteMemberResponse,
 } from "~~/shared/contracts/api/security/establishments/invite-member.contract";
+import {
+    type CreateCheckoutSessionBody,
+    CreateCheckoutSessionBodySchema,
+} from "~~/shared/contracts/api/security/establishments/subscription/create-checkout.contract";
 
 export const establishmentApi = {
     inviteMember(body: InviteMemberBody) {
@@ -13,5 +17,16 @@ export const establishmentApi = {
                 body: parseBody(InviteMemberBodySchema, body),
             },
         );
+    },
+    subscription: {
+        createCheckoutSession(body: CreateCheckoutSessionBody) {
+            return $fetch<string>(
+                "/api/security/establishment/subscription/create-checkout",
+                {
+                    method: "POST",
+                    body: parseBody(CreateCheckoutSessionBodySchema, body),
+                },
+            );
+        },
     },
 };

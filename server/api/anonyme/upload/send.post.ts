@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { buildRequestScope } from "~~/server/core/container";
-import { useServerUsecases } from "~~/server/plugins/usecases.server";
+import { useServerUsecases } from "~~/server/plugins/usecases.plugin";
 import { SendUploadInvoiceRequestSchema } from "~~/shared/contracts/api/security/upload/send.contract";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 

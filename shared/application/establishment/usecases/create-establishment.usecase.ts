@@ -16,9 +16,9 @@ export class CreateEstablishmentUsecase {
             address: input.address,
             phone: input.phone,
         });
-        const newEstablishment = await this.establishmentRepository.create(
+        const newEstablishmentId = await this.establishmentRepository.create(
             entity,
         );
-        return newEstablishment.id;
+        return newEstablishmentId;
     }
 }

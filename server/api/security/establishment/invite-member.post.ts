@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { buildRequestScope } from "~~/server/core/container";
 import { HTTPStatus } from "~~/server/core/errors/status";
-import { useServerUsecases } from "~~/server/plugins/usecases.server";
+import { useServerUsecases } from "~~/server/plugins/usecases.plugin";
 import {
     DomainError,
     DomainErrorCode,
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
             deps: {
                 email: emailRepository,
                 auth,
-                database: { establishmentRepository, userRepository },
+                database: { userRepository },
             },
         } = await buildRequestScope(
             event,

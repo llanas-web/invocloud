@@ -4,7 +4,7 @@ import { fromUnix, nowISO } from "~/utils/date";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import { Deps } from "~~/server/core/types";
-import { sessionMetadataSchema } from "~~/shared/providers/payment/stripe/schema";
+import { sessionMetadataSchema } from "~~/server/lib/providers/payments/stripe/schema";
 import { SubscriptionStatus } from "~~/shared/types/models/subscription.model";
 
 const getSubscriptionId = (session: Stripe.Checkout.Session) => {
@@ -47,7 +47,7 @@ export async function handleCheckoutSessionCompleted(
     }
 
     // ✅ Validate metadata
-    const { userId, establishmentId } = sessionMetadataSchema.parse(
+    const { establishmentId } = sessionMetadataSchema.parse(
         session.metadata,
     );
 
@@ -70,7 +70,7 @@ export async function handleCheckoutSessionCompleted(
     );
 
     const { email } = await userRepository.getUser({
-        id: userId,
+        id: session.customer_email!,
     });
 
     await emailRepository.sendEmail({

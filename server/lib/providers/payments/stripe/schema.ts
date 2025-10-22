@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const sessionMetadataSchema = z.object({
-    userId: z.uuid(),
     establishmentId: z.uuid(),
 });
 
