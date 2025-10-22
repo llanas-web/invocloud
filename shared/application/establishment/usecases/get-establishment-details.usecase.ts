@@ -1,13 +1,13 @@
 import { z } from "zod";
-import type { EstablishmentQuery } from "../establishment.query";
+import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
 
 export class GetEstablishmentDetailsUsecase {
     constructor(
-        private readonly establishmentQuery: EstablishmentQuery,
+        private readonly establishmentRepository: EstablishmentRepository,
     ) {}
 
     async execute(id: unknown) {
         const parsedId = z.uuid().parse(id);
-        return this.establishmentQuery.getEstablishmentDetails(parsedId);
+        return this.establishmentRepository.getById(parsedId);
     }
 }

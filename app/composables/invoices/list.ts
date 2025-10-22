@@ -1,9 +1,6 @@
 import { createSharedComposable } from "@vueuse/core";
 import { invoicesApi } from "~/services/api/invoices.api";
-import {
-    type InvoiceVM,
-    presentInvoices,
-} from "~/ui/presenters/invoice.presenter";
+import { InvoiceListItemViewModel } from "~/viewmodels/invoice/invoice-list-item.vm";
 import type { InvoiceStatus } from "~~/shared/domain/invoice/invoice.model";
 import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
@@ -11,7 +8,7 @@ import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 const _useInvoices = () => {
     const { $storageFactory, $usecases } = useNuxtApp();
     const storageRepository = $storageFactory as StorageProvider;
-    const { selectedEstablishment } = useEstablishmentsList();
+    const { selectedId } = useEstablishmentsList();
 
     const searchQuery = ref<string>("");
     const statusFilter = ref<InvoiceStatus | undefined>(undefined);
@@ -21,12 +18,17 @@ const _useInvoices = () => {
         end: new Date(),
     });
 
-    const { data: raw, error, refresh, pending } = useAsyncData(
+    const {
+        data: dtos,
+        error,
+        refresh,
+        pending,
+    } = useAsyncData(
         "invoices",
         async () => {
-            if (!selectedEstablishment.value) return [];
+            if (!selectedId.value) return [];
             return await $usecases.invoices.list.execute({
-                establishmentIds: [selectedEstablishment.value.id],
+                establishmentIds: [selectedId.value],
                 supplierIds: supplierFilter.value.length > 0
                     ? supplierFilter.value
                     : undefined,
@@ -37,7 +39,7 @@ const _useInvoices = () => {
         {
             default: () => [],
             watch: [
-                selectedEstablishment,
+                selectedId,
                 searchQuery,
                 statusFilter,
                 supplierFilter,
@@ -46,8 +48,8 @@ const _useInvoices = () => {
         },
     );
 
-    const invoices = computed<InvoiceVM[]>(() => {
-        return presentInvoices(raw.value || []);
+    const invoices = computed<InvoiceListItemViewModel[]>(() => {
+        return dtos.value.map(InvoiceListItemViewModel.fromDTO);
     });
 
     const updateStatusAction = useAsyncAction(
@@ -87,7 +89,6 @@ const _useInvoices = () => {
     );
 
     return {
-        raw,
         invoices,
         refresh,
         pending,

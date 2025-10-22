@@ -69,25 +69,22 @@ export class InvoiceSupabaseRepository implements InvoiceRepository {
         return fromRow(data);
     }
 
-    async create(invoice: DraftInvoice): Promise<InvoiceModel> {
+    async create(invoice: DraftInvoice): Promise<string> {
         const payload = toInsert(invoice);
         const { data, error } = await this.supabaseClient
             .from("invoices")
             .insert(payload)
-            .select("*")
+            .select("id")
             .single();
         if (error) throw SupabaseError.fromPostgrest(error);
-        return fromRow(data);
+        return data.id;
     }
-    async update(entity: InvoiceModel): Promise<InvoiceModel> {
+    async update(entity: InvoiceModel): Promise<void> {
         const payload = toUpsert(entity);
-        const { data, error } = await this.supabaseClient.from("invoices")
+        const { error } = await this.supabaseClient.from("invoices")
             .update(payload)
-            .eq("id", entity.id)
-            .select("*")
-            .single();
+            .eq("id", entity.id);
         if (error) throw SupabaseError.fromPostgrest(error);
-        return fromRow(data);
     }
 
     async deleteMany(invoiceIds: string[]): Promise<void> {

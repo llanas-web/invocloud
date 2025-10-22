@@ -1,5 +1,6 @@
 import { createSharedComposable } from "@vueuse/core";
 import z from "zod";
+import { InvoiceViewModel } from "~/viewmodels/invoice/invoice.vm";
 import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 
@@ -11,20 +12,15 @@ const _useInvoiceDetails = () => {
     const invoiceId = computed(() => route.params.id as string);
 
     const {
-        data: invoice,
+        data: model,
         pending,
         error,
         refresh,
     } = useAsyncData(
         "invoice-details",
         async () => {
-            const parsed = z.uuid({ message: "ID de facture invalide." }).parse(
-                route.params.id,
-            );
-            const invoices = await $usecases.invoices.list.execute({
-                ids: [parsed],
-            });
-            return invoices[0]!;
+            if (!invoiceId.value) return null;
+            return await $usecases.invoices.details.execute(invoiceId.value);
         },
         {
             watch: [invoiceId],
@@ -32,14 +28,19 @@ const _useInvoiceDetails = () => {
         },
     );
 
+    const invoice = computed<InvoiceViewModel | null>(() => {
+        if (!model.value) return null;
+        return new InvoiceViewModel(model.value!);
+    });
+
     const downloadAction = useAsyncAction(
         async () => {
-            if (!invoice.value?.id) {
+            if (!invoiceId.value) {
                 throw new Error("No invoice loaded.");
             }
             const blob = await storageRepository.downloadFile(
                 STORAGE_BUCKETS.INVOICES,
-                invoice.value!.filePath,
+                model.value!.filePath,
             );
             return blob;
         },
@@ -47,6 +48,7 @@ const _useInvoiceDetails = () => {
 
     return {
         invoiceId,
+        model,
         invoice,
         pending,
         error,

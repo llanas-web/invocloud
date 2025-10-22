@@ -21,8 +21,7 @@ function slugify(s: string) {
 const _useEstablishmentCreate = () => {
     const supabaseUser = useSupabaseUser();
     const { $usecases } = useNuxtApp();
-    const { establishments, refresh, selectEstablishment } =
-        useEstablishmentsList();
+    const { refresh, selectEstablishment } = useEstablishmentsList();
 
     const formRef = ref();
 

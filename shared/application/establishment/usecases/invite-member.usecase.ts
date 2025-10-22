@@ -1,7 +1,4 @@
 import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
-import type {
-    UserRepository,
-} from "~~/shared/providers/database/database.interface";
 
 export type InviteMemberInput = {
     establishmentId: string;

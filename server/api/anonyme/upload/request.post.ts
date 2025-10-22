@@ -1,6 +1,6 @@
 import { generateCode, hashCode } from "~/utils/hash";
 import { buildRequestScope } from "~~/server/core/container";
-import { RequestUploadInvoiceRequestSchema } from "~~/shared/contracts/api/security/upload/request.contract";
+import { RequestUploadInvoiceRequestSchema } from "~~/shared/contracts/api/security/anonyme/upload/request.contract";
 
 export default defineEventHandler(
     async (event) => {

@@ -26,7 +26,7 @@ const toCreateInvoiceCommand = (
 const _useInvoiceCreate = () => {
     const { $storageFactory, $usecases } = useNuxtApp();
     const storageRepository = $storageFactory as StorageProvider;
-    const { selectedEstablishment } = useEstablishmentsList();
+    const { selectedId } = useEstablishmentsList();
 
     const formRef = ref();
 
@@ -55,7 +55,7 @@ const _useInvoiceCreate = () => {
             const newInvoiceId = crypto.randomUUID();
             const uploadResult = await storageRepository.uploadFile(
                 STORAGE_BUCKETS.INVOICES,
-                `${selectedEstablishment.value!.id}/${newInvoiceId}`,
+                `${selectedId.value}/${newInvoiceId}`,
                 invoiceFile.value,
                 { contentType: invoiceFile.value.type, upsert: true },
             );
