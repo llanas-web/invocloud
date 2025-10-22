@@ -60,11 +60,6 @@ export function makeUseCasesServer(
                     establishmentsRepo,
                     paymentFactory,
                 ),
-                createSubscription: new establishmentUC
-                    .CreateSubscriptionUsecase(
-                    establishmentsRepo,
-                    paymentFactory,
-                ),
                 cancelSubscription: new establishmentUC
                     .CancelSubscriptionUsecase(
                     establishmentsRepo,

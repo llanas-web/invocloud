@@ -2,10 +2,11 @@ import { createSharedComposable } from "@vueuse/core";
 import { AppError } from "~/core/errors/app.error";
 import { establishmentApi } from "~/services/api/establishment.api";
 import { MemberViewModel } from "~/viewmodels/establishment/member.vm";
-import { MemberRole } from "~~/shared/domain/establishment/member.entity";
 
 const _useMembersList = () => {
+    const { selectedId } = useEstablishmentsList();
     const { model } = useEstablishmentDetails();
+    const { currentUser } = useUser();
 
     const members = computed(() => {
         return model.value?.members.map((member) =>
@@ -15,13 +16,13 @@ const _useMembersList = () => {
 
     const inviteMemberAction = useAsyncAction(
         async (email: string) => {
-            if (!model.value?.id) {
+            if (!selectedId.value) {
                 throw new AppError("No establishment selected");
             }
             await establishmentApi.inviteMember({
-                establishmentId: model.value.id,
+                establishmentId: selectedId.value,
                 email,
-                role: MemberRole.MEMBER,
+                invitorId: currentUser.value!.id,
             });
         },
     );
