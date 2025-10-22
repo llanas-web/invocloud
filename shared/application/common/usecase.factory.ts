@@ -19,6 +19,7 @@ export function makeUseCases(
             updateDetails: new invoiceUC.UpdateInvoiceDetailsUsecase(
                 invoicesRepo,
             ),
+            details: new invoiceUC.GetInvoiceDetailsUsecase(invoicesRepo),
             updateStatus: new invoiceUC.ChangeInvoiceStatusUsecase(
                 invoicesRepo,
             ),
@@ -38,7 +39,7 @@ export function makeUseCases(
                 establishmentsRepo,
             ),
             details: new establishmentUC.GetEstablishmentDetailsUsecase(
-                establishmentQuery,
+                establishmentsRepo,
             ),
             inviteMember: new establishmentUC.InviteMemberUseCase(
                 establishmentsRepo,

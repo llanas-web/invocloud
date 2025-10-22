@@ -5,7 +5,7 @@ import type {
 
 export interface InvoiceRepository {
     getById(id: string): Promise<InvoiceModel | null>;
-    create(entity: DraftInvoice): Promise<InvoiceModel>;
-    update(entity: InvoiceModel): Promise<InvoiceModel>;
+    create(entity: DraftInvoice): Promise<string>;
+    update(entity: InvoiceModel): Promise<void>;
     deleteMany(invoiceIds: string[]): Promise<void>;
 }

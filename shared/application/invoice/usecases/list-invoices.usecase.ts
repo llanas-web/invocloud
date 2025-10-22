@@ -1,8 +1,6 @@
 import { InvoiceListQuerySchema } from "../query";
-import type {
-    InvoiceListItemDTO,
-    InvoiceListQuery,
-} from "../queries/invoice-list.query";
+import type { InvoiceListQuery } from "../queries/invoice-list.query";
+import type { InvoiceListItemDTO } from "../dto";
 
 export class ListInvoicesUsecase {
     constructor(private readonly invoiceListQuery: InvoiceListQuery) {}

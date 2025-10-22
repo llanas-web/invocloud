@@ -1,8 +1,5 @@
 import { createSharedComposable, useLocalStorage } from "@vueuse/core";
-import {
-    type EstablishmentVM,
-    presentEstablishments,
-} from "~/ui/presenters/establishment.presenter";
+import { EstablishmentListItemViewModel } from "~/viewmodels/establishment/establishment-list-item.vm";
 import type { EstablishmentListItemDTO } from "~~/shared/application/establishment/dto";
 
 const _useEstablishmentsList = () => {
@@ -16,7 +13,7 @@ const _useEstablishmentsList = () => {
     );
 
     const {
-        data: raw,
+        data: dtos,
         pending,
         refresh,
         error,
@@ -37,23 +34,13 @@ const _useEstablishmentsList = () => {
         },
     );
 
-    const establishments = computed<EstablishmentVM[]>(() =>
-        presentEstablishments(raw.value)
-    );
-
-    // Sélection dérivée (source unique = selectedId)
-    const selectedEstablishment = computed<EstablishmentVM | null>(
-        () => {
-            if (!selectedId.value) return null;
-            return establishments.value.find((e) =>
-                e.id === selectedId.value
-            ) ?? null;
-        },
+    const establishments = computed<EstablishmentListItemViewModel[]>(() =>
+        dtos.value.map(EstablishmentListItemViewModel.fromDTO)
     );
 
     // --- Helpers sélection
     function exists(id?: string | null) {
-        return !!id && establishments.value.some((e) => e.id === id);
+        return !!id && dtos.value.some((e) => e.id === id);
     }
 
     // Accepte n’importe quelle liste avec un champ id
@@ -72,17 +59,17 @@ const _useEstablishmentsList = () => {
     /** Sélection explicite (id) */
     function selectEstablishment(id: string | null) {
         selectedId.value = exists(id) ? id : null;
-        if (!selectedId.value) ensureSelection(establishments.value);
+        if (!selectedId.value) ensureSelection(dtos.value);
     }
 
     // Si la liste change et invalide la sélection, on retombe sur un fallback
-    watch(establishments, (list) => {
+    watch(dtos, (list) => {
         if (!exists(selectedId.value)) ensureSelection(list);
     });
 
     return {
+        selectedId,
         establishments,
-        selectedEstablishment,
         pending,
         error,
         status,

@@ -31,25 +31,11 @@ const _useInvoiceUpdate = () => {
         {},
     );
 
-    watch(
-        () => invoice.value,
-        (newInvoice) => {
-            if (newInvoice) {
-                Object.assign(formState, {
-                    id: newInvoice.id,
-                    invoiceNumber: newInvoice.number ?? "",
-                    emitDate: newInvoice.emitDate ?? new Date(),
-                    dueDate: newInvoice.dueDate ?? new Date(),
-                    amount: newInvoice.amount ?? 0,
-                    name: newInvoice.name ?? null,
-                    comment: newInvoice.comment ?? null,
-                    paidAt: newInvoice.paidAt ?? null,
-                    status: newInvoice.status,
-                });
-            }
-        },
-        { immediate: true },
-    );
+    watch(invoice, (newInvoice) => {
+        if (newInvoice) {
+            Object.assign(formState, newInvoice.toUpdateForm());
+        }
+    }, { immediate: true });
 
     const { data, error, pending, execute } = useAsyncAction(
         async () => {
@@ -58,10 +44,9 @@ const _useInvoiceUpdate = () => {
             }
             const parsed = UpdateInvoiceSchema.parse(formState);
             const command = toUpdateDetailsCommand(parsed);
-            const updated = await $usecases.invoices.updateDetails.execute(
+            await $usecases.invoices.updateDetails.execute(
                 command,
             );
-            Object.assign(invoice.value!, updated);
             navigateTo("/app");
         },
     );

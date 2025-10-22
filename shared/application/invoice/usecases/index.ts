@@ -3,3 +3,4 @@ export * from "./list-invoices.usecase";
 export * from "./update-invoice-details.usecase";
 export * from "./change-invoice-status.usecase";
 export * from "./delete-invoices.usecase";
+export * from "./get-invoice-details.usecase";
