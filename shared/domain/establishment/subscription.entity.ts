@@ -1,0 +1,172 @@
+import type { PaymentProviderName } from "~~/shared/types/providers/payment/types";
+
+export enum SubscriptionStatus {
+    // inactive, trial, active, canceled
+    INACTIVE = "inactive",
+    TRIAL = "trial",
+    ACTIVE = "active",
+    CANCELED = "canceled",
+}
+
+export type SubscriptionEntityProps = {
+    id: string;
+    status: SubscriptionStatus;
+    startAt: Date;
+    endAt: Date | null;
+    cancelAt: Date | null;
+    canceledAt: Date | null;
+    currentPeriodStart: Date;
+    currentPeriodEnd: Date;
+    providerSubscriptionId?: string | null;
+    providerCustomerId?: string | null;
+};
+
+/**
+ * Entity Subscription - fait partie de l'aggregate Establishment
+ * Représente l'abonnement Stripe d'un établissement
+ */
+export class SubscriptionEntity {
+    createdAt: Date = new Date();
+    provider: PaymentProviderName = "stripe";
+    private constructor(readonly props: SubscriptionEntityProps) {}
+
+    static create(props: SubscriptionEntityProps): SubscriptionEntity {
+        return new SubscriptionEntity(props);
+    }
+
+    static createTrial(
+        id: string,
+        trialEndDate: Date,
+        providerSubscriptionId?: string,
+        providerCustomerId?: string,
+    ): SubscriptionEntity {
+        const now = new Date();
+        return new SubscriptionEntity({
+            id,
+            status: SubscriptionStatus.TRIAL,
+            startAt: now,
+            endAt: trialEndDate,
+            cancelAt: null,
+            canceledAt: null,
+            currentPeriodStart: now,
+            currentPeriodEnd: trialEndDate,
+            providerSubscriptionId,
+            providerCustomerId,
+        });
+    }
+
+    // Getters
+    get id() {
+        return this.props.id;
+    }
+
+    get status() {
+        return this.props.status;
+    }
+
+    get startAt() {
+        return this.props.startAt;
+    }
+
+    get endAt() {
+        return this.props.endAt;
+    }
+
+    get cancelAt() {
+        return this.props.cancelAt;
+    }
+
+    get canceledAt() {
+        return this.props.canceledAt;
+    }
+
+    get currentPeriodStart() {
+        return this.props.currentPeriodStart;
+    }
+
+    get currentPeriodEnd() {
+        return this.props.currentPeriodEnd;
+    }
+
+    get providerSubscriptionId() {
+        return this.props.providerSubscriptionId;
+    }
+
+    get providerCustomerId() {
+        return this.props.providerCustomerId;
+    }
+
+    // Business logic
+    isActive(): boolean {
+        return this.props.status === SubscriptionStatus.ACTIVE ||
+            this.props.status === SubscriptionStatus.TRIAL;
+    }
+
+    isTrialing(): boolean {
+        return this.props.status === SubscriptionStatus.TRIAL;
+    }
+
+    isCanceled(): boolean {
+        return this.props.status === SubscriptionStatus.CANCELED;
+    }
+
+    canBeDeleted(): boolean {
+        return !this.isActive();
+    }
+
+    /**
+     * Active l'abonnement (sortie de période d'essai)
+     */
+    activate(): SubscriptionEntity {
+        if (this.props.status !== SubscriptionStatus.TRIAL) {
+            throw new Error(
+                "Seul un abonnement en essai peut être activé",
+            );
+        }
+        return new SubscriptionEntity({
+            ...this.props,
+            status: SubscriptionStatus.ACTIVE,
+        });
+    }
+
+    /**
+     * Annule l'abonnement
+     */
+    cancel(cancelAt: Date): SubscriptionEntity {
+        if (!this.isActive()) {
+            throw new Error(
+                "Seul un abonnement actif peut être annulé",
+            );
+        }
+        return new SubscriptionEntity({
+            ...this.props,
+            status: SubscriptionStatus.CANCELED,
+            cancelAt,
+            canceledAt: new Date(),
+        });
+    }
+
+    /**
+     * Met à jour le statut de l'abonnement
+     */
+    updateStatus(status: SubscriptionStatus): SubscriptionEntity {
+        return new SubscriptionEntity({
+            ...this.props,
+            status,
+        });
+    }
+
+    /**
+     * Met à jour les périodes de facturation
+     */
+    updatePeriod(
+        currentPeriodStart: Date,
+        currentPeriodEnd: Date,
+    ): SubscriptionEntity {
+        return new SubscriptionEntity({
+            ...this.props,
+            currentPeriodStart,
+            currentPeriodEnd,
+        });
+    }
+}

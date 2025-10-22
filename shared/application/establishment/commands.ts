@@ -22,13 +22,6 @@ export type UpdateEstablishmentCommand = z.infer<
     typeof UpdateEstablishmentCommandSchema
 >;
 
-export const DeleteEstablishmentsCommandSchema = z
-    .array(z.uuid())
-    .nonempty();
-export type DeleteEstablishmentsCommand = z.infer<
-    typeof DeleteEstablishmentsCommandSchema
->;
-
 export const InviteMemberCommandSchema = z.object({
     establishmentId: z.uuid(),
     email: z.email().max(255),
