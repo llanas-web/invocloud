@@ -115,6 +115,14 @@ export class SupplierModel extends PayloadModel {
     }
 
     override fromPayload(data: any): this {
-        throw new Error("Method not implemented.");
+        return SupplierModel.create({
+            id: data.id,
+            createdAt: new Date(data.createdAt),
+            updatedAt: new Date(data.updatedAt),
+            name: data.name,
+            emails: data.emails,
+            establishmentId: data.establishmentId,
+            phone: data.phone,
+        }) as this;
     }
 }

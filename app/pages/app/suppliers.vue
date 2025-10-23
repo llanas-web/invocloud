@@ -1,7 +1,6 @@
 <script setup lang="ts">
     import type { TableColumn } from '@nuxt/ui'
     import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-    import type SupplierModel from '~~/shared/domain/supplier/supplier.model';
 
     definePageMeta({
         layout: 'app'

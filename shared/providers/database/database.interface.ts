@@ -1,13 +1,7 @@
-import type UserSettingsModel from "~~/shared/types/models/user-settings.model";
-import type {
-    UserModel,
-    UserModelUpdate,
-} from "~~/shared/types/models/user.model";
 import type {
     InvoiceTaskUpdate,
     UploadValidation,
     UploadValidationUpdate,
-    UserSettingsUpdate,
 } from "#shared/types/providers/database/index";
 import type {
     InvoiceTaskModel,
@@ -40,24 +34,6 @@ export interface UploadValidationRepository {
     ): Promise<void>;
 }
 
-export interface UserRepository {
-    getUser(
-        filter?: { id?: string; email?: string },
-    ): EncapsulatedResult<UserModel>;
-    updateUser(
-        id: string,
-        updates: UserModelUpdate,
-    ): EncapsulatedResult<UserModel>;
-    deleteUser(id: string): Promise<void>;
-    getUserSettings(
-        userId: string,
-    ): EncapsulatedResult<UserSettingsModel>;
-    upsertUserSettings(
-        userId: string,
-        settings: UserSettingsUpdate,
-    ): EncapsulatedResult<UserSettingsModel>;
-}
-
 export interface AdminRepository {
     inviteUserByEmail(
         email: string,
@@ -82,7 +58,6 @@ export interface InvoiceTaskRepository {
 
 export interface DatabaseInterface {
     uploadValidationRepository: UploadValidationRepository;
-    userRepository: UserRepository;
     adminRepository: AdminRepository;
     invoiceTaskRepository: InvoiceTaskRepository;
 }

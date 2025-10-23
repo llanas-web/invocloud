@@ -3,6 +3,7 @@ import type { QueryFactory } from "~~/shared/infra/common/query.factory";
 import * as invoiceUC from "../invoice/usecases";
 import * as establishmentUC from "../establishment/usecases";
 import * as supplierUC from "../supplier/usecases";
+import * as userUc from "../user/usecases";
 import type { PaymentRepository } from "~~/shared/application/common/providers/payment/payment.repository";
 
 export function makeUseCasesServer(
@@ -16,6 +17,7 @@ export function makeUseCasesServer(
     const establishmentQuery = queryFactory.establishmentQuery();
     const suppliersRepo = repositoryFactory.suppliers();
     const suppliersQuery = queryFactory.suppliersQuery();
+    const userRepo = repositoryFactory.users();
 
     return {
         invoices: {
@@ -91,6 +93,18 @@ export function makeUseCasesServer(
                 suppliersRepo,
             ),
             update: new supplierUC.UpdateSupplierUsecase(suppliersRepo),
+        },
+        users: {
+            details: new userUc.GetUserDetailsUsecase(
+                userRepo,
+            ),
+            update: new userUc.UpdateUserUseCase(
+                userRepo,
+            ),
+            delete: new userUc.DeleteUserUsecase(
+                userRepo,
+                establishmentQuery,
+            ),
         },
     } as const;
 }

@@ -1,4 +1,4 @@
-import type { UserModel } from "~~/shared/types/models/user.model";
+import type { UserModel } from "~~/shared/domain/user/user.model";
 import type { ModelCommonProps } from "../common/common.interface";
 
 export enum MemberStatus {
