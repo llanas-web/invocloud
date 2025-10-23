@@ -43,8 +43,7 @@
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <UBadge :label="memberStatusLabels[member.status].label"
-                        :color="memberStatusLabels[member.status].color">
+                    <UBadge :label="member.getStatusLabel()" :color="member.getStatusColor()">
                     </UBadge>
                     <!-- <USelect :model-value="member.role" :items="['member', 'owner']" color="neutral"
                         :ui="{ value: 'capitalize', item: 'capitalize' }" />

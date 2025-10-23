@@ -11,7 +11,7 @@ const _useEstablishmentDetails = () => {
     const { user } = useAuth();
 
     const {
-        data: model,
+        data: dto,
         error,
         pending,
     } = useAsyncData(
@@ -29,11 +29,15 @@ const _useEstablishmentDetails = () => {
     );
 
     const establishment = computed<EstablishmentViewModel | null>(() => {
-        if (!model.value) return null;
-        return new EstablishmentViewModel(model.value);
+        if (!dto.value) return null;
+        return new EstablishmentViewModel(dto.value);
     });
 
     const isSelected = computed(() => !!selectedId.value);
+
+    const isAdmin = computed(() => {
+        return establishment.value?.creatorId === user.value?.id;
+    });
 
     const deleteAction = useAsyncAction(async () => {
         if (!selectedId.value) throw new AppError("No establishment selected");
@@ -66,8 +70,9 @@ const _useEstablishmentDetails = () => {
     );
 
     return {
-        model,
+        dto,
         isSelected,
+        isAdmin,
         establishment,
         pending,
         error,

@@ -5,7 +5,7 @@ import { AppError } from "~/core/errors/app.error";
 const _useUser = () => {
     const { $usecases } = useNuxtApp();
     const { user } = useAuth();
-    const { logout } = useAuth();
+    const { actions: { logout: logoutAction } } = useAuth();
 
     const {
         data: model,
@@ -24,7 +24,7 @@ const _useUser = () => {
         async () => {
             if (!user.value?.id) throw new AppError("No user id");
             await $usecases.users.delete.execute(user.value.id);
-            await logout.execute();
+            await logoutAction.execute();
         },
     );
 

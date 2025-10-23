@@ -1,18 +1,16 @@
 <script lang="ts" setup>
     import { ref, watch } from 'vue'
-    import type { InvoiceModel } from '~~/shared/domain/invoice/invoice.model';
+    import type { InvoiceViewModel } from '~/viewmodels/invoice/invoice.vm';
 
-    const { actions: { download: { execute, pending, data, error } } } = useInvoiceDetails();
-
-    const props = defineProps<{
-        invoice: InvoiceModel
-    }>()
+    const { invoice, actions: { download: { execute, pending, error } } } = useInvoiceDetails();
 
     const fileUrl = ref<string | null>(null)
     const fileType = ref<string>('')
     const fileName = ref<string>('example.pdf')
 
-    const loadInvoiceFile = async (invoice: InvoiceModel) => {
+    const loadInvoiceFile = async (invoice: InvoiceViewModel | null) => {
+        if (!invoice) return
+
         const blob = await execute()
 
         fileUrl.value = URL.createObjectURL(blob)
@@ -20,7 +18,11 @@
         fileName.value = invoice.name ?? 'File'
     }
 
-    watch(() => props.invoice, loadInvoiceFile, { immediate: true })
+    watch(invoice, (newInvoice) => {
+        if (newInvoice) {
+            loadInvoiceFile(newInvoice)
+        }
+    }, { immediate: true })
 </script>
 
 <template>

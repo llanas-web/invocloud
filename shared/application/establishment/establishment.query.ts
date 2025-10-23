@@ -1,4 +1,4 @@
-import type { EstablishmentListItemDTO } from "./dto";
+import type { EstablishmentDetailsDTO, EstablishmentListItemDTO } from "./dto";
 import type { ListEstablishmentQueryFilter } from "./queries";
 
 export interface EstablishmentQuery {
@@ -12,4 +12,8 @@ export interface EstablishmentQuery {
     ): Promise<boolean>;
 
     hasAnyByCreatorId(userId: string): Promise<boolean>;
+
+    getEstablishmentDetails(
+        id: string,
+    ): Promise<EstablishmentDetailsDTO | null>;
 }

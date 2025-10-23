@@ -1,32 +1,32 @@
 <script setup lang="ts">
-import type { BreadcrumbItem } from '@nuxt/ui'
-import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
+    import type { BreadcrumbItem } from '@nuxt/ui'
+    import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 
-definePageMeta({
-    layout: 'app'
-})
+    definePageMeta({
+        layout: 'app'
+    })
 
-const { invoice, isLoading: loadingDetails, invoiceId } = useInvoiceDetails()
-const { formRef, isLoading: loadingUpdate } = useInvoiceUpdate()
+    const { invoice, pending: loadingDetails, invoiceId } = useInvoiceDetails()
+    const { formRef, pending: loadingUpdate } = useInvoiceUpdate()
 
-const items = ref<BreadcrumbItem[]>([
-    {
-        label: 'Factures',
-        icon: 'i-lucide-files',
-        to: '/app'
-    },
-    {
-        label: `Détails Facture`,
-        icon: 'i-lucide-file-text',
-        to: `/app/invoices/${invoice.value?.id}`
-    }
-])
+    const items = ref<BreadcrumbItem[]>([
+        {
+            label: 'Factures',
+            icon: 'i-lucide-files',
+            to: '/app'
+        },
+        {
+            label: `Détails Facture`,
+            icon: 'i-lucide-file-text',
+            to: `/app/invoices/${invoice.value?.id}`
+        }
+    ])
 
-const breakpoints = useBreakpoints(breakpointsTailwind)
-const isMobile = breakpoints.smaller('lg')
-const isFormOpen = ref(false)
+    const breakpoints = useBreakpoints(breakpointsTailwind)
+    const isMobile = breakpoints.smaller('lg')
+    const isFormOpen = ref(false)
 
-const isLoading = computed(() => loadingDetails.value || loadingUpdate.value)
+    const isLoading = computed(() => loadingDetails.value || loadingUpdate.value)
 </script>
 <template>
     <UDashboardPanel :id="`invoices-${invoiceId}`" :default-size="25" :min-size="20" :max-size="100" resizable>

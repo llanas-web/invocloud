@@ -23,11 +23,21 @@ const _useSuppliers = () => {
         dtos.value.map((dto) => SupplierListItemViewModel.fromDTO(dto))
     );
 
+    const deleteSupplierAction = useAsyncAction(
+        async (supplierId: string) => {
+            await $usecases.suppliers.delete.execute(supplierId);
+            await refresh();
+        },
+    );
+
     return {
         suppliers,
         refresh,
         pending,
         error,
+        actions: {
+            delete: deleteSupplierAction,
+        },
     };
 };
 
