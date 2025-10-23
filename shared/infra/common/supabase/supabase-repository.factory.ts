@@ -6,7 +6,9 @@ import { InvoiceSupabaseRepository } from "../../invoice/supabase/invoice.supaba
 import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
 import { EstablishmentSupabaseRepository } from "../../establishment/supabase/establishment.supabase.repository";
 import type { SupplierRepository } from "~~/shared/domain/supplier/supplier.repository";
-import { SupplierSupabaseRepository } from "../../supplier/supplier.supabase.repository";
+import { SupplierSupabaseRepository } from "../../supplier/supabase/supplier.supabase.repository";
+import type { UserRepository } from "~~/shared/domain/user/user.repository";
+import { UserSupabaseRepository } from "../../user/supabase/user.supabase.repository";
 
 export class SupabaseRepositoryFactory implements RepositoryFactory {
     constructor(private readonly supabaseInstance: SupabaseClient<Database>) {}
@@ -20,5 +22,9 @@ export class SupabaseRepositoryFactory implements RepositoryFactory {
 
     establishments(): EstablishmentRepository {
         return new EstablishmentSupabaseRepository(this.supabaseInstance);
+    }
+
+    users(): UserRepository {
+        return new UserSupabaseRepository(this.supabaseInstance);
     }
 }

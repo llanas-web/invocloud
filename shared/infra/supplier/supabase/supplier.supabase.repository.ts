@@ -5,6 +5,7 @@ import {
 import type { SupplierRepository } from "~~/shared/domain/supplier/supplier.repository";
 import { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
+import { SupabaseError } from "../../common/errors/supabase.error";
 
 export class SupplierSupabaseRepository implements SupplierRepository {
     constructor(private supabaseClient: SupabaseClient<Database>) {}
@@ -41,10 +42,7 @@ export class SupplierSupabaseRepository implements SupplierRepository {
             })
             .select("id")
             .single();
-        if (error) {
-            console.error("Error creating supplier:", error);
-            throw new Error("Could not create supplier");
-        }
+        if (error) throw SupabaseError.fromPostgrest(error);
         return data.id;
     }
     async update(entity: SupplierModel): Promise<void> {
@@ -56,10 +54,7 @@ export class SupplierSupabaseRepository implements SupplierRepository {
                 phone: entity.phone,
             })
             .eq("id", entity.id);
-        if (error) {
-            console.error("Error updating supplier:", error);
-            throw new Error("Could not update supplier");
-        }
+        if (error) throw SupabaseError.fromPostgrest(error);
     }
 
     async deleteMany(supplierIds: string[]): Promise<void> {
@@ -67,9 +62,6 @@ export class SupplierSupabaseRepository implements SupplierRepository {
             .from("suppliers")
             .delete()
             .in("id", supplierIds);
-        if (error) {
-            console.error("Error deleting suppliers:", error);
-            throw new Error("Could not delete suppliers");
-        }
+        if (error) throw SupabaseError.fromPostgrest(error);
     }
 }

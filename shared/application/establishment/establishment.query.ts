@@ -10,4 +10,6 @@ export interface EstablishmentQuery {
         emailPrefix: string,
         excludeId?: string | null,
     ): Promise<boolean>;
+
+    hasAnyByCreatorId(userId: string): Promise<boolean>;
 }

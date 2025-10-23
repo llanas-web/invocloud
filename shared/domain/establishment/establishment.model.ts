@@ -1,4 +1,4 @@
-import type { UserModel } from "~~/shared/types/models/user.model";
+import type { UserModel } from "~~/shared/domain/user/user.model";
 import type { ModelCommonUpdateProps } from "../common/common.interface";
 import { PayloadModel } from "../common/payload.model";
 import { MemberEntity, MemberStatus } from "./member.entity";
