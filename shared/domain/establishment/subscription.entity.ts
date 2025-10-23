@@ -5,11 +5,11 @@ export enum SubscriptionStatus {
     INACTIVE = "inactive",
     TRIAL = "trial",
     ACTIVE = "active",
+    PAST_DUE = "past_due",
     CANCELED = "canceled",
 }
 
 export type SubscriptionEntityProps = {
-    id: string;
     status: SubscriptionStatus;
     startAt: Date;
     endAt: Date | null;
@@ -35,14 +35,12 @@ export class SubscriptionEntity {
     }
 
     static createTrial(
-        id: string,
         trialEndDate: Date,
         providerSubscriptionId?: string,
         providerCustomerId?: string,
     ): SubscriptionEntity {
         const now = new Date();
         return new SubscriptionEntity({
-            id,
             status: SubscriptionStatus.TRIAL,
             startAt: now,
             endAt: trialEndDate,
@@ -53,11 +51,6 @@ export class SubscriptionEntity {
             providerSubscriptionId,
             providerCustomerId,
         });
-    }
-
-    // Getters
-    get id() {
-        return this.props.id;
     }
 
     get status() {
@@ -117,7 +110,7 @@ export class SubscriptionEntity {
     /**
      * Active l'abonnement (sortie de période d'essai)
      */
-    activate(): SubscriptionEntity {
+    activate(periodEnd: Date, periodStart?: Date): SubscriptionEntity {
         if (this.props.status !== SubscriptionStatus.TRIAL) {
             throw new Error(
                 "Seul un abonnement en essai peut être activé",
@@ -126,6 +119,23 @@ export class SubscriptionEntity {
         return new SubscriptionEntity({
             ...this.props,
             status: SubscriptionStatus.ACTIVE,
+            currentPeriodEnd: periodEnd,
+            currentPeriodStart: periodStart ?? new Date(),
+        });
+    }
+
+    /**
+     *  Renouvelle l'abonnement
+     */
+    renew(periodEnd: Date): SubscriptionEntity {
+        if (!this.isActive()) {
+            throw new Error(
+                "Seul un abonnement actif peut être renouvelé",
+            );
+        }
+        return new SubscriptionEntity({
+            ...this.props,
+            currentPeriodEnd: periodEnd,
         });
     }
 

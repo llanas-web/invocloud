@@ -6,20 +6,19 @@ import {
 } from "h3";
 import Stripe from "stripe";
 import { buildRequestScope } from "~~/server/core/container";
-import { handleCheckoutSessionCompleted } from "~~/server/lib/providers/payments/stripe/events/checkout/session";
-import { handleInvoicePaymentSucceeded } from "~~/server/lib/providers/payments/stripe/events/invoice/payment";
-import {
-    handleSubscriptionDeleted,
-    handleSubscriptionUpdated,
-} from "~~/server/lib/providers/payments/stripe/events/subscription";
+import ServerError from "~~/server/core/errors";
+import { HTTPStatus } from "~~/server/core/errors/status";
+import { StripeEventAdapter } from "~~/server/lib/providers/payments/stripe/adapters/stripe-event.adapter";
 import { PaymentStripeRepository } from "~~/server/lib/providers/payments/stripe/payment.stripe.repository";
-
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+import { fromSessionToSubscription } from "~~/server/lib/providers/payments/stripe/utils/mapper";
+import { useServerUsecases } from "~~/server/plugins/usecases.plugin";
 
 export default defineEventHandler(async (event) => {
     const sig = getRequestHeaders(event)["stripe-signature"] as string;
     const rawBody = await readRawBody(event);
-    const { deps } = await buildRequestScope(event);
+    const usecase = useServerUsecases(event);
+    const { handlePaymentEvents } = usecase.establishments.subscription;
+    const { stripeWebhookSecret } = useRuntimeConfig();
 
     if (!sig || !rawBody) {
         throw createError({
@@ -30,39 +29,78 @@ export default defineEventHandler(async (event) => {
     }
 
     const stripeRepository = new PaymentStripeRepository();
-    const { type, data } = stripeRepository.stripeInstance.webhooks
+    const stripeEvent = stripeRepository.stripeInstance.webhooks
         .constructEvent(
             rawBody,
             sig,
-            endpointSecret,
+            stripeWebhookSecret,
         );
-
-    switch (type) {
+    const eventData = stripeEvent.data as unknown;
+    switch (stripeEvent.type) {
         case "checkout.session.completed":
-            return handleCheckoutSessionCompleted(
-                stripeRepository.stripeInstance,
-                data as unknown as Stripe.Checkout.Session,
-                deps,
+            const session = eventData as Stripe.Checkout.Session;
+            const subscriptionId = fromSessionToSubscription(session);
+            if (!subscriptionId) {
+                throw new ServerError(
+                    HTTPStatus.BAD_REQUEST,
+                    "No subscription ID found in checkout session",
+                );
+            }
+            const subscription = await stripeRepository.retreiveSubscription(
+                subscriptionId,
             );
+            const checkoutSessionDTO = StripeEventAdapter
+                .toCheckoutSessionCreated(
+                    session,
+                    subscription,
+                );
+            await handlePaymentEvents.handleTrialSucceeded(
+                checkoutSessionDTO,
+            );
+            break;
         case "invoice.payment_succeeded":
-            return handleInvoicePaymentSucceeded(
-                data as unknown as Stripe.Invoice,
-                deps,
+            const invoicePaymentData = eventData as Stripe.Invoice;
+            const invoicePaymentDTO = StripeEventAdapter
+                .toInvoicePaymentSucceeded(
+                    invoicePaymentData,
+                );
+            await handlePaymentEvents.handleInvoicePaymentSucceeded(
+                invoicePaymentDTO,
             );
+            break;
         case "customer.subscription.updated":
-            return handleSubscriptionUpdated(
-                data as unknown as Stripe.Subscription,
-                deps,
+            const subscriptionUpdatedData = eventData as Stripe.Subscription;
+            const subscriptionDTO = StripeEventAdapter
+                .toSubscriptionUpdated(
+                    subscriptionUpdatedData,
+                );
+            await handlePaymentEvents.handleSubscriptionUpdated(
+                subscriptionDTO,
             );
+            break;
         case "customer.subscription.deleted":
-        case "invoice.payment_failed":
-            return handleSubscriptionDeleted(
-                stripeRepository.stripeInstance,
-                data as unknown as Stripe.Subscription,
-                deps,
+            const subscriptionDeletedData = eventData as Stripe.Subscription;
+            const subscriptionDeletedDTO = StripeEventAdapter
+                .toSubscriptionDeleted(
+                    subscriptionDeletedData,
+                );
+            await handlePaymentEvents.handleSubscriptionDeleted(
+                subscriptionDeletedDTO,
             );
-
+            break;
+        case "invoice.payment_failed":
+            const paymentFailedData = eventData as Stripe.Invoice;
+            const paymentFailedDTO = StripeEventAdapter
+                .toPaymentFailed(
+                    paymentFailedData,
+                );
+            await handlePaymentEvents.handlePaymentFailed(
+                paymentFailedDTO,
+            );
+            break;
         default:
-            console.log(`No handler for Stripe event type: ${type}`);
+            console.log(
+                `No handler for Stripe event type: ${stripeEvent.type}`,
+            );
     }
 });

@@ -246,8 +246,20 @@ export class EstablishmentModel extends PayloadModel {
     /**
      * Active l'abonnement (sortie de période d'essai)
      */
-    activateSubscription(): EstablishmentModel {
-        return this.updateSubscription((sub) => sub.activate());
+    activateSubscription(
+        periodEnd: Date,
+        periodStart?: Date,
+    ): EstablishmentModel {
+        return this.updateSubscription((sub) =>
+            sub.activate(periodEnd, periodStart)
+        );
+    }
+
+    /**
+     * Renouvelle l'abonnement
+     */
+    renewSubscription(periodEnd: Date): EstablishmentModel {
+        return this.updateSubscription((sub) => sub.renew(periodEnd));
     }
 
     /**
@@ -283,7 +295,6 @@ export class EstablishmentModel extends PayloadModel {
             })),
             subscription: this.props.subscription
                 ? {
-                    id: this.props.subscription.id,
                     status: this.props.subscription.status,
                     startAt: this.props.subscription.startAt,
                     endAt: this.props.subscription.endAt,

@@ -46,7 +46,7 @@ const _useEstablishmentDetails = () => {
             if (!selectedId.value) {
                 throw new AppError("No establishment selected");
             }
-            window.location.href = await establishmentApi.subscription
+            await establishmentApi.subscription
                 .createCheckoutSession({
                     establishmentId: selectedId.value,
                     userId: user.value!.id,
@@ -54,33 +54,16 @@ const _useEstablishmentDetails = () => {
         },
     );
 
-    const cancelStripeTrial = async () => {
-        if (!selectedId.value) {
-            throw new Error("Aucun établissement sélectionné");
-        }
-        const { success, message }: { success: boolean; message: string } =
-            await $fetch("/api/stripe/trial/cancel", {
-                method: "POST",
-                body: { establishmentId: selectedId.value },
+    const cancelSubscriptionAction = useAsyncAction(
+        async () => {
+            if (!selectedId.value) {
+                throw new AppError("No establishment selected");
+            }
+            await establishmentApi.subscription.cancel({
+                establishmentId: selectedId.value,
             });
-        if (!success) console.error("Error canceling Stripe trial:", message);
-        return { success, message };
-    };
-
-    const cancelStripeSubscription = async () => {
-        if (!selectedId.value) {
-            throw new Error("Aucun établissement sélectionné");
-        }
-        const { success, message }: { success: boolean; message: string } =
-            await $fetch("/api/stripe/subscription/cancel", {
-                method: "POST",
-                body: { establishmentId: selectedId.value },
-            });
-        if (!success) {
-            console.error("Error canceling Stripe subscription:", message);
-        }
-        return { success, message };
-    };
+        },
+    );
 
     return {
         model,
@@ -91,9 +74,8 @@ const _useEstablishmentDetails = () => {
         actions: {
             delete: deleteAction,
             createCheckoutSession: createCheckoutSessionAction,
+            cancelSubscription: cancelSubscriptionAction,
         },
-        cancelStripeTrial,
-        cancelStripeSubscription,
     };
 };
 

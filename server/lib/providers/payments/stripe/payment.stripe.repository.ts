@@ -1,30 +1,48 @@
 import Stripe from "stripe";
-import {
-    generateCreateCheckoutSessionObject,
-    mapCheckoutSessionToPaymentSession,
-} from "./mapper/stripe.mapper";
 import { PaymentRepository } from "#shared/application/common/providers/payment/payment.repository";
 import { ApplicationError } from "~~/shared/application/common/errors/application.error";
 
 export class PaymentStripeRepository implements PaymentRepository {
     public stripeInstance: Stripe;
+    private priceId: string;
+    private baseUrl: string;
+
     constructor() {
         const config = useRuntimeConfig();
         this.stripeInstance = new Stripe(config.STRIPE_SECRET_KEY!, {
             apiVersion: config.STRIPE_API_VERSION ?? "2025-09-30.clover",
         });
+        this.priceId = config.STRIPE_PRICE_ID!;
+        this.baseUrl = config.BASE_URL!;
     }
 
     async createCheckoutSession(
+        email: string,
         userId: string,
         establishmentId: string,
-    ) {
-        const checkoutSessionObject = generateCreateCheckoutSessionObject(
-            userId,
-            establishmentId,
-        );
+    ): Promise<string> {
         const session = await this.stripeInstance.checkout.sessions.create(
-            checkoutSessionObject,
+            {
+                mode: "subscription",
+                customer_email: email,
+                payment_method_types: ["card"],
+                line_items: [
+                    {
+                        price: this.priceId,
+                        quantity: 1,
+                    },
+                ],
+                subscription_data: {
+                    trial_period_days: 7,
+                },
+                success_url: `${this.baseUrl}/app?subscription_success=true`,
+                cancel_url:
+                    `${this.baseUrl}/app/settings/establishments?cancel=true`,
+                metadata: {
+                    userId,
+                    establishmentId,
+                },
+            },
         );
         if (!session.url) {
             throw new ApplicationError("Failed to create checkout session URL");
@@ -32,18 +50,11 @@ export class PaymentStripeRepository implements PaymentRepository {
         return session.url;
     }
 
-    async createSubscription(
-        userEmail: string,
-        establishmentId: string,
-    ) {
-        const checkoutSessionObject = generateCreateCheckoutSessionObject(
-            userEmail,
-            establishmentId,
+    async retreiveSubscription(subscriptionId: string) {
+        const subscription = await this.stripeInstance.subscriptions.retrieve(
+            subscriptionId,
         );
-        const session = await this.stripeInstance.checkout.sessions.create(
-            checkoutSessionObject,
-        );
-        return session.url!;
+        return subscription;
     }
 
     async cancelSubscription(subscriptionId: string) {

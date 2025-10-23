@@ -1,4 +1,3 @@
-import type SupplierModel from "~~/shared/domain/supplier/supplier.model";
 import type UserSettingsModel from "~~/shared/types/models/user-settings.model";
 import type {
     UserModel,
@@ -6,10 +5,6 @@ import type {
 } from "~~/shared/types/models/user.model";
 import type {
     InvoiceTaskUpdate,
-    SubscriptionInsert,
-    SubscriptionUpdate,
-    SupplierInsert,
-    SupplierUpdate,
     UploadValidation,
     UploadValidationUpdate,
     UserSettingsUpdate,
@@ -18,23 +13,8 @@ import type {
     InvoiceTaskModel,
     InvoiceTaskStatus,
 } from "~~/shared/types/models/invoice-task.model";
-import type { SubscriptionModel } from "~~/shared/types/models/subscription.model";
 
 type EncapsulatedResult<T> = Promise<T>;
-
-export interface SupplierRepository {
-    getAllSuppliers(
-        filters?: { establishmentIds?: string[]; emails?: string[] },
-    ): EncapsulatedResult<SupplierModel[]>;
-    createSupplier(
-        supplier: SupplierInsert,
-    ): EncapsulatedResult<SupplierModel>;
-    updateSupplier(
-        supplierId: string,
-        updatedSupplier: SupplierUpdate,
-    ): EncapsulatedResult<SupplierModel>;
-    deleteSupplier(supplierId: string): EncapsulatedResult<boolean>;
-}
 
 export interface UploadValidationRepository {
     createUploadValidation(
@@ -100,28 +80,9 @@ export interface InvoiceTaskRepository {
     ): Promise<InvoiceTaskModel>;
 }
 
-export interface SubscriptionRepository {
-    createSubscription(
-        subscription: SubscriptionInsert,
-    ): Promise<SubscriptionModel>;
-
-    getSubscriptionById(id: string): Promise<SubscriptionModel>;
-
-    getSubscriptionByCustomerId(
-        customerId: string,
-    ): Promise<SubscriptionModel>;
-
-    updateSubscription(
-        id: string,
-        updates: SubscriptionUpdate,
-    ): Promise<SubscriptionModel>;
-}
-
 export interface DatabaseInterface {
-    supplierRepository: SupplierRepository;
     uploadValidationRepository: UploadValidationRepository;
     userRepository: UserRepository;
     adminRepository: AdminRepository;
     invoiceTaskRepository: InvoiceTaskRepository;
-    subscriptionRepository: SubscriptionRepository;
 }

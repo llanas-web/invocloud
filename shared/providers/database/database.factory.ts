@@ -3,20 +3,16 @@ import SupabaseAuthRepository from "../auth/supabase/auth.repository";
 import type {
     AdminRepository,
     InvoiceTaskRepository,
-    SubscriptionRepository,
-    SupplierRepository,
     UploadValidationRepository,
     UserRepository,
 } from "./database.interface";
 import {
     AdminSupabaseRepository,
-    SupplierSupabaseRepository,
     UploadValidationSupabaseRepository,
     UserSupabaseRepository,
 } from "./supabase/repositories";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { InvoiceTaskSupabaseRepository } from "./supabase/repositories/invoice-task.repository";
-import { SubscriptionSupabaseRepository } from "./supabase/repositories/subscription.repository";
 
 // Typage des repositories
 type RepositoryMap = {};
@@ -24,27 +20,19 @@ type RepositoryMap = {};
 class DatabaseFactory {
     private static instance: DatabaseFactory;
 
-    public supplierRepository: SupplierRepository;
     public userRepository: UserRepository;
     public uploadValidationRepository: UploadValidationRepository;
     public authRepository: AuthInterface;
     public adminRepository: AdminRepository;
     public invoiceTaskRepository: InvoiceTaskRepository;
-    public subscriptionRepository: SubscriptionRepository;
 
     private constructor(client: SupabaseClient) {
-        this.supplierRepository = new SupplierSupabaseRepository(
-            client,
-        );
         this.userRepository = new UserSupabaseRepository(client);
         this.uploadValidationRepository =
             new UploadValidationSupabaseRepository(client);
         this.authRepository = new SupabaseAuthRepository(client);
         this.adminRepository = new AdminSupabaseRepository(client);
         this.invoiceTaskRepository = new InvoiceTaskSupabaseRepository(client);
-        this.subscriptionRepository = new SubscriptionSupabaseRepository(
-            client,
-        );
     }
 
     public static getInstance(client: SupabaseClient): DatabaseFactory {

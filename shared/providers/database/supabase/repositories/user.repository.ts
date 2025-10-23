@@ -27,7 +27,7 @@ export class UserSupabaseRepository implements UserRepository {
         if (error) throw SupabaseError.fromPostgrest(error);
         if (!data) {
             throw new DomainError(
-                DomainErrorCode.UESR_NOT_FOUND,
+                DomainErrorCode.USER_NOT_FOUND,
                 "Utilisateur non trouvé",
             );
         }

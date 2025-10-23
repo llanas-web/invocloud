@@ -4,6 +4,10 @@ import {
     type InviteMemberResponse,
 } from "~~/shared/contracts/api/security/establishments/invite-member.contract";
 import {
+    type CancelSubscriptionBody,
+    CancelSubscriptionBodySchema,
+} from "~~/shared/contracts/api/security/establishments/subscription/cancel.contract";
+import {
     type CreateCheckoutSessionBody,
     CreateCheckoutSessionBodySchema,
 } from "~~/shared/contracts/api/security/establishments/subscription/create-checkout.contract";
@@ -25,6 +29,15 @@ export const establishmentApi = {
                 {
                     method: "POST",
                     body: parseBody(CreateCheckoutSessionBodySchema, body),
+                },
+            );
+        },
+        cancel(body: CancelSubscriptionBody) {
+            return $fetch<string>(
+                "/api/security/establishment/subscription/cancel",
+                {
+                    method: "POST",
+                    body: parseBody(CancelSubscriptionBodySchema, body),
                 },
             );
         },
