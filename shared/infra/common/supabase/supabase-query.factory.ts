@@ -7,6 +7,8 @@ import type { EstablishmentQuery } from "~~/shared/application/establishment/est
 import { SupplierSupabaseQuery } from "../../supplier/supabase/supplier.supabase.query";
 import type { SupplierQuery } from "~~/shared/application/supplier/supplier.query";
 import type { QueryFactory } from "../query.factory";
+import { UserSupabaseQuery } from "../../user/supabase/user.supabase.query";
+import type { UserQuery } from "~~/shared/application/user/user.query";
 
 export class SupabaseQueryFactory implements QueryFactory {
     constructor(private readonly supabase: SupabaseClient<Database>) {}
@@ -21,5 +23,9 @@ export class SupabaseQueryFactory implements QueryFactory {
 
     suppliersQuery(): SupplierQuery {
         return new SupplierSupabaseQuery(this.supabase);
+    }
+
+    userQuery(): UserQuery {
+        return new UserSupabaseQuery(this.supabase);
     }
 }

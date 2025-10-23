@@ -6,7 +6,8 @@
         collapsed?: boolean
     }>()
 
-    const { establishments, selectedEstablishment, pending, selectEstablishment } = useEstablishmentsList()
+    const { establishments, pending, selectEstablishment } = useEstablishmentsList()
+    const { establishment } = useEstablishmentDetails();
     const { userSettings, toggleFavorite: { execute, pending: togglePending, error: toggleError, data: toggleData } } = useUserSettings()
 
     const addModel = useTemplateRef<typeof LazyEstablishmentsAddModal>('addModal')
@@ -46,11 +47,11 @@
                 </UButton>
             </div>
         </template>
-        <UButton v-bind="selectedEstablishment" color="neutral" variant="soft" block :square="collapsed"
+        <UButton v-bind="establishment" color="neutral" variant="soft" block :square="collapsed"
             class="data-[state=open]:bg-elevated" :class="[!collapsed && 'py-2']"
             :ui="{ trailingIcon: 'text-dimmed', leadingIcon: collapsed ? 'hidden' : 'block' }"
-            :label="selectedEstablishment?.name || 'Sélectionner une structure'"
-            trailing-icon="i-lucide-chevrons-up-down" leading-icon="i-lucide-building">
+            :label="establishment?.name || 'Sélectionner une structure'" trailing-icon="i-lucide-chevrons-up-down"
+            leading-icon="i-lucide-building">
         </UButton>
     </UDropdownMenu>
 

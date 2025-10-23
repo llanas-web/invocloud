@@ -2,10 +2,14 @@ import type { Database } from "~~/shared/types/providers/database/supabase/datab
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SupabaseError } from "../../common/errors/supabase.error";
 import type {
+    EstablishmentDetailsDTO,
     EstablishmentListItemDTO,
+    MemberDTO,
+    SubscriptionDTO,
 } from "~~/shared/application/establishment/dto";
 import type { EstablishmentQuery } from "~~/shared/application/establishment/establishment.query";
 import type { ListEstablishmentQueryFilter } from "~~/shared/application/establishment/queries";
+import type { SubscriptionStatus } from "~~/shared/domain/establishment/subscription.entity";
 
 export class EstablishmentSupabaseQuery implements EstablishmentQuery {
     constructor(private readonly supabase: SupabaseClient<Database>) {}
@@ -59,5 +63,48 @@ export class EstablishmentSupabaseQuery implements EstablishmentQuery {
             .eq("creator_id", userId);
         if (error) throw SupabaseError.fromPostgrest(error);
         return count != null && count > 0;
+    }
+
+    async getEstablishmentDetails(
+        id: string,
+    ): Promise<EstablishmentDetailsDTO | null> {
+        const { data, error } = await this.supabase
+            .from("establishments")
+            .select(`*,
+                subscription:subscriptions(*),
+                establishment_members(
+                    *,
+                    users(*)
+                )`)
+            .eq("establishment_id", id)
+            .single();
+        if (error) throw SupabaseError.fromPostgrest(error);
+        if (!data) return null;
+
+        const subscription = data.subscription === null ? null : {
+            status: data.subscription?.status as SubscriptionStatus,
+            endAt: data.subscription?.end_at
+                ? new Date(data.subscription.end_at)
+                : null,
+        } as SubscriptionDTO;
+
+        const members = data.establishment_members.map((em) => ({
+            id: em.user_id,
+            role: em.role,
+            email: em.users.email,
+            fullName: em.users.full_name,
+            status: em.status,
+        } as MemberDTO));
+
+        return {
+            id: data.id,
+            name: data.name,
+            emailPrefix: data.email_prefix,
+            address: data.address,
+            phone: data.phone,
+            creatorId: data.creator_id,
+            members: members,
+            subscription,
+        };
     }
 }

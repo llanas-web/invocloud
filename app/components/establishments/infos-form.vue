@@ -1,11 +1,6 @@
 <script lang="ts" setup>
-    import * as z from 'zod'
-
-    const { selectedEstablishment } = useEstablishmentsList()
+    const { isAdmin } = useEstablishmentDetails()
     const { formState, onSubmit, pending, checkEmailPrefixAvailable } = useEstablishmentUpdate()
-    const { currentUser } = useUser()
-
-    const isAdmin = computed(() => selectedEstablishment.value?.creatorId === currentUser.value?.id)
 </script>
 
 <template>

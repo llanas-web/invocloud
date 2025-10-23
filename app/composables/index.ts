@@ -19,3 +19,6 @@ export * from "./invoices/upload/wizard";
 export * from "./suppliers/create";
 export * from "./suppliers/list";
 export * from "./suppliers/update";
+
+export * from "./users/details";
+export * from "./users/update";

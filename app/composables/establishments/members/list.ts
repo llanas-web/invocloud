@@ -5,11 +5,12 @@ import { MemberViewModel } from "~/viewmodels/establishment/member.vm";
 
 const _useMembersList = () => {
     const { selectedId } = useEstablishmentsList();
-    const { model } = useEstablishmentDetails();
+    const { dto: establishmentDetailsDTO } = useEstablishmentDetails();
     const { currentUser } = useUser();
+    const { $usecases } = useNuxtApp();
 
     const members = computed(() => {
-        return model.value?.members.map((member) =>
+        return establishmentDetailsDTO.value?.members.map((member) =>
             new MemberViewModel(member)
         ) ?? [];
     });

@@ -2,8 +2,8 @@
   import * as z from 'zod'
   import type { FormSubmitEvent, FormError } from '@nuxt/ui'
 
-  const { resetPassword } = useAuth()
-  const { deleteAccount } = useUser()
+  const { actions: { resetPassword: resetPasswordAction } } = useAuth()
+  const { actions: { delete: deleteUser } } = useUser()
   const { confirm } = useConfirmModal()
 
   const passwordSchema = z.object({
@@ -28,7 +28,7 @@
 
   const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof passwordSchema>>) => {
     const { new: newPassword } = payload.data;
-    const response = await resetPassword(newPassword);
+    const response = await resetPasswordAction.execute(newPassword);
   }
 
   const onDeleteAccount = async () => {
@@ -40,8 +40,8 @@
       danger: true,
     });
     if (!confirmResult) return;
-    const response = await deleteAccount();
-    if (response) {
+    await deleteUser.execute();
+    if (!deleteUser.error.value) {
       useToast().add({
         title: 'Votre compte a été supprimé avec succès.',
         color: 'success'

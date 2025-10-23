@@ -38,15 +38,17 @@ const _useAuth = () => {
         authRepository.onAuthChange(handleAuthEvent);
     });
 
-    const login = useAsyncAction(async (email: string, password: string) => {
-        const response = await authRepository.signInWithPassword(
-            email,
-            password,
-        );
-        return response;
-    });
+    const loginAction = useAsyncAction(
+        async (email: string, password: string) => {
+            const response = await authRepository.signInWithPassword(
+                email,
+                password,
+            );
+            return response;
+        },
+    );
 
-    const signup = useAsyncAction(async (
+    const signupAction = useAsyncAction(async (
         email: string,
         password: string,
         establishment_name: string,
@@ -66,7 +68,7 @@ const _useAuth = () => {
         return response;
     });
 
-    const resetPassword = useAsyncAction(async (newPassword: string) => {
+    const resetPasswordAction = useAsyncAction(async (newPassword: string) => {
         const { data, error } = await useFetch(
             "/api/user/reset-password",
             {
@@ -82,7 +84,7 @@ const _useAuth = () => {
         return data;
     });
 
-    const logout = useAsyncAction(async () => {
+    const logoutAction = useAsyncAction(async () => {
         await authRepository.signOut();
         localStorage.removeItem("selectedEstablishment");
     });
@@ -90,10 +92,12 @@ const _useAuth = () => {
     return {
         user,
         session,
-        login,
-        signup,
-        resetPassword,
-        logout,
+        actions: {
+            login: loginAction,
+            signup: signupAction,
+            resetPassword: resetPasswordAction,
+            logout: logoutAction,
+        },
     };
 };
 

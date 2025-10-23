@@ -2,7 +2,7 @@
   import { EstablishmentsMembersInviteForm } from '#components'
 
   const { confirm } = useConfirmModal()
-  const { establishment: selectedEstablishment, actions: { deleteEstablishment } } = useEstablishmentDetails()
+  const { establishment: selectedEstablishment, actions: { delete: deleteEstablishment } } = useEstablishmentDetails()
 
   const onDeleteEstablishment = async () => {
     const { execute, pending, error } = deleteEstablishment;

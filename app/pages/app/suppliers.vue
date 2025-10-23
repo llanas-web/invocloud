@@ -1,12 +1,15 @@
 <script setup lang="ts">
     import type { TableColumn } from '@nuxt/ui'
     import { getPaginationRowModel, type Row } from '@tanstack/table-core'
+    import { useSupplierDetails } from '~/composables/suppliers/details';
+    import type { SupplierListItemViewModel } from '~/viewmodels/supplier/supplier-list-item.vm';
 
     definePageMeta({
         layout: 'app'
     })
 
-    const { supplier, openModal } = useSupplierEdit();
+    const { supplier, openModal } = useSupplierUpdate();
+    const { selectedId } = useSupplierDetails();
 
     const UAvatar = resolveComponent('UAvatar')
     const UButton = resolveComponent('UButton')
@@ -16,12 +19,13 @@
 
     const toast = useToast()
     const table = useTemplateRef('table')
-    const { suppliers, pending, deleteSuppliers } = useSuppliers()
+    const { suppliers, pending, actions: { delete: deleteSupplierAction } } = useSuppliers()
     const { openModal: openCreateModal } = useSupplierCreate()
 
     const rowSelection = ref()
 
-    function getRowItems(row: Row<SupplierModel>) {
+    function getRowItems(row: Row<SupplierListItemViewModel>) {
+
         return [
             {
                 type: 'label',
@@ -31,7 +35,7 @@
                 label: 'Modifier le fournisseur',
                 icon: 'i-lucide-edit',
                 onSelect() {
-                    supplier.value = row.original
+                    selectedId.value = row.original.id
                     openModal.value = true
                 }
             },
@@ -43,7 +47,7 @@
                 icon: 'i-lucide-trash',
                 color: 'error',
                 async onSelect() {
-                    await deleteSuppliers([row.original.id])
+                    await deleteSupplierAction.execute(row.original.id)
                     toast.add({
                         title: 'Fournisseur supprimé',
                         description: 'Le fournisseur a été supprimé.'
@@ -53,7 +57,7 @@
         ]
     }
 
-    const columns: TableColumn<SupplierModel>[] = [
+    const columns: TableColumn<SupplierListItemViewModel>[] = [
         {
             id: 'select',
             header: ({ table }) =>
@@ -165,7 +169,7 @@
                     @update:model-value="table?.tableApi?.getColumn('emails')?.setFilterValue($event)" /> -->
 
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <SuppliersDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
+                    <!-- <SuppliersDeleteModal :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length">
                         <UButton v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length" label="Delete"
                             color="error" variant="subtle" icon="i-lucide-trash"
                             @click="() => deleteSuppliers(table!.tableApi!.getFilteredSelectedRowModel().rows.map((row) => row.original.id))">
@@ -174,8 +178,8 @@
                                     {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
                                 </UKbd>
                             </template>
-                        </UButton>
-                    </SuppliersDeleteModal>
+</UButton>
+</SuppliersDeleteModal> -->
                     <SuppliersEditModal />
                 </div>
             </div>

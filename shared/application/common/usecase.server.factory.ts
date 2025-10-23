@@ -18,6 +18,7 @@ export function makeUseCasesServer(
     const suppliersRepo = repositoryFactory.suppliers();
     const suppliersQuery = queryFactory.suppliersQuery();
     const userRepo = repositoryFactory.users();
+    const userQuery = queryFactory.userQuery();
 
     return {
         invoices: {
@@ -46,7 +47,7 @@ export function makeUseCasesServer(
                 establishmentsRepo,
             ),
             details: new establishmentUC.GetEstablishmentDetailsUsecase(
-                establishmentsRepo,
+                establishmentQuery,
             ),
             emailPrefixAvailable: new establishmentUC
                 .EmailPrefixAvailableUsecase(
@@ -93,6 +94,9 @@ export function makeUseCasesServer(
                 suppliersRepo,
             ),
             update: new supplierUC.UpdateSupplierUsecase(suppliersRepo),
+            delete: new supplierUC.DeleteSupplierUseCase(
+                suppliersRepo,
+            ),
         },
         users: {
             details: new userUc.GetUserDetailsUsecase(
@@ -104,6 +108,9 @@ export function makeUseCasesServer(
             delete: new userUc.DeleteUserUsecase(
                 userRepo,
                 establishmentQuery,
+            ),
+            list: new userUc.ListUsersUsecase(
+                userQuery,
             ),
         },
     } as const;

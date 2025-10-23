@@ -45,6 +45,7 @@ export class SupplierSupabaseRepository implements SupplierRepository {
         if (error) throw SupabaseError.fromPostgrest(error);
         return data.id;
     }
+
     async update(entity: SupplierModel): Promise<void> {
         const { error } = await this.supabaseClient
             .from("suppliers")
@@ -54,6 +55,14 @@ export class SupplierSupabaseRepository implements SupplierRepository {
                 phone: entity.phone,
             })
             .eq("id", entity.id);
+        if (error) throw SupabaseError.fromPostgrest(error);
+    }
+
+    async delete(id: string): Promise<void> {
+        const { error } = await this.supabaseClient
+            .from("suppliers")
+            .delete()
+            .eq("id", id);
         if (error) throw SupabaseError.fromPostgrest(error);
     }
 
