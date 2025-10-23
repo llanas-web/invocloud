@@ -63,10 +63,22 @@ export function makeUseCasesServer(
                     establishmentsRepo,
                     paymentFactory,
                 ),
+                createSubscription: new establishmentUC
+                    .CreateSubscriptionUsecase(
+                    establishmentsRepo,
+                ),
                 cancelSubscription: new establishmentUC
                     .CancelSubscriptionUsecase(
                     establishmentsRepo,
                     paymentFactory,
+                ),
+                updateSubscription: new establishmentUC
+                    .ActivateSubscriptionUsecase(
+                    establishmentsRepo,
+                ),
+                handlePaymentEvents: new establishmentUC
+                    .HandlePaymentEventsUsecase(
+                    establishmentsRepo,
                 ),
             },
         },

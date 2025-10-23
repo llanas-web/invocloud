@@ -10,8 +10,9 @@ export class CreateCheckoutSessionUsecase {
     ) {}
 
     async execute(raw: unknown): Promise<string> {
-        const { userId, establishmentId } = CreateCheckoutSessionCommandSchema
-            .parse(raw);
+        const { userId, establishmentId, email } =
+            CreateCheckoutSessionCommandSchema
+                .parse(raw);
         const establishment = await this.establishmentRepo.getById(
             establishmentId,
         );
@@ -19,6 +20,7 @@ export class CreateCheckoutSessionUsecase {
             throw new ApplicationError("Establishment not found");
         }
         const checkoutSessionUrl = await this.paymentRepo.createCheckoutSession(
+            email,
             userId,
             establishmentId,
         );

@@ -34,6 +34,7 @@ export type InviteMemberCommand = z.infer<
 export const CreateCheckoutSessionCommandSchema = z.object({
     establishmentId: z.uuid(),
     userId: z.uuid(),
+    email: z.email(),
 });
 export type CreateCheckoutSessionCommand = z.infer<
     typeof CreateCheckoutSessionCommandSchema
