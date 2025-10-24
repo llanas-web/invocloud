@@ -1,9 +1,8 @@
 /// <reference lib="webworker" />
 // app/workers/invoices-downloader.worker.ts
 import { BlobReader, BlobWriter, TextReader, ZipWriter } from "@zip.js/zip.js";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 import * as mime from "mime-types";
-import type { InvoiceModel } from "~~/shared/types/models/invoice.model";
 import StorageFactory from "~~/shared/providers/storage/storage.factory";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 // if you ever need supabase-js in worker, you can import it here and initialize with the passed keys.

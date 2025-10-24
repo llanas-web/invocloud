@@ -1,5 +1,4 @@
 import { createSharedComposable } from "@vueuse/core";
-import { SupplierViewModel } from "~/viewmodels/supplier/supplier.vm";
 
 const _useSupplierDetails = () => {
     const { $usecases } = useNuxtApp();
@@ -20,7 +19,12 @@ const _useSupplierDetails = () => {
 
     const supplier = computed(() => {
         if (!model.value) return null;
-        return new SupplierViewModel(model.value);
+        return {
+            id: model.value.id,
+            name: model.value.name,
+            emails: model.value.emails,
+            phone: model.value.phone,
+        };
     });
 
     return {

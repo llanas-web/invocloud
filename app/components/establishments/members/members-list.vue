@@ -1,8 +1,7 @@
 <script setup lang="ts">
     import type { DropdownMenuItem } from '@nuxt/ui'
-    import { useMembersList } from '~/composables/establishments/members/list'
 
-    const { members } = useMembersList()
+    const { members } = useEstablishmentDetails()
     const q = ref('')
 
     const items = [{
@@ -29,30 +28,7 @@
         </template>
 
         <ul role="list" class="divide-y divide-default">
-            <li v-for="(member, index) in members" :key="index"
-                class="flex items-center justify-between gap-3 py-3 px-4 sm:px-6">
-                <div class="flex items-center gap-3 min-w-0">
-                    <div class="text-sm min-w-0">
-                        <p class="text-highlighted font-medium truncate">
-                            {{ member.fullName }}
-                        </p>
-                        <p class="text-muted truncate">
-                            {{ member.email }}
-                        </p>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <UBadge :label="member.getStatusLabel()" :color="member.getStatusColor()">
-                    </UBadge>
-                    <!-- <USelect :model-value="member.role" :items="['member', 'owner']" color="neutral"
-                        :ui="{ value: 'capitalize', item: 'capitalize' }" />
-
-                    <UDropdownMenu :items="items" :content="{ align: 'end' }">
-                        <UButton icon="i-lucide-ellipsis-vertical" color="neutral" variant="ghost" />
-                    </UDropdownMenu> -->
-                </div>
-            </li>
+            <EstablishmentsMembersItemRow v-for="(member, index) in members" :key="index" :member="member" />
         </ul>
     </UPageCard>
 </template>
