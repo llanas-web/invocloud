@@ -9,7 +9,7 @@ import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 
 type DownloadMsg = {
     type: "download";
-    invoices: Partial<InvoiceModel>[];
+    invoices: { id: string; filePath: string; invoiceNumber: string }[];
     supabaseUrl: string;
     supabaseAnonKey: string;
     access_token: string;
