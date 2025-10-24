@@ -1,6 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
 import { invoicesApi } from "~/services/api/invoices.api";
-import { InvoiceListItemViewModel } from "~/viewmodels/invoice/invoice-list-item.vm";
 import type { InvoiceStatus } from "~~/shared/domain/invoice/invoice.model";
 import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
@@ -48,8 +47,17 @@ const _useInvoices = () => {
         },
     );
 
-    const invoices = computed<InvoiceListItemViewModel[]>(() => {
-        return dtos.value.map(InvoiceListItemViewModel.fromDTO);
+    const invoices = computed(() => {
+        return dtos.value.map((dto) => ({
+            id: dto.id,
+            name: dto.name,
+            amount: dto.amount,
+            invoiceNumber: dto.number,
+            emitDate: dto.emitDate,
+            dueDate: dto.dueDate,
+            status: dto.status,
+            paidAt: dto.paidAt,
+        }));
     });
 
     const updateStatusAction = useAsyncAction(

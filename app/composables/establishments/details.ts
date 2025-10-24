@@ -1,8 +1,9 @@
 import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "../core/useAsyncAction";
 import { AppError } from "~/core/errors/app.error";
-import { EstablishmentViewModel } from "~/viewmodels/establishment/establishment.vm";
 import { establishmentApi } from "~/services/api/establishment.api";
+import { SubscriptionStatus } from "~~/shared/domain/establishment/subscription.entity";
+import { fromDate } from "~/utils/date";
 
 const _useEstablishmentDetails = () => {
     const { $usecases } = useNuxtApp();
@@ -28,15 +29,50 @@ const _useEstablishmentDetails = () => {
         },
     );
 
-    const establishment = computed<EstablishmentViewModel | null>(() => {
+    const establishment = computed(() => {
         if (!dto.value) return null;
-        return new EstablishmentViewModel(dto.value);
+        return {
+            id: dto.value.id,
+            name: dto.value.name,
+            emailPrefix: dto.value.emailPrefix,
+            creatorId: dto.value.creatorId,
+        };
+    });
+
+    const subscription = computed(() => {
+        if (!dto.value?.subscription) return null;
+        return {
+            status: dto.value.subscription.status,
+            endDate: dto.value.subscription.endAt,
+            endDateLabel: dto.value.subscription.endAt
+                ? fromDate(dto.value.subscription.endAt)
+                : "N/A",
+        };
+    });
+
+    const members = computed(() => {
+        if (!dto.value) return [];
+        return dto.value.members.map((member) => ({
+            id: member.id,
+            fullName: member.fullName,
+            email: member.email,
+            role: member.role,
+            status: member.status,
+        }));
     });
 
     const isSelected = computed(() => !!selectedId.value);
 
     const isAdmin = computed(() => {
         return establishment.value?.creatorId === user.value?.id;
+    });
+
+    const isActive = computed(() => {
+        return subscription.value?.status === SubscriptionStatus.ACTIVE;
+    });
+
+    const isTrial = computed(() => {
+        return subscription.value?.status === SubscriptionStatus.TRIAL;
     });
 
     const deleteAction = useAsyncAction(async () => {
@@ -69,17 +105,35 @@ const _useEstablishmentDetails = () => {
         },
     );
 
+    const inviteMemberAction = useAsyncAction(
+        async (email: string) => {
+            if (!selectedId.value) {
+                throw new AppError("No establishment selected");
+            }
+            await establishmentApi.inviteMember({
+                establishmentId: selectedId.value,
+                email,
+                invitorId: user.value!.id,
+            });
+        },
+    );
+
     return {
         dto,
+        establishment,
+        subscription,
+        members,
         isSelected,
         isAdmin,
-        establishment,
+        isActive,
+        isTrial,
         pending,
         error,
         actions: {
             delete: deleteAction,
             createCheckoutSession: createCheckoutSessionAction,
             cancelSubscription: cancelSubscriptionAction,
+            inviteMember: inviteMemberAction,
         },
     };
 };

@@ -2,11 +2,11 @@
     import { UBadge } from '#components';
     import { format } from 'date-fns';
 
-    const { establishment, actions } = useEstablishmentDetails()
+    const { establishment, isAdmin, isTrial, isActive, subscription, actions } = useEstablishmentDetails()
 </script>
 
 <template>
-    <UPageCard v-if="!establishment || !establishment.isActive" id="subscriptions" variant="subtle" :ui="{
+    <UPageCard v-if="!subscription" id="subscriptions" variant="subtle" :ui="{
         header: 'flex items-center justify-between w-full',
     }">
         <template #body>
@@ -18,7 +18,7 @@
             </UButton>
         </template>
     </UPageCard>
-    <UPageCard v-else-if="establishment.isActive" id="subscriptions" variant="subtle" :ui="{
+    <UPageCard v-else-if="isActive" id="subscriptions" variant="subtle" :ui="{
         header: 'flex items-center justify-between w-full',
     }">
         <template #header>
@@ -36,19 +36,19 @@
             </UButton>
         </template>
     </UPageCard>
-    <UPageCard v-else-if="establishment.isTrial" id="subscriptions" variant="subtle" :ui="{
+    <UPageCard v-else-if="isTrial" id="subscriptions" variant="subtle" :ui="{
         header: 'flex items-center justify-between w-full',
     }">
         <template #header>
             <h2 class="text-lg font-semibold">Abonnement actuel</h2>
             <UBadge color="warning" icon="i-lucide:alert-triangle">
-                Fin de période d'essai le {{ establishment.dateEndLabel }}
+                Fin de période d'essai le {{ subscription.endDateLabel }}
             </UBadge>
         </template>
         <template #body>
             Vous êtes actuellement en période d'essai.
             Votre période d'essai se termine le
-            <strong>{{ establishment.dateEndLabel }}</strong>. Vous pouvez annuler votre période d'essai à tout moment.
+            <strong>{{ subscription.endDateLabel }}</strong>. Vous pouvez annuler votre période d'essai à tout moment.
         </template>
         <template #footer>
             <UButton @click="actions.cancelSubscription.execute" color="error">

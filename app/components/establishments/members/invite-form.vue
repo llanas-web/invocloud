@@ -1,10 +1,9 @@
 <script setup lang="ts">
     import * as z from 'zod'
     import type { FormSubmitEvent } from '@nuxt/ui'
-    import { useMembersList } from '~/composables/establishments/members/list'
 
     const toast = useToast()
-    const { actions: { inviteMember } } = useMembersList()
+    const { actions: { inviteMember } } = useEstablishmentDetails()
 
 
     const invitationSchema = z.object({

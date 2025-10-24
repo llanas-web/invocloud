@@ -1,5 +1,4 @@
 import { createSharedComposable, useLocalStorage } from "@vueuse/core";
-import { EstablishmentListItemViewModel } from "~/viewmodels/establishment/establishment-list-item.vm";
 import type { EstablishmentListItemDTO } from "~~/shared/application/establishment/dto";
 
 const _useEstablishmentsList = () => {
@@ -34,8 +33,12 @@ const _useEstablishmentsList = () => {
         },
     );
 
-    const establishments = computed<EstablishmentListItemViewModel[]>(() =>
-        dtos.value.map(EstablishmentListItemViewModel.fromDTO)
+    const establishments = computed(() =>
+        dtos.value.map((dto) => ({
+            id: dto.id,
+            name: dto.name,
+            emailPrefix: dto.emailPrefix,
+        }))
     );
 
     // --- Helpers sélection

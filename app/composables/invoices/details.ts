@@ -1,6 +1,4 @@
 import { createSharedComposable } from "@vueuse/core";
-import z from "zod";
-import { InvoiceViewModel } from "~/viewmodels/invoice/invoice.vm";
 import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
 import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
 
@@ -28,9 +26,20 @@ const _useInvoiceDetails = () => {
         },
     );
 
-    const invoice = computed<InvoiceViewModel | null>(() => {
+    const invoice = computed(() => {
         if (!model.value) return null;
-        return new InvoiceViewModel(model.value!);
+        return {
+            id: model.value.id,
+            name: model.value.name,
+            amount: model.value.amount,
+            filePath: model.value.filePath,
+            invoiceNumber: model.value.number,
+            emitDate: model.value.emitDate,
+            dueDate: model.value.dueDate,
+            status: model.value.status,
+            paidAt: model.value.paidAt,
+            comment: model.value.comment,
+        };
     });
 
     const downloadAction = useAsyncAction(

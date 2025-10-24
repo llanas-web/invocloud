@@ -1,5 +1,4 @@
 import { createSharedComposable } from "@vueuse/core";
-import { SupplierListItemViewModel } from "~/viewmodels/supplier/supplier-list-item.vm";
 
 const _useSuppliers = () => {
     const { $usecases } = useNuxtApp();
@@ -20,7 +19,12 @@ const _useSuppliers = () => {
     );
 
     const suppliers = computed(() =>
-        dtos.value.map((dto) => SupplierListItemViewModel.fromDTO(dto))
+        dtos.value.map((dto) => ({
+            id: dto.id,
+            name: dto.name,
+            emails: dto.emails,
+            phone: dto.phone,
+        }))
     );
 
     const deleteSupplierAction = useAsyncAction(
