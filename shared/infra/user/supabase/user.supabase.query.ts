@@ -1,9 +1,9 @@
 import type { UserListItemDTO } from "~~/shared/application/user/dto";
 import type { ListUserQueryFilter } from "~~/shared/application/user/queries";
 import type { UserQuery } from "~~/shared/application/user/user.query";
-import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import { SupabaseError } from "../../common/errors/supabase.error";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "../../common/supabase/database.types";
 
 export class UserSupabaseQuery implements UserQuery {
     constructor(private readonly supabase: SupabaseClient<Database>) {}

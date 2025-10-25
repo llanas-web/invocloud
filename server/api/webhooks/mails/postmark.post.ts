@@ -1,0 +1,89 @@
+import { defineEventHandler } from "h3";
+import { z } from "zod";
+import { HTTPStatus } from "~~/server/core/errors/status";
+import { useServerUsecases } from "~~/server/plugins/usecases.plugin";
+
+export const PostmarkInboundSchema = z.object({
+    FromFull: z.object({
+        Email: z.email(),
+        Name: z.string(),
+    }),
+    ToFull: z.array(
+        z.object({
+            Email: z.email(),
+            Name: z.string(),
+        }),
+    ).min(1).max(1),
+    Subject: z.string(),
+    Attachments: z.array(
+        z.object({
+            Name: z.string(),
+            ContentType: z.string(),
+            ContentLength: z.number(),
+            Content: z.string(),
+        }),
+    ).min(1),
+});
+
+export default defineEventHandler(async (event) => {
+    const config = useRuntimeConfig();
+    const { invoices } = useServerUsecases(event);
+
+    // Security: Basic Auth
+    const auth = event.node.req.headers.authorization || "";
+    const expectedUser = config.inboundBasicUser;
+    const expectedPass = config.inboundBasicPass;
+
+    const ok = auth.startsWith("Basic ") &&
+        (() => {
+            const [u, p] = Buffer.from(auth.slice(6), "base64").toString("utf8")
+                .split(":");
+            return u === expectedUser && p === expectedPass;
+        })();
+
+    if (!ok) {
+        throw createError({ status: HTTPStatus.UNAUTHORIZED });
+    }
+
+    // Postmark sends JSON for inbound
+    const {
+        FromFull: sender,
+        ToFull: recipients,
+        Subject: subject,
+        Attachments: attachments,
+    } = await parseBody(event, PostmarkInboundSchema);
+
+    if (recipients.length === 0 || recipients.length > 0) {
+        console.error("No recipients found in email from:", sender.Email);
+        throw createError({ status: 400, message: "No recipients found" });
+    }
+
+    if (attachments.length === 0) {
+        console.error("No attachments found in email from:", sender.Email);
+        throw createError({ status: 400, message: "No attachments found" });
+    }
+
+    // TODO: lookup alias -> établissement, stockage, création facture
+    console.log("[INBOUND]", {
+        from: sender.Email,
+        to: recipients.map((t) => t.Email),
+        subject,
+        attachments: attachments.map((a) => ({
+            name: a.Name,
+            type: a.ContentType,
+            size: a.ContentLength,
+        })),
+    });
+
+    const recipientEmail = recipients[0].Email.toLowerCase();
+    await invoices.mail.handleInbound.execute({
+        from: sender.Email,
+        to: recipientEmail,
+        subject,
+        attachments: attachments.map((a) => ({
+            name: a.Name,
+            content: a.Content,
+            contentType: a.ContentType,
+        })),
+    });
+});

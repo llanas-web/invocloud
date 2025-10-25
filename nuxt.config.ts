@@ -27,9 +27,13 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     baseUrl: process.env.BASE_URL || "http://localhost:3000",
-    // Email
-    resendApiKey: process.env.RESEND_API_KEY || "",
+    // Email Resend
     emailFrom: process.env.RESEND_EMAIL_FROM || "",
+    resendApiKey: process.env.RESEND_API_KEY || "",
+
+    // Inbound Mail Basic Auth
+    inboundBasicUser: process.env.INBOUND_BASIC_USER || "",
+    inboundBasicPass: process.env.INBOUND_BASIC_PASS || "",
 
     // Stripe
     stripeSecretKey: process.env.STRIPE_SECRET_KEY || "",

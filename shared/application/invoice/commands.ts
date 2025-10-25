@@ -79,3 +79,19 @@ export const CheckUploadAuthorizationSchema = z.object({
 export type CheckUploadAuthorizationCommand = z.infer<
     typeof CheckUploadAuthorizationSchema
 >;
+
+export const HandleInboundMailCommand = z.object({
+    senderEmail: z.email(),
+    recipientEmail: z.email(),
+    subject: z.string().optional(),
+    attachments: z.array(
+        z.object({
+            name: z.string(),
+            content: z.string(),
+            contentType: z.string(),
+        }),
+    ),
+});
+export type HandleInboundMailCommand = z.infer<
+    typeof HandleInboundMailCommand
+>;

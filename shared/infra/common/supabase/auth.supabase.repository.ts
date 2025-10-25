@@ -6,9 +6,10 @@ import {
     BaseAuthUserModel,
 } from "~~/shared/application/common/providers/auth/dto/auth.dto";
 import { AuthEvent } from "~~/shared/application/common/providers/auth/types";
+import type { Database } from "./database.types";
 
 export default class AuthSupabaseRepository implements AuthRepository {
-    constructor(private supabaseClient: SupabaseClient) {}
+    constructor(private supabaseClient: SupabaseClient<Database>) {}
 
     currentUser: BaseAuthUserModel | null = null;
 

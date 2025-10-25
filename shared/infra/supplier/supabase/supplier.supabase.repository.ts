@@ -4,8 +4,8 @@ import {
 } from "~~/shared/domain/supplier/supplier.model";
 import type { SupplierRepository } from "~~/shared/domain/supplier/supplier.repository";
 import { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import { SupabaseError } from "../../common/errors/supabase.error";
+import type { Database } from "../../common/supabase/database.types";
 
 export class SupplierSupabaseRepository implements SupplierRepository {
     constructor(private supabaseClient: SupabaseClient<Database>) {}

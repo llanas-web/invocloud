@@ -1,4 +1,3 @@
-import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SupabaseError } from "../../common/errors/supabase.error";
 import type {
@@ -10,6 +9,7 @@ import type {
 import type { EstablishmentQuery } from "~~/shared/application/establishment/establishment.query";
 import type { ListEstablishmentQueryFilter } from "~~/shared/application/establishment/queries";
 import type { SubscriptionStatus } from "~~/shared/domain/establishment/subscription.entity";
+import type { Database } from "../../common/supabase/database.types";
 
 export class EstablishmentSupabaseQuery implements EstablishmentQuery {
     constructor(private readonly supabase: SupabaseClient<Database>) {}

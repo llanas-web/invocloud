@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { GuestUploadSessionRepository } from "~~/shared/domain/guest-upload/guest-upload-session.repository";
 import GuestUploadSessionModel from "~~/shared/domain/guest-upload/guest-upload-session.model";
-import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
+import type { Database } from "../../common/supabase/database.types";
 
 export class GuestUploadSessionSupabaseRepository
     implements GuestUploadSessionRepository {

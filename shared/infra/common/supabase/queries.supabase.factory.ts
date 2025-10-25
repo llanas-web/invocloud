@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import type { InvoiceQuery } from "~~/shared/application/invoice/invoice.query";
 import { InvoiceSupabaseQuery } from "~~/shared/infra/invoice/supabase/invoice.supabase.query";
 import { EstablishmentSupabaseQuery } from "../../establishment/supabase/establishment.supabase.query";
@@ -9,6 +8,7 @@ import type { SupplierQuery } from "~~/shared/application/supplier/supplier.quer
 import type { QueriesFactory } from "../../../domain/common/queries.factory";
 import { UserSupabaseQuery } from "../../user/supabase/user.supabase.query";
 import type { UserQuery } from "~~/shared/application/user/user.query";
+import type { Database } from "./database.types";
 
 export class QueriesSupabaseFactory implements QueriesFactory {
     constructor(private readonly supabase: SupabaseClient<Database>) {}

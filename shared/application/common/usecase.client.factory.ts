@@ -4,7 +4,6 @@ import * as invoiceUC from "../invoice/usecases";
 import * as establishmentUC from "../establishment/usecases";
 import * as supplierUC from "../supplier/usecases";
 import * as userUc from "../user/usecases";
-import type { AuthRepository } from "./providers/auth/auth.repository";
 import type { StorageRepository } from "./providers/storage/storage.repository";
 
 export function makeUseCasesClient(

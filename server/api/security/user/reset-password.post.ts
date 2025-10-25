@@ -1,18 +1,16 @@
 import * as z from "zod";
-import { buildRequestScope } from "~~/server/core/container";
+import { useServerAuthRepository } from "~~/server/plugins/auth.plugin";
 
 const schema = z.object({
     password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
 export default defineEventHandler(async (event) => {
-    const {
-        ctx: { authentProtection, userId },
-        deps: { auth },
-    } = await buildRequestScope(event);
-    authentProtection();
+    const authRepository = useServerAuthRepository(event);
 
     const { password } = await parseBody(event, schema);
 
-    await auth.updateUser(userId, { password });
+    await authRepository.updateUser(authRepository.currentUser!.id, {
+        password,
+    });
 });

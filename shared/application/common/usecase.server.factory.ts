@@ -5,12 +5,14 @@ import * as establishmentUC from "../establishment/usecases";
 import * as supplierUC from "../supplier/usecases";
 import * as userUc from "../user/usecases";
 import * as guestUploadSessionUC from "../guest-upload/usecases";
+import * as invoiceTaskUC from "../invoice-task/usecase";
 import type { PaymentRepository } from "~~/shared/application/common/providers/payment/payment.repository";
 import ServerError from "~~/server/core/errors";
 import { HTTPStatus } from "~~/server/core/errors/status";
 import type { StorageRepository } from "./providers/storage/storage.repository";
 import type { EmailRepository } from "./providers/email/email.repository";
 import type { AuthRepository } from "./providers/auth/auth.repository";
+import type { OcrRepository } from "./providers/ocr/ocr.repository";
 
 export function makeUseCasesServer(
     repositoryFactory: RepositoriesFactory,
@@ -19,6 +21,7 @@ export function makeUseCasesServer(
     storageRepository: StorageRepository,
     emailRepository: EmailRepository,
     authRepository: AuthRepository,
+    ocrRepository: OcrRepository,
 ) {
     if (import.meta.client || !import.meta.server) {
         throw new ServerError(
@@ -35,6 +38,7 @@ export function makeUseCasesServer(
     const userRepo = repositoryFactory.users();
     const userQuery = queryFactory.userQuery();
     const guestUploadSessionRepo = repositoryFactory.guestUploadSessions();
+    const invoiceTasksRepo = repositoryFactory.invoiceTasks();
 
     return {
         invoices: {
@@ -62,6 +66,14 @@ export function makeUseCasesServer(
                 checkUploadAuthorization: new invoiceUC
                     .CheckUploadAuthorizationUsecase(
                     establishmentQuery,
+                ),
+            },
+            mail: {
+                handleInbound: new invoiceUC.HandleInboundMailUsecase(
+                    establishmentQuery,
+                    suppliersQuery,
+                    invoicesRepo,
+                    storageRepository,
                 ),
             },
         },
@@ -163,6 +175,22 @@ export function makeUseCasesServer(
                 .CreateInvoiceFromGuestSessionUseCase(
                 guestUploadSessionRepo,
                 invoicesRepo,
+            ),
+        },
+        invoiceTask: {
+            createOcrTask: new invoiceTaskUC.CreateOcrTaskUsecase(
+                invoiceTasksRepo,
+                invoicesRepo,
+            ),
+            processOcrWebhook: new invoiceTaskUC.ProcessOcrWebhookUsecase(
+                invoiceTasksRepo,
+                invoicesRepo,
+            ),
+            processPendingTasks: new invoiceTaskUC.ProcessPendingTasksUsecase(
+                invoiceTasksRepo,
+                invoicesRepo,
+                storageRepository,
+                ocrRepository,
             ),
         },
     } as const;

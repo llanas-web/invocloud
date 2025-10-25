@@ -1,5 +1,6 @@
 import type { ModelCommonUpdateProps } from "~~/shared/domain/common/common.interface";
 import { PayloadModel } from "~~/shared/domain/common/payload.model";
+import { DomainError, DomainErrorCode } from "../common/errors/domain.error";
 
 export const InvoiceTaskStatus = {
     QUEUED: "queued",
@@ -13,7 +14,6 @@ export type InvoiceTaskStatus =
 
 export const InvoiceTaskType = {
     OCR: "ocr",
-    PDP_VALIDATION: "pdp_validation",
 } as const;
 
 export type InvoiceTaskType =
@@ -54,6 +54,10 @@ export class InvoiceTaskModel extends PayloadModel {
         super();
     }
 
+    get id(): string {
+        return this.props.id;
+    }
+
     get invoiceId(): string {
         return this.props.invoiceId;
     }
@@ -82,11 +86,19 @@ export class InvoiceTaskModel extends PayloadModel {
         return this.props.rawResult ?? null;
     }
 
+    get createdAt(): Date {
+        return this.props.createdAt;
+    }
+
+    get updatedAt(): Date {
+        return this.props.updatedAt;
+    }
+
     public static createOcrTask(data: {
         invoiceId: string;
         provider: OcrProviderName;
     }): InvoiceTaskDraft {
-        return new InvoiceTaskModel({
+        return {
             invoiceId: data.invoiceId,
             type: InvoiceTaskType.OCR,
             status: InvoiceTaskStatus.QUEUED,
@@ -94,9 +106,7 @@ export class InvoiceTaskModel extends PayloadModel {
             attempts: 0,
             jobId: null,
             rawResult: null,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        });
+        };
     }
 
     public submit(jobId: string): void {
@@ -134,5 +144,35 @@ export class InvoiceTaskModel extends PayloadModel {
     public canRetry(maxAttempts: number = 5): boolean {
         return this.attempts < maxAttempts &&
             this.props.status !== InvoiceTaskStatus.DONE;
+    }
+
+    override toPayload(): Record<string, any> {
+        return {
+            id: this.props.id,
+            invoiceId: this.props.invoiceId,
+            type: this.props.type,
+            status: this.props.status,
+            jobId: this.props.jobId,
+            provider: this.props.provider,
+            attempts: this.props.attempts,
+            rawResult: this.props.rawResult,
+            createdAt: this.props.createdAt,
+            updatedAt: this.props.updatedAt,
+        };
+    }
+
+    override fromPayload(data: any): this {
+        return new InvoiceTaskModel({
+            id: data.id,
+            invoiceId: data.invoiceId,
+            type: data.type,
+            status: data.status,
+            jobId: data.jobId ?? null,
+            provider: data.provider ?? undefined,
+            attempts: data.attempts ?? 0,
+            rawResult: data.rawResult ?? null,
+            createdAt: new Date(data.createdAt),
+            updatedAt: new Date(data.updatedAt),
+        }) as this;
     }
 }

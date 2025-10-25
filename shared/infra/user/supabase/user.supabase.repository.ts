@@ -1,8 +1,8 @@
 import type { UserRepository } from "~~/shared/domain/user/user.repository";
-import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { type DraftUser, UserModel } from "~~/shared/domain/user/user.model";
 import { SupabaseError } from "../../common/errors/supabase.error";
+import type { Database } from "../../common/supabase/database.types";
 
 export class UserSupabaseRepository implements UserRepository {
     constructor(private supabase: SupabaseClient<Database>) {}
