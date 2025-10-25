@@ -1,16 +1,31 @@
-import type { RepositoryFactory } from "~~/shared/domain/common/repository.factory";
-import type { QueryFactory } from "~~/shared/infra/common/query.factory";
+import type { RepositoriesFactory } from "~~/shared/domain/common/repositories.factory";
+import type { QueriesFactory } from "~~/shared/domain/common/queries.factory";
 import * as invoiceUC from "../invoice/usecases";
 import * as establishmentUC from "../establishment/usecases";
 import * as supplierUC from "../supplier/usecases";
 import * as userUc from "../user/usecases";
+import * as guestUploadSessionUC from "../guest-upload/usecases";
 import type { PaymentRepository } from "~~/shared/application/common/providers/payment/payment.repository";
+import ServerError from "~~/server/core/errors";
+import { HTTPStatus } from "~~/server/core/errors/status";
+import type { StorageRepository } from "./providers/storage/storage.repository";
+import type { EmailRepository } from "./providers/email/email.repository";
+import type { AuthRepository } from "./providers/auth/auth.repository";
 
 export function makeUseCasesServer(
-    repositoryFactory: RepositoryFactory,
-    queryFactory: QueryFactory,
-    paymentFactory: PaymentRepository,
+    repositoryFactory: RepositoriesFactory,
+    queryFactory: QueriesFactory,
+    paymentRepository: PaymentRepository,
+    storageRepository: StorageRepository,
+    emailRepository: EmailRepository,
+    authRepository: AuthRepository,
 ) {
+    if (import.meta.client || !import.meta.server) {
+        throw new ServerError(
+            HTTPStatus.INTERNAL_SERVER_ERROR,
+            "Server UseCasesFactory can only be instantiated on the server side.",
+        );
+    }
     const invoicesRepo = repositoryFactory.invoices();
     const invoiceListQuery = queryFactory.invoiceListQuery();
     const establishmentsRepo = repositoryFactory.establishments();
@@ -19,10 +34,10 @@ export function makeUseCasesServer(
     const suppliersQuery = queryFactory.suppliersQuery();
     const userRepo = repositoryFactory.users();
     const userQuery = queryFactory.userQuery();
+    const guestUploadSessionRepo = repositoryFactory.guestUploadSessions();
 
     return {
         invoices: {
-            create: new invoiceUC.CreateInvoiceUsecase(invoicesRepo),
             list: new invoiceUC.ListInvoicesUsecase(invoiceListQuery),
             updateDetails: new invoiceUC.UpdateInvoiceDetailsUsecase(
                 invoicesRepo,
@@ -32,6 +47,23 @@ export function makeUseCasesServer(
                 invoicesRepo,
             ),
             delete: new invoiceUC.DeleteInvoicesUsecase(invoicesRepo),
+            sendByEmail: new invoiceUC.SendInvoiceByEmailUsecase(
+                invoiceListQuery,
+                emailRepository,
+                storageRepository,
+            ),
+            upload: {
+                createInvoiceFromUpload: new invoiceUC
+                    .CreateInvoiceFromUploadUsecase(
+                    invoicesRepo,
+                    establishmentsRepo,
+                    storageRepository,
+                ),
+                checkUploadAuthorization: new invoiceUC
+                    .CheckUploadAuthorizationUsecase(
+                    establishmentQuery,
+                ),
+            },
         },
         establishments: {
             create: new establishmentUC.CreateEstablishmentUsecase(
@@ -56,15 +88,17 @@ export function makeUseCasesServer(
             member: {
                 invite: new establishmentUC.InviteMemberUsecase(
                     establishmentsRepo,
-                    // establishmentQuery,
-                    // emailPrefixAvailable,
+                    userQuery,
+                    emailRepository,
+                    authRepository,
                 ),
             },
             subscription: {
                 createCheckoutSession: new establishmentUC
                     .CreateCheckoutSessionUsecase(
                     establishmentsRepo,
-                    paymentFactory,
+                    authRepository,
+                    paymentRepository,
                 ),
                 createSubscription: new establishmentUC
                     .CreateSubscriptionUsecase(
@@ -73,7 +107,7 @@ export function makeUseCasesServer(
                 cancelSubscription: new establishmentUC
                     .CancelSubscriptionUsecase(
                     establishmentsRepo,
-                    paymentFactory,
+                    paymentRepository,
                 ),
                 updateSubscription: new establishmentUC
                     .ActivateSubscriptionUsecase(
@@ -111,6 +145,24 @@ export function makeUseCasesServer(
             ),
             list: new userUc.ListUsersUsecase(
                 userQuery,
+            ),
+        },
+        guestUploadSession: {
+            initiate: new guestUploadSessionUC.InitiateGuestUploadUseCase(
+                establishmentQuery,
+                guestUploadSessionRepo,
+                emailRepository,
+                hashCode,
+            ),
+            verify: new guestUploadSessionUC.VerifyGuestUploadSessionUseCase(
+                guestUploadSessionRepo,
+                establishmentQuery,
+                hashCode,
+            ),
+            createInvoice: new guestUploadSessionUC
+                .CreateInvoiceFromGuestSessionUseCase(
+                guestUploadSessionRepo,
+                invoicesRepo,
             ),
         },
     } as const;

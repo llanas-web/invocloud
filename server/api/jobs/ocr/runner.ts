@@ -1,5 +1,5 @@
 import { buildRequestScope } from "~~/server/core/container";
-import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
+import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/types";
 import { InvoiceTaskStatus } from "~~/shared/types/models/invoice-task.model";
 
 export default defineEventHandler(async (event) => {

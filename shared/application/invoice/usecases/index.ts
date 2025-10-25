@@ -4,3 +4,6 @@ export * from "./update-invoice-details.usecase";
 export * from "./change-invoice-status.usecase";
 export * from "./delete-invoices.usecase";
 export * from "./get-invoice-details.usecase";
+export * from "./send-by-email.usecase";
+export * from "./upload/create-invoice-from-upload.usecase";
+export * from "./upload/check-upload-authorization.usecase";

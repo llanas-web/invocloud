@@ -1,7 +1,7 @@
 import { defineEventHandler } from "h3";
 import { buildRequestScope } from "~~/server/core/container";
 import { HTTPStatus } from "~~/server/core/errors/status";
-import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
+import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/types";
 
 type PostmarkInbound = {
     From: string;

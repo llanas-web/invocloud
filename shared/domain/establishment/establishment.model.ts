@@ -1,8 +1,8 @@
 import type { UserModel } from "~~/shared/domain/user/user.model";
 import type { ModelCommonUpdateProps } from "../common/common.interface";
 import { PayloadModel } from "../common/payload.model";
-import { MemberEntity, MemberStatus } from "./member.entity";
-import { SubscriptionEntity } from "./subscription.entity";
+import MemberEntity, { MemberStatus } from "./member.entity";
+import SubscriptionEntity from "./subscription.entity";
 import { DomainError, DomainErrorCode } from "../common/errors/domain.error";
 
 export type EstablishmentModelProps =
@@ -98,7 +98,7 @@ export class EstablishmentModel extends PayloadModel {
     /**
      * Invite un nouveau membre (crée un membre en statut PENDING)
      */
-    inviteMember(userId: string, user: UserModel): EstablishmentModel {
+    inviteMember(userId: string): EstablishmentModel {
         // Vérifier que l'utilisateur n'est pas déjà membre
         if (this.hasMember(userId)) {
             throw new DomainError(
@@ -107,7 +107,7 @@ export class EstablishmentModel extends PayloadModel {
             );
         }
 
-        const newMember = MemberEntity.createFromUser(user);
+        const newMember = MemberEntity.createFromUserId(userId);
 
         return new EstablishmentModel({
             ...this.props,

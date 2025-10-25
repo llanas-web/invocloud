@@ -1,17 +1,17 @@
 import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "../core/useAsyncAction";
-import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
-import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
+import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/types";
 import type { z } from "zod";
 import { CreateInvoiceSchema } from "~/types/schemas/forms/invoices.schema";
 import type { CreateInvoiceCommand } from "~~/shared/application/invoice/commands";
 
 const toCreateInvoiceCommand = (
     parsed: z.output<typeof CreateInvoiceSchema>,
+    establishmentId: string,
+    file: File,
 ): CreateInvoiceCommand => ({
     supplierId: parsed.supplierId,
-    filePath: parsed.filePath,
-    source: parsed.source,
+    establishmentId,
     status: parsed.status,
     // optional fields
     name: parsed.name,
@@ -21,11 +21,11 @@ const toCreateInvoiceCommand = (
     emitDate: parsed.emitDate,
     paidAt: parsed.paidAt,
     dueDate: parsed.dueDate,
+    file,
 });
 
 const _useInvoiceCreate = () => {
-    const { $storageFactory, $usecases } = useNuxtApp();
-    const storageRepository = $storageFactory as StorageProvider;
+    const { $usecases } = useNuxtApp();
     const { selectedId } = useEstablishmentsList();
 
     const formRef = ref();
@@ -51,17 +51,12 @@ const _useInvoiceCreate = () => {
             if (!invoiceFile.value) {
                 throw new Error("No invoice file provided.");
             }
-            const command = toCreateInvoiceCommand(parsed);
-            const newInvoiceId = crypto.randomUUID();
-            const uploadResult = await storageRepository.uploadFile(
-                STORAGE_BUCKETS.INVOICES,
-                `${selectedId.value}/${newInvoiceId}`,
+            const command = toCreateInvoiceCommand(
+                parsed,
+                selectedId.value!,
                 invoiceFile.value,
-                { contentType: invoiceFile.value.type, upsert: true },
             );
-            const newInvoice = await $usecases.invoices.create.execute(
-                command,
-            );
+            await $usecases.invoices.create.execute(command);
             navigateTo("/app");
         },
     );

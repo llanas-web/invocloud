@@ -28,12 +28,12 @@ export type InvoiceModelProps =
 
 export type InvoiceRequiredProps = {
     supplierId: string;
-    filePath: string;
     status: InvoiceStatus;
     source: InvoiceSource;
 };
 
 export type InvoiceMutableProps = {
+    filePath?: string;
     name?: string | null;
     amount?: number | null;
     emitDate?: Date | null;

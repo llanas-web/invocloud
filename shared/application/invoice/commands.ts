@@ -6,9 +6,9 @@ import {
 
 export const CreateInvoiceCommandSchema = z.object({
     supplierId: z.uuid(),
-    filePath: z.string().min(1),
-    source: z.enum(InvoiceSource).default(InvoiceSource.APP),
     status: z.enum(InvoiceStatus).default(InvoiceStatus.VALIDATED),
+    file: z.file(),
+    establishmentId: z.uuid(),
 
     // optional fields
     name: z.string().trim().nullable().optional(),
@@ -19,7 +19,6 @@ export const CreateInvoiceCommandSchema = z.object({
     paidAt: z.coerce.date().nullable().optional(),
     comment: z.string().trim().nullable().optional(),
 });
-
 export type CreateInvoiceCommand = z.infer<typeof CreateInvoiceCommandSchema>;
 
 export const UpdateInvoiceDetailsSchema = z.object({
@@ -37,7 +36,6 @@ export const UpdateInvoiceDetailsSchema = z.object({
     if (data.status !== "paid" && data.paidAt != null) return false;
     return true;
 }, { message: "paidAt n’est cohérent que si le statut est 'paid'." });
-
 export type UpdateInvoiceDetailsCommand = z.input<
     typeof UpdateInvoiceDetailsSchema
 >;
@@ -49,11 +47,35 @@ export const ChangeInvoiceStatusSchema = z.object({
 }).refine((d) => (d.status === "paid" ? true : d.paidAt == null), {
     message: "paidAt ne doit être défini que si le statut est 'paid'.",
 });
-
 export type ChangeInvoiceStatusCommand = z.input<
     typeof ChangeInvoiceStatusSchema
 >;
 
 export const DeleteInvoicesSchema = z.array(z.uuid()).nonempty();
-
 export type DeleteInvoicesCommand = z.infer<typeof DeleteInvoicesSchema>;
+
+export const SendInvoiceByEmailCommandSchema = z.object({
+    invoiceIds: z.array(z.uuid()).nonempty(),
+    recipientEmail: z.email(),
+});
+export type SendInvoiceByEmailCommand = z.infer<
+    typeof SendInvoiceByEmailCommandSchema
+>;
+
+export const CreateInvoiceFromUploadSchema = z.object({
+    supplierId: z.uuid(),
+    establishmentId: z.uuid(),
+    comment: z.string().trim().optional(),
+    name: z.string().trim(),
+});
+export type CreateInvoiceFromUploadCommand = z.infer<
+    typeof CreateInvoiceFromUploadSchema
+>;
+
+export const CheckUploadAuthorizationSchema = z.object({
+    senderEmail: z.email(),
+    recipientEmail: z.email(),
+});
+export type CheckUploadAuthorizationCommand = z.infer<
+    typeof CheckUploadAuthorizationSchema
+>;

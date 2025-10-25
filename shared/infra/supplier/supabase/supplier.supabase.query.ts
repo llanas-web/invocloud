@@ -21,6 +21,9 @@ export class SupplierSupabaseQuery implements SupplierQuery {
         if (filters?.establishmentIds) {
             req.in("establishment_id", filters.establishmentIds);
         }
+        if (filters?.emails) {
+            req.overlaps("emails", filters.emails);
+        }
 
         const { data, error } = await req;
         if (error) throw SupabaseError.fromPostgrest(error);

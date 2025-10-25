@@ -1,5 +1,6 @@
 import type { ModelCommonUpdateProps } from "../common/common.interface";
 import { PayloadModel } from "../common/payload.model";
+import type UserSettingsEntity from "./user-settings.entity";
 
 export type UserModelProps =
     & ModelCommonUpdateProps
@@ -12,6 +13,7 @@ export type UserRequiredProps = {
 
 export type UserMutableProps = {
     fullName?: string | null;
+    settings?: UserSettingsEntity | null;
 };
 
 export type DraftUser = Omit<
@@ -24,7 +26,10 @@ export class UserModel extends PayloadModel {
 
     private constructor(readonly props: UserModelProps) {
         super();
-        this.props = props;
+        this.props = {
+            ...props,
+            settings: props.settings ?? null,
+        };
     }
 
     static create(props: UserModelProps): UserModel {
@@ -64,6 +69,10 @@ export class UserModel extends PayloadModel {
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             fullName: this.fullName,
+            settings: this.props.settings && {
+                favoriteEstablishmentId:
+                    this.props.settings.favoriteEstablishmentId,
+            },
         };
     }
 
@@ -74,6 +83,9 @@ export class UserModel extends PayloadModel {
             createdAt: new Date(data.createdAt),
             updatedAt: new Date(data.updatedAt),
             fullName: data.fullName,
+            settings: data.settings && {
+                favoriteEstablishmentId: data.settings.favoriteEstablishmentId,
+            },
         }) as this;
     }
 }

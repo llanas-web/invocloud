@@ -5,31 +5,11 @@ import {
 import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
 import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import { SupabaseClient } from "@supabase/supabase-js";
-import {
-    MemberEntity,
+import MemberEntity, {
     MemberRole,
 } from "~~/shared/domain/establishment/member.entity";
 import { SupabaseError } from "../../common/errors/supabase.error";
-import type { SubscriptionEntity } from "~~/shared/domain/establishment/subscription.entity";
-
-type EstablishmentRow = Database["public"]["Tables"]["establishments"]["Row"];
-type EstablishmentInsert =
-    Database["public"]["Tables"]["establishments"]["Insert"];
-type EstablishmentUpdate =
-    Database["public"]["Tables"]["establishments"]["Update"];
-
-type EstablishmentMemberRow =
-    Database["public"]["Tables"]["establishment_members"]["Row"];
-type EstablishmentMemberInsert =
-    Database["public"]["Tables"]["establishment_members"]["Insert"];
-type EstablishmentMemberUpdate =
-    Database["public"]["Tables"]["establishment_members"]["Update"];
-
-type SubscriptionRow = Database["public"]["Tables"]["subscriptions"]["Row"];
-type SubscriptionInsert =
-    Database["public"]["Tables"]["subscriptions"]["Insert"];
-type SubscriptionUpdate =
-    Database["public"]["Tables"]["subscriptions"]["Update"];
+import type SubscriptionEntity from "~~/shared/domain/establishment/subscription.entity";
 
 const fromRow = (row: any): EstablishmentModel => {
     const members = (row.establishment_members ?? []).map((em: any) =>
@@ -215,7 +195,7 @@ export class EstablishmentSupabaseRepository
                     "",
                 started_at: subscription.startAt.toISOString(),
                 end_at: subscription.endAt?.toISOString() ?? null,
-                provider: subscription.provider,
+                provider: "stripe",
             }], {
                 onConflict: "establishment_id",
                 ignoreDuplicates: false,

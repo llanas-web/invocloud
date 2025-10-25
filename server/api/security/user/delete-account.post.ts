@@ -1,11 +1,9 @@
-import { buildRequestScope } from "~~/server/core/container";
+import z from "zod";
+import { useServerUsecases } from "~~/server/plugins/usecases.plugin";
 
 export default defineEventHandler(async (event) => {
-    const {
-        ctx: { authentProtection, userId },
-        deps: { database: { userRepository } },
-    } = await buildRequestScope(event);
-    authentProtection();
+    const { users } = useServerUsecases(event);
+    const parsedBody = await parseBody(event, z.object({ userId: z.uuid() }));
 
-    await userRepository.deleteUser(userId);
+    await users.delete.execute(parsedBody.userId);
 });
