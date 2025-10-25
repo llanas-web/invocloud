@@ -89,6 +89,9 @@ export function makeUseCasesClient(
                 userRepo,
                 establishmentQuery,
             ),
+            toggleFavorite: new userUc.ToggleFavoriteUsecase(
+                userRepo,
+            ),
         },
     } as const;
 }

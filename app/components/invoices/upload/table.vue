@@ -1,6 +1,5 @@
 <script setup lang="ts">
     import type { TableColumn } from '@nuxt/ui'
-    import type { InvoiceVM } from '~/ui/presenters/invoice.presenter'
 
     const { invoices } = useInvoices()
     const { error: deleteInvoiceError, selectedInvoices, onSubmit } = useInvoicesDelete()
@@ -13,7 +12,7 @@
         invoices.value.filter((invoice) => invoice.status === 'pending')
     )
 
-    const columns: TableColumn<InvoiceVM>[] = [
+    const columns: TableColumn<any>[] = [
         {
             accessorKey: 'supplier',
             header: 'Fournisseur',

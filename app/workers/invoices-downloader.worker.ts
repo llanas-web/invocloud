@@ -5,7 +5,6 @@ import { createClient } from "@supabase/supabase-js";
 import * as mime from "mime-types";
 import StorageFactory from "~~/shared/application/common/providers/storage/storage.factory";
 import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/types";
-// if you ever need supabase-js in worker, you can import it here and initialize with the passed keys.
 
 type DownloadMsg = {
     type: "download";

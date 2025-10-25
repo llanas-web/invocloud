@@ -3,34 +3,44 @@ import type { AuthRepository } from "~~/shared/application/common/providers/auth
 import {
     AnonymousAuthUserModel,
     AuthUserModel,
-    BaseAuthUserModel,
 } from "~~/shared/application/common/providers/auth/dto/auth.dto";
 import { AuthEvent } from "~~/shared/application/common/providers/auth/types";
 import type { Database } from "./database.types";
 
 export default class AuthSupabaseRepository implements AuthRepository {
-    constructor(private supabaseClient: SupabaseClient<Database>) {}
+    private _connectedUser: AuthUserModel | AnonymousAuthUserModel | null =
+        null;
 
-    currentUser: BaseAuthUserModel | null = null;
+    get connectedUser() {
+        return this._connectedUser;
+    }
+
+    constructor(private supabaseClient: SupabaseClient<Database>) {
+        this.supabaseClient.auth.onAuthStateChange((event, session) => {
+            const _event = event as AuthEvent;
+            this.onAuthChange(
+                _event,
+                session?.user != null
+                    ? new AuthUserModel(
+                        session.user.id,
+                        session.user.email ?? "",
+                    )
+                    : null,
+            );
+        });
+    }
 
     onAuthChange(
-        callback: (event: AuthEvent, user: AuthUserModel | null) => void,
+        event: AuthEvent,
+        user: AnonymousAuthUserModel | AuthUserModel | null,
     ): void {
-        this.supabaseClient.auth.onAuthStateChange((event, session) => {
-            switch (event) {
-                case AuthEvent.PASSWORD_RECOVERY:
-                    const user = new AuthUserModel(
-                        session?.user.id!,
-                        session?.user.email!,
-                    );
-                    callback(AuthEvent.PASSWORD_RECOVERY, user);
-                    break;
-                case AuthEvent.SIGNED_IN:
-                case AuthEvent.SIGNED_OUT:
-                    console.warn("event", event, "session", session);
-                    break;
-            }
-        });
+        switch (event) {
+            case AuthEvent.SIGNED_IN:
+                this._connectedUser = user;
+                break;
+            case AuthEvent.SIGNED_OUT:
+                this._connectedUser = null;
+        }
     }
 
     async signInWithPassword(
@@ -86,6 +96,9 @@ export default class AuthSupabaseRepository implements AuthRepository {
     async sendPasswordResetEmail(email: string): Promise<void> {
         const { error } = await this.supabaseClient.auth.resetPasswordForEmail(
             email,
+            {
+                redirectTo: `${import.meta.env.BASE_URL}/auth/update-password`,
+            },
         );
         if (error) throw new AuthError(error.message);
     }

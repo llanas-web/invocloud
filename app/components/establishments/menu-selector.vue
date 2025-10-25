@@ -6,9 +6,9 @@
         collapsed?: boolean
     }>()
 
-    const { establishments, pending, selectEstablishment } = useEstablishmentsList()
+    const { establishments, status, pending, selectEstablishment } = useEstablishmentsList()
     const { establishment } = useEstablishmentDetails();
-    const { userSettings, toggleFavorite: { execute, pending: togglePending, error: toggleError, data: toggleData } } = useUserSettings()
+    const { userSettings, actions } = useUser();
 
     const addModel = useTemplateRef<typeof LazyEstablishmentsAddModal>('addModal')
 
@@ -18,7 +18,7 @@
                 id: establishment.id,
                 label: establishment.name,
                 onSelect: () => selectEstablishment(establishment.id),
-                isFavorite: userSettings.value.favorite_establishment_id === establishment.id,
+                isFavorite: userSettings.value?.favoriteEstablishmentId === establishment.id,
             })), [{
                 label: 'Créer une structure',
                 icon: 'i-lucide-circle-plus',
@@ -30,10 +30,14 @@
                 icon: 'i-lucide-cog'
             }]]
     })
+
+    const establishmentsLoading = computed(() => {
+        return status.value === 'idle' || pending.value;
+    })
 </script>
 
 <template>
-    <template v-if="pending">
+    <template v-if="establishmentsLoading">
         <USkeleton class="h-9 w-full" />
     </template>
     <UDropdownMenu v-else :items="items" :content="{ align: 'center', collisionPadding: 12 }"
@@ -43,7 +47,8 @@
                 <span>{{ item.label }}</span>
                 <UButton v-if="item.id" :class="item.isFavorite ? '' : 'text-gray-400 dark:text-gray-600'"
                     color="warning" variant="ghost" size="xs"
-                    :icon="item.isFavorite ? 'i-lucide-star' : 'i-lucide-star'" @click.stop="execute(item.id)">
+                    :icon="item.isFavorite ? 'i-lucide-star' : 'i-lucide-star'"
+                    @click.stop="() => actions.toggleFavorite.execute(item.id)">
                 </UButton>
             </div>
         </template>

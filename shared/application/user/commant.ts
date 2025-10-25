@@ -7,3 +7,11 @@ export const UpdateUserDetailsSchema = z.object({
 export type UpdateUserDetailsCommand = z.input<
     typeof UpdateUserDetailsSchema
 >;
+
+export const ToggleFavoriteEstablishmentSchema = z.object({
+    userId: z.uuid(),
+    establishmentId: z.uuid(),
+});
+export type ToggleFavoriteEstablishmentCommand = z.input<
+    typeof ToggleFavoriteEstablishmentSchema
+>;

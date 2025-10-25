@@ -35,6 +35,16 @@ const _useUser = () => {
         },
     );
 
+    const toggleFavoriteAction = useAsyncAction(
+        async (establishmentId: string) => {
+            if (!connectedUser.value?.id) throw new AppError("No user id");
+            await $usecases.users.toggleFavorite.execute({
+                userId: connectedUser.value.id,
+                establishmentId,
+            });
+        },
+    );
+
     return {
         currentUser: model,
         userSettings,
@@ -43,6 +53,7 @@ const _useUser = () => {
         pending,
         actions: {
             delete: deleteAccountAction,
+            toggleFavorite: toggleFavoriteAction,
         },
     };
 };

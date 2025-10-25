@@ -1,9 +1,8 @@
 <script lang="ts" setup>
   import { UCard } from '#components';
+  import type { AuthUserModel } from '~~/shared/application/common/providers/auth/dto/auth.dto';
 
-  const user = useSupabaseUser()
-  console.log('User:', user)
-  const supabase = useSupabaseClient()
+  const { connectedUser } = useAuth();
 
   definePageMeta({
     layout: 'auth',
@@ -16,7 +15,7 @@
       <template #header>
         <h1 class="text-2xl font-bold">🎉 Félicitations !</h1>
       </template>
-      <h2 class="text-xl font-semibold mb-4">Bienvenue sur Invocloud {{ user?.email }}</h2>
+      <h2 class="text-xl font-semibold mb-4">Bienvenue sur Invocloud {{ (connectedUser as AuthUserModel).email }}</h2>
       <p>Votre compte a été vérifié avec succès.</p>
       <p>Vous pouvez maintenant vous connecter à votre compte.</p>
       <template #footer>

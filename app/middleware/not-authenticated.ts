@@ -1,9 +1,7 @@
 export default defineNuxtRouteMiddleware(() => {
-    const session = useSupabaseSession();
-    const user = useSupabaseUser();
+    const { connectedUser } = useAuth();
     const loggedIn = useState("loggedIn", () => {
-        return session.value !== null && user.value !== null &&
-            !user.value.is_anonymous;
+        return connectedUser.value !== null && !connectedUser.value.isAnonymous;
     });
     console.log("Middleware - loggedIn:", loggedIn.value);
 

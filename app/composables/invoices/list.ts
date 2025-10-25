@@ -8,7 +8,7 @@ const _useInvoices = () => {
     const { selectedId } = useEstablishmentsList();
 
     const searchQuery = ref<string>("");
-    const statusFilter = ref<InvoiceStatus | undefined>(undefined);
+    const statusFilter = ref<InvoiceStatus | "overdue" | undefined>(undefined);
     const supplierFilter = ref<string[]>([]);
     const rangeFilter = ref<{ start: Date; end: Date }>({
         start: new Date(new Date().setDate(new Date().getDate() - 30)),
@@ -24,13 +24,22 @@ const _useInvoices = () => {
         "invoices",
         async () => {
             if (!selectedId.value) return [];
+            const overdue = statusFilter.value === "overdue" ? true : undefined;
+            const status =
+                statusFilter.value && statusFilter.value !== "overdue"
+                    ? [statusFilter.value]
+                    : undefined;
+            const search = searchQuery.value ? searchQuery.value : undefined;
             return await $usecases.invoices.list.execute({
                 establishmentIds: [selectedId.value],
                 supplierIds: supplierFilter.value.length > 0
                     ? supplierFilter.value
                     : undefined,
-                status: statusFilter.value ? [statusFilter.value] : undefined,
-                search: searchQuery.value,
+                dateFrom: rangeFilter.value.start,
+                dateTo: rangeFilter.value.end,
+                overdue,
+                status,
+                search,
             });
         },
         {
@@ -40,6 +49,7 @@ const _useInvoices = () => {
                 searchQuery,
                 statusFilter,
                 supplierFilter,
+                rangeFilter,
             ],
             lazy: true,
         },

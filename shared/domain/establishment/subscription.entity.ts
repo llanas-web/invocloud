@@ -1,7 +1,7 @@
 export enum SubscriptionStatus {
     // inactive, trial, active, canceled
     INACTIVE = "inactive",
-    TRIAL = "trial",
+    TRIALING = "trialing",
     ACTIVE = "active",
     PAST_DUE = "past_due",
     CANCELED = "canceled",
@@ -39,7 +39,7 @@ class SubscriptionEntity {
     ): SubscriptionEntity {
         const now = new Date();
         return new SubscriptionEntity({
-            status: SubscriptionStatus.TRIAL,
+            status: SubscriptionStatus.TRIALING,
             startAt: now,
             endAt: trialEndDate,
             cancelAt: null,
@@ -90,11 +90,11 @@ class SubscriptionEntity {
     // Business logic
     isActive(): boolean {
         return this.props.status === SubscriptionStatus.ACTIVE ||
-            this.props.status === SubscriptionStatus.TRIAL;
+            this.props.status === SubscriptionStatus.TRIALING;
     }
 
     isTrialing(): boolean {
-        return this.props.status === SubscriptionStatus.TRIAL;
+        return this.props.status === SubscriptionStatus.TRIALING;
     }
 
     isCanceled(): boolean {
@@ -109,7 +109,7 @@ class SubscriptionEntity {
      * Active l'abonnement (sortie de période d'essai)
      */
     activate(periodEnd: Date, periodStart?: Date): SubscriptionEntity {
-        if (this.props.status !== SubscriptionStatus.TRIAL) {
+        if (this.props.status !== SubscriptionStatus.TRIALING) {
             throw new Error(
                 "Seul un abonnement en essai peut être activé",
             );
