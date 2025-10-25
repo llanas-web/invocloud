@@ -55,6 +55,10 @@ export class UserModel extends PayloadModel {
         return this.props.fullName ?? null;
     }
 
+    get favoriteEstablishmentId(): string | null {
+        return this.props.settings?.favoriteEstablishmentId ?? null;
+    }
+
     withDetails(details: Partial<UserMutableProps>): UserModel {
         return UserModel.create({
             ...this.props,

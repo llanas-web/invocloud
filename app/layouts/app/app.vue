@@ -1,7 +1,6 @@
 <script setup lang="ts">
     import type { NavigationMenuItem } from '@nuxt/ui'
     import { LazyInvoicesUploadModalContainer, LazyCommonConfirmModal } from '#components'
-    import { SubscriptionStatus } from '~~/shared/types/models/subscription.model'
 
     const route = useRoute()
     const router = useRouter()
@@ -13,14 +12,14 @@
     const open = ref(false)
 
     const { establishments, status } = useEstablishmentsList()
-    const { establishment: selectedEstablishment, subscribeToStripe } = useEstablishmentDetails()
+    const { isActive, isTrial, actions } = useEstablishmentDetails()
     const user = useSupabaseUser()
 
     const isEstablishementActive = computed(() => {
         if (router.currentRoute.value.name?.toString().includes('app-settings')) {
             return true;
         }
-        return selectedEstablishment.value?.subscription?.status === SubscriptionStatus.ACTIVE || selectedEstablishment.value?.subscription?.status === SubscriptionStatus.TRIAL;
+        return isActive.value || isTrial.value;
     })
 
     onMounted(() => {
@@ -141,18 +140,6 @@
     //     })
     // })
 
-    const onSubscribe = async () => {
-        if (!selectedEstablishment.value) {
-            toast.add({
-                title: 'Aucun établissement sélectionné',
-                description: 'Veuillez sélectionner un établissement avant de vous abonner.',
-                color: 'warning',
-            })
-            return
-        }
-        await subscribeToStripe()
-    }
-
 </script>
 
 <template>
@@ -219,7 +206,7 @@
                             </UCard>
                             <USeparator />
                             <UButton class="w-full justify-center py-3 cursor-pointer"
-                                label="Démarrer la période d'essai" @click="onSubscribe" />
+                                label="Démarrer la période d'essai" @click="actions.createCheckoutSession.execute" />
                             <span class="text-center text-sm text-muted">Si vous n’annulez pas votre essai avant les 7
                                 jours, un
                                 montant de

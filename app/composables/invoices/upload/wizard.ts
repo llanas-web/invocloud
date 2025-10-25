@@ -5,7 +5,7 @@ import { invoicesApi } from "~/services/api/invoices.api";
 const _useUploadWizard = () => {
     const toast = useToast();
     const { currentUser } = useUser();
-    const { user } = useAuth();
+    const { connectedUser } = useAuth();
 
     const open = ref(false);
     const pending = computed(() =>
@@ -42,7 +42,7 @@ const _useUploadWizard = () => {
 
     const submitFormStep = useAsyncAction(
         async () => {
-            const serverCall = (user.value?.is_anonymous)
+            const serverCall = (connectedUser.value?.isAnonymous)
                 ? invoicesApi.requestUploadAnonymous
                 : invoicesApi.requestUpload;
             const uploadId = await serverCall({
@@ -70,7 +70,7 @@ const _useUploadWizard = () => {
 
     const confirmUpload = useAsyncAction(
         async () => {
-            const serverCall = (user.value !== null && !user.value.is_anonymous)
+            const serverCall = (!connectedUser.value?.isAnonymous)
                 ? invoicesApi.sendUpload
                 : invoicesApi.sendUploadAnonymous;
             uploadUrl.value = await serverCall({

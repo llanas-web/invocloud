@@ -2,7 +2,7 @@
     import { getPaginationRowModel, type Row } from '@tanstack/table-core';
     import { createInvoiceColumns } from './columns';
     import { createRowActions, type RowAction } from './row-actions';
-    import type { InvoiceVM } from '~/ui/presenters/invoice.presenter';
+    import type { InvoiceDetailsDTO } from '~~/shared/application/invoice/dto';
 
     const table = useTemplateRef('invoiceTable');
 
@@ -45,7 +45,7 @@
         }),
         {
             id: 'actions',
-            cell: ({ row }: { row: Row<InvoiceVM> }) =>
+            cell: ({ row }: { row: Row<InvoiceDetailsDTO> }) =>
                 h('div', { class: 'text-right' },
                     h(UDropdownMenu, {
                         content: { align: 'end' },

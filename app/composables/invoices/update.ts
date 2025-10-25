@@ -1,13 +1,16 @@
 import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "../core/useAsyncAction";
-import { UpdateInvoiceSchema } from "~/types/schemas/forms/invoices.schema";
-import type { z } from "zod";
+import {
+    type UpdateInvoiceForm,
+    UpdateInvoiceFormSchema,
+} from "~/types/schemas/forms/invoices.schema";
+import { z } from "zod";
 import type { UpdateInvoiceDetailsCommand } from "~~/shared/application/invoice/commands";
 import { AppError } from "~/core/errors/app.error";
 
 // Mapping UI → Application command
 const toUpdateDetailsCommand = (
-    parsed: z.output<typeof UpdateInvoiceSchema>,
+    parsed: z.output<typeof UpdateInvoiceFormSchema>,
 ): UpdateInvoiceDetailsCommand => ({
     id: parsed.id,
     name: parsed.name ?? undefined,
@@ -27,13 +30,29 @@ const _useInvoiceUpdate = () => {
     const formRef = ref();
     const paidAtInputRef = ref();
 
-    const formState = reactive<Partial<z.input<typeof UpdateInvoiceSchema>>>(
-        {},
-    );
+    const formState = reactive<UpdateInvoiceForm>({
+        id: "",
+        invoiceNumber: "",
+        emitDate: new Date(),
+        dueDate: new Date(),
+        amount: 0,
+        name: null,
+        comment: null,
+        status: "validated",
+        paidAt: null,
+    });
 
     watch(invoice, (newInvoice) => {
         if (newInvoice) {
-            Object.assign(formState, newInvoice.toUpdateForm());
+            formState.id = newInvoice.id;
+            formState.invoiceNumber = newInvoice.invoiceNumber ?? "";
+            formState.emitDate = newInvoice.emitDate ?? new Date();
+            formState.dueDate = newInvoice.dueDate ?? new Date();
+            formState.amount = newInvoice.amount ?? 0;
+            formState.name = newInvoice.name ?? null;
+            formState.comment = newInvoice.comment ?? null;
+            formState.status = newInvoice.status ?? "pending";
+            formState.paidAt = newInvoice.paidAt ?? null;
         }
     }, { immediate: true });
 
@@ -42,7 +61,7 @@ const _useInvoiceUpdate = () => {
             if (!invoice.value?.id) {
                 throw new AppError("Facture non chargée");
             }
-            const parsed = UpdateInvoiceSchema.parse(formState);
+            const parsed = UpdateInvoiceFormSchema.parse(formState);
             const command = toUpdateDetailsCommand(parsed);
             await $usecases.invoices.updateDetails.execute(
                 command,

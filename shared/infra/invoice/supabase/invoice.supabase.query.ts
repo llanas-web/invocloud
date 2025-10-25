@@ -1,7 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { InvoiceQuery } from "~~/shared/application/invoice/invoice.query";
 import { SupabaseError } from "~~/shared/infra/common/errors/supabase.error";
-import type { InvoiceListItemDTO } from "~~/shared/application/invoice/dto";
+import type {
+    InvoiceDetailsDTO,
+    InvoiceListItemDTO,
+} from "~~/shared/application/invoice/dto";
 import type { InvoiceListQuery } from "~~/shared/application/invoice/query";
 import type { Database } from "../../common/supabase/database.types";
 
@@ -55,5 +58,31 @@ export class InvoiceSupabaseQuery implements InvoiceQuery {
         const { data, error } = await req;
         if (error) throw SupabaseError.fromPostgrest(error);
         return (data as Row[]).map(fromRow);
+    }
+
+    async getInvoiceDetails(id: string): Promise<InvoiceDetailsDTO | null> {
+        const { data, error } = await this.supabase
+            .from("invoices")
+            .select("*, suppliers(name)")
+            .eq("id", id)
+            .single();
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return {
+            id: data.id,
+            supplierId: data.supplier_id,
+            supplierName: data.suppliers.name,
+            status: data.status,
+            source: data.source,
+            filePath: data.file_path,
+            createdAt: new Date(data.created_at),
+            updatedAt: new Date(data.updated_at),
+            name: data.name ?? null,
+            number: data.invoice_number ?? null,
+            amount: data.amount ?? null,
+            emitDate: data.emit_date ? new Date(data.emit_date) : null,
+            dueDate: data.due_date ? new Date(data.due_date) : null,
+            paidAt: data.paid_at ? new Date(data.paid_at) : null,
+            comment: data.comment ?? null,
+        };
     }
 }

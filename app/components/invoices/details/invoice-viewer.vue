@@ -1,6 +1,5 @@
 <script lang="ts" setup>
     import { ref, watch } from 'vue'
-    import type { InvoiceViewModel } from '~/viewmodels/invoice/invoice.vm';
 
     const { invoice, actions: { download: { execute, pending, error } } } = useInvoiceDetails();
 
@@ -8,9 +7,8 @@
     const fileType = ref<string>('')
     const fileName = ref<string>('example.pdf')
 
-    const loadInvoiceFile = async (invoice: InvoiceViewModel | null) => {
+    const loadInvoiceFile = async (invoice: { name: string | null } | null) => {
         if (!invoice) return
-
         const blob = await execute()
 
         fileUrl.value = URL.createObjectURL(blob)

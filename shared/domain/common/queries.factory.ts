@@ -4,7 +4,7 @@ import type { SupplierQuery } from "~~/shared/application/supplier/supplier.quer
 import type { UserQuery } from "~~/shared/application/user/user.query";
 
 export interface QueriesFactory {
-    invoiceListQuery(): InvoiceQuery;
+    invoiceQuery(): InvoiceQuery;
     establishmentQuery(): EstablishmentQuery;
     suppliersQuery(): SupplierQuery;
     userQuery(): UserQuery;

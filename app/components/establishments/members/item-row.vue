@@ -3,7 +3,7 @@
 
     const props = defineProps<{
         member: {
-            fullName: string;
+            fullName: string | null;
             email: string;
             status: MemberStatus;
             role: MemberRole;

@@ -1,8 +1,7 @@
 import { z } from "zod";
 import { ApplicationError } from "~~/shared/application/common/errors/application.error";
-import type { PaymentRepository } from "~~/shared/application/common/providers/payment/payment.repository";
 import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
-import { SubscriptionEntity } from "~~/shared/domain/establishment/subscription.entity";
+import SubscriptionEntity from "~~/shared/domain/establishment/subscription.entity";
 
 export const CreateSubscriptionCommandSchema = z.object({
     userId: z.uuid(),

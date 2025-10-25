@@ -1,5 +1,5 @@
 import type { DropdownMenuItem } from "@nuxt/ui";
-import type { InvoiceVM } from "~/ui/presenters/invoice.presenter";
+import type { InvoiceDetailsDTO } from "~~/shared/application/invoice/dto";
 
 export type RowAction = {
     onSend: (id: string) => void;
@@ -9,7 +9,7 @@ export type RowAction = {
 };
 
 export const createRowActions = (
-    invoice: InvoiceVM,
+    invoice: InvoiceDetailsDTO,
     actions: RowAction,
 ): DropdownMenuItem[] => [
     {

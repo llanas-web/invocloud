@@ -1,13 +1,16 @@
 // composables/useWorker.ts
 import { createSharedComposable } from "@vueuse/core";
-import { format } from "date-fns";
 import useAsyncAction from "./core/useAsyncAction";
-import type { InvoiceModel } from "~~/shared/domain/invoice/invoice.model";
-import type { InvoiceVM } from "~/ui/presenters/invoice.presenter";
+
+export type InvoiceWorkerMessageDTO = {
+  id: string;
+  filePath: string;
+  number: string;
+};
 
 type DownloadMsg = {
   type: "download";
-  invoices: Partial<InvoiceModel>[];
+  invoices: InvoiceWorkerMessageDTO[];
   supabaseUrl: string;
   supabaseAnonKey: string;
   access_token: string | undefined;
@@ -16,7 +19,7 @@ type DownloadMsg = {
 
 const _useWorker = () => {
   const { public: pub } = useRuntimeConfig();
-  const { selectedEstablishment } = useEstablishmentsList();
+  const { establishment } = useEstablishmentDetails();
   const session = useSupabaseSession();
   const worker = shallowRef<Worker | null>(null);
   const ready = computed(() => !!worker.value);
@@ -29,7 +32,7 @@ const _useWorker = () => {
   const init = () => {
     if (worker.value) return;
     // client-only
-    if (process.client) {
+    if (import.meta.client) {
       const w = new Worker(
         new URL("~/workers/invoices-downloader.worker.ts", import.meta.url),
         { type: "module" },
@@ -44,9 +47,7 @@ const _useWorker = () => {
           const url = URL.createObjectURL(msg.blob as Blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${
-            selectedEstablishment.value?.name.replace(/\s+/g, "_")
-          }.zip`;
+          a.download = `${establishment.value?.name.replace(/\s+/g, "_")}.zip`;
           document.body.appendChild(a);
           a.click();
           a.remove();
@@ -78,7 +79,9 @@ const _useWorker = () => {
   }
 
   const launchDownloadWorkerAction = useAsyncAction(
-    async (invoices: InvoiceVM[]) => {
+    async (
+      invoices: InvoiceWorkerMessageDTO[],
+    ) => {
       if (!invoices?.length) throw new Error("Aucune facture à télécharger");
       running.value = true;
       const msg: DownloadMsg = {

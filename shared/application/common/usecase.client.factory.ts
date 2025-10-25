@@ -13,7 +13,7 @@ export function makeUseCasesClient(
     storageRepository: StorageRepository,
 ) {
     const invoicesRepo = repositoryFactory.invoices();
-    const invoiceListQuery = queryFactory.invoiceListQuery();
+    const invoiceQuery = queryFactory.invoiceQuery();
     const establishmentsRepo = repositoryFactory.establishments();
     const establishmentQuery = queryFactory.establishmentQuery();
     const suppliersRepo = repositoryFactory.suppliers();
@@ -27,11 +27,11 @@ export function makeUseCasesClient(
                 invoicesRepo,
                 storageRepository,
             ),
-            list: new invoiceUC.ListInvoicesUsecase(invoiceListQuery),
+            list: new invoiceUC.ListInvoicesUsecase(invoiceQuery),
             updateDetails: new invoiceUC.UpdateInvoiceDetailsUsecase(
                 invoicesRepo,
             ),
-            details: new invoiceUC.GetInvoiceDetailsUsecase(invoicesRepo),
+            details: new invoiceUC.GetInvoiceDetailsUsecase(invoiceQuery),
             updateStatus: new invoiceUC.ChangeInvoiceStatusUsecase(
                 invoicesRepo,
             ),

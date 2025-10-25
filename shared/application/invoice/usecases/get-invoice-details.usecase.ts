@@ -1,13 +1,13 @@
 import { z } from "zod";
-import type { InvoiceRepository } from "~~/shared/domain/invoice/invoice.repository";
+import type { InvoiceQuery } from "../invoice.query";
 
 export class GetInvoiceDetailsUsecase {
     constructor(
-        private readonly invoiceRepository: InvoiceRepository,
+        private readonly invoiceQuery: InvoiceQuery,
     ) {}
 
     async execute(id: unknown) {
         const parsedId = z.uuid().parse(id);
-        return this.invoiceRepository.getById(parsedId);
+        return this.invoiceQuery.getInvoiceDetails(parsedId);
     }
 }

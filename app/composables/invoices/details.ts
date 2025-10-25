@@ -1,16 +1,14 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { StorageProvider } from "~~/shared/application/common/providers/storage/storage.repository";
 import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/types";
 
 const _useInvoiceDetails = () => {
     const route = useRoute();
-    const { $usecases, $storageFactory } = useNuxtApp();
-    const storageRepository = $storageFactory as StorageProvider;
+    const { $usecases, $storageRepository } = useNuxtApp();
 
     const invoiceId = computed(() => route.params.id as string);
 
     const {
-        data: model,
+        data: dto,
         pending,
         error,
         refresh,
@@ -27,18 +25,23 @@ const _useInvoiceDetails = () => {
     );
 
     const invoice = computed(() => {
-        if (!model.value) return null;
+        if (!dto.value) return null;
         return {
-            id: model.value.id,
-            name: model.value.name,
-            amount: model.value.amount,
-            filePath: model.value.filePath,
-            invoiceNumber: model.value.number,
-            emitDate: model.value.emitDate,
-            dueDate: model.value.dueDate,
-            status: model.value.status,
-            paidAt: model.value.paidAt,
-            comment: model.value.comment,
+            id: dto.value.id,
+            name: dto.value.name,
+            amount: dto.value.amount,
+            filePath: dto.value.filePath,
+            invoiceNumber: dto.value.number,
+            emitDate: dto.value.emitDate,
+            dueDate: dto.value.dueDate,
+            status: dto.value.status,
+            paidAt: dto.value.paidAt,
+            comment: dto.value.comment,
+            supplierName: dto.value.supplierName,
+            supplierId: dto.value.supplierId,
+            source: dto.value.source,
+            createdAt: dto.value.createdAt,
+            updatedAt: dto.value.updatedAt,
         };
     });
 
@@ -47,9 +50,9 @@ const _useInvoiceDetails = () => {
             if (!invoiceId.value) {
                 throw new Error("No invoice loaded.");
             }
-            const blob = await storageRepository.downloadFile(
+            const blob = await $storageRepository.downloadFile(
                 STORAGE_BUCKETS.INVOICES,
-                model.value!.filePath,
+                dto.value!.filePath,
             );
             return blob;
         },
@@ -57,7 +60,7 @@ const _useInvoiceDetails = () => {
 
     return {
         invoiceId,
-        model,
+        dto,
         invoice,
         pending,
         error,
