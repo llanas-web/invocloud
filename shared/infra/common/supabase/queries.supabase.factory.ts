@@ -13,7 +13,7 @@ import type { Database } from "./database.types";
 export class QueriesSupabaseFactory implements QueriesFactory {
     constructor(private readonly supabase: SupabaseClient<Database>) {}
 
-    invoiceListQuery(): InvoiceQuery {
+    invoiceQuery(): InvoiceQuery {
         return new InvoiceSupabaseQuery(this.supabase);
     }
 

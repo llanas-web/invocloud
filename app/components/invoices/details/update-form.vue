@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { UpdateInvoiceSchema } from '~/types/schemas/forms/invoices.schema'
+    import { UpdateInvoiceFormSchema } from '~/types/schemas/forms/invoices.schema'
     import { InvoiceStatus } from '~~/shared/domain/invoice/invoice.model'
 
     const { invoice, pending: loadingDetails } = useInvoiceDetails()
@@ -20,7 +20,7 @@
 
 <template>
     <UForm @submit="onSubmit" ref="updateInvoiceFormRef" class="space-y-4" :state="formState" :disabled="isLoading"
-        :loading="isLoading" :schema="UpdateInvoiceSchema">
+        :loading="isLoading" :schema="UpdateInvoiceFormSchema">
         <UFormField name="created_at" label="Date de facture" required
             class="flex flex-row justify-between items-center gap-4">
             <CommonFormDatePicker v-model="formState.emitDate" label="Date de la facture" />
@@ -59,9 +59,9 @@
         </UFormField>
         <UFormField label="Montant TTC" name="amount" required>
             <USkeleton v-if="!invoice" class="h-8" />
-            <CommonFormNumberInput v-model.trim="formState.amount as string | undefined" icon="i-lucide-euro"
-                class="w-full" :format-on-blur="true" :fraction-digits="2" :allow-negative="false" type="string"
-                inputmode="decimal" spellcheck="false" />
+            <CommonFormNumberInput v-model.trim="(formState.amount as unknown) as string | undefined"
+                icon="i-lucide-euro" class="w-full" :format-on-blur="true" :fraction-digits="2" :allow-negative="false"
+                type="string" inputmode="decimal" spellcheck="false" />
         </UFormField>
     </UForm>
 </template>

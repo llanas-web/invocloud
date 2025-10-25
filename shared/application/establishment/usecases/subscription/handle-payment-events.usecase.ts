@@ -8,8 +8,7 @@ import type {
     SubscriptionDeletedDto,
     SubscriptionUpdatedDto,
 } from "~~/shared/application/common/providers/payment/dtos/payment-event.dto";
-import {
-    SubscriptionEntity,
+import SubscriptionEntity, {
     SubscriptionStatus,
 } from "~~/shared/domain/establishment/subscription.entity";
 

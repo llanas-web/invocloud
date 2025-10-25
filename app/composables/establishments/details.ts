@@ -9,7 +9,7 @@ const _useEstablishmentDetails = () => {
     const { $usecases } = useNuxtApp();
     const { selectedId, refresh: refreshListEstablishments } =
         useEstablishmentsList();
-    const { user } = useAuth();
+    const { connectedUser } = useAuth();
 
     const {
         data: dto,
@@ -36,6 +36,8 @@ const _useEstablishmentDetails = () => {
             name: dto.value.name,
             emailPrefix: dto.value.emailPrefix,
             creatorId: dto.value.creatorId,
+            address: dto.value.address,
+            phone: dto.value.phone,
         };
     });
 
@@ -64,7 +66,7 @@ const _useEstablishmentDetails = () => {
     const isSelected = computed(() => !!selectedId.value);
 
     const isAdmin = computed(() => {
-        return establishment.value?.creatorId === user.value?.id;
+        return establishment.value?.creatorId === connectedUser.value?.id;
     });
 
     const isActive = computed(() => {
@@ -89,7 +91,7 @@ const _useEstablishmentDetails = () => {
             await establishmentApi.subscription
                 .createCheckoutSession({
                     establishmentId: selectedId.value,
-                    userId: user.value!.id,
+                    userId: connectedUser.value!.id,
                 });
         },
     );
@@ -113,7 +115,7 @@ const _useEstablishmentDetails = () => {
             await establishmentApi.inviteMember({
                 establishmentId: selectedId.value,
                 email,
-                invitorId: user.value!.id,
+                invitorId: connectedUser.value!.id,
             });
         },
     );

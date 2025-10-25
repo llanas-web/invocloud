@@ -28,7 +28,7 @@ export const CreateInvoiceSchema = z.object({
 
 export type CreateInvoiceForm = z.input<typeof CreateInvoiceSchema>;
 
-export const UpdateInvoiceSchema = z.object({
+export const UpdateInvoiceFormSchema = z.object({
     id: z.uuid("Identifiant de facture invalide"),
     invoiceNumber: z.string().default(""),
     emitDate: z.date().default(new Date()),
@@ -46,5 +46,4 @@ export const UpdateInvoiceSchema = z.object({
 }, {
     message: "La date de paiement est requise lorsque le statut est 'payé'.",
 });
-
-export type UpdateInvoiceForm = z.input<typeof UpdateInvoiceSchema>;
+export type UpdateInvoiceForm = z.infer<typeof UpdateInvoiceFormSchema>;

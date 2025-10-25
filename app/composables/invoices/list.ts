@@ -1,12 +1,10 @@
 import { createSharedComposable } from "@vueuse/core";
 import { invoicesApi } from "~/services/api/invoices.api";
 import type { InvoiceStatus } from "~~/shared/domain/invoice/invoice.model";
-import type { StorageProvider } from "~~/shared/application/common/providers/storage/storage.repository";
 import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/types";
 
 const _useInvoices = () => {
-    const { $storageFactory, $usecases } = useNuxtApp();
-    const storageRepository = $storageFactory as StorageProvider;
+    const { $storageRepository, $usecases } = useNuxtApp();
     const { selectedId } = useEstablishmentsList();
 
     const searchQuery = ref<string>("");
@@ -52,11 +50,16 @@ const _useInvoices = () => {
             id: dto.id,
             name: dto.name,
             amount: dto.amount,
-            invoiceNumber: dto.number,
+            number: dto.number,
             emitDate: dto.emitDate,
             dueDate: dto.dueDate,
             status: dto.status,
             paidAt: dto.paidAt,
+            comment: dto.comment,
+            supplierName: dto.supplierName,
+            supplierId: dto.supplierId,
+            source: dto.source,
+            filePath: dto.filePath,
         }));
     });
 
@@ -86,7 +89,7 @@ const _useInvoices = () => {
 
     const downloadAction = useAsyncAction(
         async (filePath: string) => {
-            const blob = await storageRepository.downloadFile(
+            const blob = await $storageRepository.downloadFile(
                 STORAGE_BUCKETS.INVOICES,
                 filePath,
             );

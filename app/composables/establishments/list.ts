@@ -3,8 +3,8 @@ import type { EstablishmentListItemDTO } from "~~/shared/application/establishme
 
 const _useEstablishmentsList = () => {
     const { $usecases } = useNuxtApp();
-    const { userSettings } = useUserSettings();
-    const { user } = useAuth();
+    const { userSettings } = useUser();
+    const { connectedUser } = useAuth();
 
     const selectedId = useLocalStorage<string | null>(
         "selectedEstablishmentId",
@@ -19,9 +19,9 @@ const _useEstablishmentsList = () => {
         status,
     } = useAsyncData(
         async () => {
-            if (!user.value?.id) return [];
+            if (!connectedUser.value?.id) return [];
             const list = await $usecases.establishments.list.execute(
-                { memberIds: [user.value.id] },
+                { memberIds: [connectedUser.value.id] },
             );
             ensureSelection(list);
             return list;
@@ -29,7 +29,7 @@ const _useEstablishmentsList = () => {
         {
             immediate: true,
             default: () => [] as EstablishmentListItemDTO[],
-            watch: [() => user.value?.id],
+            watch: [() => connectedUser.value?.id],
         },
     );
 
@@ -52,8 +52,8 @@ const _useEstablishmentsList = () => {
         const candidate =
             (exists(selectedId.value)
                 ? selectedId.value
-                : (exists(userSettings.value?.favorite_establishment_id)
-                    ? userSettings.value?.favorite_establishment_id
+                : (exists(userSettings.value?.favoriteEstablishmentId)
+                    ? userSettings.value?.favoriteEstablishmentId
                     : list[0]?.id)) ?? null;
 
         selectedId.value = candidate;

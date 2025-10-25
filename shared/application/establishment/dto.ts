@@ -17,7 +17,7 @@ export type MemberDTO = {
     id: string;
     fullName: string | null;
     email: string;
-    role: "admin";
+    role: MemberRole.ADMIN;
     status: MemberStatus;
 };
 

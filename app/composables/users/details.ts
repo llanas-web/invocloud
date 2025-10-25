@@ -4,7 +4,7 @@ import { AppError } from "~/core/errors/app.error";
 
 const _useUser = () => {
     const { $usecases } = useNuxtApp();
-    const { user } = useAuth();
+    const { connectedUser } = useAuth();
     const { actions: { logout: logoutAction } } = useAuth();
 
     const {
@@ -13,23 +13,31 @@ const _useUser = () => {
         refresh,
         pending,
     } = useAsyncData(async () => {
-        if (!user.value?.id) return null;
-        return await $usecases.users.details.execute(user.value.id);
+        if (!connectedUser.value?.id) return null;
+        return await $usecases.users.details.execute(connectedUser.value.id);
     }, {
         deep: true,
         immediate: true,
     });
 
+    const userSettings = computed(() => {
+        if (!model.value) return null;
+        return {
+            favoriteEstablishmentId: model.value.favoriteEstablishmentId,
+        };
+    });
+
     const deleteAccountAction = useAsyncAction(
         async () => {
-            if (!user.value?.id) throw new AppError("No user id");
-            await $usecases.users.delete.execute(user.value.id);
+            if (!connectedUser.value?.id) throw new AppError("No user id");
+            await $usecases.users.delete.execute(connectedUser.value.id);
             await logoutAction.execute();
         },
     );
 
     return {
         currentUser: model,
+        userSettings,
         error,
         refresh,
         pending,

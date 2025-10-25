@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import { eachDayOfInterval } from 'date-fns'
-  import { useInvoicesTableList } from '~/composables/invoices/table-list';
 
   const months = [
     { label: 'Janvier', value: 1 },
@@ -21,7 +20,7 @@
   const startRange = ref<Date | null>(null);
   const endRange = ref<Date | null>(null);
 
-  const { rangeFilter } = useInvoicesTableList();
+  const { rangeFilter } = useInvoices();
 
   watch(() => rangeFilter.value, (newRange) => {
     if (newRange.start !== startRange.value || newRange.end !== endRange.value) {
