@@ -2,9 +2,9 @@
 
     const { invoices, pending, statusFilter } = useInvoices();
 
-    const pendingInvoices = computed(() =>
+    const overdueInvoices = computed(() =>
         invoices.value?.filter((i) =>
-            i.status === "pending" || i.status === "ocr"
+            i.dueDate && !i.paidAt && new Date(i.dueDate) < new Date()
         ) || []
     );
 
@@ -24,10 +24,10 @@
     }
 
     const onPendingInvoiceClick = () => {
-        if (statusFilter.value === 'error') {
+        if (statusFilter.value === 'overdue') {
             statusFilter.value = undefined
         } else {
-            statusFilter.value = 'error'
+            statusFilter.value = 'overdue'
         }
     }
 </script>
@@ -68,7 +68,7 @@
                 </template>
             </div>
         </UPageCard>
-        <UPageCard icon="i-lucide-clock" title="En retard" variant="subtle" :highlight="statusFilter === 'error'" :ui="{
+        <UPageCard icon="i-lucide-clock" title="En retard" variant="subtle" :highlight="statusFilter === 'overdue'" :ui="{
             container: 'gap-y-1.5',
             wrapper: 'items-center md:items-start',
             leading: 'p-2.5 rounded-full bg-red-500/10 ring ring-inset ring-red-500/25 flex-col',
@@ -81,7 +81,7 @@
                 </template>
                 <template v-else>
                     <span class="text-lg lg:text-2xl font-semibold text-highlighted">
-                        {{ pendingInvoices.length }}
+                        {{ overdueInvoices.length }}
                     </span>
                 </template>
             </div>

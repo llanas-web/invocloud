@@ -1,39 +1,12 @@
 import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "~/composables/core/useAsyncAction";
-import type {
-    AnonymousAuthUserModel,
-    AuthUserModel,
-} from "~~/shared/application/common/providers/auth/dto/auth.dto";
-import { AuthEvent } from "~~/shared/application/common/providers/auth/types";
 
 const _useAuth = () => {
     const config = useRuntimeConfig();
     const authRepository = useNuxtApp().$authRepository;
     const redirectTo = `${config.public.baseUrl}/auth/callback`;
 
-    const connectedUser = ref<AuthUserModel | AnonymousAuthUserModel | null>(
-        null,
-    );
-
-    const handleAuthEvent = (event: AuthEvent, user: AuthUserModel | null) => {
-        switch (event) {
-            case AuthEvent.PASSWORD_RECOVERY:
-                navigateTo("/app/settings/security");
-                break;
-            case AuthEvent.SIGNED_IN:
-                connectedUser.value = user!;
-                navigateTo("/app");
-                break;
-            case AuthEvent.SIGNED_OUT:
-                connectedUser.value = null;
-                navigateTo("/auth/login");
-                break;
-        }
-    };
-
-    watchEffect(() => {
-        authRepository.onAuthChange(handleAuthEvent);
-    });
+    const connectedUser = computed(() => authRepository.connectedUser);
 
     const loginAction = useAsyncAction(
         async (email: string, password: string) => {
@@ -81,6 +54,12 @@ const _useAuth = () => {
         return data;
     });
 
+    const sendResetPasswordEmailAction = useAsyncAction(
+        async (email: string) => {
+            authRepository.sendPasswordResetEmail(email);
+        },
+    );
+
     const logoutAction = useAsyncAction(async () => {
         await authRepository.signOut();
         localStorage.removeItem("selectedEstablishment");
@@ -91,6 +70,7 @@ const _useAuth = () => {
         actions: {
             login: loginAction,
             signup: signupAction,
+            sendResetPasswordEmail: sendResetPasswordEmailAction,
             resetPassword: resetPasswordAction,
             logout: logoutAction,
         },

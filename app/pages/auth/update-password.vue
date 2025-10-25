@@ -1,63 +1,62 @@
 <script setup lang="ts">
-import type { FormError, FormSubmitEvent } from '@nuxt/ui'
-import * as z from 'zod'
+    import * as z from 'zod'
+    import type { FormError, FormSubmitEvent } from '@nuxt/ui'
 
-const route = useRoute()
-const toast = useToast()
-const { code, error, error_code, error_description } = route.query
-if (error) {
-    console.error('Error during password reset:', { error, error_code, error_description })
-    await navigateTo('/auth/forgot-password')
-}
+    definePageMeta({
+        layout: 'auth',
+    })
 
-const { resetPassword } = useAuth()
-definePageMeta({
-    layout: 'auth',
-})
+    const { actions: { resetPassword } } = useAuth()
+    const route = useRoute()
 
-const loading = ref(false)
-
-const fields = [{
-    name: 'new',
-    type: 'password' as const,
-    label: 'Nouveau mot de passe',
-    placeholder: 'Entrez votre nouveau mot de passe',
-    required: true
-}, {
-    name: 'newValidation',
-    type: 'password' as const,
-    label: 'Confirmez le nouveau mot de passe',
-    placeholder: 'Confirmez votre nouveau mot de passe',
-    required: true
-}]
-
-const passwordSchema = z.object({
-    new: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
-    newValidation: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères')
-})
-
-type PasswordSchema = z.output<typeof passwordSchema>
-
-const password = reactive<Partial<PasswordSchema>>({
-    new: undefined,
-    newValidation: undefined
-})
-
-const validate = (state: Partial<PasswordSchema>): FormError[] => {
-    const errors: FormError[] = []
-    if (state?.new !== state?.newValidation) {
-        errors.push({ name: 'newValidation', message: 'Les mots de passe doivent être identiques' })
+    const { error, error_code, error_description } = route.query
+    if (error) {
+        console.error('Error during password reset:', { error, error_code, error_description })
+        await navigateTo('/auth/forgot-password')
     }
-    return errors
-}
 
-const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof passwordSchema>>) => {
-    loading.value = true
-    const { new: newPassword } = payload.data;
-    await resetPassword(newPassword);
-    await navigateTo('/app')
-    loading.value = false
-}
+
+    const fields = [{
+        name: 'new',
+        type: 'password' as const,
+        label: 'Nouveau mot de passe',
+        placeholder: 'Entrez votre nouveau mot de passe',
+        required: true
+    }, {
+        name: 'newValidation',
+        type: 'password' as const,
+        label: 'Confirmez le nouveau mot de passe',
+        placeholder: 'Confirmez votre nouveau mot de passe',
+        required: true
+    }]
+
+    const passwordSchema = z.object({
+        new: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
+        newValidation: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères')
+    })
+
+    type PasswordSchema = z.output<typeof passwordSchema>
+
+    const password = reactive<Partial<PasswordSchema>>({
+        new: undefined,
+        newValidation: undefined
+    })
+
+    const loading = computed(() => resetPassword.pending.value)
+
+    const validate = (state: Partial<PasswordSchema>): FormError[] => {
+        const errors: FormError[] = []
+        if (state?.new !== state?.newValidation) {
+            errors.push({ name: 'newValidation', message: 'Les mots de passe doivent être identiques' })
+        }
+        return errors
+    }
+
+    const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof passwordSchema>>) => {
+        const { new: newPassword } = payload.data;
+        await resetPassword.execute(newPassword);
+        await navigateTo('/app')
+    }
 </script>
 
 <template>

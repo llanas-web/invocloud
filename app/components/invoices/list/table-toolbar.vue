@@ -5,21 +5,21 @@
         selectedCount: number;
         isDownloading: boolean;
         downloadProgress?: { done: number; total: number } | null;
-        statusFilter: InvoiceStatus | undefined;
+        statusFilter: InvoiceStatus | 'overdue' | undefined;
     }>();
 
     const emit = defineEmits<{
         send: [];
         download: [];
         delete: [];
-        'update:statusFilter': [value: InvoiceStatus | undefined];
+        'update:statusFilter': [value: InvoiceStatus | 'overdue' | undefined];
     }>();
 
     const statusItems = [
         { label: 'Tout', value: undefined },
         { label: 'En cours', value: 'validated' },
         { label: 'Payé', value: 'paid' },
-        { label: 'En retard', value: 'error' }
+        { label: 'En retard', value: 'overdue' }
     ];
 
     const downloadLabel = computed(() => {

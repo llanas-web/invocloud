@@ -61,11 +61,6 @@ export default defineNuxtConfig({
     key: process.env.SUPABASE_ANON_KEY || "",
     url: process.env.SUPABASE_URL || "",
     serviceKey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
-    redirectOptions: {
-      login: "/auth/login",
-      callback: "/auth/confirm",
-      include: ["/app/**"],
-    },
   },
   icon: {
     customCollections: [{

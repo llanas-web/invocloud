@@ -2,10 +2,11 @@ import type { AnonymousAuthUserModel, AuthUserModel } from "./dto/auth.dto";
 import type { AuthEvent } from "./types";
 
 export interface AuthRepository {
-    currentUser: AuthUserModel | AnonymousAuthUserModel | null;
+    readonly connectedUser: AuthUserModel | AnonymousAuthUserModel | null;
 
     onAuthChange(
-        callback: (event: AuthEvent, user: AuthUserModel | null) => void,
+        event: AuthEvent,
+        user: AnonymousAuthUserModel | AuthUserModel | null,
     ): void;
 
     signInWithPassword(

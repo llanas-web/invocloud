@@ -6,6 +6,7 @@ export const InvoiceListQuerySchema = z.object({
     supplierIds: z.array(z.uuid()).nonempty().optional(),
     establishmentIds: z.array(z.uuid()).nonempty().optional(),
     status: z.array(z.enum(InvoiceStatus)).nonempty().optional(),
+    overdue: z.boolean().optional(),
     search: z.string().trim().min(1).optional(),
     dateFrom: z.coerce.date().optional(),
     dateTo: z.coerce.date().optional(),

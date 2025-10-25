@@ -5,7 +5,7 @@ import useAsyncAction from "./core/useAsyncAction";
 export type InvoiceWorkerMessageDTO = {
   id: string;
   filePath: string;
-  number: string;
+  number: string | null;
 };
 
 type DownloadMsg = {

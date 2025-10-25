@@ -9,8 +9,8 @@ const _useUploadWizard = () => {
 
     const open = ref(false);
     const pending = computed(() =>
-        submitFormStep.pending ||
-        submitTokenStep.pending || confirmUpload.pending
+        submitFormStep.pending.value ||
+        submitTokenStep.pending.value || confirmUpload.pending.value
     );
     const stepIndex = ref(0);
     const formState = reactive({

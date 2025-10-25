@@ -8,8 +8,7 @@
   })
   const config = useRuntimeConfig()
 
-  const { login } = useAuth()
-  const loading = ref(false)
+  const { actions } = useAuth()
 
   const fields = [{
     name: 'email',
@@ -29,17 +28,18 @@
   }]
 
   const schema = z.object({
-    email: z.string().email('E-mail invalide'),
+    email: z.email('E-mail invalide'),
     password: z.string().min(8, 'Doit contenir au moins 8 caractères')
   })
 
   type Schema = z.output<typeof schema>
 
-  async function onSubmit(payload: FormSubmitEvent<Schema>) {
-    loading.value = true
-    await login(payload.data.email, payload.data.password)
-    loading.value = false
+  const onSubmit = async (payload: FormSubmitEvent<Schema>) => {
+    await actions.login.execute(payload.data.email, payload.data.password)
+    await navigateTo('/app')
   }
+
+  const loading = computed(() => actions.login.pending.value)
 
   useSeoMeta({
     title: 'Connexion - Invocloud',

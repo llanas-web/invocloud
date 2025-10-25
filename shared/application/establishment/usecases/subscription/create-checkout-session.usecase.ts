@@ -15,7 +15,7 @@ export class CreateCheckoutSessionUsecase {
     async execute(raw: unknown): Promise<string> {
         const { establishmentId } = CreateCheckoutSessionCommandSchema
             .parse(raw);
-        const authenticatedUser = this.authRepo.currentUser as AuthUserModel;
+        const authenticatedUser = this.authRepo.connectedUser as AuthUserModel;
         if (!authenticatedUser || authenticatedUser.isAnonymous) {
             throw new ApplicationError("User not authenticated");
         }

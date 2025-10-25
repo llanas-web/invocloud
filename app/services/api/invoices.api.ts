@@ -41,7 +41,7 @@ export const invoicesApi = {
     },
     requestUpload(body: RequestUploadInvoiceBody) {
         return $fetch<RequestUploadInvoiceResponse>(
-            "/api/upload/request",
+            "/api/security/upload/request",
             {
                 method: "POST",
                 body: parseBody(CheckUploadAuthorizationSchema, body),

@@ -19,6 +19,10 @@ const _useEstablishmentsList = () => {
         status,
     } = useAsyncData(
         async () => {
+            console.log(
+                "Fetching establishments for user:",
+                connectedUser.value,
+            );
             if (!connectedUser.value?.id) return [];
             const list = await $usecases.establishments.list.execute(
                 { memberIds: [connectedUser.value.id] },
@@ -27,9 +31,9 @@ const _useEstablishmentsList = () => {
             return list;
         },
         {
-            immediate: true,
+            server: false,
             default: () => [] as EstablishmentListItemDTO[],
-            watch: [() => connectedUser.value?.id],
+            watch: [() => connectedUser.value],
         },
     );
 

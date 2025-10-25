@@ -23,7 +23,7 @@ const _useEstablishmentDetails = () => {
             );
         },
         {
-            immediate: true,
+            immediate: false,
             default: () => null,
             watch: [selectedId],
         },
@@ -42,6 +42,7 @@ const _useEstablishmentDetails = () => {
     });
 
     const subscription = computed(() => {
+        console.log(dto.value);
         if (!dto.value?.subscription) return null;
         return {
             status: dto.value.subscription.status,
@@ -74,7 +75,7 @@ const _useEstablishmentDetails = () => {
     });
 
     const isTrial = computed(() => {
-        return subscription.value?.status === SubscriptionStatus.TRIAL;
+        return subscription.value?.status === SubscriptionStatus.TRIALING;
     });
 
     const deleteAction = useAsyncAction(async () => {

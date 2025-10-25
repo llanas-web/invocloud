@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
     const { password } = await parseBody(event, schema);
 
-    await authRepository.updateUser(authRepository.currentUser!.id, {
+    await authRepository.updateUser(authRepository.connectedUser!.id, {
         password,
     });
 });

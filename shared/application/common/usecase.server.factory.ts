@@ -158,6 +158,9 @@ export function makeUseCasesServer(
             list: new userUc.ListUsersUsecase(
                 userQuery,
             ),
+            toggleFavorite: new userUc.ToggleFavoriteUsecase(
+                userRepo,
+            ),
         },
         guestUploadSession: {
             initiate: new guestUploadSessionUC.InitiateGuestUploadUseCase(

@@ -19,7 +19,7 @@ export class StripeEventAdapter {
     static toSubscriptionStatus(status: string) {
         switch (status) {
             case "trialing":
-                return SubscriptionStatus.TRIAL;
+                return SubscriptionStatus.TRIALING;
             case "active":
                 return SubscriptionStatus.ACTIVE;
             case "past_due":

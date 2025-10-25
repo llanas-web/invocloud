@@ -10,8 +10,9 @@
     const config = useRuntimeConfig()
 
     const loading = ref(false)
-    const { signup } = useAuth()
-    const { subscribeToStripe, refresh } = useEstablishmentsList()
+    const { actions: { signup } } = useAuth()
+    const { refresh } = useEstablishmentsList()
+    const { actions: { createCheckoutSession } } = useEstablishmentDetails()
     const user = useSupabaseUser()
 
     const fields: Array<{
@@ -73,15 +74,15 @@
     async function onSubmit(payload: FormSubmitEvent<Schema>) {
         loading.value = true
         const { email, password, full_name, establishment_name } = payload.data
-        const data = await signup(
+        await signup.execute(
             email,
             password,
             establishment_name,
             full_name,
         )
-        if (data) {
+        if (signup.data.value) {
             await refresh()
-            await subscribeToStripe()
+            await createCheckoutSession.execute()
         }
         loading.value = false
     }

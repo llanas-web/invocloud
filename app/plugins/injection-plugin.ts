@@ -12,6 +12,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     const queryFactory = new QueriesSupabaseFactory(sb);
     const storageRepository = new StorageSupabaseRepository(sb);
     const authRepository = new AuthSupabaseRepository(sb);
+
     const usecases = makeUseCasesClient(
         repoFactory,
         queryFactory,

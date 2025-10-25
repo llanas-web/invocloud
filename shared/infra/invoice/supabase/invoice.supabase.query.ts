@@ -38,13 +38,17 @@ export class InvoiceSupabaseQuery implements InvoiceQuery {
     ): Promise<InvoiceListItemDTO[]> {
         const req = this.supabase
             .from("invoices")
-            .select("*, suppliers(name)")
+            .select("*, suppliers(name, establishment_id)")
             .order("created_at", { ascending: false });
 
+        if (filters?.overdue) {
+            const nowIso = new Date().toISOString();
+            req.lt("due_date", nowIso).is("paid_at", null);
+        }
         if (filters?.ids) req.in("id", filters.ids);
         if (filters?.supplierIds) req.in("supplier_id", filters.supplierIds);
         if (filters?.establishmentIds) {
-            req.in("establishment_id", filters.establishmentIds);
+            req.in("suppliers.establishment_id", filters.establishmentIds);
         }
         if (filters?.status) req.in("status", filters.status);
         if (filters?.dateFrom) {
@@ -56,6 +60,7 @@ export class InvoiceSupabaseQuery implements InvoiceQuery {
         if (filters?.search) req.ilike("name", `%${filters.search}%`);
 
         const { data, error } = await req;
+        console.log("Supabase listInvoices data:", data);
         if (error) throw SupabaseError.fromPostgrest(error);
         return (data as Row[]).map(fromRow);
     }

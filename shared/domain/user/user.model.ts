@@ -1,6 +1,6 @@
 import type { ModelCommonUpdateProps } from "../common/common.interface";
 import { PayloadModel } from "../common/payload.model";
-import type UserSettingsEntity from "./user-settings.entity";
+import UserSettingsEntity from "./user-settings.entity";
 
 export type UserModelProps =
     & ModelCommonUpdateProps
@@ -63,6 +63,19 @@ export class UserModel extends PayloadModel {
         return UserModel.create({
             ...this.props,
             ...details,
+        });
+    }
+
+    toggleFavoriteEstablishment(establishmentId: string | null): UserModel {
+        const newSettings = this.props.settings
+            ? this.props.settings.toggleFavoriteEstablishment(establishmentId)
+            : UserSettingsEntity.create({
+                favoriteEstablishmentId: establishmentId,
+            });
+
+        return UserModel.create({
+            ...this.props,
+            settings: newSettings,
         });
     }
 

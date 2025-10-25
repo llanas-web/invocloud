@@ -39,7 +39,7 @@
     };
 
     // Columns avec actions intégrées
-    const columns = [
+    const columns: any = [
         ...createInvoiceColumns((supplierId) => {
             supplierFilter.value = [supplierId];
         }),
@@ -78,7 +78,11 @@
 
     const handleBulkDownload = () => {
         if (selectedRows.value.length === 0) return;
-        launchDownloadWorker.execute(selectedRows.value);
+        launchDownloadWorker.execute(selectedRows.value.map(r => ({
+            id: r.id,
+            filePath: r.filePath,
+            number: r.number
+        })));
     };
 </script>
 

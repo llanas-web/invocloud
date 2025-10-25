@@ -71,20 +71,19 @@ export class EstablishmentSupabaseQuery implements EstablishmentQuery {
         const { data, error } = await this.supabase
             .from("establishments")
             .select(`*,
-                subscription:subscriptions(*),
+                subscriptions(*),
                 establishment_members(
                     *,
                     users(*)
                 )`)
-            .eq("establishment_id", id)
+            .eq("id", id)
             .single();
         if (error) throw SupabaseError.fromPostgrest(error);
         if (!data) return null;
-
-        const subscription = data.subscription === null ? null : {
-            status: data.subscription?.status as SubscriptionStatus,
-            endAt: data.subscription?.end_at
-                ? new Date(data.subscription.end_at)
+        const subscription = data.subscriptions === null ? null : {
+            status: data.subscriptions?.status as SubscriptionStatus,
+            endAt: data.subscriptions?.end_at
+                ? new Date(data.subscriptions.end_at)
                 : null,
         } as SubscriptionDTO;
 

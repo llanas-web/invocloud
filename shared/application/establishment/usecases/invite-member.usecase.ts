@@ -19,7 +19,7 @@ export class InviteMemberUsecase {
         const establishment = await this.establishmentRepo.getById(
             parsed.establishmentId,
         );
-        const authenticatedUser = this.authRepository.currentUser;
+        const authenticatedUser = this.authRepository.connectedUser;
 
         if (!establishment) {
             throw new ApplicationError("Établissement non trouvé");

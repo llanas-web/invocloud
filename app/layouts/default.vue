@@ -3,7 +3,7 @@
     import { fr } from '@nuxt/ui/locale'
 
     const { openModal } = useUploadWizard()
-    const user = useSupabaseUser()
+    const { connectedUser } = useAuth();
 
 </script>
 
@@ -32,8 +32,8 @@
                     label: 'hidden lg:block'
                 }" />
                 <USeparator orientation="vertical" class="h-6 hidden lg:block" size="sm" />
-                <UButton v-if="user != null && user.is_anonymous === false" label="Tableau de bord" to="/app"
-                    trailingIcon="i-lucide-home" size="md" variant="ghost" :ui="{
+                <UButton v-if="connectedUser != null && connectedUser.isAnonymous === false" label="Tableau de bord"
+                    to="/app" trailingIcon="i-lucide-home" size="md" variant="ghost" :ui="{
                         label: 'hidden lg:block'
                     }" />
                 <template v-else>

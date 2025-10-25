@@ -19,6 +19,7 @@ const _useInvoiceDetails = () => {
             return await $usecases.invoices.details.execute(invoiceId.value);
         },
         {
+            immediate: false,
             watch: [invoiceId],
             lazy: true,
         },
