@@ -1,9 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import type { InvoiceQuery } from "~~/shared/application/invoice/invoice.query";
 import { SupabaseError } from "~~/shared/infra/common/errors/supabase.error";
 import type { InvoiceListItemDTO } from "~~/shared/application/invoice/dto";
 import type { InvoiceListQuery } from "~~/shared/application/invoice/query";
+import type { Database } from "../../common/supabase/database.types";
 
 type Row = Database["public"]["Tables"]["invoices"]["Row"] & {
     suppliers: { name: string };

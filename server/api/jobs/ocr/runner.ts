@@ -1,15 +1,7 @@
-import { buildRequestScope } from "~~/server/core/container";
-import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/types";
-import { InvoiceTaskStatus } from "~~/shared/types/models/invoice-task.model";
+import { useServerUsecases } from "~~/server/plugins/usecases.plugin";
 
 export default defineEventHandler(async (event) => {
-    const {
-        deps: {
-            ocr,
-            storage,
-            database: { invoiceTaskRepository },
-        },
-    } = await buildRequestScope(event);
+    const { invoiceTask } = useServerUsecases(event);
 
     // SECURITY CHECK
     const cron_token = event.headers.get("authorization") || "";
@@ -22,54 +14,8 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
     }
 
-    // GET THE JOBS
-    const invoiceTasks = await invoiceTaskRepository.getInvoiceTasks(
-        InvoiceTaskStatus.QUEUED,
-    );
-
-    const processJob = async (
-        jobId: string,
-        filePath: string,
-        attempts: number,
-    ) => {
-        const result = await ocr.submitUrl(filePath, {
-            invoiceId: jobId,
-        });
-        if (!result.jobId) {
-            console.error(`Failed to submit job for invoice ${jobId}`);
-            return;
-        }
-        await invoiceTaskRepository
-            .updateInvoiceTask(jobId, {
-                status: InvoiceTaskStatus.SUBMITTED,
-                job_id: result.jobId,
-                attempts: attempts + 1,
-            });
-        console.log(
-            `Job ${jobId} submitted successfully.`,
-        );
-    };
-
-    await Promise.all(
-        invoiceTasks.map(
-            async (job, index) => {
-                if (!job.invoicePath) {
-                    console.error(
-                        `Job ${job.id} has no associated invoice file path.`,
-                    );
-                    return Promise.resolve();
-                }
-                const signedUrl = await storage.createSignedUrl(
-                    STORAGE_BUCKETS.INVOICES,
-                    job.invoicePath,
-                    60,
-                );
-                return processJob(
-                    job.id,
-                    signedUrl,
-                    job.attempts,
-                );
-            },
-        ),
-    );
+    await invoiceTask.processPendingTasks.execute({
+        limit: 20,
+        maxAttempts: 5,
+    });
 });

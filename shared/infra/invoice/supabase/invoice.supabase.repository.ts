@@ -2,12 +2,12 @@ import type {
     InvoiceRepository,
 } from "~~/shared/domain/invoice/invoice.repository";
 import { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import { SupabaseError } from "../../common/errors/supabase.error";
 import {
     type DraftInvoice,
     InvoiceModel,
 } from "~~/shared/domain/invoice/invoice.model";
+import type { Database } from "../../common/supabase/database.types";
 
 type Row = Database["public"]["Tables"]["invoices"]["Row"];
 type Insert = Database["public"]["Tables"]["invoices"]["Insert"];

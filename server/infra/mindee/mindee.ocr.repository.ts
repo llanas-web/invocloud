@@ -1,11 +1,11 @@
 import type { EventHandlerRequest, H3Event } from "h3";
 import type { OcrRepository } from "~~/shared/application/common/providers/ocr/ocr.repository";
-import type {
-    OcrSubmitOptions,
-    OcrSubmitResult,
-    OcrWebhookPayload,
-} from "~~/shared/types/providers/ocr/types";
 import { ClientV2, LocalResponse, UrlInput } from "mindee";
+import {
+    OcrSubmitDTO,
+    OcrSubmitResultDTO,
+    OcrWebhookPayloadDTO,
+} from "~~/shared/application/common/providers/ocr/dto/ocr.dto";
 
 /**
  * Mindee Invoice API (predict v4)
@@ -31,8 +31,8 @@ export class OcrMindeeRepository implements OcrRepository {
     async submitBuffer(
         input: Uint8Array,
         filename: string,
-        opts: OcrSubmitOptions,
-    ): Promise<OcrSubmitResult> {
+        opts: OcrSubmitDTO,
+    ): Promise<OcrSubmitResultDTO> {
         throw new Error("Not implemented");
         // const form = new FormData();
         // form.append("document", new Blob([input]), filename);
@@ -65,8 +65,8 @@ export class OcrMindeeRepository implements OcrRepository {
 
     async submitUrl(
         url: string,
-        opts: OcrSubmitOptions,
-    ): Promise<OcrSubmitResult> {
+        opts: OcrSubmitDTO,
+    ): Promise<OcrSubmitResultDTO> {
         const loadedDocument = new UrlInput({ url });
         await loadedDocument.init();
         const { job } = await this.mindeeInstance.enqueueInference(
@@ -88,7 +88,7 @@ export class OcrMindeeRepository implements OcrRepository {
 
     async parseWebhook(
         event: H3Event<EventHandlerRequest>,
-    ): Promise<OcrWebhookPayload> {
+    ): Promise<OcrWebhookPayloadDTO> {
         const sig = getHeader(event, "X-Signature") || "";
         const raw = await readRawBody(event, "utf8");
 

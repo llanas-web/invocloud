@@ -1,7 +1,7 @@
 import type { StorageRepository } from "~~/shared/application/common/providers/storage/storage.repository";
-import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import StorageError from "~~/shared/application/common/providers/storage/storage.error";
+import type { Database } from "./database.types";
 
 class StorageSupabaseRepository implements StorageRepository {
     constructor(private readonly supabase: SupabaseClient<Database>) {}

@@ -3,13 +3,13 @@ import {
     EstablishmentModel,
 } from "~~/shared/domain/establishment/establishment.model";
 import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
-import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import { SupabaseClient } from "@supabase/supabase-js";
 import MemberEntity, {
     MemberRole,
 } from "~~/shared/domain/establishment/member.entity";
 import { SupabaseError } from "../../common/errors/supabase.error";
 import type SubscriptionEntity from "~~/shared/domain/establishment/subscription.entity";
+import type { Database } from "../../common/supabase/database.types";
 
 const fromRow = (row: any): EstablishmentModel => {
     const members = (row.establishment_members ?? []).map((em: any) =>

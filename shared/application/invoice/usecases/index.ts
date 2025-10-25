@@ -7,3 +7,4 @@ export * from "./get-invoice-details.usecase";
 export * from "./send-by-email.usecase";
 export * from "./upload/create-invoice-from-upload.usecase";
 export * from "./upload/check-upload-authorization.usecase";
+export * from "./mail/handle-inbound-mail.usecase";
