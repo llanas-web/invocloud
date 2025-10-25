@@ -26,6 +26,20 @@ export default defineNuxtConfig({
     "@nuxtjs/robots",
   ],
   runtimeConfig: {
+    baseUrl: process.env.BASE_URL || "http://localhost:3000",
+    // Email
+    resendApiKey: process.env.RESEND_API_KEY || "",
+    emailFrom: process.env.RESEND_EMAIL_FROM || "",
+
+    // Stripe
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY || "",
+    stripePriceId: process.env.STRIPE_PRICE_ID || "",
+    stripeApiVersion: process.env.STRIPE_API_VERSION || "2025-09-30.clover",
+    // Mindee OCR
+    mindeeApiKey: process.env.MINDEE_API_KEY || "",
+    mindeeModelId: process.env.MINDEE_MODEL_ID || "",
+    mindeeWebhookId: process.env.MINDEE_WEBHOOK_ID || "",
+    mindeeWebhookSecret: process.env.MINDEE_WEBHOOK_SECRET || "",
     public: {
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL || "http://localhost:3000",
       vpvLicenseKey: process.env.NUXT_PUBLIC_VPV_LICENSE_KEY || "",

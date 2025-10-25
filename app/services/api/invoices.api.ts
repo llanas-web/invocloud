@@ -20,6 +20,8 @@ import {
     type SendUploadInvoiceResponse,
 } from "~~/shared/contracts/api/security/upload/send.contract";
 import { z } from "zod";
+import { CheckUploadAuthorizationSchema } from "~~/shared/application/invoice/commands";
+import { SendInvoiceUploadSchema } from "~~/shared/contracts/api/security/invoices/upload/send.contrat";
 
 export const invoicesApi = {
     send(body: SendInvoicesBody) {
@@ -42,7 +44,7 @@ export const invoicesApi = {
             "/api/upload/request",
             {
                 method: "POST",
-                body: parseBody(RequestUploadInvoiceRequestSchema, body),
+                body: parseBody(CheckUploadAuthorizationSchema, body),
             },
         );
     },
@@ -72,7 +74,7 @@ export const invoicesApi = {
             "/api/security/upload/send",
             {
                 method: "POST",
-                body: parseBody(SendUploadInvoiceRequestSchema, body),
+                body: parseBody(SendInvoiceUploadSchema, body),
             },
         );
     },

@@ -9,7 +9,7 @@ import { buildRequestScope } from "~~/server/core/container";
 import ServerError from "~~/server/core/errors";
 import { HTTPStatus } from "~~/server/core/errors/status";
 import { StripeEventAdapter } from "~~/server/lib/providers/payments/stripe/adapters/stripe-event.adapter";
-import { PaymentStripeRepository } from "~~/server/lib/providers/payments/stripe/payment.stripe.repository";
+import PaymentStripeRepository from "~~/server/lib/providers/payments/stripe/payment.stripe.repository";
 import { fromSessionToSubscription } from "~~/server/lib/providers/payments/stripe/utils/mapper";
 import { useServerUsecases } from "~~/server/plugins/usecases.plugin";
 

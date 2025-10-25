@@ -1,5 +1,3 @@
-import type { PaymentProviderName } from "~~/shared/types/providers/payment/types";
-
 export enum SubscriptionStatus {
     // inactive, trial, active, canceled
     INACTIVE = "inactive",
@@ -25,9 +23,9 @@ export type SubscriptionEntityProps = {
  * Entity Subscription - fait partie de l'aggregate Establishment
  * Représente l'abonnement Stripe d'un établissement
  */
-export class SubscriptionEntity {
+class SubscriptionEntity {
     createdAt: Date = new Date();
-    provider: PaymentProviderName = "stripe";
+    provider = "stripe";
     private constructor(readonly props: SubscriptionEntityProps) {}
 
     static create(props: SubscriptionEntityProps): SubscriptionEntity {
@@ -180,3 +178,5 @@ export class SubscriptionEntity {
         });
     }
 }
+
+export default SubscriptionEntity;

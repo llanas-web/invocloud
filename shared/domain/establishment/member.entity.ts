@@ -23,7 +23,7 @@ export type MemberEntityProps = {
  * Entity membre - fait partie de l'aggregate Establishment
  * N'existe jamais sans un Establishment
  */
-export class MemberEntity {
+class MemberEntity {
     private constructor(readonly props: MemberEntityProps) {}
 
     static create(props: MemberEntityProps): MemberEntity {
@@ -39,12 +39,12 @@ export class MemberEntity {
         });
     }
 
-    static createFromUser(
-        user: UserModel,
+    static createFromUserId(
+        userId: string,
         status: MemberStatus = MemberStatus.PENDING,
     ): MemberEntity {
         return new MemberEntity({
-            userId: user.id,
+            userId,
             role: MemberRole.ADMIN,
             status,
         });
@@ -101,3 +101,5 @@ export class MemberEntity {
         });
     }
 }
+
+export default MemberEntity;

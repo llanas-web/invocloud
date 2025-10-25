@@ -1,8 +1,8 @@
 import { createSharedComposable } from "@vueuse/core";
 import { invoicesApi } from "~/services/api/invoices.api";
 import type { InvoiceStatus } from "~~/shared/domain/invoice/invoice.model";
-import type { StorageProvider } from "~~/shared/providers/storage/storage.interface";
-import { STORAGE_BUCKETS } from "~~/shared/providers/storage/types";
+import type { StorageProvider } from "~~/shared/application/common/providers/storage/storage.repository";
+import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/types";
 
 const _useInvoices = () => {
     const { $storageFactory, $usecases } = useNuxtApp();

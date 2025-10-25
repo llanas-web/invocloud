@@ -1,13 +1,17 @@
-import type { RepositoryFactory } from "~~/shared/domain/common/repository.factory";
-import type { QueryFactory } from "~~/shared/infra/common/query.factory";
+import type { RepositoriesFactory } from "~~/shared/domain/common/repositories.factory";
+import type { QueriesFactory } from "~~/shared/domain/common/queries.factory";
 import * as invoiceUC from "../invoice/usecases";
 import * as establishmentUC from "../establishment/usecases";
 import * as supplierUC from "../supplier/usecases";
 import * as userUc from "../user/usecases";
+import type { AuthRepository } from "./providers/auth/auth.repository";
+import type { StorageRepository } from "./providers/storage/storage.repository";
 
 export function makeUseCasesClient(
-    repositoryFactory: RepositoryFactory,
-    queryFactory: QueryFactory,
+    repositoryFactory: RepositoriesFactory,
+    queryFactory: QueriesFactory,
+    // authRepository: AuthRepository,
+    storageRepository: StorageRepository,
 ) {
     const invoicesRepo = repositoryFactory.invoices();
     const invoiceListQuery = queryFactory.invoiceListQuery();
@@ -20,7 +24,10 @@ export function makeUseCasesClient(
 
     return {
         invoices: {
-            create: new invoiceUC.CreateInvoiceUsecase(invoicesRepo),
+            create: new invoiceUC.CreateInvoiceUsecase(
+                invoicesRepo,
+                storageRepository,
+            ),
             list: new invoiceUC.ListInvoicesUsecase(invoiceListQuery),
             updateDetails: new invoiceUC.UpdateInvoiceDetailsUsecase(
                 invoicesRepo,

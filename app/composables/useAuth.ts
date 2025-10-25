@@ -1,6 +1,6 @@
 import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "~/composables/core/useAsyncAction";
-import SupabaseAuthRepository from "~~/shared/providers/auth/supabase/auth.repository";
+import AuthSupabaseRepository from "~~/shared/infra/common/supabase/auth.supabase.repository";
 import {
     AnonymousAuthUserModel,
     AuthEvent,
@@ -8,7 +8,7 @@ import {
 } from "~~/shared/types/models/auth-user.model";
 const _useAuth = () => {
     const { $authFactory } = useNuxtApp();
-    const authRepository = $authFactory as SupabaseAuthRepository;
+    const authRepository = $authFactory as AuthSupabaseRepository;
     const user = useSupabaseUser();
     const session = useSupabaseSession();
     const config = useRuntimeConfig();

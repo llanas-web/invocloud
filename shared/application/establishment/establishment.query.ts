@@ -16,4 +16,13 @@ export interface EstablishmentQuery {
     getEstablishmentDetails(
         id: string,
     ): Promise<EstablishmentDetailsDTO | null>;
+
+    isSenderAuthorized(
+        senderEmail: string,
+        recipientEmail: string,
+    ): Promise<boolean>;
+
+    listEstablishmentBySupplierEmail(
+        supplierEmail: string,
+    ): Promise<EstablishmentListItemDTO[]>;
 }

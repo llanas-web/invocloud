@@ -107,4 +107,47 @@ export class EstablishmentSupabaseQuery implements EstablishmentQuery {
             subscription,
         };
     }
+
+    async isSenderAuthorized(
+        senderEmail: string,
+        recipientEmail: string,
+    ) {
+        const { data, error } = await this.supabase.rpc(
+            "check_sender_authorized",
+            {
+                sender_email: senderEmail,
+                recipient_email: recipientEmail,
+            },
+        );
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return data.length !== 0;
+    }
+
+    async listEstablishmentBySupplierEmail(
+        supplierEmail: string,
+    ): Promise<EstablishmentListItemDTO[]> {
+        const { data, error } = await this.supabase
+            .from("suppliers")
+            .select(`
+                id, 
+                emails, 
+                establishment:establishments(
+                    id,
+                    name,
+                    email_prefix,
+                    creator_id,
+                    created_at,
+                    updated_at
+                )`)
+            .contains("emails", [supplierEmail]);
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return data.map((row) => ({
+            id: row.establishment.id,
+            name: row.establishment.name,
+            emailPrefix: row.establishment.email_prefix,
+            creatorId: row.establishment.creator_id,
+            createdAt: new Date(row.establishment.created_at),
+            updatedAt: new Date(row.establishment.updated_at),
+        }));
+    }
 }
