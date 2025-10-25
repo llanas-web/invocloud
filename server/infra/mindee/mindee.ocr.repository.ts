@@ -1,6 +1,5 @@
 import type { EventHandlerRequest, H3Event } from "h3";
 import type { OcrRepository } from "~~/shared/application/common/providers/ocr/ocr.repository";
-import { ClientV2, LocalResponse, UrlInput } from "mindee";
 import {
     OcrSubmitDTO,
     OcrSubmitResultDTO,
@@ -13,16 +12,14 @@ import {
  * Webhook signature header: `Mindee-Signature: t=...,v1=...`
  */
 export class OcrMindeeRepository implements OcrRepository {
-    private mindeeInstance: ClientV2;
+    private apiKey: string;
     private modelId: string;
     private webhookId: string;
     private webhookSecret: string;
 
     constructor() {
         const config = useRuntimeConfig();
-        this.mindeeInstance = new ClientV2({
-            apiKey: config.MINDEE_API_KEY as string,
-        });
+        this.apiKey = config.MINDEE_API_KEY as string;
         this.modelId = config.MINDEE_MODEL_ID as string;
         this.webhookId = config.MINDEE_WEBHOOK_ID as string;
         this.webhookSecret = config.MINDEE_WEBHOOK_SECRET as string;
@@ -67,9 +64,11 @@ export class OcrMindeeRepository implements OcrRepository {
         url: string,
         opts: OcrSubmitDTO,
     ): Promise<OcrSubmitResultDTO> {
-        const loadedDocument = new UrlInput({ url });
+        const mindee = await import("mindee");
+        const loadedDocument = new mindee.UrlInput({ url });
         await loadedDocument.init();
-        const { job } = await this.mindeeInstance.enqueueInference(
+        const mindeeInstance = new mindee.ClientV2({ apiKey: this.apiKey });
+        const { job } = await mindeeInstance.enqueueInference(
             loadedDocument,
             {
                 modelId: this.modelId,
@@ -103,7 +102,8 @@ export class OcrMindeeRepository implements OcrRepository {
         }
 
         // 3) HMAC verify using raw
-        const lr = new LocalResponse(raw);
+        const mindee = await import("mindee");
+        const lr = new mindee.LocalResponse(raw);
         await lr.init();
         const ok = lr.isValidHmacSignature(
             this.webhookSecret,

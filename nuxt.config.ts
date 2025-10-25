@@ -57,7 +57,6 @@ export default defineNuxtConfig({
     },
   },
   supabase: {
-    redirect: true,
     key: process.env.SUPABASE_ANON_KEY || "",
     url: process.env.SUPABASE_URL || "",
     serviceKey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
