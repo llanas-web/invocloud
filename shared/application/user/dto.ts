@@ -5,3 +5,12 @@ export type UserListItemDTO = {
     createdAt: Date;
     updatedAt: Date;
 };
+
+export type UserDetailsDTO = {
+    id: string;
+    fullName: string | null;
+    email: string;
+    createdAt: Date;
+    updatedAt: Date;
+    favoriteEstablishmentId: string | null;
+};

@@ -80,7 +80,7 @@ export function makeUseCasesClient(
                 userQuery,
             ),
             details: new userUc.GetUserDetailsUsecase(
-                userRepo,
+                userQuery,
             ),
             update: new userUc.UpdateUserUseCase(
                 userRepo,
