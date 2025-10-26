@@ -3,9 +3,9 @@ import type {
     SupplierListFilter,
     SupplierQuery,
 } from "~~/shared/application/supplier/supplier.query";
-import type { Database } from "~~/shared/types/providers/database/supabase/database.types";
 import { SupabaseError } from "../../common/errors/supabase.error";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "../../common/supabase/database.types";
 
 export class SupplierSupabaseQuery implements SupplierQuery {
     constructor(private readonly supabase: SupabaseClient<Database>) {}

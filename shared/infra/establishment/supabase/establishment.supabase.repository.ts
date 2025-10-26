@@ -8,30 +8,10 @@ import MemberEntity, {
     MemberRole,
 } from "~~/shared/domain/establishment/member.entity";
 import { SupabaseError } from "../../common/errors/supabase.error";
-import type SubscriptionEntity from "~~/shared/domain/establishment/subscription.entity";
+import SubscriptionEntity, {
+    SubscriptionStatus,
+} from "~~/shared/domain/establishment/subscription.entity";
 import type { Database } from "../../common/supabase/database.types";
-
-const fromRow = (row: any): EstablishmentModel => {
-    const members = (row.establishment_members ?? []).map((em: any) =>
-        MemberEntity.create({
-            userId: em.user_id,
-            role: em.role,
-            status: em.status,
-        })
-    );
-
-    return EstablishmentModel.create({
-        id: row.id,
-        creatorId: row.creator_id,
-        name: row.name,
-        emailPrefix: row.email_prefix,
-        address: row.address,
-        phone: row.phone,
-        members,
-        createdAt: new Date(row.created_at),
-        updatedAt: new Date(row.updated_at),
-    });
-};
 
 export class EstablishmentSupabaseRepository
     implements EstablishmentRepository {
@@ -48,10 +28,10 @@ export class EstablishmentSupabaseRepository
                     status,
                     created_at,
                     users(
-                        id,
+                        id
                     )
                 ),
-                subscriptions(*)
+                subscription:subscriptions(*)
             `)
             .eq("id", id)
             .single();
@@ -60,8 +40,42 @@ export class EstablishmentSupabaseRepository
             if (error.code === "PGRST116") return null;
             throw SupabaseError.fromPostgrest(error);
         }
+        const members = (data.establishment_members ?? []).map((em: any) =>
+            MemberEntity.create({
+                userId: em.user_id,
+                role: em.role,
+                status: em.status,
+            })
+        );
 
-        return fromRow(data);
+        let subscription: SubscriptionEntity | null = null;
+        if (data.subscription !== null) {
+            subscription = SubscriptionEntity.create({
+                status: data.subscription.status as SubscriptionStatus,
+                createdAt: new Date(data.subscription.created_at),
+                providerCustomerId: data.subscription.provider_customer_id ||
+                    null,
+                providerSubscriptionId:
+                    data.subscription.provider_subscription_id || null,
+                startAt: new Date(data.subscription.started_at),
+                endAt: data.subscription.end_at
+                    ? new Date(data.subscription.end_at)
+                    : null,
+            });
+        }
+
+        return EstablishmentModel.create({
+            id: data.id,
+            creatorId: data.creator_id,
+            name: data.name,
+            emailPrefix: data.email_prefix,
+            address: data.address,
+            phone: data.phone,
+            createdAt: new Date(data.created_at),
+            updatedAt: new Date(data.updated_at),
+            members,
+            subscription,
+        });
     }
 
     async create(entity: DraftEstablishment): Promise<string> {
@@ -94,7 +108,6 @@ export class EstablishmentSupabaseRepository
             .eq("id", entity.id);
 
         if (estabError) {
-            console.error("Error updating establishment:", estabError);
             throw SupabaseError.fromPostgrest(estabError);
         }
 

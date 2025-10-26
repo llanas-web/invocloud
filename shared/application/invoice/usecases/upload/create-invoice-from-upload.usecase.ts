@@ -20,20 +20,23 @@ export class CreateInvoiceFromUploadUsecase {
         raw: unknown,
     ) {
         const parsed = CreateInvoiceFromUploadSchema.parse(raw);
-
-        const newInvoiceId = InvoiceModel.createDraft({
+        const newInvoiceId = crypto.randomUUID();
+        const filePath = `${parsed.establishmentId}/${newInvoiceId}`;
+        const newInvoice = InvoiceModel.createDraft({
+            id: newInvoiceId,
+            filePath: filePath,
             supplierId: parsed.supplierId,
             name: parsed.name,
             comment: parsed.comment,
             status: InvoiceStatus.PENDING,
             source: InvoiceSource.UPLOAD,
         });
-        await this.invoiceRepository.create(newInvoiceId);
+        await this.invoiceRepository.create(newInvoice);
 
         return this.storageRepository
             .createSignedUploadUrl(
                 STORAGE_BUCKETS.INVOICES,
-                `${parsed.establishmentId}/${newInvoiceId}`,
+                newInvoice.filePath,
             );
     }
 }

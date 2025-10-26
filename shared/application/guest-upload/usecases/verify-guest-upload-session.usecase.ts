@@ -32,7 +32,7 @@ export class VerifyGuestUploadSessionUseCase {
         }
 
         // 3. Sauvegarder la session vérifiée
-        await this.sessionRepository.save(session);
+        await this.sessionRepository.save(verifyResult.value!);
 
         // 4. Récupérer les établissements disponibles
         const establishments = await this.establishmentQuery

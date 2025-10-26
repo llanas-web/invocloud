@@ -7,16 +7,18 @@ export class UpdateEstablishmentUsecase {
     ) {}
 
     async execute(raw: unknown) {
-        const cmd = UpdateEstablishmentCommandSchema.parse(raw);
-        const entity = await this.establishmentRepository.getById(cmd.id);
-        if (!entity) throw new Error("Establishment not found");
-        const next = entity.withDetails({
-            name: cmd.name ?? undefined,
-            emailPrefix: cmd.emailPrefix ?? undefined,
-            address: cmd.address ?? undefined,
-            phone: cmd.phone ?? undefined,
+        const parsed = UpdateEstablishmentCommandSchema.parse(raw);
+        const establishment = await this.establishmentRepository.getById(
+            parsed.id,
+        );
+        if (!establishment) throw new Error("Establishment not found");
+        const updatedEstablishment = establishment.withDetails({
+            name: parsed.name ?? undefined,
+            emailPrefix: parsed.emailPrefix ?? undefined,
+            address: parsed.address ?? undefined,
+            phone: parsed.phone ?? undefined,
         });
-        await this.establishmentRepository.update(next);
-        return next.id;
+        await this.establishmentRepository.update(updatedEstablishment);
+        return updatedEstablishment.id;
     }
 }

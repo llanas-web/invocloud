@@ -2,15 +2,15 @@ import type { InvoiceRepository } from "~~/shared/domain/invoice/invoice.reposit
 import { ChangeInvoiceStatusSchema } from "../commands";
 
 export class ChangeInvoiceStatusUsecase {
-    constructor(private readonly repo: InvoiceRepository) {}
+    constructor(private readonly invoiceRepo: InvoiceRepository) {}
 
     async execute(raw: unknown) {
-        const cmd = ChangeInvoiceStatusSchema.parse(raw);
-        const entity = await this.repo.getById(cmd.id);
+        const parsed = ChangeInvoiceStatusSchema.parse(raw);
+        const entity = await this.invoiceRepo.getById(parsed.id);
         if (!entity) throw new Error("Invoice not found");
-        const next = entity.changeStatus(cmd.status, {
-            paidAt: cmd.paidAt ?? undefined,
+        const updatedInvoice = entity.changeStatus(parsed.status, {
+            paidAt: parsed.paidAt ?? undefined,
         });
-        return this.repo.update(next);
+        return this.invoiceRepo.update(updatedInvoice);
     }
 }

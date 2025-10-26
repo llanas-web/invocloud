@@ -115,6 +115,8 @@ export function makeUseCasesServer(
                 createSubscription: new establishmentUC
                     .CreateSubscriptionUsecase(
                     establishmentsRepo,
+                    userRepo,
+                    emailRepository,
                 ),
                 cancelSubscription: new establishmentUC
                     .CancelSubscriptionUsecase(
@@ -146,7 +148,7 @@ export function makeUseCasesServer(
         },
         users: {
             details: new userUc.GetUserDetailsUsecase(
-                userRepo,
+                userQuery,
             ),
             update: new userUc.UpdateUserUseCase(
                 userRepo,
@@ -178,6 +180,7 @@ export function makeUseCasesServer(
                 .CreateInvoiceFromGuestSessionUseCase(
                 guestUploadSessionRepo,
                 invoicesRepo,
+                suppliersQuery,
             ),
         },
         invoiceTask: {

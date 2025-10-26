@@ -54,14 +54,14 @@ export class ProcessPendingTasksUsecase {
                     }
 
                     // Mettre à jour la tâche
-                    task.submit(result.jobId);
-                    await this.invoiceTaskRepository.update(task);
+                    const submitedTask = task.submit(result.jobId);
+                    await this.invoiceTaskRepository.update(submitedTask);
 
                     return { taskId: task.id, jobId: result.jobId };
                 } catch (error) {
                     console.error(`Error processing task ${task.id}:`, error);
-                    task.markAsError();
-                    await this.invoiceTaskRepository.update(task);
+                    const erroredTask = task.markAsError();
+                    await this.invoiceTaskRepository.update(erroredTask);
                     throw error;
                 }
             }),

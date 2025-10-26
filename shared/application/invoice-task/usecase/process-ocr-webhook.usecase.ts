@@ -30,12 +30,12 @@ export class ProcessOcrWebhookUsecase {
 
         if (!parsed.prediction || !parsed.isValid) {
             // Marquer la tâche comme erreur
-            task.markAsError();
-            await this.invoiceTaskRepository.update(task);
+            const erroredTask = task.markAsError();
+            await this.invoiceTaskRepository.update(erroredTask);
 
             // Mettre à jour le statut de la facture
-            invoice.changeStatus(InvoiceStatus.ERROR);
-            await this.invoiceRepository.update(invoice);
+            const updatedInvoice = invoice.changeStatus(InvoiceStatus.ERROR);
+            await this.invoiceRepository.update(updatedInvoice);
 
             throw new Error("Invalid webhook payload");
         }
@@ -44,20 +44,18 @@ export class ProcessOcrWebhookUsecase {
         const rawResult = typeof parsed.rawResult === "object"
             ? JSON.stringify(parsed.rawResult)
             : String(parsed.rawResult);
-        task.markAsDone(rawResult);
-        await this.invoiceTaskRepository.update(task);
+        const doneTask = task.markAsDone(rawResult);
+        await this.invoiceTaskRepository.update(doneTask);
 
         // Mettre à jour la facture avec les données OCR
-        invoice.withDetails({
+        const updatedInvoice = invoice.withDetails({
             number: parsed.prediction.invoiceNumber ?? undefined,
             amount: parsed.prediction.totalTtc ?? undefined,
             dueDate: parsed.prediction.dueDate
                 ? new Date(parsed.prediction.dueDate)
                 : undefined,
-        });
-
-        invoice.changeStatus(InvoiceStatus.PENDING);
-        await this.invoiceRepository.update(invoice);
+        }).changeStatus(InvoiceStatus.PENDING);
+        await this.invoiceRepository.update(updatedInvoice);
 
         return task.id;
     }
