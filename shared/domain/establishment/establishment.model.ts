@@ -298,11 +298,6 @@ export class EstablishmentModel extends PayloadModel {
                     status: this.props.subscription.status,
                     startAt: this.props.subscription.startAt,
                     endAt: this.props.subscription.endAt,
-                    cancelAt: this.props.subscription.cancelAt,
-                    canceledAt: this.props.subscription.canceledAt,
-                    currentPeriodStart: this.props.subscription
-                        .currentPeriodStart,
-                    currentPeriodEnd: this.props.subscription.currentPeriodEnd,
                     providerSubscriptionId:
                         this.props.subscription.providerSubscriptionId,
                     providerCustomerId:

@@ -109,7 +109,7 @@ export class InvoiceTaskModel extends PayloadModel {
         };
     }
 
-    public submit(jobId: string): void {
+    public submit(jobId: string): InvoiceTaskModel {
         if (this.props.status !== InvoiceTaskStatus.QUEUED) {
             throw new DomainError(
                 DomainErrorCode.BUSINESS_RULE_VIOLATION,
@@ -117,13 +117,16 @@ export class InvoiceTaskModel extends PayloadModel {
             );
         }
 
-        this.props.status = InvoiceTaskStatus.SUBMITTED;
-        this.props.jobId = jobId;
-        this.props.attempts = (this.props.attempts ?? 0) + 1;
-        this.props.updatedAt = new Date();
+        return new InvoiceTaskModel({
+            ...this.props,
+            status: InvoiceTaskStatus.SUBMITTED,
+            jobId: jobId,
+            attempts: (this.props.attempts ?? 0) + 1,
+            updatedAt: new Date(),
+        });
     }
 
-    public markAsDone(rawResult?: string): void {
+    public markAsDone(rawResult?: string): InvoiceTaskModel {
         if (this.props.status !== InvoiceTaskStatus.SUBMITTED) {
             throw new DomainError(
                 DomainErrorCode.BUSINESS_RULE_VIOLATION,
@@ -131,14 +134,20 @@ export class InvoiceTaskModel extends PayloadModel {
             );
         }
 
-        this.props.status = InvoiceTaskStatus.DONE;
-        this.props.rawResult = rawResult ?? null;
-        this.props.updatedAt = new Date();
+        return new InvoiceTaskModel({
+            ...this.props,
+            status: InvoiceTaskStatus.DONE,
+            rawResult: rawResult ?? null,
+            updatedAt: new Date(),
+        });
     }
 
-    public markAsError(): void {
-        this.props.status = InvoiceTaskStatus.ERROR;
-        this.props.updatedAt = new Date();
+    public markAsError(): InvoiceTaskModel {
+        return new InvoiceTaskModel({
+            ...this.props,
+            status: InvoiceTaskStatus.ERROR,
+            updatedAt: new Date(),
+        });
     }
 
     public canRetry(maxAttempts: number = 5): boolean {

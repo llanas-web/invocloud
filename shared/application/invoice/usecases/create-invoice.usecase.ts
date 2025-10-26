@@ -31,6 +31,7 @@ export class CreateInvoiceUsecase {
             body: parsed.file,
         });
         const entity = InvoiceModel.createDraft({
+            id: id,
             status: parsed.status,
             supplierId: parsed.supplierId,
             name: parsed.name,

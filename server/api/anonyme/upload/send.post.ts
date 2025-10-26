@@ -4,15 +4,14 @@ import { SendUploadInvoiceRequestSchema } from "~~/shared/contracts/api/security
 export default defineEventHandler(async (event) => {
     const { guestUploadSession } = useServerUsecases(event);
 
-    const { uploadValidationId, selectedEstablishmentId, comment, fileName } =
-        await parseBody(
-            event,
-            SendUploadInvoiceRequestSchema,
-        );
+    const { sessionId, establishmentId, comment, fileName } = await parseBody(
+        event,
+        SendUploadInvoiceRequestSchema,
+    );
 
     return guestUploadSession.createInvoice.execute({
-        uploadValidationId,
-        selectedEstablishmentId,
+        sessionId,
+        establishmentId,
         comment,
         fileName,
     });

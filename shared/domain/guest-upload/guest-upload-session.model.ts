@@ -43,7 +43,7 @@ class GuestUploadSessionModel extends PayloadModel {
     verify(
         token: string,
         hashFn: (token: string) => string,
-    ): GuestUploadResult<void> {
+    ): GuestUploadResult<GuestUploadSessionModel> {
         if (this.isExpired()) {
             return { success: false, error: "Session expirée" };
         }
@@ -57,8 +57,11 @@ class GuestUploadSessionModel extends PayloadModel {
             return { success: false, error: "Token invalide" };
         }
 
-        this.props.verifiedAt = new Date();
-        return { success: true, value: undefined };
+        const verifiedSession = new GuestUploadSessionModel({
+            ...this.props,
+            verifiedAt: new Date(),
+        });
+        return { success: true, value: verifiedSession };
     }
 
     isVerified(): boolean {

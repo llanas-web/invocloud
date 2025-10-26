@@ -5,26 +5,26 @@ export class UpdateInvoiceDetailsUsecase {
     constructor(private readonly repo: InvoiceRepository) {}
 
     async execute(raw: unknown) {
-        const cmd = UpdateInvoiceDetailsSchema.parse(raw);
-        const entity = await this.repo.getById(cmd.id);
-        if (!entity) throw new Error("Invoice not found");
+        const parsed = UpdateInvoiceDetailsSchema.parse(raw);
+        const invoice = await this.repo.getById(parsed.id);
+        if (!invoice) throw new Error("Invoice not found");
 
-        let next = entity.withDetails({
-            name: cmd.name,
-            amount: cmd.amount ?? undefined,
-            emitDate: cmd.emitDate ?? undefined,
-            dueDate: cmd.dueDate ?? undefined,
-            number: cmd.number ?? undefined,
-            comment: cmd.comment ?? undefined,
-            paidAt: cmd.paidAt ?? undefined,
+        let updatedInvoice = invoice.withDetails({
+            name: parsed.name,
+            amount: parsed.amount ?? undefined,
+            emitDate: parsed.emitDate ?? undefined,
+            dueDate: parsed.dueDate ?? undefined,
+            number: parsed.number ?? undefined,
+            comment: parsed.comment ?? undefined,
+            paidAt: parsed.paidAt ?? undefined,
         });
 
-        if (cmd.status && cmd.status !== entity.status) {
-            next = next.changeStatus(cmd.status, {
-                paidAt: cmd.paidAt ?? undefined,
+        if (parsed.status && parsed.status !== updatedInvoice.status) {
+            updatedInvoice = updatedInvoice.changeStatus(parsed.status, {
+                paidAt: parsed.paidAt ?? undefined,
             });
         }
 
-        return this.repo.update(next);
+        return this.repo.update(updatedInvoice);
     }
 }

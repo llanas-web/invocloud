@@ -31,8 +31,8 @@ export class CreateOcrTaskUsecase {
         const taskId = await this.invoiceTaskRepository.create(task);
 
         // Mettre à jour le statut de la facture
-        invoice.changeStatus(InvoiceStatus.OCR);
-        await this.invoiceRepository.update(invoice);
+        const updatedInvoice = invoice.changeStatus(InvoiceStatus.OCR);
+        await this.invoiceRepository.update(updatedInvoice);
 
         return taskId;
     }

@@ -74,8 +74,8 @@ const _useUploadWizard = () => {
                 ? invoicesApi.sendUpload
                 : invoicesApi.sendUploadAnonymous;
             uploadUrl.value = await serverCall({
-                selectedEstablishmentId: confirmState.establishmentId,
-                uploadValidationId: invoiceId.value!,
+                establishmentId: confirmState.establishmentId,
+                sessionId: invoiceId.value!,
                 comment: formState.comment,
                 fileName: formState.invoiceFile!.name,
             });

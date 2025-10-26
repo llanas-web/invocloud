@@ -43,9 +43,10 @@ export type InvoiceMutableProps = {
     paidAt?: Date | null;
 };
 
+// ID is not excluded because it is needed for the file path generation
 export type DraftInvoice = Omit<
     InvoiceModelProps,
-    "id" | "createdAt" | "updatedAt"
+    "createdAt" | "updatedAt"
 >;
 
 export class InvoiceModel extends PayloadModel {

@@ -82,7 +82,7 @@ export class HandleInboundMailUsecase {
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 status: InvoiceStatus.PENDING,
-                supplierId: suppliers[0]!.id,
+                supplierId: supplier.id,
                 filePath: path,
                 name: sanitizedName,
                 comment: subject ?? null,

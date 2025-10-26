@@ -9,12 +9,13 @@ export enum SubscriptionStatus {
 
 export type SubscriptionEntityProps = {
     status: SubscriptionStatus;
+    createdAt: Date;
     startAt: Date;
     endAt: Date | null;
-    cancelAt: Date | null;
-    canceledAt: Date | null;
-    currentPeriodStart: Date;
-    currentPeriodEnd: Date;
+    // cancelAt: Date | null;
+    // canceledAt: Date | null;
+    // currentPeriodStart: Date;
+    // currentPeriodEnd: Date;
     providerSubscriptionId?: string | null;
     providerCustomerId?: string | null;
 };
@@ -41,11 +42,12 @@ class SubscriptionEntity {
         return new SubscriptionEntity({
             status: SubscriptionStatus.TRIALING,
             startAt: now,
+            createdAt: now,
             endAt: trialEndDate,
-            cancelAt: null,
-            canceledAt: null,
-            currentPeriodStart: now,
-            currentPeriodEnd: trialEndDate,
+            // cancelAt: null,
+            // canceledAt: null,
+            // currentPeriodStart: now,
+            // currentPeriodEnd: trialEndDate,
             providerSubscriptionId,
             providerCustomerId,
         });
@@ -63,21 +65,21 @@ class SubscriptionEntity {
         return this.props.endAt;
     }
 
-    get cancelAt() {
-        return this.props.cancelAt;
-    }
+    // get cancelAt() {
+    //     return this.props.cancelAt;
+    // }
 
-    get canceledAt() {
-        return this.props.canceledAt;
-    }
+    // get canceledAt() {
+    //     return this.props.canceledAt;
+    // }
 
-    get currentPeriodStart() {
-        return this.props.currentPeriodStart;
-    }
+    // get currentPeriodStart() {
+    //     return this.props.currentPeriodStart;
+    // }
 
-    get currentPeriodEnd() {
-        return this.props.currentPeriodEnd;
-    }
+    // get currentPeriodEnd() {
+    //     return this.props.currentPeriodEnd;
+    // }
 
     get providerSubscriptionId() {
         return this.props.providerSubscriptionId;
@@ -117,8 +119,8 @@ class SubscriptionEntity {
         return new SubscriptionEntity({
             ...this.props,
             status: SubscriptionStatus.ACTIVE,
-            currentPeriodEnd: periodEnd,
-            currentPeriodStart: periodStart ?? new Date(),
+            endAt: periodEnd,
+            // currentPeriodStart: periodStart ?? new Date(),
         });
     }
 
@@ -133,7 +135,7 @@ class SubscriptionEntity {
         }
         return new SubscriptionEntity({
             ...this.props,
-            currentPeriodEnd: periodEnd,
+            endAt: periodEnd,
         });
     }
 
@@ -149,8 +151,8 @@ class SubscriptionEntity {
         return new SubscriptionEntity({
             ...this.props,
             status: SubscriptionStatus.CANCELED,
-            cancelAt,
-            canceledAt: new Date(),
+            endAt: cancelAt,
+            // canceledAt: new Date(),
         });
     }
 
@@ -173,8 +175,8 @@ class SubscriptionEntity {
     ): SubscriptionEntity {
         return new SubscriptionEntity({
             ...this.props,
-            currentPeriodStart,
-            currentPeriodEnd,
+            startAt: currentPeriodStart,
+            endAt: currentPeriodEnd,
         });
     }
 }

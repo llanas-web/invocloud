@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const SendUploadInvoiceRequestSchema = z.object({
-    uploadValidationId: z.uuid(),
-    selectedEstablishmentId: z.uuid(),
+    sessionId: z.uuid(),
+    establishmentId: z.uuid(),
     comment: z.string().optional(),
     fileName: z.string().optional(),
 });

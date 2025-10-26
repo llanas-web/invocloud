@@ -12,23 +12,26 @@ export class CancelSubscriptionUsecase {
         const establishment = await this.establishmentRepository.getById(
             establishmentId,
         );
-        if (!establishment) {
+        if (!establishment || !establishment.hasActiveSubscription()) {
             throw new ApplicationError(
                 "Establishment or subscription not found",
             );
         }
+        let updatedEstablishment;
         if (establishment.subscription?.isTrialing) {
             await this.paymentRepositoryFactory.cancelTrialingPeriod(
                 establishment.subscription.providerSubscriptionId!,
             );
-            establishment.cancelSubscription(new Date());
+            updatedEstablishment = establishment.cancelSubscription(new Date());
         } else {
             const cancelAt = await this.paymentRepositoryFactory
                 .cancelSubscription(
                     establishment.subscription!.providerSubscriptionId!,
                 );
-            establishment.cancelSubscription(new Date(cancelAt));
+            updatedEstablishment = establishment.cancelSubscription(
+                new Date(cancelAt),
+            );
         }
-        await this.establishmentRepository.update(establishment);
+        await this.establishmentRepository.update(updatedEstablishment);
     }
 }

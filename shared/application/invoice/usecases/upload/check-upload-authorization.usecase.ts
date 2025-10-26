@@ -8,12 +8,12 @@ export class CheckUploadAuthorizationUsecase {
     ) {}
 
     async execute(raw: unknown) {
-        const command = CheckUploadAuthorizationSchema.parse(raw);
+        const parsed = CheckUploadAuthorizationSchema.parse(raw);
 
         // 1. Vérifier que le sender est autorisé
         const isAuthorized = await this.establishmentQuery.isSenderAuthorized(
-            command.senderEmail,
-            command.recipientEmail,
+            parsed.senderEmail,
+            parsed.recipientEmail,
         );
 
         if (!isAuthorized) {
@@ -24,7 +24,7 @@ export class CheckUploadAuthorizationUsecase {
 
         // 2. Récupérer les établissements disponibles pour ce sender
         const establishments = await this.establishmentQuery
-            .listEstablishmentBySupplierEmail(command.senderEmail);
+            .listEstablishmentBySupplierEmail(parsed.senderEmail);
 
         if (establishments.length === 0) {
             throw new ApplicationError(

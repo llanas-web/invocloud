@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { optional, z } from "zod";
 
 export const InitiateGuestUploadSchema = z.object({
     senderEmail: z.email("Email invalide"),
@@ -19,12 +19,7 @@ export type VerifyGuestUploadSessionCommand = z.infer<
 export const CreateInvoiceFromGuestSessionSchema = z.object({
     sessionId: z.uuid("ID de session invalide"),
     establishmentId: z.uuid("ID d'établissement invalide"),
-    filePath: z.string().min(1, "Chemin du fichier requis"),
-    amount: z.number().positive("Le montant doit être positif"),
-    invoiceNumber: z.string().min(1, "Numéro de facture requis"),
-    dueDate: z.date(),
-    supplierId: z.uuid("ID de fournisseur invalide"),
-    name: z.string().optional(),
+    fileName: z.string().optional(),
     comment: z.string().optional(),
 });
 

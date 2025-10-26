@@ -28,10 +28,10 @@ export class ActivateSubscriptionUsecase {
                 "Establishment or subscription not found",
             );
         }
-        establishment.activateSubscription(
+        const activatedEstablishment = establishment.activateSubscription(
             currentPeriodEnd,
             currentPeriodStart,
         );
-        await this.establishmentRepo.update(establishment);
+        await this.establishmentRepo.update(activatedEstablishment);
     }
 }
