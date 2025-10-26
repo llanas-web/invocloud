@@ -8,7 +8,7 @@ const _useUser = () => {
     const { actions: { logout: logoutAction } } = useAuth();
 
     const {
-        data: model,
+        data: dto,
         error: error,
         refresh,
         pending,
@@ -21,9 +21,10 @@ const _useUser = () => {
     });
 
     const userSettings = computed(() => {
-        if (!model.value) return null;
+        console.log("Computing user settings:", dto.value);
+        if (!dto.value) return null;
         return {
-            favoriteEstablishmentId: model.value.favoriteEstablishmentId,
+            favoriteEstablishmentId: dto.value.favoriteEstablishmentId,
         };
     });
 
@@ -42,11 +43,12 @@ const _useUser = () => {
                 userId: connectedUser.value.id,
                 establishmentId,
             });
+            await refresh();
         },
     );
 
     return {
-        currentUser: model,
+        currentUser: dto,
         userSettings,
         error,
         refresh,

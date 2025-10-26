@@ -59,6 +59,10 @@ export class UserModel extends PayloadModel {
         return this.props.settings?.favoriteEstablishmentId ?? null;
     }
 
+    get settings(): UserSettingsEntity | null {
+        return this.props.settings ?? null;
+    }
+
     withDetails(details: Partial<UserMutableProps>): UserModel {
         return UserModel.create({
             ...this.props,

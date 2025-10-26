@@ -1,4 +1,7 @@
-import type { UserListItemDTO } from "~~/shared/application/user/dto";
+import type {
+    UserDetailsDTO,
+    UserListItemDTO,
+} from "~~/shared/application/user/dto";
 import type { ListUserQueryFilter } from "~~/shared/application/user/queries";
 import type { UserQuery } from "~~/shared/application/user/user.query";
 import { SupabaseError } from "../../common/errors/supabase.error";
@@ -30,5 +33,23 @@ export class UserSupabaseQuery implements UserQuery {
             createdAt: fromStringToLocalDate(row.created_at),
             updatedAt: fromStringToLocalDate(row.updated_at),
         }));
+    }
+
+    async getUserDetails(id: string): Promise<UserDetailsDTO | null> {
+        const { data, error } = await this.supabase
+            .from("users")
+            .select("*, user_settings(*)")
+            .eq("id", id)
+            .single();
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return {
+            id: data.id,
+            email: data.email,
+            fullName: data.full_name,
+            createdAt: fromStringToLocalDate(data.created_at),
+            updatedAt: fromStringToLocalDate(data.updated_at),
+            favoriteEstablishmentId: data.user_settings
+                ?.favorite_establishment_id ?? null,
+        };
     }
 }

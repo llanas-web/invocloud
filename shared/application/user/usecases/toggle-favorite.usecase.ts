@@ -13,7 +13,7 @@ export class ToggleFavoriteUsecase {
         const user = await this.userRepository.getById(userId);
         if (!user) throw new ApplicationError("User not found");
 
-        user.toggleFavoriteEstablishment(establishmentId);
-        await this.userRepository.update(user);
+        const updatedUser = user.toggleFavoriteEstablishment(establishmentId);
+        await this.userRepository.update(updatedUser);
     }
 }
