@@ -3,6 +3,7 @@
     import { createInvoiceColumns } from './columns';
     import { createRowActions, type RowAction } from './row-actions';
     import type { InvoiceDetailsDTO } from '~~/shared/application/invoice/dto';
+    import type { TableColumn } from '@nuxt/ui';
 
     const table = useTemplateRef('invoiceTable');
 
@@ -39,7 +40,7 @@
     };
 
     // Columns avec actions intégrées
-    const columns: any = [
+    const columns: any[] = [
         ...createInvoiceColumns((supplierId) => {
             supplierFilter.value = [supplierId];
         }),

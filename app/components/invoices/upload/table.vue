@@ -1,5 +1,6 @@
 <script setup lang="ts">
     import type { TableColumn } from '@nuxt/ui'
+    import { formatDate } from '~/utils/date'
 
     const { invoices } = useInvoices()
     const { error: deleteInvoiceError, selectedInvoices, onSubmit } = useInvoicesDelete()
@@ -12,7 +13,7 @@
         invoices.value.filter((invoice) => invoice.status === 'pending')
     )
 
-    const columns: TableColumn<any>[] = [
+    const columns: TableColumn<typeof invoices.value[0]>[] = [
         {
             accessorKey: 'supplier',
             header: 'Fournisseur',
@@ -37,13 +38,7 @@
             accessorKey: 'created_at',
             header: 'Envoyé le',
             cell: ({ row }) => {
-                return new Date(row.getValue('created_at')).toLocaleString('fr-FR', {
-                    day: 'numeric',
-                    month: 'short',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false
-                })
+                return formatDate(row.original.emitDate);
             }
         },
         {

@@ -8,7 +8,7 @@ class EmailResendRepository implements EmailRepository {
 
     constructor() {
         const config = useRuntimeConfig();
-        this.emailFrom = config.EMAIL_FROM as string;
+        this.emailFrom = config.emailFrom as string;
     }
 
     async sendEmail({

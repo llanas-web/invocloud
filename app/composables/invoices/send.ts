@@ -15,8 +15,8 @@ const _useInvoicesSend = () => {
 
     const action = useAsyncAction(async () => {
         await invoicesApi.send({
-            invoices: selectedInvoices.value,
-            email: formState.email,
+            invoiceIds: selectedInvoices.value,
+            recipientEmail: formState.email,
         });
         resetForm();
         open.value = false;

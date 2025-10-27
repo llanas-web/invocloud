@@ -91,8 +91,8 @@ const _useInvoices = () => {
     const sendAction = useAsyncAction(
         async (invoiceIds: string[], email: string) => {
             await invoicesApi.send({
-                invoices: invoiceIds,
-                email,
+                invoiceIds,
+                recipientEmail: email,
             });
         },
     );

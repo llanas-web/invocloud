@@ -60,7 +60,6 @@ export class InvoiceSupabaseQuery implements InvoiceQuery {
         if (filters?.search) req.ilike("name", `%${filters.search}%`);
 
         const { data, error } = await req;
-        console.log("Supabase listInvoices data:", data);
         if (error) throw SupabaseError.fromPostgrest(error);
         return (data as Row[]).map(fromRow);
     }

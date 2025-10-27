@@ -35,7 +35,7 @@ const _useInvoiceUpdate = () => {
         invoiceNumber: "",
         emitDate: new Date(),
         dueDate: new Date(),
-        amount: 0,
+        amount: "",
         name: null,
         comment: null,
         status: "validated",
@@ -48,7 +48,7 @@ const _useInvoiceUpdate = () => {
             formState.invoiceNumber = newInvoice.invoiceNumber ?? "";
             formState.emitDate = newInvoice.emitDate ?? new Date();
             formState.dueDate = newInvoice.dueDate ?? new Date();
-            formState.amount = newInvoice.amount ?? 0;
+            formState.amount = newInvoice.amount ?? "";
             formState.name = newInvoice.name ?? null;
             formState.comment = newInvoice.comment ?? null;
             formState.status = newInvoice.status ?? "pending";

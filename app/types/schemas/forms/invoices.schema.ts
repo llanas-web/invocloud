@@ -46,4 +46,4 @@ export const UpdateInvoiceFormSchema = z.object({
 }, {
     message: "La date de paiement est requise lorsque le statut est 'payé'.",
 });
-export type UpdateInvoiceForm = z.infer<typeof UpdateInvoiceFormSchema>;
+export type UpdateInvoiceForm = z.input<typeof UpdateInvoiceFormSchema>;

@@ -20,14 +20,18 @@ import {
     type SendUploadInvoiceResponse,
 } from "~~/shared/contracts/api/security/upload/send.contract";
 import { z } from "zod";
-import { CheckUploadAuthorizationSchema } from "~~/shared/application/invoice/commands";
+import {
+    CheckUploadAuthorizationSchema,
+    type SendInvoiceByEmailCommand,
+    SendInvoiceByEmailCommandSchema,
+} from "~~/shared/application/invoice/commands";
 import { SendInvoiceUploadSchema } from "~~/shared/contracts/api/security/invoices/upload/send.contrat";
 
 export const invoicesApi = {
-    send(body: SendInvoicesBody) {
+    send(body: SendInvoiceByEmailCommand) {
         return $fetch<SendInvoicesResponse>("/api/security/invoice/send", {
             method: "POST",
-            body: parseBody(SendInvoicesBodySchema, body),
+            body: parseBody(SendInvoiceByEmailCommandSchema, body),
         });
     },
     requestUploadAnonymous(body: RequestUploadInvoiceBody) {
