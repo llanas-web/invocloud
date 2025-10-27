@@ -1,7 +1,7 @@
 import { defineEventHandler } from "h3";
 import { z } from "zod";
 import { HTTPStatus } from "~~/server/core/errors/status";
-import { useServerUsecases } from "~~/server/plugins/usecases.plugin";
+import { useServerUsecases } from "~~/server/middleware/injection.middleware";
 
 export const PostmarkInboundSchema = z.object({
     FromFull: z.object({

@@ -1,4 +1,4 @@
-import { useServerUsecases } from "~~/server/plugins/usecases.plugin";
+import { useServerUsecases } from "~~/server/middleware/injection.middleware";
 import { SendInvoiceByEmailCommandSchema } from "~~/shared/application/invoice/commands";
 
 export default defineEventHandler(async (event) => {

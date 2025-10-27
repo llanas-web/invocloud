@@ -4,6 +4,10 @@ import type { AuthEvent } from "./types";
 export interface AuthRepository {
     readonly connectedUser: AuthUserModel | AnonymousAuthUserModel | null;
 
+    getCurrentUser(): Promise<
+        AuthUserModel | AnonymousAuthUserModel | null
+    >;
+
     onAuthChange(
         event: AuthEvent,
         user: AnonymousAuthUserModel | AuthUserModel | null,

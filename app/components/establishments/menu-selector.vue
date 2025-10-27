@@ -8,6 +8,7 @@
 
     const { establishments, status, pending, selectEstablishment } = useEstablishmentsList()
     const { establishment } = useEstablishmentDetails();
+    const { isOpen } = useEstablishmentCreate();
     const { userSettings, actions } = useUser();
 
     const addModel = useTemplateRef<typeof LazyEstablishmentsAddModal>('addModal')
@@ -22,12 +23,11 @@
             })), [{
                 label: 'Créer une structure',
                 icon: 'i-lucide-circle-plus',
-                onSelect() {
-                    addModel.value?.showModal();
-                }
+                onSelect: () => isOpen.value = true,
             }, {
                 label: 'Gérer la structure',
-                icon: 'i-lucide-cog'
+                icon: 'i-lucide-cog',
+                to: 'app/settings/establishments'
             }]]
     })
 

@@ -1,4 +1,4 @@
-import { useServerUsecases } from "~~/server/plugins/usecases.plugin";
+import { useServerUsecases } from "~~/server/middleware/injection.middleware";
 import { SendUploadInvoiceRequestSchema } from "~~/shared/contracts/api/security/upload/send.contract";
 
 export default defineEventHandler(async (event) => {

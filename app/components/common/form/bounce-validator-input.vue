@@ -123,7 +123,7 @@
                 // prepend async error message, keep existing sync errors if any
                 errors.value = [error.value.message, ...errors.value]
             } else if (errors.value.length === 0) {
-                errors.value = ['Valeur non valide']
+                errors.value = [props.msgTaken]
             }
         }
 

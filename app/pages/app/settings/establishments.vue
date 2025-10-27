@@ -18,14 +18,13 @@
     await execute()
     if (error.value) {
       useToast().add({
-        title: "L'établissement a été supprimé avec succès.",
-        color: "success",
-      })
-      // Redirect to home or establishments list page
-    } else {
-      useToast().add({
         title: "Échec de la suppression de l'établissement",
         color: "error",
+      })
+    } else {
+      useToast().add({
+        title: "L'établissement a été supprimé avec succès.",
+        color: "success",
       })
     }
   }

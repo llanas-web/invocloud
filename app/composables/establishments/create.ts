@@ -22,6 +22,7 @@ const _useEstablishmentCreate = () => {
     const supabaseUser = useSupabaseUser();
     const { $usecases } = useNuxtApp();
     const { refresh, selectEstablishment } = useEstablishmentsList();
+    const isOpen = ref(false);
 
     const formRef = ref();
 
@@ -32,7 +33,7 @@ const _useEstablishmentCreate = () => {
     const { data: newEstablishment, error, pending, execute } = useAsyncAction(
         async () => {
             const parsedEstablishment = CreateEstablishmentSchema.parse(
-                formState,
+                formState.value,
             );
             const newEstablishmentId = await $usecases.establishments.create
                 .execute({
@@ -42,11 +43,13 @@ const _useEstablishmentCreate = () => {
                 });
             await refresh();
             selectEstablishment(newEstablishmentId);
+            isOpen.value = false;
         },
     );
 
     return {
         formRef,
+        isOpen,
         formState,
         newEstablishment,
         error,

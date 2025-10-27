@@ -9,11 +9,13 @@ class PaymentStripeRepository implements PaymentRepository {
 
     constructor() {
         const config = useRuntimeConfig();
-        this.stripeInstance = new Stripe(config.STRIPE_SECRET_KEY!, {
-            apiVersion: config.STRIPE_API_VERSION ?? "2025-09-30.clover",
+        this.stripeInstance = new Stripe(config.stripeSecretKey!, {
+            apiVersion:
+                config.stripeApiVersion as Stripe.StripeConfig["apiVersion"] ??
+                    "2025-09-30.clover",
         });
-        this.priceId = config.STRIPE_PRICE_ID!;
-        this.baseUrl = config.BASE_URL!;
+        this.priceId = config.stripePriceId!;
+        this.baseUrl = config.baseUrl!;
     }
 
     async createCheckoutSession(

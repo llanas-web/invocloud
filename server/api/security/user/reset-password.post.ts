@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { useServerAuthRepository } from "~~/server/plugins/auth.plugin";
+import { useServerAuthRepository } from "~~/server/middleware/injection.middleware";
 
 const schema = z.object({
     password: z.string().min(8, "Password must be at least 8 characters long"),

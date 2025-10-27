@@ -10,7 +10,7 @@ import { HTTPStatus } from "~~/server/core/errors/status";
 import { StripeEventAdapter } from "~~/server/infra/stripe/adapters/stripe-event.adapter";
 import PaymentStripeRepository from "~~/server/infra/stripe/payment.stripe.repository";
 import { fromSessionToSubscription } from "~~/server/infra/stripe/utils/mapper";
-import { useServerUsecases } from "~~/server/plugins/usecases.plugin";
+import { useServerUsecases } from "~~/server/middleware/injection.middleware";
 
 export default defineEventHandler(async (event) => {
     const sig = getRequestHeaders(event)["stripe-signature"] as string;

@@ -1,6 +1,5 @@
-import { buildRequestScope } from "~~/server/core/container";
 import { OcrMindeeRepository } from "~~/server/infra/mindee/mindee.ocr.repository";
-import { useServerUsecases } from "~~/server/plugins/usecases.plugin";
+import { useServerUsecases } from "~~/server/middleware/injection.middleware";
 
 export default defineEventHandler(async (event) => {
     const { invoiceTask } = useServerUsecases(event);

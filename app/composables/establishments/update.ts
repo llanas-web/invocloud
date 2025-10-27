@@ -35,7 +35,7 @@ const _useEstablishmentUpdate = () => {
             formState.phone = newEstablishment.phone;
             formState.emailPrefix = newEstablishment.emailPrefix;
         }
-    });
+    }, { immediate: true });
 
     const { error, pending, execute } = useAsyncAction(
         async () => {

@@ -1,5 +1,5 @@
 import z from "zod";
-import { useServerUsecases } from "~~/server/plugins/usecases.plugin";
+import { useServerUsecases } from "~~/server/middleware/injection.middleware";
 
 export default defineEventHandler(async (event) => {
     const { users } = useServerUsecases(event);
