@@ -7,7 +7,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import MemberEntity, {
     MemberRole,
 } from "~~/shared/domain/establishment/member.entity";
-import { SupabaseError } from "../../common/errors/supabase.error";
+import { SupabaseError } from "../../common/supabase/supabase.error";
 import SubscriptionEntity, {
     SubscriptionStatus,
 } from "~~/shared/domain/establishment/subscription.entity";

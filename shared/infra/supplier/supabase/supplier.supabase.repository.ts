@@ -4,7 +4,7 @@ import {
 } from "~~/shared/domain/supplier/supplier.model";
 import type { SupplierRepository } from "~~/shared/domain/supplier/supplier.repository";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { SupabaseError } from "../../common/errors/supabase.error";
+import { SupabaseError } from "../../common/supabase/supabase.error";
 import type { Database } from "../../common/supabase/database.types";
 
 export class SupplierSupabaseRepository implements SupplierRepository {

@@ -1,16 +1,16 @@
 <script setup lang="ts">
-const user = useSupabaseUser()
+  const { isAuthenticated } = useAuth();
 
-definePageMeta({
-  layout: false,
-})
+  definePageMeta({
+    layout: false,
+  })
 
-watch(user, () => {
-  if (user.value) {
-    // Redirect to protected page
-    return navigateTo('/app')
-  }
-}, { immediate: true })
+  watch(isAuthenticated, () => {
+    if (isAuthenticated.value) {
+      // Redirect to protected page
+      return navigateTo('/app')
+    }
+  }, { immediate: true })
 </script>
 
 <template>

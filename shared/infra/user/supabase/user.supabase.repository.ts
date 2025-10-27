@@ -1,7 +1,7 @@
 import type { UserRepository } from "~~/shared/domain/user/user.repository";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { type DraftUser, UserModel } from "~~/shared/domain/user/user.model";
-import { SupabaseError } from "../../common/errors/supabase.error";
+import { SupabaseError } from "../../common/supabase/supabase.error";
 import type { Database } from "../../common/supabase/database.types";
 import UserSettingsEntity from "~~/shared/domain/user/user-settings.entity";
 

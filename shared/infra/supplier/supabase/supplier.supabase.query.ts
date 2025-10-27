@@ -6,7 +6,7 @@ import type {
     SupplierListFilter,
     SupplierQuery,
 } from "~~/shared/application/supplier/supplier.query";
-import { SupabaseError } from "../../common/errors/supabase.error";
+import { SupabaseError } from "../../common/supabase/supabase.error";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../../common/supabase/database.types";
 

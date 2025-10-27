@@ -3,17 +3,17 @@
 
     const router = useRouter();
     const currentRoute = router.currentRoute;
-    const user = useSupabaseUser();
+    const { isAuthenticated } = useAuth();
     const { actions } = useAuth();
 
     const buttonLabel = computed(() => {
-        if (user.value) {
+        if (isAuthenticated.value) {
             return 'Déconnexion';
         }
         return currentRoute.value.name === 'auth-login' ? 'S\'inscrire' : 'Connexion';
     });
     const redirectTo = computed(() => {
-        if (user.value) {
+        if (isAuthenticated.value) {
             return '';
         }
         return currentRoute.value.name === 'auth-login' ? '/auth/sign-up' : '/auth/login';
@@ -40,7 +40,7 @@
                 </NuxtLink>
             </template>
             <template #right>
-                <UButton v-if="user" :label="buttonLabel" variant="ghost" :ui="{ label: 'hidden md:block' }"
+                <UButton v-if="isAuthenticated" :label="buttonLabel" variant="ghost" :ui="{ label: 'hidden md:block' }"
                     @click="actions.logout.execute" trailingIcon="i-lucide-log-out" size="md" />
                 <UButton v-else :label="buttonLabel" variant="ghost" :ui="{ label: 'hidden md:block' }" :to="redirectTo"
                     trailingIcon="i-lucide-log-in" size="md" />

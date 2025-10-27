@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import type { DropdownMenuItem } from '@nuxt/ui'
+  import type { AuthUserModel } from '~~/shared/application/common/providers/auth/dto/auth.dto';
 
   defineProps<{
     collapsed?: boolean
@@ -7,12 +8,11 @@
 
   const router = useRouter();
   const currentRoute = router.currentRoute;
-  const supabaseUser = useSupabaseUser()
-  const { logout } = useAuth()
+  const { connectedUser, actions } = useAuth()
 
-  const user = ref({
-    name: supabaseUser.value?.email,
-  })
+  const user = computed(() => ({
+    name: (connectedUser.value as AuthUserModel | null)?.email,
+  }))
 
   const items = computed<DropdownMenuItem[][]>(() => ([[{
     type: 'label',
@@ -34,7 +34,7 @@
   [{
     label: 'Déconnexion',
     icon: 'i-lucide-log-out',
-    onSelect: logout
+    onSelect: actions.logout.execute
   }],
   ]))
 </script>

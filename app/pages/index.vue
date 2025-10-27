@@ -3,6 +3,7 @@
     import type { FormSubmitEvent } from '@nuxt/ui'
 
     const { openModal } = useUploadWizard()
+    const { isAuthenticated, connectedUser } = useAuth();
     const config = useRuntimeConfig();
 
     const schema = z.object({
@@ -20,7 +21,6 @@
 
 
     const { data: page } = await useAsyncData(() => queryCollection('index').first())
-    const user = useSupabaseUser()
 
     useSeoMeta({
         title: page.value?.seo.title || page.value?.title,
@@ -60,7 +60,7 @@
                 <p class="text-muted text-lg">{{ page.description }}</p>
             </template>
             <template #links>
-                <UButton v-if="user != null && user.is_anonymous === false" to="/app" class="z-50"
+                <UButton v-if="isAuthenticated && !connectedUser?.isAnonymous" to="/app" class="z-50"
                     trailingIcon="i-lucide-home" size="xl">Tableau de bord</UButton>
                 <UButton v-else to="/auth/login" class="z-50" trailingIcon="i-lucide-log-in" size="xl">
                     Connexion
