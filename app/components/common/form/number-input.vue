@@ -23,7 +23,7 @@
 
   // v-model (string) pour coller exactement ce que l’utilisateur tape / colle.
   // La validation Zod convertira en Number au submit.
-  const model = defineModel<string>({ default: '' })
+  const model = defineModel<string | number>({ default: '' })
 
   // Nettoyage léger à l’input: on laisse l’utilisateur taper, on filtre seulement les caractères très exotiques.
   // On autorise chiffres, espaces (y compris fines/NBSP), ., , , €, et - (optionnel).

@@ -1,6 +1,8 @@
-import type { InvoiceRepository } from "~~/shared/domain/invoice/invoice.repository";
 import type { EmailRepository } from "../../common/providers/email/email.repository";
-import { SendInvoiceByEmailCommandSchema } from "../commands";
+import {
+    type SendInvoiceByEmailCommand,
+    SendInvoiceByEmailCommandSchema,
+} from "../commands";
 import type { InvoiceQuery } from "../invoice.query";
 import type { StorageRepository } from "../../common/providers/storage/storage.repository";
 import { STORAGE_BUCKETS } from "../../common/providers/storage/types";
@@ -12,7 +14,7 @@ export class SendInvoiceByEmailUsecase {
         private readonly storageRepository: StorageRepository,
     ) {}
 
-    async execute(raw: unknown): Promise<void> {
+    async execute(raw: SendInvoiceByEmailCommand): Promise<void> {
         const parsed = SendInvoiceByEmailCommandSchema
             .parse(raw);
 

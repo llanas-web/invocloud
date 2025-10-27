@@ -2,6 +2,7 @@ import type { TableColumn } from "@nuxt/ui";
 import { h } from "vue";
 import { NuxtLink, UBadge, UButton, UCheckbox } from "#components";
 import type { InvoiceDetailsDTO } from "~~/shared/application/invoice/dto";
+import { formatDate } from "~/utils/date";
 
 const statusColors = {
     pending: "warning" as const,
@@ -17,15 +18,6 @@ const statusLabels: Record<string, string> = {
     validated: "En cours",
     paid: "Payée",
     error: "Erreur",
-};
-
-const formatDate = (value: string | null) => {
-    if (!value) return "";
-    return new Date(value).toLocaleDateString("fr-FR", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-    });
 };
 
 const formatCurrency = (value: number) => {

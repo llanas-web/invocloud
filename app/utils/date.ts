@@ -1,6 +1,23 @@
 import { CalendarDate } from "@internationalized/date";
 import { format, isAfter, isBefore, isEqual, isSameDay } from "date-fns";
 
+export const formatDate = (value: Date | string | null) => {
+    if (!value) return "";
+    if (typeof value === "object" && value instanceof Date) {
+        return value.toLocaleDateString("fr-FR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+        });
+    } else if (typeof value === "string") {
+        return new Date(value).toLocaleDateString("fr-FR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+        });
+    }
+};
+
 export function fromUnix(timestamp?: number | null): string | null {
     return timestamp ? new Date(timestamp * 1000).toISOString() : null;
 }

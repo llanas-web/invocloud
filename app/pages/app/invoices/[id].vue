@@ -67,7 +67,4 @@
         </USlideover>
         <InvoicesDetailsInvoiceViewer v-else :invoice="invoice" />
     </template>
-
-
-
 </template>

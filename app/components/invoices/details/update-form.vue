@@ -59,9 +59,9 @@
         </UFormField>
         <UFormField label="Montant TTC" name="amount" required>
             <USkeleton v-if="!invoice" class="h-8" />
-            <CommonFormNumberInput v-model.trim="(formState.amount as unknown) as string | undefined"
-                icon="i-lucide-euro" class="w-full" :format-on-blur="true" :fraction-digits="2" :allow-negative="false"
-                type="string" inputmode="decimal" spellcheck="false" />
+            <CommonFormNumberInput v-model.trim="formState.amount" icon="i-lucide-euro" class="w-full"
+                :format-on-blur="true" :fraction-digits="2" :allow-negative="false" type="string" inputmode="decimal"
+                spellcheck="false" />
         </UFormField>
     </UForm>
 </template>
