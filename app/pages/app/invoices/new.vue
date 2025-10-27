@@ -1,55 +1,55 @@
 <script setup lang="ts">
-import type { BreadcrumbItem } from '@nuxt/ui'
-import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
+    import type { BreadcrumbItem } from '@nuxt/ui'
+    import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 
-definePageMeta({
-    layout: 'app'
-})
+    definePageMeta({
+        layout: 'app'
+    })
 
-const { formRef, formState, invoiceFile, isLoading, isDirty } = useInvoiceCreate()
+    const { formRef, formState, invoiceFile, pending } = useInvoiceCreate()
 
-const items = ref<BreadcrumbItem[]>([
-    {
-        label: 'Factures',
-        icon: 'i-lucide-files',
-        to: '/app'
-    },
-    {
-        label: `Nouvelle Facture`,
-        icon: 'i-lucide-file-text',
+    const items = ref<BreadcrumbItem[]>([
+        {
+            label: 'Factures',
+            icon: 'i-lucide-files',
+            to: '/app'
+        },
+        {
+            label: `Nouvelle Facture`,
+            icon: 'i-lucide-file-text',
+        }
+    ])
+
+    const fileUrl = computed(() => invoiceFile.value ? URL.createObjectURL(invoiceFile.value) : '')
+    const fileType = computed(() => invoiceFile.value ? invoiceFile.value.type : '')
+    const fileName = computed(() => invoiceFile.value ? invoiceFile.value.name : 'example.pdf')
+
+    const onFileChange = (event: Event) => {
+        const target = event.target as HTMLInputElement
+        const file = target.files ? target.files[0] : null
+
+        if (file) {
+            invoiceFile.value = file
+            formState.name = formState.name ?? file.name
+            formState.filePath = fileUrl.value
+        } else {
+            invoiceFile.value = null
+            formState.name = formState.name ?? ''
+            formState.filePath = ''
+        }
     }
-])
 
-const fileUrl = computed(() => invoiceFile.value ? URL.createObjectURL(invoiceFile.value) : '')
-const fileType = computed(() => invoiceFile.value ? invoiceFile.value.type : '')
-const fileName = computed(() => invoiceFile.value ? invoiceFile.value.name : 'example.pdf')
-
-const onFileChange = (event: Event) => {
-    const target = event.target as HTMLInputElement
-    const file = target.files ? target.files[0] : null
-
-    if (file) {
-        invoiceFile.value = file
-        formState.name = formState.name ?? file.name
-        formState.file_path = fileUrl.value
-    } else {
-        invoiceFile.value = null
-        formState.name = formState.name ?? ''
-        formState.file_path = ''
+    const triggerFilePicker = () => {
+        const input = document.createElement('input')
+        input.type = 'file'
+        input.onchange = onFileChange
+        input.click()
     }
-}
-
-const triggerFilePicker = () => {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.onchange = onFileChange
-    input.click()
-}
 
 
-const breakpoints = useBreakpoints(breakpointsTailwind)
-const isMobile = breakpoints.smaller('lg')
-const isFormOpen = ref(false)
+    const breakpoints = useBreakpoints(breakpointsTailwind)
+    const isMobile = breakpoints.smaller('lg')
+    const isFormOpen = ref(false)
 </script>
 <template>
     <UDashboardPanel id="invoices-new" :default-size="25" :min-size="20" :max-size="100" resizable>
@@ -80,10 +80,9 @@ const isFormOpen = ref(false)
                 <InvoicesDetailsCreateForm />
             </div>
             <div class="flex justify-end p-4 mt-auto space-x-4">
-                <UButton label="Annuler" color="neutral" variant="subtle" :disabled="isLoading"
+                <UButton label="Annuler" color="neutral" variant="subtle" :disabled="pending"
                     @click="navigateTo('/app')" />
-                <UButton label="Sauvegarder" color="success" :loading="isLoading" @click="formRef?.submit()"
-                    :disabled="!isDirty" />
+                <UButton label="Sauvegarder" color="success" :loading="pending" @click="formRef?.submit()" />
             </div>
         </template>
     </UDashboardPanel>

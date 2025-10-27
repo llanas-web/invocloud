@@ -3,7 +3,6 @@
     import { createInvoiceColumns } from './columns';
     import { createRowActions, type RowAction } from './row-actions';
     import type { InvoiceDetailsDTO } from '~~/shared/application/invoice/dto';
-    import type { TableColumn } from '@nuxt/ui';
 
     const table = useTemplateRef('invoiceTable');
 
