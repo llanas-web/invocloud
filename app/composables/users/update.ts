@@ -22,7 +22,7 @@ const _useUserUpdate = () => {
         if (newUser) {
             formState.fullName = newUser.fullName;
         }
-    });
+    }, { immediate: true });
 
     const { error, pending, execute } = useAsyncAction(
         async () => {

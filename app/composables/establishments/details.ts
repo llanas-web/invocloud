@@ -23,6 +23,7 @@ const _useEstablishmentDetails = () => {
             );
         },
         {
+            server: false,
             immediate: false,
             default: () => null,
             watch: [selectedId],
@@ -80,7 +81,7 @@ const _useEstablishmentDetails = () => {
 
     const deleteAction = useAsyncAction(async () => {
         if (!selectedId.value) throw new AppError("No establishment selected");
-        await $usecases.establishments.delete.execute([selectedId.value]);
+        await $usecases.establishments.delete.execute(selectedId.value);
         await refreshListEstablishments();
     });
 
@@ -89,11 +90,12 @@ const _useEstablishmentDetails = () => {
             if (!selectedId.value) {
                 throw new AppError("No establishment selected");
             }
-            await establishmentApi.subscription
+            const checkoutUrl = await establishmentApi.subscription
                 .createCheckoutSession({
                     establishmentId: selectedId.value,
                     userId: connectedUser.value!.id,
                 });
+            navigateTo(checkoutUrl, { external: true });
         },
     );
 

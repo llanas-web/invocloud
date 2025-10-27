@@ -1,6 +1,9 @@
 import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
 import { ApplicationError } from "../../common/errors/application.error";
-import { InviteMemberCommandSchema } from "../commands";
+import {
+    type InviteMemberCommand,
+    InviteMemberCommandSchema,
+} from "../commands";
 import type { UserRepository } from "~~/shared/domain/user/user.repository";
 import type { EmailRepository } from "../../common/providers/email/email.repository";
 import type { AuthRepository } from "../../common/providers/auth/auth.repository";
@@ -14,7 +17,7 @@ export class InviteMemberUsecase {
         private readonly authRepository: AuthRepository,
     ) {}
 
-    async execute(raw: unknown): Promise<void> {
+    async execute(raw: InviteMemberCommand): Promise<void> {
         const parsed = InviteMemberCommandSchema.parse(raw);
         const establishment = await this.establishmentRepo.getById(
             parsed.establishmentId,

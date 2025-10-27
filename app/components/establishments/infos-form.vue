@@ -36,7 +36,7 @@
                     label="Préfixe email" :action="checkEmailPrefixAvailable"
                     :normalize="(v: string) => v.toLowerCase()" :debounce-ms="350" :required="true"
                     suffix="@in.invocloud.fr" description="Choisissez le préfixe pour recevoir vos factures par email."
-                    @checking-change="(checking) => { pending = checking }" />
+                    @checking-change="(checking) => { pending = checking }" msg-taken="Préfix non disponible" />
                 <template #error></template>
             </UFormField>
         </UPageCard>
