@@ -20,12 +20,6 @@ export default class AuthSupabaseRepository implements AuthRepository {
             const _event = event as AuthEvent;
             this.onAuthChange(
                 _event,
-                session?.user != null
-                    ? new AuthUserModel(
-                        session.user.id,
-                        session.user.email ?? "",
-                    )
-                    : null,
             );
         });
     }
@@ -40,14 +34,23 @@ export default class AuthSupabaseRepository implements AuthRepository {
         return this._connectedUser;
     }
 
-    onAuthChange(
+    async onAuthChange(
         event: AuthEvent,
-        user: AnonymousAuthUserModel | AuthUserModel | null,
-    ): void {
+        user?: AnonymousAuthUserModel | AuthUserModel | null,
+    ) {
         switch (event) {
             case AuthEvent.INITIAL_SESSION:
             case AuthEvent.SIGNED_IN:
-                this._connectedUser = user;
+                const { data, error } = await this.supabaseClient.auth
+                    .getUser();
+                if (error) {
+                    this._connectedUser = null;
+                    break;
+                }
+                this._connectedUser = new AuthUserModel(
+                    data.user.id,
+                    data.user.email || "",
+                );
                 break;
             case AuthEvent.SIGNED_OUT:
                 this._connectedUser = null;

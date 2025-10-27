@@ -10,7 +10,7 @@
     const toast = useToast()
 
     const pendingInvoices = computed(() =>
-        invoices.value.filter((invoice) => invoice.status === 'pending')
+        invoices.value.filter((invoice) => invoice.status === 'pending' || invoice.status === 'ocr')
     )
 
     const columns: TableColumn<typeof invoices.value[0]>[] = [

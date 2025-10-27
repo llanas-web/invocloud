@@ -10,7 +10,7 @@ export interface AuthRepository {
 
     onAuthChange(
         event: AuthEvent,
-        user: AnonymousAuthUserModel | AuthUserModel | null,
+        user?: AnonymousAuthUserModel | AuthUserModel | null,
     ): void;
 
     signInWithPassword(

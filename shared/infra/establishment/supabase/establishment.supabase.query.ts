@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { SupabaseError } from "../../common/errors/supabase.error";
+import { SupabaseError } from "../../common/supabase/supabase.error";
 import type {
     EstablishmentDetailsDTO,
     EstablishmentListItemDTO,

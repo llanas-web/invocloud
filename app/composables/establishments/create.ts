@@ -19,8 +19,8 @@ function slugify(s: string) {
 }
 
 const _useEstablishmentCreate = () => {
-    const supabaseUser = useSupabaseUser();
     const { $usecases } = useNuxtApp();
+    const { connectedUser } = useAuth();
     const { refresh, selectEstablishment } = useEstablishmentsList();
     const isOpen = ref(false);
 
@@ -38,7 +38,7 @@ const _useEstablishmentCreate = () => {
             const newEstablishmentId = await $usecases.establishments.create
                 .execute({
                     name: parsedEstablishment.name,
-                    creatorId: supabaseUser.value!.id,
+                    creatorId: connectedUser.value!.id,
                     emailPrefix: slugify(parsedEstablishment.name),
                 });
             await refresh();

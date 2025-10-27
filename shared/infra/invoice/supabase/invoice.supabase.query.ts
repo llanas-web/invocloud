@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { InvoiceQuery } from "~~/shared/application/invoice/invoice.query";
-import { SupabaseError } from "~~/shared/infra/common/errors/supabase.error";
+import { SupabaseError } from "~~/shared/infra/common/supabase/supabase.error";
 import type {
     InvoiceDetailsDTO,
     InvoiceListItemDTO,

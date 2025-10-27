@@ -9,6 +9,10 @@ const _useAuth = () => {
 
     const connectedUser = computed(() => authRepository.connectedUser);
 
+    const isAuthenticated = computed(() => {
+        return connectedUser.value !== null;
+    });
+
     const loginAction = useAsyncAction(
         async (email: string, password: string) => {
             const response = await authRepository.signInWithPassword(
@@ -58,6 +62,7 @@ const _useAuth = () => {
 
     return {
         connectedUser,
+        isAuthenticated,
         actions: {
             login: loginAction,
             signup: signupAction,

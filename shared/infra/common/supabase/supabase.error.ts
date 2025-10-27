@@ -1,4 +1,4 @@
-import { InfraError } from "~~/shared/infra/common/errors/infra.error";
+import { InfraError } from "../infra.error";
 
 export class SupabaseError extends InfraError {
     constructor(

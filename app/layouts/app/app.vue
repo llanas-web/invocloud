@@ -1,19 +1,20 @@
 <script setup lang="ts">
     import type { NavigationMenuItem } from '@nuxt/ui'
     import { LazyInvoicesUploadModalContainer, LazyCommonConfirmModal } from '#components'
+    import type { AuthUserModel } from '~~/shared/application/common/providers/auth/dto/auth.dto';
 
     const route = useRoute()
     const router = useRouter()
+    const { connectedUser } = useAuth();
     const { formState, pending, onSubmit: createEstablishment } = useEstablishmentCreate()
+    const { establishments, status } = useEstablishmentsList()
+    const { isActive, isTrial, actions } = useEstablishmentDetails()
 
     // get the subscription_success from the query params
     const subscriptionSuccess = route.query.subscription_success === 'true'
     const toast = useToast()
     const open = ref(false)
 
-    const { establishments, status } = useEstablishmentsList()
-    const { isActive, isTrial, actions } = useEstablishmentDetails()
-    const user = useSupabaseUser()
 
     const isEstablishementActive = computed(() => {
         if (router.currentRoute.value.name?.toString().includes('app-settings')) {
@@ -189,7 +190,7 @@
                             <div>
                                 <h2 class="text-left text-4xl font-bold text-muted">
                                     Bonjour <span class="text-primary">
-                                        {{ user?.user_metadata?.full_name || user?.email }}</span>
+                                        {{ (connectedUser as AuthUserModel)?.email }}</span>
                                 </h2>
                                 <div class="mt-1 text-left text-muted mb-4 font-sans">
                                     Terminez votre inscription à <span class="text-primary">
@@ -232,7 +233,7 @@
                         <div>
                             <h2 class="text-left text-4xl font-bold text-muted">
                                 Bonjour <span class="text-primary">
-                                    {{ user?.user_metadata?.full_name || user?.email }}</span>
+                                    {{ (connectedUser as AuthUserModel).email }}</span>
                             </h2>
                             <div class="mt-1 text-left text-muted mb-4 font-sans">
                                 Terminez votre inscription à <span class="text-primary">
