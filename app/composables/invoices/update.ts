@@ -5,8 +5,8 @@ import {
     UpdateInvoiceFormSchema,
 } from "~/types/schemas/forms/invoices.schema";
 import { z } from "zod";
-import type { UpdateInvoiceDetailsCommand } from "~~/shared/application/invoice/commands";
 import { AppError } from "~/core/errors/app.error";
+import type { UpdateInvoiceDetailsCommand } from "~~/shared/application/invoice/usecases/update-invoice-details.usecase";
 
 // Mapping UI → Application command
 const toUpdateDetailsCommand = (

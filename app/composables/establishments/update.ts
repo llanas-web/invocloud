@@ -43,8 +43,10 @@ const _useEstablishmentUpdate = () => {
             const parsedForm = UpdateEstablishmentSchema.parse(formState);
             await $usecases.establishments.update
                 .execute({
-                    id: selectedId.value,
-                    ...parsedForm,
+                    id: selectedId.value!,
+                    emailPrefix: parsedForm.emailPrefix,
+                    address: parsedForm.address ?? undefined,
+                    phone: parsedForm.phone ?? undefined,
                 });
             await refresh();
         },

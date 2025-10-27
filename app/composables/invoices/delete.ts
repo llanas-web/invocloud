@@ -20,7 +20,9 @@ const _useInvoicesDelete = () => {
     const { error, pending, execute } = useAsyncAction(
         async () => {
             const parsed = stateSchema.parse(selectedInvoices.value);
-            await $usecases.invoices.delete.execute(parsed);
+            await $usecases.invoices.delete.execute({
+                invoiceIds: parsed,
+            });
             resetForm();
         },
     );

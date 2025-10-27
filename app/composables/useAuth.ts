@@ -1,5 +1,6 @@
 import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "~/composables/core/useAsyncAction";
+import { userApi } from "~/services/api/user.api";
 
 const _useAuth = () => {
     const config = useRuntimeConfig();
@@ -39,19 +40,9 @@ const _useAuth = () => {
     });
 
     const resetPasswordAction = useAsyncAction(async (newPassword: string) => {
-        const { data, error } = await useFetch(
-            "/api/user/reset-password",
-            {
-                method: "POST",
-                body: {
-                    password: newPassword,
-                },
-            },
-        );
-        if (error.value) {
-            throw new Error(error.value.message);
-        }
-        return data;
+        await userApi.resetPassword({
+            password: newPassword,
+        });
     });
 
     const sendResetPasswordEmailAction = useAsyncAction(

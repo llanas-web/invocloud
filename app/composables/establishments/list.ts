@@ -2,7 +2,7 @@ import { createSharedComposable, useLocalStorage } from "@vueuse/core";
 import type { EstablishmentListItemDTO } from "~~/shared/application/establishment/dto";
 
 const _useEstablishmentsList = () => {
-    const { $usecases } = useNuxtApp();
+    const { $queries } = useNuxtApp();
     const { userSettings } = useUser();
     const { connectedUser } = useAuth();
 
@@ -24,7 +24,7 @@ const _useEstablishmentsList = () => {
                 connectedUser.value,
             );
             if (!connectedUser.value?.id) return [];
-            return $usecases.establishments.list.execute(
+            return $queries.establishmentQuery.listEstablishments(
                 { memberIds: [connectedUser.value.id] },
             );
         },

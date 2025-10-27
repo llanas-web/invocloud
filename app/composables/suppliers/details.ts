@@ -1,16 +1,16 @@
 import { createSharedComposable } from "@vueuse/core";
 
 const _useSupplierDetails = () => {
-    const { $usecases } = useNuxtApp();
+    const { $queries } = useNuxtApp();
 
     const selectedId = ref<string | null>(null);
 
-    const { data: model, pending, refresh } = useAsyncData(
+    const { data: dto, pending, refresh } = useAsyncData(
         async () => {
             if (!selectedId.value) {
                 throw new Error("No supplier selected.");
             }
-            return await $usecases.suppliers.details.execute(
+            return await $queries.suppliersQuery.getSupplierDetails(
                 selectedId.value,
             );
         },
@@ -18,19 +18,19 @@ const _useSupplierDetails = () => {
     );
 
     const supplier = computed(() => {
-        if (!model.value) return null;
+        if (!dto.value) return null;
         return {
-            id: model.value.id,
-            name: model.value.name,
-            emails: model.value.emails,
-            phone: model.value.phone,
+            id: dto.value.id,
+            name: dto.value.name,
+            emails: dto.value.emails,
+            phone: dto.value.phone,
         };
     });
 
     return {
         selectedId,
         supplier,
-        model,
+        dto,
         pending,
         refresh,
     };

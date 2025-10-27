@@ -1,4 +1,7 @@
-import type { SupplierListItemDTO } from "~~/shared/application/supplier/dto";
+import type {
+    SupplierDetailsDTO,
+    SupplierListItemDTO,
+} from "~~/shared/application/supplier/dto";
 import type {
     SupplierListFilter,
     SupplierQuery,
@@ -36,5 +39,22 @@ export default class SupplierSupabaseQuery implements SupplierQuery {
             createdAt: new Date(row.created_at),
             updatedAt: new Date(row.updated_at),
         }));
+    }
+
+    async getSupplierDetails(supplierId: string) {
+        const { data, error } = await this.supabase
+            .from("suppliers")
+            .select("*")
+            .eq(
+                "id",
+                supplierId,
+            ).single();
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return {
+            id: data.id,
+            name: data.name,
+            emails: data.emails,
+            phone: data.phone,
+        };
     }
 }

@@ -1,13 +1,14 @@
 import { createSharedComposable } from "@vueuse/core";
 
 const _useSuppliers = () => {
-    const { $usecases } = useNuxtApp();
+    const { $usecases, $queries } = useNuxtApp();
     const { selectedId } = useEstablishmentsList();
 
     const { data: dtos, error, refresh, pending } = useAsyncData(
         "suppliers",
         async () => {
-            return await $usecases.suppliers.list.execute({
+            if (!selectedId.value) return [];
+            return await $queries.suppliersQuery.listSuppliers({
                 establishmentIds: [selectedId.value],
             });
         },
@@ -29,7 +30,9 @@ const _useSuppliers = () => {
 
     const deleteSupplierAction = useAsyncAction(
         async (supplierId: string) => {
-            await $usecases.suppliers.delete.execute(supplierId);
+            await $usecases.suppliers.delete.execute({
+                id: supplierId,
+            });
             await refresh();
         },
     );

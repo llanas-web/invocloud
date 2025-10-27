@@ -6,7 +6,7 @@ import { SubscriptionStatus } from "~~/shared/domain/establishment/subscription.
 import { fromDate } from "~/utils/date";
 
 const _useEstablishmentDetails = () => {
-    const { $usecases } = useNuxtApp();
+    const { $usecases, $queries } = useNuxtApp();
     const { selectedId, refresh: refreshListEstablishments } =
         useEstablishmentsList();
     const { connectedUser } = useAuth();
@@ -18,9 +18,10 @@ const _useEstablishmentDetails = () => {
     } = useAsyncData(
         async () => {
             if (!selectedId.value) return null;
-            return await $usecases.establishments.details.execute(
-                selectedId.value,
-            );
+            return await $queries.establishmentQuery
+                .getEstablishmentDetails(
+                    selectedId.value,
+                );
         },
         {
             server: false,
@@ -81,7 +82,9 @@ const _useEstablishmentDetails = () => {
 
     const deleteAction = useAsyncAction(async () => {
         if (!selectedId.value) throw new AppError("No establishment selected");
-        await $usecases.establishments.delete.execute(selectedId.value);
+        await $usecases.establishments.delete.execute({
+            establishmentId: selectedId.value,
+        });
         await refreshListEstablishments();
     });
 

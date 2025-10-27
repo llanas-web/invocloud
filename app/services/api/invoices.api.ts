@@ -1,4 +1,5 @@
 import { AppError } from "~/core/errors/app.error";
+import { z } from "zod";
 import {
     type RequestUploadInvoiceBody,
     RequestUploadInvoiceRequestSchema,
@@ -19,19 +20,14 @@ import {
     SendUploadInvoiceRequestSchema,
     type SendUploadInvoiceResponse,
 } from "~~/shared/contracts/api/security/upload/send.contract";
-import { z } from "zod";
-import {
-    CheckUploadAuthorizationSchema,
-    type SendInvoiceByEmailCommand,
-    SendInvoiceByEmailCommandSchema,
-} from "~~/shared/application/invoice/commands";
 import { SendInvoiceUploadSchema } from "~~/shared/contracts/api/security/invoices/upload/send.contrat";
+import { CheckUploadAuthorizationSchema } from "~~/shared/application/invoice/usecases/upload/check-upload-authorization.usecase";
 
 export const invoicesApi = {
-    send(body: SendInvoiceByEmailCommand) {
+    send(body: SendInvoicesBody) {
         return $fetch<SendInvoicesResponse>("/api/security/invoice/send", {
             method: "POST",
-            body: parseBody(SendInvoiceByEmailCommandSchema, body),
+            body: parseBody(SendInvoiceUploadSchema, body),
         });
     },
     requestUploadAnonymous(body: RequestUploadInvoiceBody) {

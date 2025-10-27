@@ -46,7 +46,7 @@ const _useSupplierCreate = () => {
             }
             const _newSupplier = await $usecases.suppliers.create.execute({
                 name: formState.name,
-                establishment_id: selectedId.value,
+                establishmentId: selectedId.value,
                 emails: formState.emails,
             });
             openModal.value = false;

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ResetPasswordSchema = z.object({
+export const ResetPasswordBodySchema = z.object({
     password: z.string().min(8, "Password must be at least 8 characters long"),
 });
-export type ResetPasswordCommand = z.infer<typeof ResetPasswordSchema>;
+export type ResetPasswordBody = z.infer<typeof ResetPasswordBodySchema>;

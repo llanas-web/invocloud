@@ -4,7 +4,7 @@ import type { InvoiceStatus } from "~~/shared/domain/invoice/invoice.model";
 import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/types";
 
 const _useInvoices = () => {
-    const { $storageRepository, $usecases } = useNuxtApp();
+    const { $usecases, $storageRepository, $queries } = useNuxtApp();
     const { selectedId } = useEstablishmentsList();
 
     const searchQuery = ref<string>("");
@@ -30,7 +30,7 @@ const _useInvoices = () => {
                     ? [statusFilter.value]
                     : undefined;
             const search = searchQuery.value ? searchQuery.value : undefined;
-            return await $usecases.invoices.list.execute({
+            return await $queries.invoiceQuery.listInvoices({
                 establishmentIds: [selectedId.value],
                 supplierIds: supplierFilter.value.length > 0
                     ? supplierFilter.value
@@ -91,8 +91,8 @@ const _useInvoices = () => {
     const sendAction = useAsyncAction(
         async (invoiceIds: string[], email: string) => {
             await invoicesApi.send({
-                invoiceIds,
-                recipientEmail: email,
+                invoices: invoiceIds,
+                email,
             });
         },
     );
