@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "../core/useAsyncAction";
+import { establishmentApi } from "~/services/api/establishment.api";
 
 export const UpdateEstablishmentSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -51,12 +52,11 @@ const _useEstablishmentUpdate = () => {
 
     const checkEmailPrefixAvailable = useAsyncAction(
         async (emailPrefix: string) => {
-            return await $usecases.establishments
-                .emailPrefixAvailable
-                .execute({
-                    emailPrefix,
-                    excludeId: selectedId.value,
-                });
+            const { isAvailable } = await establishmentApi.checkPrefix(
+                emailPrefix,
+                selectedId.value ?? undefined,
+            );
+            return isAvailable;
         },
     );
 
