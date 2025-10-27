@@ -1,18 +1,25 @@
-import { useServerUsecases } from "~~/server/middleware/injection.middleware";
 import { SendInvoiceUploadSchema } from "~~/shared/contracts/api/security/invoices/upload/send.contrat";
+import CreateInvoiceFromUploadUsecase from "~~/shared/application/invoice/usecases/upload/create-invoice-from-upload.usecase";
+import { useServerDi } from "~~/server/middleware/injection.middleware";
 
 export default defineEventHandler(async (event) => {
-    const { invoices } = useServerUsecases(event);
+    const { repos, queries, storageRepository } = useServerDi(event);
 
     const { establishmentId, supplierId, fileName, comment } = await parseBody(
         event,
         SendInvoiceUploadSchema,
     );
 
-    return invoices.upload.createInvoiceFromUpload.execute({
+    const createInvoiceFromUploadUsecase = new CreateInvoiceFromUploadUsecase(
+        repos,
+        queries,
+        storageRepository,
+    );
+
+    return createInvoiceFromUploadUsecase.execute({
         establishmentId,
         supplierId,
-        fileName,
+        name: fileName,
         comment,
     });
 });

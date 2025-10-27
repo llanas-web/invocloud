@@ -1,7 +1,8 @@
 import { defineEventHandler } from "h3";
 import { z } from "zod";
 import { HTTPStatus } from "~~/server/core/errors/status";
-import { useServerUsecases } from "~~/server/middleware/injection.middleware";
+import { useServerDi } from "~~/server/middleware/injection.middleware";
+import HandleInboundMailUsecase from "#shared/application/invoice/usecases/mail/handle-inbound-mail.usecase";
 
 export const PostmarkInboundSchema = z.object({
     FromFull: z.object({
@@ -27,7 +28,7 @@ export const PostmarkInboundSchema = z.object({
 
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
-    const { invoices } = useServerUsecases(event);
+    const { repos, queries, storageRepository } = useServerDi(event);
 
     // Security: Basic Auth
     const auth = event.node.req.headers.authorization || "";
@@ -76,9 +77,16 @@ export default defineEventHandler(async (event) => {
     });
 
     const recipientEmail = recipients[0].Email.toLowerCase();
-    await invoices.mail.handleInbound.execute({
-        from: sender.Email,
-        to: recipientEmail,
+
+    const handMailInboundUsecase = new HandleInboundMailUsecase(
+        repos,
+        queries,
+        storageRepository,
+    );
+
+    await handMailInboundUsecase.execute({
+        senderEmail: sender.Email,
+        recipientEmail: recipientEmail,
         subject,
         attachments: attachments.map((a) => ({
             name: a.Name,

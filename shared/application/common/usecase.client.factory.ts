@@ -1,93 +1,49 @@
 import type { RepositoriesFactory } from "~~/shared/domain/common/repositories.factory";
 import type { QueriesFactory } from "~~/shared/domain/common/queries.factory";
-import * as invoiceUC from "../invoice/usecases";
-import * as establishmentUC from "../establishment/usecases";
-import * as supplierUC from "../supplier/usecases";
-import * as userUc from "../user/usecases";
 import type { StorageRepository } from "./providers/storage/storage.repository";
+import CreateInvoiceUsecase from "../invoice/usecases/create-invoice.usecase";
+import UpdateInvoiceDetailsUsecase from "../invoice/usecases/update-invoice-details.usecase";
+import ChangeInvoiceStatusUsecase from "../invoice/usecases/change-invoice-status.usecase";
+import DeleteInvoicesUsecase from "../invoice/usecases/delete-invoices.usecase";
+import CreateEstablishmentUsecase from "../establishment/usecases/create-establishment.usecase";
+import UpdateEstablishmentUsecase from "../establishment/usecases/update-establishment.usecase";
+import DeleteEstablishmentUsecase from "../establishment/usecases/delete-establishments.usecase";
+import CreateSupplierUsecase from "../supplier/usecases/create-supplier.usecase";
+import UpdateSupplierUsecase from "../supplier/usecases/update-supplier.usecase";
+import DeleteSupplierUseCase from "../supplier/usecases/delete-supplier.usecase";
+import UpdateUserUseCase from "../user/usecases/update-user.usecase";
+import DeleteUserUsecase from "../user/usecases/delete-user.usecase";
+import ToggleFavoriteUsecase from "../user/usecases/toggle-favorite.usecase";
 
 export function makeUseCasesClient(
     repositoryFactory: RepositoriesFactory,
     queryFactory: QueriesFactory,
-    // authRepository: AuthRepository,
     storageRepository: StorageRepository,
 ) {
-    const invoicesRepo = repositoryFactory.invoices();
-    const invoiceQuery = queryFactory.invoiceQuery();
-    const establishmentsRepo = repositoryFactory.establishments();
-    const establishmentQuery = queryFactory.establishmentQuery();
-    const suppliersRepo = repositoryFactory.suppliers();
-    const suppliersQuery = queryFactory.suppliersQuery();
-    const userRepo = repositoryFactory.users();
-    const userQuery = queryFactory.userQuery();
+    const q = queryFactory.queries;
+    const r = repositoryFactory.repositories;
 
     return {
         invoices: {
-            create: new invoiceUC.CreateInvoiceUsecase(
-                invoicesRepo,
-                storageRepository,
-            ),
-            list: new invoiceUC.ListInvoicesUsecase(invoiceQuery),
-            updateDetails: new invoiceUC.UpdateInvoiceDetailsUsecase(
-                invoicesRepo,
-            ),
-            details: new invoiceUC.GetInvoiceDetailsUsecase(invoiceQuery),
-            updateStatus: new invoiceUC.ChangeInvoiceStatusUsecase(
-                invoicesRepo,
-            ),
-            delete: new invoiceUC.DeleteInvoicesUsecase(invoicesRepo),
+            create: new CreateInvoiceUsecase(r, q, storageRepository),
+            updateDetails: new UpdateInvoiceDetailsUsecase(r, q),
+            updateStatus: new ChangeInvoiceStatusUsecase(r, q),
+            delete: new DeleteInvoicesUsecase(r, q),
         },
         establishments: {
-            create: new establishmentUC.CreateEstablishmentUsecase(
-                establishmentsRepo,
-            ),
-            list: new establishmentUC.ListEstablishmentsUsecase(
-                establishmentQuery,
-            ),
-            update: new establishmentUC.UpdateEstablishmentUsecase(
-                establishmentsRepo,
-            ),
-            delete: new establishmentUC.DeleteEstablishmentUsecase(
-                establishmentsRepo,
-            ),
-            details: new establishmentUC.GetEstablishmentDetailsUsecase(
-                establishmentQuery,
-            ),
+            create: new CreateEstablishmentUsecase(r, q),
+            update: new UpdateEstablishmentUsecase(r, q),
+            delete: new DeleteEstablishmentUsecase(r, q),
         },
         suppliers: {
-            create: new supplierUC.CreateSupplierUsecase(
-                suppliersRepo,
-            ),
-            list: new supplierUC.ListSuppliersUsecase(
-                suppliersQuery,
-            ),
-            details: new supplierUC.GetSupplierDetailsUsecase(
-                suppliersRepo,
-            ),
-            update: new supplierUC.UpdateSupplierUsecase(
-                suppliersRepo,
-            ),
-            delete: new supplierUC.DeleteSupplierUseCase(
-                suppliersRepo,
-            ),
+            create: new CreateSupplierUsecase(r, q),
+            update: new UpdateSupplierUsecase(r, q),
+            delete: new DeleteSupplierUseCase(r, q),
         },
         users: {
-            list: new userUc.ListUsersUsecase(
-                userQuery,
-            ),
-            details: new userUc.GetUserDetailsUsecase(
-                userQuery,
-            ),
-            update: new userUc.UpdateUserUseCase(
-                userRepo,
-            ),
-            delete: new userUc.DeleteUserUsecase(
-                userRepo,
-                establishmentQuery,
-            ),
-            toggleFavorite: new userUc.ToggleFavoriteUsecase(
-                userRepo,
-            ),
+            update: new UpdateUserUseCase(r, q),
+            delete: new DeleteUserUsecase(r, q),
+            toggleFavorite: new ToggleFavoriteUsecase(r, q),
         },
     } as const;
 }

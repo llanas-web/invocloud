@@ -1,13 +1,20 @@
-import type { InvoiceRepository } from "~~/shared/domain/invoice/invoice.repository";
-import { DeleteInvoicesSchema } from "../commands";
+import { z } from "zod";
+import type { Queries } from "~~/shared/domain/common/queries.factory";
+import type { Repositories } from "~~/shared/domain/common/repositories.factory";
 
-export class DeleteInvoicesUsecase {
+export const DeleteInvoicesCommandSchema = z.object({
+    invoiceIds: z.array(z.uuid()).nonempty(),
+});
+export type DeleteInvoicesCommand = z.input<typeof DeleteInvoicesCommandSchema>;
+
+export default class DeleteInvoicesUsecase {
     constructor(
-        private readonly invoiceRepository: InvoiceRepository,
+        private readonly repos: Repositories,
+        private readonly queries: Queries,
     ) {}
 
-    async execute(raw: unknown): Promise<void> {
-        const invoiceIds = DeleteInvoicesSchema.parse(raw);
-        await this.invoiceRepository.deleteMany(invoiceIds);
+    async execute(command: DeleteInvoicesCommand) {
+        const parsed = DeleteInvoicesCommandSchema.parse(command);
+        await this.repos.invoicesRepo.deleteMany(parsed.invoiceIds);
     }
 }

@@ -1,26 +1,35 @@
-import type { GuestUploadSessionRepository } from "~~/shared/domain/guest-upload/guest-upload-session.repository";
-import type { InvoiceRepository } from "~~/shared/domain/invoice/invoice.repository";
-import { CreateInvoiceFromGuestSessionSchema } from "../command";
 import {
     InvoiceModel,
     InvoiceSource,
 } from "~~/shared/domain/invoice/invoice.model";
-import type { SupplierQuery } from "../../supplier/supplier.query";
+import { z } from "zod";
+import type { Queries } from "~~/shared/domain/common/queries.factory";
+import type { Repositories } from "~~/shared/domain/common/repositories.factory";
 
-export class CreateInvoiceFromGuestSessionUseCase {
+export const CreateInvoiceFromGuestSessionSchema = z.object({
+    sessionId: z.uuid("ID de session invalide"),
+    establishmentId: z.uuid("ID d'établissement invalide"),
+    fileName: z.string().optional(),
+    comment: z.string().optional(),
+});
+
+export type CreateInvoiceFromGuestSessionCommand = z.input<
+    typeof CreateInvoiceFromGuestSessionSchema
+>;
+
+export default class CreateInvoiceFromGuestSessionUseCase {
     constructor(
-        private readonly sessionRepository: GuestUploadSessionRepository,
-        private readonly invoiceRepository: InvoiceRepository,
-        private readonly supplierQuery: SupplierQuery,
+        private readonly repos: Repositories,
+        private readonly queries: Queries,
     ) {}
 
     async execute(
-        raw: unknown,
+        command: CreateInvoiceFromGuestSessionCommand,
     ) {
-        const parsed = CreateInvoiceFromGuestSessionSchema.parse(raw);
+        const parsed = CreateInvoiceFromGuestSessionSchema.parse(command);
 
         // 1. Vérifier que la session existe et est vérifiée
-        const session = await this.sessionRepository.findById(
+        const session = await this.repos.guestUploadSessionsRepo.findById(
             parsed.sessionId,
         );
         if (!session) {
@@ -31,7 +40,7 @@ export class CreateInvoiceFromGuestSessionUseCase {
             return { success: false, error: "Session non vérifiée ou expirée" };
         }
 
-        const suppliers = await this.supplierQuery.listSuppliers({
+        const suppliers = await this.queries.suppliersQuery.listSuppliers({
             emails: [session.senderEmail],
             establishmentIds: [parsed.establishmentId],
         });
@@ -51,12 +60,12 @@ export class CreateInvoiceFromGuestSessionUseCase {
             source: InvoiceSource.UPLOAD,
         });
 
-        const createdInvoiceId = await this.invoiceRepository.create(
+        const createdInvoiceId = await this.repos.invoicesRepo.create(
             draftInvoice,
         );
 
         // 3. Supprimer la session (elle a été utilisée)
-        await this.sessionRepository.delete(session.id);
+        await this.repos.guestUploadSessionsRepo.delete(session.id);
 
         return {
             success: true,

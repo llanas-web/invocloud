@@ -3,23 +3,32 @@ import {
     InvoiceSource,
     InvoiceStatus,
 } from "~~/shared/domain/invoice/invoice.model";
-import { CreateInvoiceFromUploadSchema } from "../../commands";
 import type { StorageRepository } from "~~/shared/application/common/providers/storage/storage.repository";
-import type { InvoiceRepository } from "~~/shared/domain/invoice/invoice.repository";
 import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/types";
-import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
+import { z } from "zod";
+import type { Repositories } from "~~/shared/domain/common/repositories.factory";
+import type { Queries } from "~~/shared/domain/common/queries.factory";
 
-export class CreateInvoiceFromUploadUsecase {
+export const CreateInvoiceFromUploadSchema = z.object({
+    supplierId: z.uuid(),
+    establishmentId: z.uuid(),
+    comment: z.string().trim().optional(),
+    name: z.string().trim(),
+});
+export type CreateInvoiceFromUploadCommand = z.input<
+    typeof CreateInvoiceFromUploadSchema
+>;
+
+export default class CreateInvoiceFromUploadUsecase {
     constructor(
-        private readonly invoiceRepository: InvoiceRepository,
-        private readonly establishmentRepository: EstablishmentRepository,
+        private readonly repos: Repositories,
+        private readonly queries: Queries,
         private readonly storageRepository: StorageRepository,
     ) {}
 
-    async execute(
-        raw: unknown,
-    ) {
-        const parsed = CreateInvoiceFromUploadSchema.parse(raw);
+    async execute(command: CreateInvoiceFromUploadCommand) {
+        const parsed = CreateInvoiceFromUploadSchema.parse(command);
+
         const newInvoiceId = crypto.randomUUID();
         const filePath = `${parsed.establishmentId}/${newInvoiceId}`;
         const newInvoice = InvoiceModel.createDraft({
@@ -31,7 +40,7 @@ export class CreateInvoiceFromUploadUsecase {
             status: InvoiceStatus.PENDING,
             source: InvoiceSource.UPLOAD,
         });
-        await this.invoiceRepository.create(newInvoice);
+        await this.repos.invoicesRepo.create(newInvoice);
 
         return this.storageRepository
             .createSignedUploadUrl(

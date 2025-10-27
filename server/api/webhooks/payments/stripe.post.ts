@@ -10,15 +10,15 @@ import { HTTPStatus } from "~~/server/core/errors/status";
 import { StripeEventAdapter } from "~~/server/infra/stripe/adapters/stripe-event.adapter";
 import PaymentStripeRepository from "~~/server/infra/stripe/payment.stripe.repository";
 import { fromSessionToSubscription } from "~~/server/infra/stripe/utils/mapper";
-import { useServerUsecases } from "~~/server/middleware/injection.middleware";
+import { useServerDi } from "~~/server/middleware/injection.middleware";
+import HandlePaymentEventsUsecase from "~~/shared/application/establishment/usecases/subscription/handle-payment-events.usecase";
 
 export default defineEventHandler(async (event) => {
     const sig = getRequestHeaders(event)["stripe-signature"] as string;
     const rawBody = await readRawBody(event);
-    const usecase = useServerUsecases(event);
-    const { handlePaymentEvents } = usecase.establishments.subscription;
-    const { stripeWebhookSecret } = useRuntimeConfig();
+    const { repos, queries } = useServerDi(event);
 
+    const { stripeWebhookSecret } = useRuntimeConfig();
     if (!sig || !rawBody) {
         throw createError({
             statusCode: 400,
@@ -35,6 +35,12 @@ export default defineEventHandler(async (event) => {
             stripeWebhookSecret,
         );
     const eventData = stripeEvent.data as unknown;
+
+    const handlePaymentEventsUsecase = new HandlePaymentEventsUsecase(
+        repos,
+        queries,
+    );
+
     switch (stripeEvent.type) {
         case "checkout.session.completed":
             const session = eventData as Stripe.Checkout.Session;
@@ -53,7 +59,7 @@ export default defineEventHandler(async (event) => {
                     session,
                     subscription,
                 );
-            await handlePaymentEvents.handleTrialSucceeded(
+            await handlePaymentEventsUsecase.handleTrialSucceeded(
                 checkoutSessionDTO,
             );
             break;
@@ -63,7 +69,7 @@ export default defineEventHandler(async (event) => {
                 .toInvoicePaymentSucceeded(
                     invoicePaymentData,
                 );
-            await handlePaymentEvents.handleInvoicePaymentSucceeded(
+            await handlePaymentEventsUsecase.handleInvoicePaymentSucceeded(
                 invoicePaymentDTO,
             );
             break;
@@ -73,7 +79,7 @@ export default defineEventHandler(async (event) => {
                 .toSubscriptionUpdated(
                     subscriptionUpdatedData,
                 );
-            await handlePaymentEvents.handleSubscriptionUpdated(
+            await handlePaymentEventsUsecase.handleSubscriptionUpdated(
                 subscriptionDTO,
             );
             break;
@@ -83,7 +89,7 @@ export default defineEventHandler(async (event) => {
                 .toSubscriptionDeleted(
                     subscriptionDeletedData,
                 );
-            await handlePaymentEvents.handleSubscriptionDeleted(
+            await handlePaymentEventsUsecase.handleSubscriptionDeleted(
                 subscriptionDeletedDTO,
             );
             break;
@@ -93,7 +99,7 @@ export default defineEventHandler(async (event) => {
                 .toPaymentFailed(
                     paymentFailedData,
                 );
-            await handlePaymentEvents.handlePaymentFailed(
+            await handlePaymentEventsUsecase.handlePaymentFailed(
                 paymentFailedDTO,
             );
             break;

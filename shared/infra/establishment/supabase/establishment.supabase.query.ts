@@ -11,7 +11,7 @@ import type { ListEstablishmentQueryFilter } from "~~/shared/application/establi
 import type { SubscriptionStatus } from "~~/shared/domain/establishment/subscription.entity";
 import type { Database } from "../../common/supabase/database.types";
 
-export class EstablishmentSupabaseQuery implements EstablishmentQuery {
+export default class EstablishmentSupabaseQuery implements EstablishmentQuery {
     constructor(private readonly supabase: SupabaseClient<Database>) {}
 
     async listEstablishments(

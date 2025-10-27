@@ -1,11 +1,28 @@
+import type { Queries } from "~~/shared/domain/common/queries.factory";
+import type { Repositories } from "~~/shared/domain/common/repositories.factory";
 import type { AuthRepository } from "../../common/providers/auth/auth.repository";
+import { z } from "zod";
 
-export class ResetPasswordUsecase {
-    constructor(private readonly authRepository: AuthRepository) {}
+export const ResetPasswordCommandSchema = z.object({
+    userId: z.uuid(),
+    newPassword: z.string().min(8).max(128),
+});
+export type ResetPasswordCommand = z.input<
+    typeof ResetPasswordCommandSchema
+>;
 
-    async execute(userId: string, newPassword: string) {
+export default class ResetPasswordUsecase {
+    constructor(
+        private readonly repos: Repositories,
+        private readonly queries: Queries,
+        private readonly authRepository: AuthRepository,
+    ) {}
+
+    async execute(command: ResetPasswordCommand) {
         // Validate and reset the user's password
-        const user = await this.authRepository.updateUser(userId, {
+        const parsed = ResetPasswordCommandSchema.parse(command);
+        const { userId, newPassword } = parsed;
+        await this.authRepository.updateUser(userId, {
             password: newPassword,
         });
     }

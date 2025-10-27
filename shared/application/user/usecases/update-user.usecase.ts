@@ -1,18 +1,31 @@
+import { z } from "zod";
+import type { Queries } from "~~/shared/domain/common/queries.factory";
+import type { Repositories } from "~~/shared/domain/common/repositories.factory";
 import type { UserRepository } from "~~/shared/domain/user/user.repository";
-import { UpdateUserDetailsSchema } from "../commant";
 
-export class UpdateUserUseCase {
-    constructor(private readonly userRepository: UserRepository) {}
+export const UpdateUserDetailsCommandSchema = z.object({
+    id: z.uuid(),
+    fullName: z.string().min(1).optional(),
+});
+export type UpdateUserDetailsCommand = z.input<
+    typeof UpdateUserDetailsCommandSchema
+>;
 
-    async execute(raw: unknown): Promise<void> {
-        const parsed = UpdateUserDetailsSchema.parse(raw);
-        const user = await this.userRepository.getById(parsed.id);
+export default class UpdateUserUseCase {
+    constructor(
+        private readonly repos: Repositories,
+        private readonly queries: Queries,
+    ) {}
+
+    async execute(command: UpdateUserDetailsCommand): Promise<void> {
+        const parsed = UpdateUserDetailsCommandSchema.parse(command);
+        const user = await this.repos.userRepo.getById(parsed.id);
         if (!user) {
             throw new Error("User not found");
         }
         const updatedUser = user.withDetails({
             fullName: parsed.fullName ?? undefined,
         });
-        return await this.userRepository.update(updatedUser);
+        return await this.repos.userRepo.update(updatedUser);
     }
 }

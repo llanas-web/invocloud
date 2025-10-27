@@ -1,6 +1,4 @@
 import { ApplicationError } from "~~/shared/application/common/errors/application.error";
-import type { PaymentRepository } from "~~/shared/application/common/providers/payment/payment.repository";
-import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
 import type {
     CheckoutSessionCreatedDto,
     InvoicePaymentSucceededDto,
@@ -11,49 +9,54 @@ import type {
 import SubscriptionEntity, {
     SubscriptionStatus,
 } from "~~/shared/domain/establishment/subscription.entity";
+import type { Repositories } from "~~/shared/domain/common/repositories.factory";
+import type { Queries } from "~~/shared/domain/common/queries.factory";
 
-export class HandlePaymentEventsUsecase {
+export default class HandlePaymentEventsUsecase {
     constructor(
-        private readonly establishmentRepo: EstablishmentRepository,
+        private readonly repos: Repositories,
+        private readonly queries: Queries,
     ) {}
 
     async handleTrialSucceeded(
         dto: CheckoutSessionCreatedDto,
     ): Promise<void> {
-        const establishment = await this.establishmentRepo.getById(
+        const establishment = await this.repos.establishmentsRepo.getById(
             dto.establishmentId,
         );
         if (!establishment) {
             throw new ApplicationError("Établissement non trouvé");
         }
-        establishment.withSubscription(
+        const updatedEstablishment = establishment.withSubscription(
             SubscriptionEntity.createTrial(
                 dto.trialEndDate,
                 dto.subscriptionId,
                 dto.customerId,
             ),
         );
-        await this.establishmentRepo.update(establishment);
+        await this.repos.establishmentsRepo.update(updatedEstablishment);
     }
 
     async handleInvoicePaymentSucceeded(
         dto: InvoicePaymentSucceededDto,
     ): Promise<void> {
-        const establishment = await this.establishmentRepo.getById(
+        const establishment = await this.repos.establishmentsRepo.getById(
             dto.establishmentId,
         );
         if (!establishment) {
             throw new ApplicationError("Établissement non trouvé");
         }
 
-        establishment.renewSubscription(dto.periodEnd);
-        await this.establishmentRepo.update(establishment);
+        const updatedEstablishment = establishment.renewSubscription(
+            dto.periodEnd,
+        );
+        await this.repos.establishmentsRepo.update(updatedEstablishment);
     }
 
     async handleSubscriptionUpdated(
         dto: SubscriptionUpdatedDto,
     ): Promise<void> {
-        const establishment = await this.establishmentRepo.getById(
+        const establishment = await this.repos.establishmentsRepo.getById(
             dto.establishmentId,
         );
         if (!establishment) {
@@ -61,39 +64,42 @@ export class HandlePaymentEventsUsecase {
         }
 
         if (dto.status === "active") {
-            establishment.activateSubscription(dto.currentPeriodEnd);
+            const updatedEstablishment = establishment.activateSubscription(
+                dto.currentPeriodEnd,
+            );
+            await this.repos.establishmentsRepo.update(updatedEstablishment);
         }
-
-        await this.establishmentRepo.update(establishment);
     }
 
     async handleSubscriptionDeleted(
         dto: SubscriptionDeletedDto,
     ): Promise<void> {
-        const establishment = await this.establishmentRepo.getById(
+        const establishment = await this.repos.establishmentsRepo.getById(
             dto.establishmentId,
         );
         if (!establishment) {
             throw new ApplicationError("Établissement non trouvé");
         }
-        establishment.cancelSubscription(dto.endedAt);
-        await this.establishmentRepo.update(establishment);
+        const updatedEstablishment = establishment.cancelSubscription(
+            dto.endedAt,
+        );
+        await this.repos.establishmentsRepo.update(updatedEstablishment);
     }
 
     async handlePaymentFailed(
         dto: PaymentFailedDto,
     ): Promise<void> {
-        const establishment = await this.establishmentRepo.getById(
+        const establishment = await this.repos.establishmentsRepo.getById(
             dto.establishmentId,
         );
         if (!establishment) {
             throw new ApplicationError("Établissement non trouvé");
         }
-        establishment.updateSubscription((sub) =>
+        const updatedEstablishment = establishment.updateSubscription((sub) =>
             sub.updateStatus(
                 SubscriptionStatus.PAST_DUE,
             )
         );
-        await this.establishmentRepo.update(establishment);
+        await this.repos.establishmentsRepo.update(updatedEstablishment);
     }
 }

@@ -1,15 +1,25 @@
-import { useServerUsecases } from "~~/server/middleware/injection.middleware";
-import { SendInvoiceByEmailCommandSchema } from "~~/shared/application/invoice/commands";
+import { useServerDi } from "~~/server/middleware/injection.middleware";
+import { SendInvoicesBodySchema } from "#shared/contracts/api/security/invoices/send.contract";
+import SendInvoicesUsecase from "~~/shared/application/invoice/usecases/send-by-email.usecase";
 
 export default defineEventHandler(async (event) => {
-    const { invoices } = useServerUsecases(event);
-    const { invoiceIds, recipientEmail } = await parseBody(
+    const { repos, queries, emailRepository, storageRepository } = useServerDi(
         event,
-        SendInvoiceByEmailCommandSchema,
+    );
+    const { invoices, email } = await parseBody(
+        event,
+        SendInvoicesBodySchema,
     );
 
-    await invoices.sendByEmail.execute({
-        invoiceIds,
-        recipientEmail,
+    const sendByEmailUsecase = new SendInvoicesUsecase(
+        repos,
+        queries,
+        emailRepository,
+        storageRepository,
+    );
+
+    await sendByEmailUsecase.execute({
+        invoiceIds: invoices,
+        recipientEmail: email,
     });
 });

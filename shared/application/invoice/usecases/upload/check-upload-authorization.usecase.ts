@@ -1,20 +1,31 @@
-import type { EstablishmentQuery } from "~~/shared/application/establishment/establishment.query";
-import { CheckUploadAuthorizationSchema } from "../../commands";
 import { ApplicationError } from "~~/shared/application/common/errors/application.error";
+import { z } from "zod";
+import type { Repositories } from "~~/shared/domain/common/repositories.factory";
+import type { Queries } from "~~/shared/domain/common/queries.factory";
 
-export class CheckUploadAuthorizationUsecase {
+export const CheckUploadAuthorizationSchema = z.object({
+    senderEmail: z.email(),
+    recipientEmail: z.email(),
+});
+export type CheckUploadAuthorizationCommand = z.input<
+    typeof CheckUploadAuthorizationSchema
+>;
+
+export default class CheckUploadAuthorizationUsecase {
     constructor(
-        private readonly establishmentQuery: EstablishmentQuery,
+        private readonly repos: Repositories,
+        private readonly queries: Queries,
     ) {}
 
-    async execute(raw: unknown) {
-        const parsed = CheckUploadAuthorizationSchema.parse(raw);
+    async execute(command: CheckUploadAuthorizationCommand) {
+        const parsed = CheckUploadAuthorizationSchema.parse(command);
 
         // 1. Vérifier que le sender est autorisé
-        const isAuthorized = await this.establishmentQuery.isSenderAuthorized(
-            parsed.senderEmail,
-            parsed.recipientEmail,
-        );
+        const isAuthorized = await this.queries.establishmentQuery
+            .isSenderAuthorized(
+                parsed.senderEmail,
+                parsed.recipientEmail,
+            );
 
         if (!isAuthorized) {
             throw new ApplicationError(
@@ -23,7 +34,7 @@ export class CheckUploadAuthorizationUsecase {
         }
 
         // 2. Récupérer les établissements disponibles pour ce sender
-        const establishments = await this.establishmentQuery
+        const establishments = await this.queries.establishmentQuery
             .listEstablishmentBySupplierEmail(parsed.senderEmail);
 
         if (establishments.length === 0) {

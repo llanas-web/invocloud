@@ -1,21 +1,35 @@
-import type { SupplierRepository } from "~~/shared/domain/supplier/supplier.repository";
-import { UpdateSupplierDetailsSchema } from "../commands";
 import { ApplicationError } from "../../common/errors/application.error";
+import { z } from "zod";
+import type { Queries } from "~~/shared/domain/common/queries.factory";
+import type { Repositories } from "~~/shared/domain/common/repositories.factory";
 
-export class UpdateSupplierUsecase {
-    constructor(private supplierRepository: SupplierRepository) {}
+export const UpdateSupplierDetailsSchema = z.object({
+    id: z.uuid(),
+    name: z.string().nullable().optional(),
+    emails: z.array(z.email()).nullable().optional(),
+    phone: z.string().nullable().optional(),
+});
+export type UpdateSupplierDetailsCommand = z.input<
+    typeof UpdateSupplierDetailsSchema
+>;
 
-    async execute(raw: unknown) {
-        const parsedData = UpdateSupplierDetailsSchema.parse(raw);
-        const existingSupplier = await this.supplierRepository.getById(
-            parsedData.id,
+export default class UpdateSupplierUsecase {
+    constructor(
+        private readonly repos: Repositories,
+        private readonly queries: Queries,
+    ) {}
+
+    async execute(command: UpdateSupplierDetailsCommand) {
+        const parsed = UpdateSupplierDetailsSchema.parse(command);
+        const existingSupplier = await this.repos.suppliersRepo.getById(
+            parsed.id,
         );
         if (!existingSupplier) throw new ApplicationError("Supplier not found");
         const updatedSupplier = existingSupplier.withDetails({
-            name: parsedData.name ?? undefined,
-            emails: parsedData.emails ?? undefined,
-            phone: parsedData.phone ?? undefined,
+            name: parsed.name ?? undefined,
+            emails: parsed.emails ?? undefined,
+            phone: parsed.phone ?? undefined,
         });
-        return this.supplierRepository.update(updatedSupplier);
+        return this.repos.suppliersRepo.update(updatedSupplier);
     }
 }

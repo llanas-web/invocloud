@@ -1,26 +1,40 @@
-import type { EstablishmentQuery } from "~~/shared/application/establishment/establishment.query";
-import { HandleInboundMailCommand } from "../../commands";
-import type { SupplierQuery } from "~~/shared/application/supplier/supplier.query";
 import type { StorageRepository } from "~~/shared/application/common/providers/storage/storage.repository";
 import { ApplicationError } from "~~/shared/application/common/errors/application.error";
 import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/types";
-import type { InvoiceRepository } from "~~/shared/domain/invoice/invoice.repository";
 import {
     InvoiceModel,
     InvoiceSource,
     InvoiceStatus,
 } from "~~/shared/domain/invoice/invoice.model";
+import { z } from "zod";
+import type { Repositories } from "~~/shared/domain/common/repositories.factory";
+import type { Queries } from "~~/shared/domain/common/queries.factory";
 
-export class HandleInboundMailUsecase {
+export const HandleInboundMailCommand = z.object({
+    senderEmail: z.email(),
+    recipientEmail: z.email(),
+    subject: z.string().optional(),
+    attachments: z.array(
+        z.object({
+            name: z.string(),
+            content: z.string(),
+            contentType: z.string(),
+        }),
+    ),
+});
+export type HandleInboundMailCommand = z.input<
+    typeof HandleInboundMailCommand
+>;
+
+export default class HandleInboundMailUsecase {
     constructor(
-        private readonly establishmentQuery: EstablishmentQuery,
-        private readonly supplierQuery: SupplierQuery,
-        private readonly invoiceRepository: InvoiceRepository,
+        private readonly repos: Repositories,
+        private readonly queries: Queries,
         private readonly storageRepository: StorageRepository,
     ) {}
 
-    async execute(raw: unknown) {
-        const parsed = HandleInboundMailCommand.parse(raw);
+    async execute(command: HandleInboundMailCommand) {
+        const parsed = HandleInboundMailCommand.parse(command);
         const {
             senderEmail,
             recipientEmail,
@@ -31,7 +45,7 @@ export class HandleInboundMailUsecase {
         const localPartFull = recipientEmail.split("@")[0];
         const emailPrefix = localPartFull!.split("+")[0]!;
 
-        const establishments = await this.establishmentQuery
+        const establishments = await this.queries.establishmentQuery
             .listEstablishments({
                 emailPrefixes: [emailPrefix],
             });
@@ -39,7 +53,7 @@ export class HandleInboundMailUsecase {
             throw new ApplicationError("Establishment not found");
         }
         const establishmentFounded = establishments[0]!;
-        const suppliers = await this.supplierQuery.listSuppliers({
+        const suppliers = await this.queries.suppliersQuery.listSuppliers({
             emails: [senderEmail],
         });
         if (suppliers.length === 0) {
@@ -88,7 +102,7 @@ export class HandleInboundMailUsecase {
                 comment: subject ?? null,
                 source: InvoiceSource.EMAIL,
             });
-            await this.invoiceRepository.create(newInvoice);
+            await this.repos.invoicesRepo.create(newInvoice);
         }
     }
 }
