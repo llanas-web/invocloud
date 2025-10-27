@@ -24,11 +24,9 @@ const _useEstablishmentsList = () => {
                 connectedUser.value,
             );
             if (!connectedUser.value?.id) return [];
-            const list = await $usecases.establishments.list.execute(
+            return $usecases.establishments.list.execute(
                 { memberIds: [connectedUser.value.id] },
             );
-            ensureSelection(list);
-            return list;
         },
         {
             server: false,

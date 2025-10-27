@@ -59,7 +59,7 @@ export const createInvoiceColumns = (
             }, () => row.original.number),
     },
     {
-        accessorKey: "supplier",
+        accessorKey: "supplierName",
         header: "Fournisseur",
         cell: ({ row }) =>
             h(UButton, {
@@ -101,7 +101,7 @@ export const createInvoiceColumns = (
         },
     },
     {
-        accessorKey: "created_at",
+        accessorKey: "createdAt",
         header: ({ column }) => {
             const isSorted = column.getIsSorted();
             return h(UButton, {
@@ -120,12 +120,12 @@ export const createInvoiceColumns = (
         cell: ({ row }) =>
             h(
                 "div",
-                { class: "text-muted" },
-                formatDate(row.getValue("created_at")),
+                { class: "text-muted text-center" },
+                formatDate(row.original.emitDate),
             ),
     },
     {
-        accessorKey: "due_date",
+        accessorKey: "dueDate",
         header: ({ column }) => {
             const isSorted = column.getIsSorted();
             return h(UButton, {
@@ -144,12 +144,12 @@ export const createInvoiceColumns = (
         cell: ({ row }) =>
             h(
                 "div",
-                { class: "text-muted" },
-                formatDate(row.getValue("due_date")),
+                { class: "text-muted text-center" },
+                formatDate(row.original.dueDate),
             ),
     },
     {
-        accessorKey: "paid_at",
+        accessorKey: "paidAt",
         header: ({ column }) => {
             const isSorted = column.getIsSorted();
             return h(UButton, {
@@ -168,8 +168,8 @@ export const createInvoiceColumns = (
         cell: ({ row }) =>
             h(
                 "div",
-                { class: "text-muted" },
-                formatDate(row.getValue("paid_at")),
+                { class: "text-muted text-center" },
+                formatDate(row.original.paidAt),
             ),
     },
 ];
