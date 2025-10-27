@@ -1,6 +1,7 @@
 <script lang="ts" setup>
     const { isAdmin } = useEstablishmentDetails()
     const { formState, onSubmit, pending, checkEmailPrefixAvailable } = useEstablishmentUpdate()
+    const errors = ref<string[]>([])
 </script>
 
 <template>
@@ -14,7 +15,7 @@
                     disabled />
             </UTooltip>
             <UButton v-else form="settings" label="Sauvegarder" color="primary" type="submit" class="w-fit lg:ms-auto"
-                :disabled="pending" />
+                :disabled="pending || errors.length > 0" />
         </UPageCard>
 
         <UPageCard variant="subtle">
@@ -36,7 +37,9 @@
                     label="Préfixe email" :action="checkEmailPrefixAvailable"
                     :normalize="(v: string) => v.toLowerCase()" :debounce-ms="350" :required="true"
                     suffix="@in.invocloud.fr" description="Choisissez le préfixe pour recevoir vos factures par email."
-                    @checking-change="(checking) => { pending = checking }" msg-taken="Préfix non disponible" />
+                    @checking-change="(checking) => { pending = checking }" msg-taken="Préfix non disponible"
+                    @errors-change="(_errors) => { errors = _errors }" />
+
                 <template #error></template>
             </UFormField>
         </UPageCard>

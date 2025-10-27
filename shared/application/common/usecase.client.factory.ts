@@ -53,10 +53,6 @@ export function makeUseCasesClient(
             details: new establishmentUC.GetEstablishmentDetailsUsecase(
                 establishmentQuery,
             ),
-            emailPrefixAvailable: new establishmentUC
-                .EmailPrefixAvailableUsecase(
-                establishmentQuery,
-            ),
         },
         suppliers: {
             create: new supplierUC.CreateSupplierUsecase(

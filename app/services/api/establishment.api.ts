@@ -22,6 +22,15 @@ export const establishmentApi = {
             },
         );
     },
+    checkPrefix(prefix: string, excludeEstablishmentId?: string) {
+        return $fetch<{ isAvailable: boolean }>(
+            "/api/security/establishment/check-prefix",
+            {
+                method: "POST",
+                body: { prefix, excludeEstablishmentId },
+            },
+        );
+    },
     subscription: {
         createCheckoutSession(body: CreateCheckoutSessionBody) {
             return $fetch<string>(
