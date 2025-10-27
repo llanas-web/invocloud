@@ -1,7 +1,10 @@
-import { useServerUsecases } from "~~/server/middleware/injection.middleware";
+import { useServerDi } from "~~/server/middleware/injection.middleware";
+import ProcessPendingTasksUsecase from "#shared/application/invoice-task/usecase/process-pending-task.usecase";
 
 export default defineEventHandler(async (event) => {
-    const { invoiceTask } = useServerUsecases(event);
+    const { repos, queries, storageRepository, ocrRepository } = useServerDi(
+        event,
+    );
 
     // SECURITY CHECK
     const cron_token = event.headers.get("authorization") || "";
@@ -14,7 +17,14 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
     }
 
-    await invoiceTask.processPendingTasks.execute({
+    const processInvoiceOcrTasksUsecase = new ProcessPendingTasksUsecase(
+        repos,
+        queries,
+        storageRepository,
+        ocrRepository,
+    );
+
+    await processInvoiceOcrTasksUsecase.execute({
         limit: 20,
         maxAttempts: 5,
     });

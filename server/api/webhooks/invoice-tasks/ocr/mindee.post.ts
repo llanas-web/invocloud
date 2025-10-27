@@ -1,8 +1,10 @@
 import { OcrMindeeRepository } from "~~/server/infra/mindee/mindee.ocr.repository";
-import { useServerUsecases } from "~~/server/middleware/injection.middleware";
+import { useServerDi } from "~~/server/middleware/injection.middleware";
+import ProcessOcrWebhookUsecase from "~~/shared/application/invoice-task/usecase/process-ocr-webhook.usecase";
 
 export default defineEventHandler(async (event) => {
-    const { invoiceTask } = useServerUsecases(event);
+    const { repos, queries } = useServerDi(event);
+
     const mindeeRepository = new OcrMindeeRepository();
 
     const { isValid, jobId, prediction, raw } = await mindeeRepository
@@ -10,10 +12,25 @@ export default defineEventHandler(async (event) => {
             event,
         );
 
-    await invoiceTask.processOcrWebhook.execute({
-        jobId: jobId,
+    if (!jobId) {
+        throw createError({
+            statusCode: 400,
+            statusMessage: "Missing jobId in webhook payload",
+        });
+    }
+
+    const processWebhookUsecase = new ProcessOcrWebhookUsecase(
+        repos,
+        queries,
+    );
+    await processWebhookUsecase.execute({
+        jobId,
         isValid,
-        prediction,
+        prediction: {
+            dueDate: prediction?.dueDate ?? undefined,
+            totalTtc: prediction?.totalTtc ?? undefined,
+            invoiceNumber: prediction?.invoiceNumber ?? undefined,
+        },
         rawResult: raw,
     });
 });

@@ -1,16 +1,17 @@
-import * as z from "zod";
-import { useServerAuthRepository } from "~~/server/middleware/injection.middleware";
-
-const schema = z.object({
-    password: z.string().min(8, "Password must be at least 8 characters long"),
-});
+import { useServerDi } from "~~/server/middleware/injection.middleware";
+import { ResetPasswordSchema } from "~~/shared/contracts/api/security/users/reset-password.contract";
+import ResetPasswordUsecase from "~~/shared/application/user/usecases/reset-password.usecase";
 
 export default defineEventHandler(async (event) => {
-    const authRepository = useServerAuthRepository(event);
+    const { repos, queries, authRepository } = useServerDi(event);
+    const { password } = await parseBody(event, ResetPasswordSchema);
+    const userId = authRepository.connectedUser!.id;
 
-    const { password } = await parseBody(event, schema);
+    const resetPasswordUsecase = new ResetPasswordUsecase(
+        repos,
+        queries,
+        authRepository,
+    );
 
-    await authRepository.updateUser(authRepository.connectedUser!.id, {
-        password,
-    });
+    await resetPasswordUsecase.execute({ userId, newPassword: password });
 });

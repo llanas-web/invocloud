@@ -9,12 +9,3 @@ export const ListEstablishmentQueryFilterSchema = z.object({
 export type ListEstablishmentQueryFilter = z.infer<
     typeof ListEstablishmentQueryFilterSchema
 >;
-
-export const EmailPrefixAvailableQuerySchema = z.object({
-    emailPrefix: z.string().trim().min(1),
-    excludeId: z.uuid().nullable().optional(),
-});
-
-export type EmailPrefixAvailableInput = z.infer<
-    typeof EmailPrefixAvailableQuerySchema
->;

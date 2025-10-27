@@ -1,4 +1,7 @@
-import type { RepositoriesFactory } from "~~/shared/domain/common/repositories.factory";
+import type {
+    Repositories,
+    RepositoriesFactory,
+} from "~~/shared/domain/common/repositories.factory";
 import type { InvoiceRepository } from "~~/shared/domain/invoice/invoice.repository";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { InvoiceSupabaseRepository } from "../../invoice/supabase/invoice.supabase.repository";
@@ -15,28 +18,24 @@ import { InvoiceTaskSupabaseRepository } from "../../invoice-task/supabase/invoi
 import type { Database } from "./database.types";
 
 export class RepositoriesSupabaseFactory implements RepositoriesFactory {
-    constructor(private readonly supabaseInstance: SupabaseClient<Database>) {}
-    suppliers(): SupplierRepository {
-        return new SupplierSupabaseRepository(this.supabaseInstance);
-    }
+    readonly repositories: Repositories;
 
-    invoices(): InvoiceRepository {
-        return new InvoiceSupabaseRepository(this.supabaseInstance);
-    }
-
-    establishments(): EstablishmentRepository {
-        return new EstablishmentSupabaseRepository(this.supabaseInstance);
-    }
-
-    users(): UserRepository {
-        return new UserSupabaseRepository(this.supabaseInstance);
-    }
-
-    guestUploadSessions(): GuestUploadSessionRepository {
-        return new GuestUploadSessionSupabaseRepository(this.supabaseInstance);
-    }
-
-    invoiceTasks(): InvoiceTaskRepository {
-        return new InvoiceTaskSupabaseRepository(this.supabaseInstance);
+    constructor(private readonly supabaseInstance: SupabaseClient<Database>) {
+        this.repositories = {
+            invoicesRepo: new InvoiceSupabaseRepository(this.supabaseInstance),
+            establishmentsRepo: new EstablishmentSupabaseRepository(
+                this.supabaseInstance,
+            ),
+            suppliersRepo: new SupplierSupabaseRepository(
+                this.supabaseInstance,
+            ),
+            userRepo: new UserSupabaseRepository(this.supabaseInstance),
+            guestUploadSessionsRepo: new GuestUploadSessionSupabaseRepository(
+                this.supabaseInstance,
+            ),
+            invoiceTasksRepo: new InvoiceTaskSupabaseRepository(
+                this.supabaseInstance,
+            ),
+        };
     }
 }

@@ -1,17 +1,17 @@
 import { CheckPrefixBodySchema } from "#shared/contracts/api/security/establishments/check-prefix.contract";
-import { useServerUsecases } from "~~/server/middleware/injection.middleware";
+import { useServerDi } from "~~/server/middleware/injection.middleware";
 
 export default defineEventHandler(async (event) => {
+    const { queries } = useServerDi(event);
     const { prefix, excludeEstablishmentId } = await parseBody(
         event,
         CheckPrefixBodySchema,
     );
-    const { establishments } = useServerUsecases(event);
 
-    const isAvailable = await establishments.emailPrefixAvailable.execute({
-        emailPrefix: prefix,
-        excludeId: excludeEstablishmentId,
-    });
+    const isAvailable = await queries.establishmentQuery.isEmailPrefixAvailable(
+        prefix,
+        excludeEstablishmentId,
+    );
 
     return { isAvailable };
 });

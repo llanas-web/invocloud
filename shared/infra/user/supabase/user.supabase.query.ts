@@ -8,7 +8,7 @@ import { SupabaseError } from "../../common/errors/supabase.error";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../../common/supabase/database.types";
 
-export class UserSupabaseQuery implements UserQuery {
+export default class UserSupabaseQuery implements UserQuery {
     constructor(private readonly supabase: SupabaseClient<Database>) {}
 
     async listUsers(

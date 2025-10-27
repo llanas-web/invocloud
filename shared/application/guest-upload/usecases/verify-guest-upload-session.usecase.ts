@@ -1,23 +1,32 @@
 import { z } from "zod";
-import { VerifyGuestUploadSessionSchema } from "../command";
-import type { GuestUploadSessionRepository } from "~~/shared/domain/guest-upload/guest-upload-session.repository";
 import { ApplicationError } from "../../common/errors/application.error";
-import type { EstablishmentQuery } from "../../establishment/establishment.query";
+import type { Queries } from "~~/shared/domain/common/queries.factory";
+import type { Repositories } from "~~/shared/domain/common/repositories.factory";
 
-export class VerifyGuestUploadSessionUseCase {
+export const VerifyGuestUploadSessionSchema = z.object({
+    sessionId: z.uuid("ID de session invalide"),
+    verificationCode: z.string().length(6, "Le code doit contenir 6 chiffres"),
+});
+export type VerifyGuestUploadSessionCommand = z.input<
+    typeof VerifyGuestUploadSessionSchema
+>;
+
+export default class VerifyGuestUploadSessionUseCase {
     constructor(
-        private readonly sessionRepository: GuestUploadSessionRepository,
-        private readonly establishmentQuery: EstablishmentQuery,
+        private readonly repos: Repositories,
+        private readonly queries: Queries,
         private readonly hashToken: (token: string) => string,
     ) {}
 
-    async execute(raw: unknown) {
-        const parsed = VerifyGuestUploadSessionSchema.parse(raw);
+    async execute(command: VerifyGuestUploadSessionCommand) {
+        const parsed = VerifyGuestUploadSessionSchema.parse(command);
 
         const { sessionId, verificationCode } = parsed;
 
         // 1. Récupérer la session
-        const session = await this.sessionRepository.findById(sessionId);
+        const session = await this.repos.guestUploadSessionsRepo.findById(
+            sessionId,
+        );
         if (!session) {
             throw new ApplicationError("Session introuvable");
         }
@@ -32,10 +41,10 @@ export class VerifyGuestUploadSessionUseCase {
         }
 
         // 3. Sauvegarder la session vérifiée
-        await this.sessionRepository.save(verifyResult.value!);
+        await this.repos.guestUploadSessionsRepo.save(verifyResult.value!);
 
         // 4. Récupérer les établissements disponibles
-        const establishments = await this.establishmentQuery
+        const establishments = await this.queries.establishmentQuery
             .listEstablishmentBySupplierEmail(session.senderEmail);
 
         return {

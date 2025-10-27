@@ -30,7 +30,7 @@ const fromRow = (row: Row): InvoiceListItemDTO => ({
     comment: row.comment ?? null,
 });
 
-export class InvoiceSupabaseQuery implements InvoiceQuery {
+export default class InvoiceSupabaseQuery implements InvoiceQuery {
     constructor(private readonly supabase: SupabaseClient<Database>) {}
 
     async listInvoices(

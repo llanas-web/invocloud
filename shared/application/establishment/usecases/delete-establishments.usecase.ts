@@ -3,16 +3,26 @@ import {
     DomainError,
     DomainErrorCode,
 } from "~~/shared/domain/common/errors/domain.error";
-import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
+import type { Queries } from "~~/shared/domain/common/queries.factory";
+import type { Repositories } from "~~/shared/domain/common/repositories.factory";
 
-export class DeleteEstablishmentUsecase {
+export const DeleteEstablishmentCommandSchema = z.object({
+    establishmentId: z.uuid(),
+});
+export type DeleteEstablishmentCommand = z.input<
+    typeof DeleteEstablishmentCommandSchema
+>;
+
+export default class DeleteEstablishmentUsecase {
     constructor(
-        private readonly establishmentRepository: EstablishmentRepository,
+        private readonly repos: Repositories,
+        private readonly queries: Queries,
     ) {}
 
-    async execute(raw: unknown) {
-        const establishmentId = z.uuid().parse(raw);
-        const establishment = await this.establishmentRepository.getById(
+    async execute(command: DeleteEstablishmentCommand) {
+        const parsed = DeleteEstablishmentCommandSchema.parse(command);
+        const { establishmentId } = parsed;
+        const establishment = await this.repos.establishmentsRepo.getById(
             establishmentId,
         );
         if (!establishment) {
@@ -29,6 +39,6 @@ export class DeleteEstablishmentUsecase {
             );
         }
 
-        await this.establishmentRepository.delete(establishmentId);
+        await this.repos.establishmentsRepo.delete(establishmentId);
     }
 }

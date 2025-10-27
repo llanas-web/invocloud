@@ -1,23 +1,36 @@
-import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
-import { CreateEstablishmentCommandSchema } from "../commands";
+import { z } from "zod";
 import { EstablishmentModel } from "~~/shared/domain/establishment/establishment.model";
+import type { Queries } from "~~/shared/domain/common/queries.factory";
+import type { Repositories } from "~~/shared/domain/common/repositories.factory";
 
-export class CreateEstablishmentUsecase {
+export const CreateEstablishmentCommandSchema = z.object({
+    creatorId: z.uuid(),
+    name: z.string().min(1).max(255),
+    emailPrefix: z.string().min(1).max(100),
+    address: z.string().min(1).max(500).optional(),
+    phone: z.string().min(1).max(20).optional(),
+});
+export type CreateEstablishmentCommand = z.input<
+    typeof CreateEstablishmentCommandSchema
+>;
+
+export default class CreateEstablishmentUsecase {
     constructor(
-        private readonly establishmentRepository: EstablishmentRepository,
+        private readonly repos: Repositories,
+        private readonly queries: Queries,
     ) {}
 
-    async execute(raw: unknown) {
-        const input = CreateEstablishmentCommandSchema.parse(raw);
-        const entity = EstablishmentModel.createDraft({
-            name: input.name,
-            creatorId: input.creatorId,
-            emailPrefix: input.emailPrefix,
-            address: input.address,
-            phone: input.phone,
+    async execute(command: CreateEstablishmentCommand) {
+        const parsed = CreateEstablishmentCommandSchema.parse(command);
+        const draftEstablishment = EstablishmentModel.createDraft({
+            name: parsed.name,
+            creatorId: parsed.creatorId,
+            emailPrefix: parsed.emailPrefix,
+            address: parsed.address,
+            phone: parsed.phone,
         });
-        const newEstablishmentId = await this.establishmentRepository.create(
-            entity,
+        const newEstablishmentId = await this.repos.establishmentsRepo.create(
+            draftEstablishment,
         );
         return newEstablishmentId;
     }

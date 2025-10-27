@@ -1,15 +1,25 @@
-import type { UserRepository } from "~~/shared/domain/user/user.repository";
 import { ApplicationError } from "../../common/errors/application.error";
-import type { EstablishmentQuery } from "../../establishment/establishment.query";
+import { z } from "zod";
+import type { Repositories } from "~~/shared/domain/common/repositories.factory";
+import type { Queries } from "~~/shared/domain/common/queries.factory";
 
-export class DeleteUserUsecase {
+export const DeleteUserCommandSchema = z.object({
+    userId: z.uuid(),
+});
+export type DeleteUserCommand = z.input<
+    typeof DeleteUserCommandSchema
+>;
+
+export default class DeleteUserUsecase {
     constructor(
-        private readonly userRepository: UserRepository,
-        private readonly establishmentQueries: EstablishmentQuery,
+        private readonly repos: Repositories,
+        private readonly queries: Queries,
     ) {}
 
-    async execute(userId: string): Promise<void> {
-        const hasEstablishments = await this.establishmentQueries
+    async execute(command: DeleteUserCommand): Promise<void> {
+        const parsed = DeleteUserCommandSchema.parse(command);
+        const { userId } = parsed;
+        const hasEstablishments = await this.queries.establishmentQuery
             .hasAnyByCreatorId(
                 userId,
             );
@@ -18,6 +28,6 @@ export class DeleteUserUsecase {
                 "Cannot delete user with associated establishments",
             );
         }
-        await this.userRepository.delete(userId);
+        await this.repos.userRepo.delete(userId);
     }
 }

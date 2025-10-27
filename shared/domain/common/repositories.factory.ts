@@ -5,11 +5,15 @@ import type { InvoiceRepository } from "../invoice/invoice.repository";
 import type { SupplierRepository } from "../supplier/supplier.repository";
 import type { UserRepository } from "../user/user.repository";
 
+export interface Repositories {
+    invoicesRepo: InvoiceRepository;
+    establishmentsRepo: EstablishmentRepository;
+    suppliersRepo: SupplierRepository;
+    userRepo: UserRepository;
+    guestUploadSessionsRepo: GuestUploadSessionRepository;
+    invoiceTasksRepo: InvoiceTaskRepository;
+}
+
 export interface RepositoriesFactory {
-    invoices(): InvoiceRepository;
-    establishments(): EstablishmentRepository;
-    suppliers(): SupplierRepository;
-    users(): UserRepository;
-    guestUploadSessions(): GuestUploadSessionRepository;
-    invoiceTasks(): InvoiceTaskRepository;
+    readonly repositories: Repositories;
 }

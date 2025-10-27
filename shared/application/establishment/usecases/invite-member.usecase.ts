@@ -1,25 +1,31 @@
-import type { EstablishmentRepository } from "~~/shared/domain/establishment/establishment.repository";
 import { ApplicationError } from "../../common/errors/application.error";
-import {
-    type InviteMemberCommand,
-    InviteMemberCommandSchema,
-} from "../commands";
-import type { UserRepository } from "~~/shared/domain/user/user.repository";
 import type { EmailRepository } from "../../common/providers/email/email.repository";
 import type { AuthRepository } from "../../common/providers/auth/auth.repository";
-import type { UserQuery } from "../../user/user.query";
+import { z } from "zod";
+import type { Repositories } from "~~/shared/domain/common/repositories.factory";
+import type { Queries } from "~~/shared/domain/common/queries.factory";
+import { MemberRole } from "~~/shared/domain/establishment/member.entity";
 
-export class InviteMemberUsecase {
+export const InviteMemberCommandSchema = z.object({
+    establishmentId: z.uuid(),
+    email: z.email().max(255),
+    role: z.enum(MemberRole).default(MemberRole.ADMIN),
+});
+export type InviteMemberCommand = z.input<
+    typeof InviteMemberCommandSchema
+>;
+
+export default class InviteMemberUsecase {
     constructor(
-        private readonly establishmentRepo: EstablishmentRepository,
-        private readonly userQuery: UserQuery,
+        private readonly repos: Repositories,
+        private readonly queries: Queries,
         private readonly emailRepository: EmailRepository,
         private readonly authRepository: AuthRepository,
     ) {}
 
-    async execute(raw: InviteMemberCommand): Promise<void> {
-        const parsed = InviteMemberCommandSchema.parse(raw);
-        const establishment = await this.establishmentRepo.getById(
+    async execute(command: InviteMemberCommand): Promise<void> {
+        const parsed = InviteMemberCommandSchema.parse(command);
+        const establishment = await this.repos.establishmentsRepo.getById(
             parsed.establishmentId,
         );
         const authenticatedUser = this.authRepository.connectedUser;
@@ -35,7 +41,7 @@ export class InviteMemberUsecase {
         }
 
         let userId: string;
-        const users = await this.userQuery.listUsers({
+        const users = await this.queries.userQuery.listUsers({
             emails: [parsed.email],
         });
         if (users.length === 0) {
@@ -52,7 +58,7 @@ export class InviteMemberUsecase {
         }
         const updatedEstablishment = establishment.inviteMember(userId);
 
-        await this.establishmentRepo.update(
+        await this.repos.establishmentsRepo.update(
             updatedEstablishment,
         );
 

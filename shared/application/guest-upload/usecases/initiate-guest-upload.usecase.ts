@@ -1,32 +1,34 @@
 import { z } from "zod";
-import type { EstablishmentQuery } from "../../establishment/establishment.query";
-import type { GuestUploadSessionRepository } from "~~/shared/domain/guest-upload/guest-upload-session.repository";
 import type { EmailRepository } from "../../common/providers/email/email.repository";
-import type { GuestUploadResult } from "~~/shared/domain/guest-upload/guest-upload-session.model";
-import { InitiateGuestUploadSchema } from "../command";
 import { ApplicationError } from "../../common/errors/application.error";
 import GuestUploadSessionModel from "~~/shared/domain/guest-upload/guest-upload-session.model";
+import type { Repositories } from "~~/shared/domain/common/repositories.factory";
+import type { Queries } from "~~/shared/domain/common/queries.factory";
 
-export interface InitiateGuestUploadOutput {
-    sessionId: string;
-    expiresAt: Date;
-}
+export const InitiateGuestUploadSchema = z.object({
+    senderEmail: z.email("Email invalide"),
+    recipientEmail: z.email("Email invalide"),
+});
+export type InitiateGuestUploadCommand = z.input<
+    typeof InitiateGuestUploadSchema
+>;
 
-export class InitiateGuestUploadUseCase {
+export default class InitiateGuestUploadUseCase {
     constructor(
-        private readonly establishmentQuery: EstablishmentQuery,
-        private readonly sessionRepository: GuestUploadSessionRepository,
+        private readonly repos: Repositories,
+        private readonly queries: Queries,
         private readonly emailRepository: EmailRepository,
         private readonly hashToken: (token: string) => string,
     ) {}
 
-    async execute(raw: unknown) {
-        const parsed = InitiateGuestUploadSchema.parse(raw);
+    async execute(command: InitiateGuestUploadCommand) {
+        const parsed = InitiateGuestUploadSchema.parse(command);
 
-        const isAuthorized = await this.establishmentQuery.isSenderAuthorized(
-            parsed.senderEmail,
-            parsed.recipientEmail,
-        );
+        const isAuthorized = await this.queries.establishmentQuery
+            .isSenderAuthorized(
+                parsed.senderEmail,
+                parsed.recipientEmail,
+            );
 
         if (!isAuthorized) {
             throw new ApplicationError(
@@ -46,7 +48,7 @@ export class InitiateGuestUploadUseCase {
         );
 
         // 4. Sauvegarder
-        await this.sessionRepository.save(session);
+        await this.repos.guestUploadSessionsRepo.save(session);
 
         // 5. Envoyer l'email
         try {
@@ -60,7 +62,7 @@ export class InitiateGuestUploadUseCase {
             });
         } catch (error) {
             // En cas d'échec d'envoi d'email, on supprime la session
-            await this.sessionRepository.delete(session.id);
+            await this.repos.guestUploadSessionsRepo.delete(session.id);
             throw new ApplicationError(
                 "Erreur lors de l'envoi de l'email de vérification",
             );
