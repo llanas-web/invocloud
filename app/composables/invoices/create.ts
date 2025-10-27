@@ -1,9 +1,8 @@
 import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "../core/useAsyncAction";
-import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/types";
 import type { z } from "zod";
 import { CreateInvoiceSchema } from "~/types/schemas/forms/invoices.schema";
-import type { CreateInvoiceCommand } from "~~/shared/application/invoice/commands";
+import type { CreateInvoiceCommand } from "~~/shared/application/invoice/usecases/create-invoice.usecase";
 
 const toCreateInvoiceCommand = (
     parsed: z.output<typeof CreateInvoiceSchema>,

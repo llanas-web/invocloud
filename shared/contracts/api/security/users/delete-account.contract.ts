@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const DeleteAccountSchema = z.object({
+export const DeleteAccountBodySchema = z.object({
     userId: z.uuid(),
 });
-export type DeleteAccountCommand = z.infer<typeof DeleteAccountSchema>;
+export type DeleteAccountBody = z.infer<typeof DeleteAccountBodySchema>;

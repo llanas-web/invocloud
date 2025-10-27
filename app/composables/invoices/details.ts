@@ -3,7 +3,7 @@ import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/
 
 const _useInvoiceDetails = () => {
     const route = useRoute();
-    const { $usecases, $storageRepository } = useNuxtApp();
+    const { $queries, $storageRepository } = useNuxtApp();
 
     const invoiceId = computed(() => route.params.id as string);
 
@@ -16,7 +16,9 @@ const _useInvoiceDetails = () => {
         "invoice-details",
         async () => {
             if (!invoiceId.value) return null;
-            return await $usecases.invoices.details.execute(invoiceId.value);
+            return await $queries.invoiceQuery.getInvoiceDetails(
+                invoiceId.value,
+            );
         },
         {
             immediate: true,

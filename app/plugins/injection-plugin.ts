@@ -1,5 +1,6 @@
 import type { AuthRepository } from "~~/shared/application/common/providers/auth/auth.repository";
 import { makeUseCasesClient } from "~~/shared/application/common/usecase.client.factory";
+import type { Queries } from "~~/shared/domain/common/queries.factory";
 import AuthSupabaseRepository from "~~/shared/infra/common/supabase/auth.supabase.repository";
 import type { Database } from "~~/shared/infra/common/supabase/database.types";
 import { QueriesSupabaseFactory } from "~~/shared/infra/common/supabase/queries.supabase.factory";
@@ -22,6 +23,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     return {
         provide: {
             usecases,
+            queries: queryFactory.queries,
             storageRepository,
             authRepository,
         },
@@ -32,6 +34,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 declare module "#app" {
     interface NuxtApp {
         $usecases: ReturnType<typeof makeUseCasesClient>;
+        $queries: Queries;
         $storageRepository: StorageSupabaseRepository;
         $authRepository: AuthRepository;
     }
@@ -39,6 +42,7 @@ declare module "#app" {
 declare module "vue" {
     interface ComponentCustomProperties {
         $usecases: ReturnType<typeof makeUseCasesClient>;
+        $queries: Queries;
         $storageRepository: StorageSupabaseRepository;
         $authRepository: AuthRepository;
     }

@@ -3,7 +3,7 @@ import useAsyncAction from "../core/useAsyncAction";
 import { AppError } from "~/core/errors/app.error";
 
 const _useUser = () => {
-    const { $usecases } = useNuxtApp();
+    const { $usecases, $queries } = useNuxtApp();
     const { connectedUser } = useAuth();
     const { actions: { logout: logoutAction } } = useAuth();
 
@@ -14,7 +14,7 @@ const _useUser = () => {
         pending,
     } = useAsyncData(async () => {
         if (!connectedUser.value?.id) return null;
-        return await $usecases.users.details.execute(connectedUser.value.id);
+        return await $queries.userQuery.getUserDetails(connectedUser.value.id);
     }, {
         deep: true,
         immediate: true,
@@ -31,7 +31,9 @@ const _useUser = () => {
     const deleteAccountAction = useAsyncAction(
         async () => {
             if (!connectedUser.value?.id) throw new AppError("No user id");
-            await $usecases.users.delete.execute(connectedUser.value.id);
+            await $usecases.users.delete.execute({
+                userId: connectedUser.value.id,
+            });
             await logoutAction.execute();
         },
     );

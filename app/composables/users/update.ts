@@ -31,7 +31,7 @@ const _useUserUpdate = () => {
             await $usecases.users.update
                 .execute({
                     id: currentUser.value.id,
-                    ...parsedForm,
+                    fullName: parsedForm.fullName ?? undefined,
                 });
             await refresh();
         },
