@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import type { EventHandlerRequest, H3Event } from "h3";
 import type { OcrRepository } from "~~/shared/application/common/providers/ocr/ocr.repository";
 import {
@@ -19,10 +21,10 @@ export class OcrMindeeRepository implements OcrRepository {
 
     constructor() {
         const config = useRuntimeConfig();
-        this.apiKey = config.MINDEE_API_KEY as string;
-        this.modelId = config.MINDEE_MODEL_ID as string;
-        this.webhookId = config.MINDEE_WEBHOOK_ID as string;
-        this.webhookSecret = config.MINDEE_WEBHOOK_SECRET as string;
+        this.apiKey = config.mindeeApiKey;
+        this.modelId = config.mindeeModelId;
+        this.webhookId = config.mindeeWebhookId;
+        this.webhookSecret = config.mindeeWebhookSecret;
     }
 
     async submitBuffer(

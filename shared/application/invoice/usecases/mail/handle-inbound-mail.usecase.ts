@@ -95,7 +95,7 @@ export default class HandleInboundMailUsecase {
                 id: newInvoiceId,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                status: InvoiceStatus.PENDING,
+                status: InvoiceStatus.DRAFT,
                 supplierId: supplier.id,
                 filePath: path,
                 name: sanitizedName,

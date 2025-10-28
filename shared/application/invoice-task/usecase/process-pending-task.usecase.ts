@@ -7,6 +7,7 @@ import type { OcrRepository } from "../../common/providers/ocr/ocr.repository";
 import { z } from "zod";
 import type { Repositories } from "~~/shared/domain/common/repositories.factory";
 import type { Queries } from "~~/shared/domain/common/queries.factory";
+import { InvoiceStatus } from "~~/shared/domain/invoice/invoice.model";
 
 export const ProcessPendingTasksCommandSchema = z.object({
     limit: z.number().optional().default(25),
@@ -64,6 +65,12 @@ export default class ProcessPendingTasksUsecase {
                     // Mettre à jour la tâche
                     const submitedTask = task.submit(result.jobId);
                     await this.repos.invoiceTasksRepo.update(submitedTask);
+
+                    // Mettre à jour le status de la facture
+                    const updatedInvoice = invoice.changeStatus(
+                        InvoiceStatus.OCR,
+                    );
+                    await this.repos.invoicesRepo.update(updatedInvoice);
 
                     return { taskId: task.id, jobId: result.jobId };
                 } catch (error) {

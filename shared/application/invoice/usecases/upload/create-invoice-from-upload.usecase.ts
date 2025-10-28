@@ -37,7 +37,7 @@ export default class CreateInvoiceFromUploadUsecase {
             supplierId: parsed.supplierId,
             name: parsed.name,
             comment: parsed.comment,
-            status: InvoiceStatus.PENDING,
+            status: InvoiceStatus.DRAFT,
             source: InvoiceSource.UPLOAD,
         });
         await this.repos.invoicesRepo.create(newInvoice);

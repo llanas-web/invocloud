@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   css: ["~/assets/css/main.css"],
   nitro: {
-    rollupConfig: { external: ["sharp", "canvas", "pdf-lib", "mindee"] },
+    rollupConfig: { external: ["sharp", "canvas", "pdf-lib"] },
     preset: "vercel",
   },
   vite: {
@@ -57,6 +57,7 @@ export default defineNuxtConfig({
     },
   },
   supabase: {
+    redirect: false,
     key: process.env.SUPABASE_ANON_KEY || "",
     url: process.env.SUPABASE_URL || "",
     serviceKey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",

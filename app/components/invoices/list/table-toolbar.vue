@@ -1,6 +1,8 @@
 <script setup lang="ts">
     import type { InvoiceStatus } from '~~/shared/domain/invoice/invoice.model';
 
+    const { refresh } = useInvoices();
+
     const props = defineProps<{
         selectedCount: number;
         isDownloading: boolean;
@@ -33,6 +35,7 @@
 <template>
     <div class="flex flex-wrap items-center justify-between gap-1.5">
         <div class="flex flex-wrap items-center gap-1.5">
+            <UButton @click="() => refresh()" color="primary" variant="outline" icon="i-lucide-refresh-cw" />
             <UButton :disabled="!selectedCount" label="Envoyer" color="primary" variant="subtle" icon="i-lucide-send"
                 @click="emit('send')" :ui="{ label: 'hidden md:block' }">
                 <template #trailing>

@@ -6,7 +6,7 @@
         layout: 'app'
     })
 
-    const { formRef, formState, invoiceFile, pending } = useInvoiceCreate()
+    const { formRef, formState, invoiceFile, pending, actions } = useInvoiceCreate()
 
     const items = ref<BreadcrumbItem[]>([
         {
@@ -73,10 +73,15 @@
             </UDashboardNavbar>
         </template>
         <template #body>
-            <div class="p-2">
+            <div class="p-2 space-y-4">
                 <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
                     <UIcon name="i-lucide-file-text" class="text-primary" /> Détails de la facture
                 </h2>
+                <div class="w-full">
+                    <UButton class="w-full text-center justify-center cursor-pointer" label="Envoyer en OCR"
+                        color="info" @click="actions.createByOcr.execute" icon="i-lucide-scan-eye"
+                        :disabled="!fileUrl" />
+                </div>
                 <InvoicesDetailsCreateForm />
             </div>
             <div class="flex justify-end p-4 mt-auto space-x-4">

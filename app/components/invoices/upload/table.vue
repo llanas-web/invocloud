@@ -1,6 +1,9 @@
 <script setup lang="ts">
     import type { TableColumn } from '@nuxt/ui'
     import { formatDate } from '~/utils/date'
+    import { InvoiceStatus } from '~~/shared/domain/invoice/invoice.model'
+
+    const pendingInvoiceStatus: InvoiceStatus[] = [InvoiceStatus.DRAFT, InvoiceStatus.OCR, InvoiceStatus.PENDING]
 
     const { invoices } = useInvoices()
     const { error: deleteInvoiceError, selectedInvoices, onSubmit } = useInvoicesDelete()
@@ -10,7 +13,7 @@
     const toast = useToast()
 
     const pendingInvoices = computed(() =>
-        invoices.value.filter((invoice) => invoice.status === 'pending' || invoice.status === 'ocr')
+        invoices.value.filter((invoice) => pendingInvoiceStatus.includes(invoice.status))
     )
 
     const columns: TableColumn<typeof invoices.value[0]>[] = [
@@ -45,16 +48,25 @@
             accessorKey: 'status',
             header: 'Status',
             cell: ({ row }) => {
-                return h(UBadge, { variant: 'subtle', color: 'neutral' }, () =>
-                    row.original.status === 'ocr' ? 'En cours de traitement OCR' : 'En attente de validation'
-                )
+                return h(UBadge, { variant: 'subtle', color: 'neutral' }, () => {
+                    switch (row.original.status) {
+                        case 'draft':
+                            return 'En attente de soumission';
+                        case 'ocr':
+                            return 'En cours de traitement OCR';
+                        case 'pending':
+                            return 'En attente de validation';
+                        default:
+                            return row.original.status;
+                    }
+                })
             }
         },
         {
             accessorKey: 'Valider',
             header: '',
             cell: ({ row }) => {
-                return h('div', { class: 'flex justify-end items-center gap-3' }, [
+                return (row.original.status === 'pending') ? h('div', { class: 'flex justify-end items-center gap-3' }, [
                     h(UButton, {
                         color: 'success',
                         icon: 'i-lucide-check',
@@ -88,7 +100,7 @@
                             })
                         }
                     }),
-                ])
+                ]) : null
             }
         }
     ]
