@@ -12,6 +12,7 @@ const _useInvoicesDelete = () => {
     const { $usecases } = useNuxtApp();
     const open = ref(false);
     const selectedInvoices = ref<inputSchema>([]);
+    const { refresh } = useInvoices();
 
     const resetForm = () => {
         selectedInvoices.value = [];
@@ -24,6 +25,8 @@ const _useInvoicesDelete = () => {
                 invoiceIds: parsed,
             });
             resetForm();
+            await refresh();
+            open.value = false;
         },
     );
 

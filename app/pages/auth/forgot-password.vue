@@ -3,7 +3,6 @@
     import type { FormSubmitEvent } from '@nuxt/ui'
     definePageMeta({
         layout: 'auth',
-        middleware: ['not-authenticated']
     })
 
     const { connectedUser, actions } = useAuth();

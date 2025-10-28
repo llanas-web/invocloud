@@ -7,12 +7,14 @@ const _useInvoices = () => {
     const { $usecases, $storageRepository, $queries } = useNuxtApp();
     const { selectedId } = useEstablishmentsList();
 
+    const tableRef = useTemplateRef("invoicesTable");
+
     const searchQuery = ref<string>("");
     const statusFilter = ref<InvoiceStatus | "overdue" | undefined>(undefined);
     const supplierFilter = ref<string[]>([]);
     const rangeFilter = ref<{ start: Date; end: Date }>({
         start: new Date(new Date().setDate(new Date().getDate() - 30)),
-        end: new Date(),
+        end: new Date(new Date().setDate(new Date().getDate() + 1)),
     });
 
     const {

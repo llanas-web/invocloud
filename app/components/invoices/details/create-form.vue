@@ -19,6 +19,7 @@
     }
 
     const createInvoiceFormRef = useTemplateRef('createInvoiceFormRef')
+
     onMounted(() => {
         formRef.value = createInvoiceFormRef.value
     })

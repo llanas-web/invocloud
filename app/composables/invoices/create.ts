@@ -1,8 +1,10 @@
 import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "../core/useAsyncAction";
-import type { z } from "zod";
+import { z } from "zod";
 import { CreateInvoiceSchema } from "~/types/schemas/forms/invoices.schema";
 import type { CreateInvoiceCommand } from "~~/shared/application/invoice/usecases/create-invoice.usecase";
+import { InvoiceStatus } from "~~/shared/domain/invoice/invoice.model";
+import type { FormError } from "@nuxt/ui";
 
 const toCreateInvoiceCommand = (
     parsed: z.output<typeof CreateInvoiceSchema>,
@@ -21,6 +23,15 @@ const toCreateInvoiceCommand = (
     paidAt: parsed.paidAt,
     dueDate: parsed.dueDate,
     file,
+});
+
+const createByOcrSchema = z.object({
+    supplierId: z.uuid({
+        error: "Veuillez saisir un fournisseur pour envoyer en OCR",
+    }),
+    establishmentId: z.uuid(),
+    file: z.instanceof(File),
+    status: z.enum(InvoiceStatus).default(InvoiceStatus.DRAFT),
 });
 
 const _useInvoiceCreate = () => {
@@ -60,6 +71,27 @@ const _useInvoiceCreate = () => {
         },
     );
 
+    const createByOcrAction = useAsyncAction(
+        async () => {
+            const { data: command, success, error } = createByOcrSchema
+                .safeParse({
+                    supplierId: formState.supplierId!,
+                    establishmentId: selectedId.value!,
+                    file: invoiceFile.value!,
+                    status: InvoiceStatus.DRAFT,
+                });
+            if (!success) {
+                formRef.value?.setErrors(error.issues.map((issue) => ({
+                    message: issue.message,
+                    name: issue.path.join("."),
+                })));
+                return;
+            }
+            await $usecases.invoices.create.execute(command);
+            navigateTo("/app");
+        },
+    );
+
     return {
         formRef,
         formState,
@@ -68,6 +100,9 @@ const _useInvoiceCreate = () => {
         newInvoice,
         error,
         pending,
+        actions: {
+            createByOcr: createByOcrAction,
+        },
     };
 };
 

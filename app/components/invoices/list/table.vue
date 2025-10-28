@@ -4,6 +4,8 @@
     import { createRowActions, type RowAction } from './row-actions';
     import type { InvoiceDetailsDTO } from '~~/shared/application/invoice/dto';
 
+    const acceptedInvoiceStatus = ['validated', 'paid', 'error'];
+
     const table = useTemplateRef('invoiceTable');
 
     const UDropdownMenu = resolveComponent('UDropdownMenu')
@@ -13,6 +15,12 @@
     const { open: isSendModalOpen, selectedInvoices: listInvoicesToSend } = useInvoicesSend();
     const { open: isDeleteModalOpen, selectedInvoices: listInvoicesToDelete } = useInvoicesDelete();
     const { launchDownloadWorker, progress, running } = useWorker();
+
+    const acceptedInvoices = computed(() =>
+        invoices.value.filter((invoice) =>
+            acceptedInvoiceStatus.includes(invoice.status)
+        )
+    );
 
     const rowSelection = ref({});
     const pagination = ref({
@@ -95,8 +103,8 @@
         @send="handleBulkSend" @download="handleBulkDownload" @delete="handleBulkDelete" />
 
     <UTable ref="invoiceTable" v-model:row-selection="rowSelection" v-model:pagination="pagination"
-        :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }" class="shrink-0" :data="invoices"
-        :columns="columns" :loading="pending" :ui="{
+        :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }" class="shrink-0"
+        :data="acceptedInvoices" :columns="columns" :loading="pending" :ui="{
             base: 'table-fixed border-separate border-spacing-0',
             thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
             tbody: '[&>tr]:last:[&>td]:border-b-0',

@@ -1,7 +1,8 @@
 <script setup lang="ts">
     import type { NavigationMenuItem } from '@nuxt/ui'
-    import { LazyInvoicesUploadModalContainer, LazyCommonConfirmModal } from '#components'
+    import { LazyInvoicesUploadModalContainer } from '#components'
     import type { AuthUserModel } from '~~/shared/application/common/providers/auth/dto/auth.dto';
+
 
     const route = useRoute()
     const router = useRouter()
@@ -168,7 +169,7 @@
                 <UserMenu :collapsed="collapsed" />
             </template>
         </UDashboardSidebar>
-        <UProgress class="w-full" v-if="status === 'idle' || pending"
+        <UProgress class="w-full" v-if="!connectedUser || status === 'idle' || pending"
             :ui="{ base: 'rounded-none', indicator: 'rounded-none' }" />
         <template v-else-if="establishments.length > 0">
             <template v-if="isEstablishementActive">
@@ -190,7 +191,7 @@
                             <div>
                                 <h2 class="text-left text-4xl font-bold text-muted">
                                     Bonjour <span class="text-primary">
-                                        {{ (connectedUser as AuthUserModel)?.email }}</span>
+                                        {{ (connectedUser as AuthUserModel)?.email ?? "" }}</span>
                                 </h2>
                                 <div class="mt-1 text-left text-muted mb-4 font-sans">
                                     Terminez votre inscription à <span class="text-primary">

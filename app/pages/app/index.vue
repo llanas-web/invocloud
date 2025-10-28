@@ -5,7 +5,7 @@
     const { openModal } = useUploadWizard()
 
     definePageMeta({
-        layout: 'app'
+        layout: 'app',
     })
 
     const { supplierFilter } = useInvoices();

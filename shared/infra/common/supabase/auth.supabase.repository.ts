@@ -1,4 +1,8 @@
-import { AuthError, type SupabaseClient } from "@supabase/supabase-js";
+import {
+    AuthError,
+    type JwtPayload,
+    type SupabaseClient,
+} from "@supabase/supabase-js";
 import type { AuthRepository } from "~~/shared/application/common/providers/auth/auth.repository";
 import {
     AnonymousAuthUserModel,
@@ -15,11 +19,23 @@ export default class AuthSupabaseRepository implements AuthRepository {
         return this._connectedUser;
     }
 
-    constructor(private supabaseClient: SupabaseClient<Database>) {
+    constructor(
+        private supabaseClient: SupabaseClient<Database>,
+        user: JwtPayload | null,
+    ) {
+        if (user != null) {
+            this._connectedUser = new AuthUserModel(user.sub, user.email ?? "");
+        }
         this.supabaseClient.auth.onAuthStateChange((event, session) => {
             const _event = event as AuthEvent;
             this.onAuthChange(
                 _event,
+                session?.user
+                    ? new AuthUserModel(
+                        session.user.id,
+                        session.user.email ?? "",
+                    )
+                    : null,
             );
         });
     }
@@ -34,23 +50,14 @@ export default class AuthSupabaseRepository implements AuthRepository {
         return this._connectedUser;
     }
 
-    async onAuthChange(
+    onAuthChange(
         event: AuthEvent,
         user?: AnonymousAuthUserModel | AuthUserModel | null,
     ) {
         switch (event) {
             case AuthEvent.INITIAL_SESSION:
             case AuthEvent.SIGNED_IN:
-                const { data, error } = await this.supabaseClient.auth
-                    .getUser();
-                if (error) {
-                    this._connectedUser = null;
-                    break;
-                }
-                this._connectedUser = new AuthUserModel(
-                    data.user.id,
-                    data.user.email || "",
-                );
+                this._connectedUser = user || null;
                 break;
             case AuthEvent.SIGNED_OUT:
                 this._connectedUser = null;

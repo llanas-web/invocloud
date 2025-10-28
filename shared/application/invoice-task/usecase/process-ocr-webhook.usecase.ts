@@ -64,13 +64,13 @@ export default class ProcessOcrWebhookUsecase {
         await this.repos.invoiceTasksRepo.update(doneTask);
 
         // Mettre à jour la facture avec les données OCR
-        const updatedInvoice = invoice.withDetails({
+        const updatedInvoice = invoice.hydrateWithOcrResults({
             number: parsed.prediction.invoiceNumber ?? undefined,
             amount: parsed.prediction.totalTtc ?? undefined,
             dueDate: parsed.prediction.dueDate
                 ? new Date(parsed.prediction.dueDate)
                 : undefined,
-        }).changeStatus(InvoiceStatus.PENDING);
+        });
         await this.repos.invoicesRepo.update(updatedInvoice);
 
         return task.id;

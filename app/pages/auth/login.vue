@@ -4,7 +4,6 @@
 
   definePageMeta({
     layout: 'auth',
-    middleware: ['not-authenticated']
   })
   const config = useRuntimeConfig()
 

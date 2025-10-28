@@ -3,6 +3,8 @@ import { DomainError, DomainErrorCode } from "../common/errors/domain.error";
 import { PayloadModel } from "../common/payload.model";
 
 export const InvoiceStatus = {
+    DRAFT: "draft",
+    PROCESSING: "processing",
     OCR: "ocr",
     PENDING: "pending",
     SENT: "sent",
@@ -150,6 +152,19 @@ export class InvoiceModel extends PayloadModel {
             paidAt: newStatus === InvoiceStatus.PAID
                 ? (optional?.paidAt ?? this.props.paidAt ?? new Date())
                 : this.props.paidAt,
+            updatedAt: new Date(),
+        });
+    }
+
+    hydrateWithOcrResults(patch: InvoiceMutableProps): InvoiceModel {
+        return new InvoiceModel({
+            ...this.props,
+            amount: patch.amount ?? this.props.amount ?? null,
+            dueDate: patch.dueDate ?? this.props.dueDate ?? null,
+            number: patch.number ?? this.props.number ?? null,
+            status: this.props.source === InvoiceSource.APP
+                ? InvoiceStatus.VALIDATED
+                : InvoiceStatus.PENDING,
             updatedAt: new Date(),
         });
     }

@@ -36,14 +36,9 @@ export default class CreateInvoiceUsecase {
         const parsed = CreateInvoiceCommandSchema.parse(command);
         const id = crypto.randomUUID();
         const filePath = `${parsed.establishmentId}/${id}`;
-        const uploadUrl = await this.storageRepository.uploadFile(
+        const uploadUrl = await this.storageRepository.createSignedUploadUrl(
             "invoices",
             filePath,
-            parsed.file,
-            {
-                contentType: parsed.file.type,
-                upsert: false,
-            },
         );
         await $fetch(uploadUrl, {
             method: "PUT",
