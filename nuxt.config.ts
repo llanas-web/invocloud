@@ -1,7 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
-  devtools: { enabled: false },
+  devtools: {
+    enabled: process.env.NODE_ENV !== "production",
+    timeline: {
+      enabled: process.env.NODE_ENV !== "production",
+    },
+  },
   css: ["~/assets/css/main.css"],
   nitro: {
     rollupConfig: { external: ["sharp", "canvas", "pdf-lib"] },

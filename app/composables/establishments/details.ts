@@ -25,7 +25,7 @@ const _useEstablishmentDetails = () => {
         },
         {
             server: false,
-            immediate: false,
+            immediate: true,
             default: () => null,
             watch: [selectedId],
         },
