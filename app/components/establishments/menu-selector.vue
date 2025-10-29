@@ -6,7 +6,7 @@
         collapsed?: boolean
     }>()
 
-    const { establishments, status, pending, selectEstablishment } = useEstablishmentsList()
+    const { establishments, status, pending, selectEstablishment, selectedId } = useEstablishmentsList()
     const { establishment } = useEstablishmentDetails();
     const { isOpen } = useEstablishmentCreate();
     const { userSettings, actions } = useUser();
@@ -43,7 +43,7 @@
     <UDropdownMenu v-else :items="items" :content="{ align: 'center', collisionPadding: 12 }"
         :ui="{ content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)' }">
         <template #item="{ item }">
-            <div class="flex items-center justify-between w-full" @click="item.onSelect">
+            <div class="flex items-center justify-between w-full">
                 <span>{{ item.label }}</span>
                 <UButton v-if="item.id" :class="item.isFavorite ? '' : 'text-gray-400 dark:text-gray-600'"
                     color="warning" variant="ghost" size="xs"
