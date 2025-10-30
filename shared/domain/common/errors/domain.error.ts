@@ -4,6 +4,30 @@ export class DomainError extends BaseError {
     constructor(code: DomainErrorCode, message: string, details?: unknown) {
         super(message, "domain", code, details);
     }
+
+    override createServerError() {
+        return createError({
+            statusCode: 400,
+            statusMessage: `${this.code}: ${this.message}`,
+            data: {
+                kind: this.kind,
+                code: this.code,
+                details: this.details,
+                message: this.message,
+            },
+        });
+    }
+
+    override createFrontError(): void {
+        if (import.meta.server || !import.meta.env.SSR) return;
+        console.log(this);
+        useToast().add({
+            title:
+                "Une erreur est survenue lors du traitement de votre demande.",
+            description: this.message,
+            color: "warning",
+        });
+    }
 }
 
 export enum DomainErrorCode {

@@ -17,17 +17,6 @@
     const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof invitationSchema>>) => {
         const { email } = payload.data
         await inviteMember.execute(email)
-        if (inviteMember.error.value) {
-            toast.add({
-                title: 'Failed to invite member',
-                color: 'error',
-            })
-            return;
-        }
-        toast.add({
-            title: 'Member invited successfully',
-            color: 'success',
-        })
     }
 </script>
 

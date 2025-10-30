@@ -9,10 +9,11 @@ import StorageSupabaseRepository from "~~/shared/infra/common/supabase/storage.s
 
 export default defineNuxtPlugin((nuxtApp) => {
     const sb = useSupabaseClient<Database>();
+    const user = useSupabaseUser();
     const repoFactory = new RepositoriesSupabaseFactory(sb);
     const queryFactory = new QueriesSupabaseFactory(sb);
     const storageRepository = new StorageSupabaseRepository(sb);
-    const authRepository = new AuthSupabaseRepository(sb);
+    const authRepository = new AuthSupabaseRepository(sb, user.value);
 
     const usecases = makeUseCasesClient(
         repoFactory,

@@ -20,4 +20,25 @@ export class SupabaseError extends InfraError {
             err,
         );
     }
+
+    override createServerError() {
+        return createError({
+            statusCode: 500,
+            statusMessage: "Supabase Error",
+            data: {
+                code: this.code,
+                details: this.details,
+            },
+        });
+    }
+
+    override createFrontError(): void {
+        if (import.meta.server || !import.meta.env.SSR) return;
+        useToast().add({
+            title:
+                "Une erreur est survenue lors de la communication avec Supabase.",
+            description: this.message,
+            color: "error",
+        });
+    }
 }

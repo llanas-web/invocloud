@@ -103,7 +103,7 @@ export class EstablishmentModel extends PayloadModel {
         if (this.hasMember(userId)) {
             throw new DomainError(
                 DomainErrorCode.ENTITY_ALREADY_EXISTS,
-                `L'utilisateur ${userId} est déjà membre de cet établissement`,
+                `L'utilisateur est déjà membre de cet établissement`,
             );
         }
 
@@ -121,7 +121,7 @@ export class EstablishmentModel extends PayloadModel {
     acceptMember(userId: string): EstablishmentModel {
         const memberIndex = this.members.findIndex((m) => m.userId === userId);
         if (memberIndex === -1) {
-            throw new Error(`Membre ${userId} non trouvé`);
+            throw new Error(`Membre non trouvé`);
         }
 
         const updatedMembers = [...this.members];
@@ -139,7 +139,7 @@ export class EstablishmentModel extends PayloadModel {
     declineMember(userId: string): EstablishmentModel {
         const memberIndex = this.members.findIndex((m) => m.userId === userId);
         if (memberIndex === -1) {
-            throw new Error(`Membre ${userId} non trouvé`);
+            throw new Error(`Membre non trouvé`);
         }
 
         const updatedMembers = [...this.members];

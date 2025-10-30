@@ -5,6 +5,7 @@ import { z } from "zod";
 import type { Repositories } from "~~/shared/domain/common/repositories.factory";
 import type { Queries } from "~~/shared/domain/common/queries.factory";
 import { MemberRole } from "~~/shared/domain/establishment/member.entity";
+import type { AdminRepository } from "../../common/providers/auth/admin.repository";
 
 export const InviteMemberCommandSchema = z.object({
     establishmentId: z.uuid(),
@@ -21,6 +22,7 @@ export default class InviteMemberUsecase {
         private readonly queries: Queries,
         private readonly emailRepository: EmailRepository,
         private readonly authRepository: AuthRepository,
+        private readonly adminRepository: AdminRepository,
     ) {}
 
     async execute(command: InviteMemberCommand): Promise<void> {
@@ -45,7 +47,7 @@ export default class InviteMemberUsecase {
             emails: [parsed.email],
         });
         if (users.length === 0) {
-            userId = await this.authRepository.inviteUser(
+            userId = await this.adminRepository.inviteUser(
                 parsed.email,
                 {
                     establishmentId: parsed.establishmentId,

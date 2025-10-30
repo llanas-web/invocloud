@@ -1,5 +1,8 @@
+import type { NuxtError } from "#app";
+
 // ~/shared/errors/BaseError.ts
 export type ErrorKind =
+    | "server"
     | "infra"
     | "domain"
     | "application"
@@ -17,4 +20,8 @@ export abstract class BaseError extends Error {
         super(message);
         this.name = this.constructor.name;
     }
+
+    abstract createServerError(): NuxtError;
+
+    abstract createFrontError(): void;
 }
