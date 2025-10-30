@@ -25,7 +25,7 @@ export default class DeleteUserUsecase {
             );
         if (hasEstablishments) {
             throw new ApplicationError(
-                "Cannot delete user with associated establishments",
+                "Impossible de supprimer l'utilisateur car il est créateur d'au moins un établissement",
             );
         }
         await this.repos.userRepo.delete(userId);

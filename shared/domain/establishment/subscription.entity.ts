@@ -111,9 +111,9 @@ class SubscriptionEntity {
      * Active l'abonnement (sortie de période d'essai)
      */
     activate(periodEnd: Date, periodStart?: Date): SubscriptionEntity {
-        if (this.props.status !== SubscriptionStatus.TRIALING) {
+        if (!this.isActive() && !this.isCanceled()) {
             throw new Error(
-                "Seul un abonnement en essai peut être activé",
+                "Seul un abonnement en essai, actif ou annulé peut être renouvellé",
             );
         }
         return new SubscriptionEntity({
@@ -128,13 +128,14 @@ class SubscriptionEntity {
      *  Renouvelle l'abonnement
      */
     renew(periodEnd: Date): SubscriptionEntity {
-        if (!this.isActive()) {
+        if (!this.isCanceled() && !this.isActive()) {
             throw new Error(
-                "Seul un abonnement actif peut être renouvelé",
+                "Seul un abonnement actif ou annulé peut être renouvelé",
             );
         }
         return new SubscriptionEntity({
             ...this.props,
+            status: SubscriptionStatus.ACTIVE,
             endAt: periodEnd,
         });
     }

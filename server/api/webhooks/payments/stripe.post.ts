@@ -36,7 +36,8 @@ export default defineEventHandler(async (event) => {
                 sig,
                 stripeWebhookSecret,
             );
-        const eventData = stripeEvent.data as unknown;
+        const eventData = stripeEvent.data.object;
+        console.log("eventData: ", eventData);
 
         const handlePaymentEventsUsecase = new HandlePaymentEventsUsecase(
             repos,
@@ -62,7 +63,7 @@ export default defineEventHandler(async (event) => {
                         session,
                         subscription,
                     );
-                await handlePaymentEventsUsecase.handleTrialSucceeded(
+                await handlePaymentEventsUsecase.handleCheckoutSucceeded(
                     checkoutSessionDTO,
                 );
                 break;

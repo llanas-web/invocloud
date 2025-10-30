@@ -1,5 +1,13 @@
 import type { SubscriptionStatus } from "~~/shared/domain/establishment/subscription.entity";
 
+export interface CreateCheckoutSessionDto {
+    email: string;
+    userId: string;
+    establishmentId: string;
+    customerId?: string;
+    subscriptionId?: string;
+}
+
 export interface CheckoutSessionCreatedDto {
     establishmentId: string;
     customerId: string;

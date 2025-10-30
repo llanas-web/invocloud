@@ -11,6 +11,7 @@ import SubscriptionEntity, {
 } from "~~/shared/domain/establishment/subscription.entity";
 import type { Repositories } from "~~/shared/domain/common/repositories.factory";
 import type { Queries } from "~~/shared/domain/common/queries.factory";
+import type { EstablishmentModel } from "~~/shared/domain/establishment/establishment.model";
 
 export default class HandlePaymentEventsUsecase {
     constructor(
@@ -18,7 +19,7 @@ export default class HandlePaymentEventsUsecase {
         private readonly queries: Queries,
     ) {}
 
-    async handleTrialSucceeded(
+    async handleCheckoutSucceeded(
         dto: CheckoutSessionCreatedDto,
     ): Promise<void> {
         const establishment = await this.repos.establishmentsRepo.getById(
@@ -27,14 +28,19 @@ export default class HandlePaymentEventsUsecase {
         if (!establishment) {
             throw new ApplicationError("Établissement non trouvé");
         }
-        const updatedEstablishment = establishment.withSubscription(
-            SubscriptionEntity.createTrial(
-                dto.trialEndDate,
-                dto.subscriptionId,
-                dto.customerId,
-            ),
-        );
-        await this.repos.establishmentsRepo.update(updatedEstablishment);
+        let updatedEstablishment: EstablishmentModel;
+        if (establishment.subscription !== null) {
+            console.log("Checkout for existing subscription");
+        } else {
+            updatedEstablishment = establishment.withSubscription(
+                SubscriptionEntity.createTrial(
+                    dto.trialEndDate,
+                    dto.subscriptionId,
+                    dto.customerId,
+                ),
+            );
+            await this.repos.establishmentsRepo.update(updatedEstablishment);
+        }
     }
 
     async handleInvoicePaymentSucceeded(

@@ -73,11 +73,19 @@ const _useEstablishmentDetails = () => {
     });
 
     const isActive = computed(() => {
-        return subscription.value?.status === SubscriptionStatus.ACTIVE;
+        return subscription.value?.status === SubscriptionStatus.ACTIVE ||
+            (subscription.value?.status === SubscriptionStatus.CANCELED &&
+                (subscription.value.endDate
+                    ? subscription.value.endDate > new Date()
+                    : false));
     });
 
     const isTrial = computed(() => {
         return subscription.value?.status === SubscriptionStatus.TRIALING;
+    });
+
+    const isCanceled = computed(() => {
+        return subscription.value?.status === SubscriptionStatus.CANCELED;
     });
 
     const deleteAction = useAsyncAction(async () => {
@@ -135,6 +143,7 @@ const _useEstablishmentDetails = () => {
         isAdmin,
         isActive,
         isTrial,
+        isCanceled,
         pending,
         error,
         actions: {
