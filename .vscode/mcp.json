@@ -3,6 +3,10 @@
         "nuxt-ui": {
             "type": "http",
             "url": "https://ui.nuxt.com/mcp"
+        },
+        "stripe": {
+            "type": "http",
+            "url": "https://mcp.stripe.com"
         }
     }
 }

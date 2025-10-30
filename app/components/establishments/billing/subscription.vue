@@ -1,12 +1,11 @@
 <script setup lang="ts">
     import { UBadge } from '#components';
-    import { format } from 'date-fns';
 
-    const { establishment, isAdmin, isTrial, isActive, subscription, actions } = useEstablishmentDetails()
+    const { establishment, isAdmin, isTrial, isActive, isCanceled, subscription, actions } = useEstablishmentDetails()
 </script>
 
 <template>
-    <UPageCard v-if="!subscription" id="subscriptions" variant="subtle" :ui="{
+    <UPageCard v-if="!subscription" variant="subtle" :ui="{
         header: 'flex items-center justify-between w-full',
     }">
         <template #body>
@@ -18,7 +17,7 @@
             </UButton>
         </template>
     </UPageCard>
-    <UPageCard v-else-if="isActive" id="subscriptions" variant="subtle" :ui="{
+    <UPageCard v-else-if="isActive" variant="subtle" :ui="{
         header: 'flex items-center justify-between w-full',
     }">
         <template #header>
@@ -36,7 +35,7 @@
             </UButton>
         </template>
     </UPageCard>
-    <UPageCard v-else-if="isTrial" id="subscriptions" variant="subtle" :ui="{
+    <UPageCard v-else-if="isTrial" variant="subtle" :ui="{
         header: 'flex items-center justify-between w-full',
     }">
         <template #header>
@@ -53,6 +52,24 @@
         <template #footer>
             <UButton @click="actions.cancelSubscription.execute" color="error">
                 Arrêter la période d'essai
+            </UButton>
+        </template>
+    </UPageCard>
+    <UPageCard v-else-if="isCanceled" variant="subtle" :ui="{
+        header: 'flex items-center justify-between w-full',
+    }">
+        <template #header>
+            <h2 class="text-lg font-semibold">Abonnement annulé</h2>
+            <UBadge color="error" icon="i-lucide:x-circle">
+                Annulation depuis le {{ subscription.endDateLabel }}
+            </UBadge>
+        </template>
+        <template #body>
+            Votre abonnement a été annulé. Vous pouvez vous réabonner à tout moment.
+        </template>
+        <template #footer>
+            <UButton @click="actions.createCheckoutSession.execute" color="primary">
+                Se réabonner
             </UButton>
         </template>
     </UPageCard>

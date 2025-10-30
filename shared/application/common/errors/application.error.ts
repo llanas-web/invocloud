@@ -13,8 +13,10 @@ export class ApplicationError extends BaseError {
             statusCode: 400,
             statusMessage: "Application Error",
             data: {
+                kind: this.kind,
                 code: this.code,
                 details: this.details,
+                message: this.message,
             },
         });
     }

@@ -5,14 +5,16 @@ import { handleError } from "~~/server/core/errors/handling-error";
 
 export default defineEventHandler(async (event) => {
     try {
-        const { repos, queries, authRepository } = useServerDi(event);
+        const { repos, queries, authRepository, adminRepository } = useServerDi(
+            event,
+        );
         const { password } = await parseBody(event, ResetPasswordBodySchema);
         const userId = authRepository.connectedUser!.id;
 
         const resetPasswordUsecase = new ResetPasswordUsecase(
             repos,
             queries,
-            authRepository,
+            adminRepository,
         );
 
         await resetPasswordUsecase.execute({ userId, newPassword: password });

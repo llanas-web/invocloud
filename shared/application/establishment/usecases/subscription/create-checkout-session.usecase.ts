@@ -36,9 +36,13 @@ export default class CreateCheckoutSessionUsecase {
             throw new ApplicationError("Establishment not found");
         }
         const checkoutSessionUrl = await this.paymentRepo.createCheckoutSession(
-            authenticatedUser.email,
-            authenticatedUser.id,
-            establishmentId,
+            {
+                userId: authenticatedUser.id,
+                email: authenticatedUser.email,
+                establishmentId: establishmentId,
+                customerId: establishment.subscription?.providerCustomerId ??
+                    undefined,
+            },
         );
         return checkoutSessionUrl;
     }

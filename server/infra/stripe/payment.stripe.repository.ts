@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { PaymentRepository } from "#shared/application/common/providers/payment/payment.repository";
 import { ApplicationError } from "~~/shared/application/common/errors/application.error";
+import { CreateCheckoutSessionDto } from "~~/shared/application/common/providers/payment/dtos/payment-event.dto";
 
 class PaymentStripeRepository implements PaymentRepository {
     public stripeInstance: Stripe;
@@ -19,37 +20,48 @@ class PaymentStripeRepository implements PaymentRepository {
     }
 
     async createCheckoutSession(
-        email: string,
-        userId: string,
-        establishmentId: string,
+        { email, userId, establishmentId, customerId }:
+            CreateCheckoutSessionDto,
     ): Promise<string> {
-        const session = await this.stripeInstance.checkout.sessions.create(
-            {
-                mode: "subscription",
-                customer_email: email,
-                payment_method_types: ["card"],
-                line_items: [
-                    {
-                        price: this.priceId,
-                        quantity: 1,
+        try {
+            const session = await this.stripeInstance.checkout.sessions.create(
+                {
+                    mode: "subscription",
+                    customer_email: customerId ? undefined : email,
+                    customer: customerId,
+                    payment_method_types: ["card"],
+                    line_items: [
+                        {
+                            price: this.priceId,
+                            quantity: 1,
+                        },
+                    ],
+                    subscription_data: {
+                        trial_period_days: 7,
                     },
-                ],
-                subscription_data: {
-                    trial_period_days: 7,
+                    success_url:
+                        `${this.baseUrl}/app?subscription_success=true`,
+                    cancel_url:
+                        `${this.baseUrl}/app/settings/establishments?cancel=true`,
+                    metadata: {
+                        userId,
+                        establishmentId,
+                    },
                 },
-                success_url: `${this.baseUrl}/app?subscription_success=true`,
-                cancel_url:
-                    `${this.baseUrl}/app/settings/establishments?cancel=true`,
-                metadata: {
-                    userId,
-                    establishmentId,
-                },
-            },
-        );
-        if (!session.url) {
-            throw new ApplicationError("Failed to create checkout session URL");
+            );
+
+            if (!session.url) {
+                throw new ApplicationError(
+                    "Failed to create checkout session URL",
+                );
+            }
+            return session.url;
+        } catch (error) {
+            throw new ApplicationError(
+                "Failed to create checkout session",
+                { cause: error },
+            );
         }
-        return session.url;
     }
 
     async retreiveSubscription(subscriptionId: string) {
