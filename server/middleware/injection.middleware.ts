@@ -2,6 +2,7 @@ import { eventHandler } from "h3";
 import {
     serverSupabaseClient,
     serverSupabaseServiceRole,
+    serverSupabaseUser,
 } from "#supabase/server";
 import { RepositoriesSupabaseFactory } from "~~/shared/infra/common/supabase/repositories.supabase.factory";
 import { QueriesSupabaseFactory } from "~~/shared/infra/common/supabase/queries.supabase.factory";
@@ -13,12 +14,20 @@ import { OcrMindeeRepository } from "~~/server/infra/mindee/mindee.ocr.repositor
 import { Database } from "~~/shared/infra/common/supabase/database.types";
 import { Repositories } from "~~/shared/domain/common/repositories.factory";
 import { Queries } from "~~/shared/domain/common/queries.factory";
+import { AuthRepository } from "~~/shared/application/common/providers/auth/auth.repository";
+import { StorageRepository } from "~~/shared/application/common/providers/storage/storage.repository";
+import { PaymentRepository } from "~~/shared/application/common/providers/payment/payment.repository";
+import { EmailRepository } from "~~/shared/application/common/providers/email/email.repository";
+import { OcrRepository } from "~~/shared/application/common/providers/ocr/ocr.repository";
+import { AdminRepository } from "~~/shared/application/common/providers/auth/admin.repository";
+import AdminSupabaseRepository from "../infra/supabase/admin.supabase.repository";
 
 export default eventHandler(async (event) => {
     const serviceRoleClient = serverSupabaseServiceRole<Database>(
         event,
     );
     const supabaseClient = await serverSupabaseClient<Database>(event);
+    const user = await serverSupabaseUser(event);
     const repos = new RepositoriesSupabaseFactory(
         serviceRoleClient,
     );
@@ -31,7 +40,9 @@ export default eventHandler(async (event) => {
     const ocrRepository = new OcrMindeeRepository();
     const authRepository = new AuthSupabaseRepository(
         supabaseClient,
+        user,
     );
+    const adminRepository = new AdminSupabaseRepository(serviceRoleClient);
     await authRepository.getCurrentUser();
 
     event.context.di = {
@@ -42,17 +53,19 @@ export default eventHandler(async (event) => {
         paymentRepository,
         emailRepository,
         ocrRepository,
+        adminRepository,
     } as ServerDi;
 });
 
 export type ServerDi = {
     repos: Repositories;
     queries: Queries;
-    authRepository: AuthSupabaseRepository;
-    storageRepository: StorageSupabaseRepository;
-    paymentRepository: PaymentStripeRepository;
-    emailRepository: ResendEmailRepository;
-    ocrRepository: OcrMindeeRepository;
+    authRepository: AuthRepository;
+    storageRepository: StorageRepository;
+    paymentRepository: PaymentRepository;
+    emailRepository: EmailRepository;
+    ocrRepository: OcrRepository;
+    adminRepository: AdminRepository;
 };
 
 // helper d’accès
