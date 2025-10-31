@@ -104,11 +104,8 @@ export default defineEventHandler(async (event) => {
                 break;
             }
             case "customer.subscription.deleted": {
-                const subscriptionDeletedData =
-                    eventData as Stripe.Subscription;
-                await handlePaymentEventsUsecase.handleSubscriptionDeleted({
-                    subscriptionId: subscriptionDeletedData.id,
-                });
+                const { id } = eventData as Stripe.Subscription;
+                await handlePaymentEventsUsecase.handleSubscriptionDeleted(id);
                 break;
             }
             case "invoice.payment_failed": {
@@ -122,9 +119,9 @@ export default defineEventHandler(async (event) => {
                         "No subscription ID found in invoice",
                     );
                 }
-                await handlePaymentEventsUsecase.handlePaymentFailed({
+                await handlePaymentEventsUsecase.handlePaymentFailed(
                     subscriptionId,
-                });
+                );
                 break;
             }
             default:
