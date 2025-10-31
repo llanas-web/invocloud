@@ -15,6 +15,7 @@ const _useEstablishmentDetails = () => {
         data: dto,
         error,
         pending,
+        refresh,
     } = useAsyncData(
         async () => {
             if (!selectedId.value) return null;
@@ -80,6 +81,11 @@ const _useEstablishmentDetails = () => {
         return subscription.value?.status === SubscriptionStatus.TRIALING;
     });
 
+    const isInactive = computed(() => {
+        return subscription.value === null ||
+            subscription.value?.status === SubscriptionStatus.CANCELED;
+    });
+
     const deleteAction = useAsyncAction(async () => {
         if (!selectedId.value) throw new AppError("No establishment selected");
         await $usecases.establishments.delete.execute({
@@ -110,6 +116,7 @@ const _useEstablishmentDetails = () => {
             await establishmentApi.subscription.cancel({
                 establishmentId: selectedId.value,
             });
+            await refresh();
         },
     );
 
@@ -123,6 +130,7 @@ const _useEstablishmentDetails = () => {
                 email,
                 invitorId: connectedUser.value!.id,
             });
+            await refresh();
         },
     );
 
@@ -133,6 +141,7 @@ const _useEstablishmentDetails = () => {
         members,
         isSelected,
         isAdmin,
+        isInactive,
         isActive,
         isTrial,
         pending,

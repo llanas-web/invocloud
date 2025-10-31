@@ -36,7 +36,7 @@ export default class CancelSubscriptionUsecase {
             await this.paymentRepository.cancelTrialingPeriod(
                 establishment.subscription.providerSubscriptionId!,
             );
-            updatedEstablishment = establishment.cancelSubscription(new Date());
+            updatedEstablishment = establishment.cancelSubscription();
         } else {
             const cancelAt = await this.paymentRepository.cancelSubscription(
                 establishment.subscription!.providerSubscriptionId!,
