@@ -24,8 +24,6 @@ export class StripeEventAdapter {
                 return SubscriptionStatus.ACTIVE;
             case "past_due":
                 return SubscriptionStatus.PAST_DUE;
-            case "canceled":
-                return SubscriptionStatus.CANCELED;
             default:
                 throw new Error(`Unknown subscription status: ${status}`);
         }
@@ -46,54 +44,13 @@ export class StripeEventAdapter {
         };
     }
 
-    static toInvoicePaymentSucceeded(
-        invoice: Stripe.Invoice,
-    ): InvoicePaymentSucceededDto {
-        const { establishmentId } = sessionMetadataSchema.parse(
-            invoice.metadata,
-        );
-        return {
-            establishmentId,
-            periodEnd: new Date(invoice.period_end * 1000),
-            invoiceId: invoice.id,
-            amount: invoice.amount_paid,
-            currency: invoice.currency,
-        };
-    }
-
     static toSubscriptionUpdated(
         subscription: Stripe.Subscription,
     ): SubscriptionUpdatedDto {
-        const { establishmentId } = sessionMetadataSchema.parse(
-            subscription.metadata,
-        );
         return {
-            establishmentId,
+            subscriptionId: subscription.id,
             currentPeriodEnd: new Date(subscription.ended_at! * 1000),
             status: this.toSubscriptionStatus(subscription.status),
-        };
-    }
-
-    static toSubscriptionDeleted(
-        subscription: Stripe.Subscription,
-    ): SubscriptionDeletedDto {
-        const { establishmentId } = sessionMetadataSchema.parse(
-            subscription.metadata,
-        );
-        return {
-            establishmentId,
-            endedAt: new Date(subscription.ended_at! * 1000),
-        };
-    }
-
-    static toPaymentFailed(
-        invoice: Stripe.Invoice,
-    ): PaymentFailedDto {
-        const { establishmentId } = sessionMetadataSchema.parse(
-            invoice.metadata,
-        );
-        return {
-            establishmentId,
         };
     }
 }

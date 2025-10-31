@@ -10,6 +10,7 @@ import type { EstablishmentQuery } from "~~/shared/application/establishment/est
 import type { ListEstablishmentQueryFilter } from "~~/shared/application/establishment/queries";
 import type { SubscriptionStatus } from "~~/shared/domain/establishment/subscription.entity";
 import type { Database } from "../../common/supabase/database.types";
+import type SubscriptionEntity from "~~/shared/domain/establishment/subscription.entity";
 
 export default class EstablishmentSupabaseQuery implements EstablishmentQuery {
     constructor(private readonly supabase: SupabaseClient<Database>) {}
@@ -148,5 +149,19 @@ export default class EstablishmentSupabaseQuery implements EstablishmentQuery {
             createdAt: new Date(row.establishment.created_at),
             updatedAt: new Date(row.establishment.updated_at),
         }));
+    }
+
+    async getEstablishmentIdByProviderSubscriptionId(
+        providerSubscriptionId: string,
+    ) {
+        const { data, error } = await this.supabase
+            .from("subscriptions")
+            .select("*")
+            .eq("provider_subscription_id", providerSubscriptionId)
+            .eq("provider", "stripe")
+            .single();
+        if (error) throw SupabaseError.fromPostgrest(error);
+        if (!data) return null;
+        return data.establishment_id;
     }
 }

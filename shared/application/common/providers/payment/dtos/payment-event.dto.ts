@@ -16,24 +16,20 @@ export interface CheckoutSessionCreatedDto {
 }
 
 export interface InvoicePaymentSucceededDto {
-    establishmentId: string;
-    periodEnd: Date;
-    invoiceId: string;
-    amount: number;
-    currency: string;
+    subscriptionId: string;
+    provider: string;
 }
 
 export interface SubscriptionUpdatedDto {
-    establishmentId: string;
+    subscriptionId: string;
     currentPeriodEnd: Date;
     status: SubscriptionStatus;
 }
 
 export interface SubscriptionDeletedDto {
-    establishmentId: string;
-    endedAt: Date;
+    subscriptionId: string;
 }
 
 export interface PaymentFailedDto {
-    establishmentId: string;
+    subscriptionId: string;
 }

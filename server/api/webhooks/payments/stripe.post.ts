@@ -10,7 +10,10 @@ import ServerError from "~~/server/core/errors/server.error";
 import { HTTPStatus } from "~~/server/core/errors/status";
 import { StripeEventAdapter } from "~~/server/infra/stripe/adapters/stripe-event.adapter";
 import PaymentStripeRepository from "~~/server/infra/stripe/payment.stripe.repository";
-import { fromSessionToSubscription } from "~~/server/infra/stripe/utils/mapper";
+import {
+    fromInvoiceToSubscription,
+    fromSessionToSubscription,
+} from "~~/server/infra/stripe/utils/mapper";
 import { useServerDi } from "~~/server/middleware/injection.middleware";
 import HandlePaymentEventsUsecase from "~~/shared/application/establishment/usecases/subscription/handle-payment-events.usecase";
 
@@ -45,7 +48,7 @@ export default defineEventHandler(async (event) => {
         );
 
         switch (stripeEvent.type) {
-            case "checkout.session.completed":
+            case "checkout.session.completed": {
                 const session = eventData as Stripe.Checkout.Session;
                 const subscriptionId = fromSessionToSubscription(session);
                 if (!subscriptionId) {
@@ -67,17 +70,28 @@ export default defineEventHandler(async (event) => {
                     checkoutSessionDTO,
                 );
                 break;
-            case "invoice.payment_succeeded":
+            }
+            case "invoice.payment_succeeded": {
+                // Update le status de la souscription
                 const invoicePaymentData = eventData as Stripe.Invoice;
-                const invoicePaymentDTO = StripeEventAdapter
-                    .toInvoicePaymentSucceeded(
-                        invoicePaymentData,
+                const subscriptionId = fromInvoiceToSubscription(
+                    invoicePaymentData,
+                );
+                if (!subscriptionId) {
+                    throw new ServerError(
+                        HTTPStatus.BAD_REQUEST,
+                        "No subscription ID found in invoice",
                     );
+                }
                 await handlePaymentEventsUsecase.handleInvoicePaymentSucceeded(
-                    invoicePaymentDTO,
+                    {
+                        subscriptionId,
+                        provider: "stripe",
+                    },
                 );
                 break;
-            case "customer.subscription.updated":
+            }
+            case "customer.subscription.updated": {
                 const subscriptionUpdatedData =
                     eventData as Stripe.Subscription;
                 const subscriptionDTO = StripeEventAdapter
@@ -88,27 +102,31 @@ export default defineEventHandler(async (event) => {
                     subscriptionDTO,
                 );
                 break;
-            case "customer.subscription.deleted":
+            }
+            case "customer.subscription.deleted": {
                 const subscriptionDeletedData =
                     eventData as Stripe.Subscription;
-                const subscriptionDeletedDTO = StripeEventAdapter
-                    .toSubscriptionDeleted(
-                        subscriptionDeletedData,
-                    );
-                await handlePaymentEventsUsecase.handleSubscriptionDeleted(
-                    subscriptionDeletedDTO,
-                );
+                await handlePaymentEventsUsecase.handleSubscriptionDeleted({
+                    subscriptionId: subscriptionDeletedData.id,
+                });
                 break;
-            case "invoice.payment_failed":
+            }
+            case "invoice.payment_failed": {
                 const paymentFailedData = eventData as Stripe.Invoice;
-                const paymentFailedDTO = StripeEventAdapter
-                    .toPaymentFailed(
-                        paymentFailedData,
-                    );
-                await handlePaymentEventsUsecase.handlePaymentFailed(
-                    paymentFailedDTO,
+                const subscriptionId = fromInvoiceToSubscription(
+                    paymentFailedData,
                 );
+                if (!subscriptionId) {
+                    throw new ServerError(
+                        HTTPStatus.BAD_REQUEST,
+                        "No subscription ID found in invoice",
+                    );
+                }
+                await handlePaymentEventsUsecase.handlePaymentFailed({
+                    subscriptionId,
+                });
                 break;
+            }
             default:
                 console.log(
                     `No handler for Stripe event type: ${stripeEvent.type}`,

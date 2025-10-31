@@ -1,10 +1,8 @@
 export enum SubscriptionStatus {
     // inactive, trial, active, canceled
-    INACTIVE = "inactive",
     TRIALING = "trialing",
     ACTIVE = "active",
     PAST_DUE = "past_due",
-    CANCELED = "canceled",
 }
 
 export type SubscriptionEntityProps = {
@@ -99,10 +97,6 @@ class SubscriptionEntity {
         return this.props.status === SubscriptionStatus.TRIALING;
     }
 
-    isCanceled(): boolean {
-        return this.props.status === SubscriptionStatus.CANCELED;
-    }
-
     canBeDeleted(): boolean {
         return !this.isActive();
     }
@@ -111,7 +105,7 @@ class SubscriptionEntity {
      * Active l'abonnement (sortie de période d'essai)
      */
     activate(periodEnd: Date, periodStart?: Date): SubscriptionEntity {
-        if (!this.isActive() && !this.isCanceled()) {
+        if (!this.isActive()) {
             throw new Error(
                 "Seul un abonnement en essai, actif ou annulé peut être renouvellé",
             );
@@ -127,33 +121,16 @@ class SubscriptionEntity {
     /**
      *  Renouvelle l'abonnement
      */
-    renew(periodEnd: Date): SubscriptionEntity {
-        if (!this.isCanceled() && !this.isActive()) {
+    renew(periodEnd?: Date): SubscriptionEntity {
+        if (!this.isActive()) {
             throw new Error(
-                "Seul un abonnement actif ou annulé peut être renouvelé",
+                "Seul un abonnement actif peut être renouvelé",
             );
         }
         return new SubscriptionEntity({
             ...this.props,
             status: SubscriptionStatus.ACTIVE,
-            endAt: periodEnd,
-        });
-    }
-
-    /**
-     * Annule l'abonnement
-     */
-    cancel(cancelAt: Date): SubscriptionEntity {
-        if (!this.isActive()) {
-            throw new Error(
-                "Seul un abonnement actif peut être annulé",
-            );
-        }
-        return new SubscriptionEntity({
-            ...this.props,
-            status: SubscriptionStatus.CANCELED,
-            endAt: cancelAt,
-            // canceledAt: new Date(),
+            endAt: periodEnd ?? this.props.endAt,
         });
     }
 

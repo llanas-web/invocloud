@@ -258,7 +258,7 @@ export class EstablishmentModel extends PayloadModel {
     /**
      * Renouvelle l'abonnement
      */
-    renewSubscription(periodEnd: Date): EstablishmentModel {
+    renewSubscription(periodEnd?: Date): EstablishmentModel {
         return this.updateSubscription((sub) => sub.renew(periodEnd));
     }
 
