@@ -74,6 +74,12 @@ export default defineEventHandler(async (event) => {
             case "invoice.payment_succeeded": {
                 // Update le status de la souscription
                 const invoicePaymentData = eventData as Stripe.Invoice;
+                if (invoicePaymentData.amount_paid === 0) {
+                    console.log(
+                        "Skipping zero amount invoice payment succeeded event",
+                    );
+                    break;
+                }
                 const subscriptionId = fromInvoiceToSubscription(
                     invoicePaymentData,
                 );
