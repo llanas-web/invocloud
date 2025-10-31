@@ -93,7 +93,7 @@ export default class HandlePaymentEventsUsecase {
         const establishment = await this.getEstablishmentBySubscriptionId(
             subscriptionId,
         );
-        const updatedEstablishment = establishment.cancelSubscription();
+        const updatedEstablishment = establishment.removeSubscription();
         await this.repos.establishmentsRepo.update(updatedEstablishment);
     }
 

@@ -1,11 +1,11 @@
 <script setup lang="ts">
     import { UBadge } from '#components';
 
-    const { establishment, isAdmin, isTrial, isActive, subscription, actions } = useEstablishmentDetails()
+    const { establishment, isAdmin, isInactive, isTrial, isActive, subscription, actions } = useEstablishmentDetails()
 </script>
 
 <template>
-    <UPageCard v-if="!subscription" variant="subtle" :ui="{
+    <UPageCard v-if="!subscription || isInactive" variant="subtle" :ui="{
         header: 'flex items-center justify-between w-full',
     }">
         <template #body>
@@ -23,7 +23,7 @@
         <template #header>
             <h2 class="text-lg font-semibold">Abonnement actuel</h2>
             <UBadge color="success" icon="i-lucide:check-circle">
-                En cours
+                En cours. Prochain renouvellement le {{ subscription.endDateLabel }}
             </UBadge>
         </template>
         <template #body>

@@ -2,7 +2,7 @@ import type { UserModel } from "~~/shared/domain/user/user.model";
 import type { ModelCommonUpdateProps } from "../common/common.interface";
 import { PayloadModel } from "../common/payload.model";
 import MemberEntity, { MemberStatus } from "./member.entity";
-import SubscriptionEntity from "./subscription.entity";
+import SubscriptionEntity, { SubscriptionStatus } from "./subscription.entity";
 import { DomainError, DomainErrorCode } from "../common/errors/domain.error";
 
 export type EstablishmentModelProps =
@@ -121,7 +121,10 @@ export class EstablishmentModel extends PayloadModel {
     acceptMember(userId: string): EstablishmentModel {
         const memberIndex = this.members.findIndex((m) => m.userId === userId);
         if (memberIndex === -1) {
-            throw new Error(`Membre non trouvé`);
+            throw new DomainError(
+                DomainErrorCode.ENTITY_NOT_FOUND,
+                "Membre non trouvé",
+            );
         }
 
         const updatedMembers = [...this.members];
@@ -139,7 +142,10 @@ export class EstablishmentModel extends PayloadModel {
     declineMember(userId: string): EstablishmentModel {
         const memberIndex = this.members.findIndex((m) => m.userId === userId);
         if (memberIndex === -1) {
-            throw new Error(`Membre non trouvé`);
+            throw new DomainError(
+                DomainErrorCode.ENTITY_NOT_FOUND,
+                "Membre non trouvé",
+            );
         }
 
         const updatedMembers = [...this.members];
@@ -156,7 +162,8 @@ export class EstablishmentModel extends PayloadModel {
      */
     removeMember(userId: string): EstablishmentModel {
         if (userId === this.creatorId) {
-            throw new Error(
+            throw new DomainError(
+                DomainErrorCode.ERROR_UPDATING,
                 "Le créateur ne peut pas être retiré de l'établissement",
             );
         }
@@ -216,7 +223,8 @@ export class EstablishmentModel extends PayloadModel {
      */
     withSubscription(subscription: SubscriptionEntity): EstablishmentModel {
         if (this.props.subscription !== null) {
-            throw new Error(
+            throw new DomainError(
+                DomainErrorCode.ERROR_UPDATING,
                 "Cet établissement a déjà un abonnement",
             );
         }
@@ -233,7 +241,8 @@ export class EstablishmentModel extends PayloadModel {
         updater: (subscription: SubscriptionEntity) => SubscriptionEntity,
     ): EstablishmentModel {
         if (!this.props.subscription) {
-            throw new Error(
+            throw new DomainError(
+                DomainErrorCode.ERROR_UPDATING,
                 "Cet établissement n'a pas d'abonnement",
             );
         }
@@ -265,7 +274,23 @@ export class EstablishmentModel extends PayloadModel {
     /**
      * Annule l'abonnement
      */
-    cancelSubscription(): EstablishmentModel {
+    cancelSubscription(endDate?: Date): EstablishmentModel {
+        if (!this.hasActiveSubscription()) {
+            throw new DomainError(
+                DomainErrorCode.ERROR_UPDATING,
+                "Seul un abonnement actif ou en essai peut être annulé",
+            );
+        }
+        return this.updateSubscription((sub) => sub.cancel(endDate));
+    }
+
+    removeSubscription(): EstablishmentModel {
+        if (this.props.subscription === null) {
+            throw new DomainError(
+                DomainErrorCode.ERROR_UPDATING,
+                "Cet établissement n'a pas d'abonnement à supprimer",
+            );
+        }
         return new EstablishmentModel({
             ...this.props,
             subscription: null,

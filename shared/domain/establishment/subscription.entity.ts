@@ -3,6 +3,7 @@ export enum SubscriptionStatus {
     TRIALING = "trialing",
     ACTIVE = "active",
     PAST_DUE = "past_due",
+    CANCELED = "canceled",
 }
 
 export type SubscriptionEntityProps = {
@@ -97,6 +98,10 @@ class SubscriptionEntity {
         return this.props.status === SubscriptionStatus.TRIALING;
     }
 
+    isCanceled(): boolean {
+        return this.props.status === SubscriptionStatus.CANCELED;
+    }
+
     canBeDeleted(): boolean {
         return !this.isActive();
     }
@@ -155,6 +160,19 @@ class SubscriptionEntity {
             ...this.props,
             startAt: currentPeriodStart,
             endAt: currentPeriodEnd,
+        });
+    }
+
+    cancel(endDate?: Date): SubscriptionEntity {
+        if (this.isCanceled()) {
+            throw new Error(
+                "L'abonnement est déjà annulé",
+            );
+        }
+        return new SubscriptionEntity({
+            ...this.props,
+            status: SubscriptionStatus.CANCELED,
+            endAt: endDate ?? new Date(),
         });
     }
 }
