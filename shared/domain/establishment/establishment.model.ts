@@ -255,13 +255,8 @@ export class EstablishmentModel extends PayloadModel {
     /**
      * Active l'abonnement (sortie de période d'essai)
      */
-    activateSubscription(
-        periodEnd: Date,
-        periodStart?: Date,
-    ): EstablishmentModel {
-        return this.updateSubscription((sub) =>
-            sub.activate(periodEnd, periodStart)
-        );
+    activateSubscription(): EstablishmentModel {
+        return this.updateSubscription((sub) => sub.activate());
     }
 
     /**
