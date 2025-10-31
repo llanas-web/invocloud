@@ -18,11 +18,11 @@ export interface CheckoutSessionCreatedDto {
 export interface InvoicePaymentSucceededDto {
     subscriptionId: string;
     provider: string;
+    periodEndAt: Date;
 }
 
 export interface SubscriptionUpdatedDto {
     subscriptionId: string;
-    currentPeriodEnd: Date;
     status: SubscriptionStatus;
 }
 

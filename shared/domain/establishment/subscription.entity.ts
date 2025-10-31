@@ -1,3 +1,5 @@
+import { DomainError, DomainErrorCode } from "../common/errors/domain.error";
+
 export enum SubscriptionStatus {
     // inactive, trial, active, canceled
     TRIALING = "trialing",
@@ -43,10 +45,6 @@ class SubscriptionEntity {
             startAt: now,
             createdAt: now,
             endAt: trialEndDate,
-            // cancelAt: null,
-            // canceledAt: null,
-            // currentPeriodStart: now,
-            // currentPeriodEnd: trialEndDate,
             providerSubscriptionId,
             providerCustomerId,
         });
@@ -63,22 +61,6 @@ class SubscriptionEntity {
     get endAt() {
         return this.props.endAt;
     }
-
-    // get cancelAt() {
-    //     return this.props.cancelAt;
-    // }
-
-    // get canceledAt() {
-    //     return this.props.canceledAt;
-    // }
-
-    // get currentPeriodStart() {
-    //     return this.props.currentPeriodStart;
-    // }
-
-    // get currentPeriodEnd() {
-    //     return this.props.currentPeriodEnd;
-    // }
 
     get providerSubscriptionId() {
         return this.props.providerSubscriptionId;
@@ -109,18 +91,14 @@ class SubscriptionEntity {
     /**
      * Active l'abonnement (sortie de période d'essai)
      */
-    activate(periodEnd: Date, periodStart?: Date): SubscriptionEntity {
+    activate(): SubscriptionEntity {
         if (!this.isActive()) {
-            throw new Error(
+            throw new DomainError(
+                DomainErrorCode.ERROR_UPDATING,
                 "Seul un abonnement en essai, actif ou annulé peut être renouvellé",
             );
         }
-        return new SubscriptionEntity({
-            ...this.props,
-            status: SubscriptionStatus.ACTIVE,
-            endAt: periodEnd,
-            // currentPeriodStart: periodStart ?? new Date(),
-        });
+        return this.updateStatus(SubscriptionStatus.ACTIVE);
     }
 
     /**
@@ -128,15 +106,15 @@ class SubscriptionEntity {
      */
     renew(periodEnd?: Date): SubscriptionEntity {
         if (!this.isActive()) {
-            throw new Error(
+            throw new DomainError(
+                DomainErrorCode.ERROR_UPDATING,
                 "Seul un abonnement actif peut être renouvelé",
             );
         }
-        return new SubscriptionEntity({
-            ...this.props,
-            status: SubscriptionStatus.ACTIVE,
-            endAt: periodEnd ?? this.props.endAt,
-        });
+        return this.updatePeriod(
+            this.props.startAt,
+            periodEnd ?? undefined,
+        );
     }
 
     /**
@@ -154,18 +132,19 @@ class SubscriptionEntity {
      */
     updatePeriod(
         currentPeriodStart: Date,
-        currentPeriodEnd: Date,
+        currentPeriodEnd?: Date,
     ): SubscriptionEntity {
         return new SubscriptionEntity({
             ...this.props,
             startAt: currentPeriodStart,
-            endAt: currentPeriodEnd,
+            endAt: currentPeriodEnd ?? null,
         });
     }
 
     cancel(endDate?: Date): SubscriptionEntity {
         if (this.isCanceled()) {
-            throw new Error(
+            throw new DomainError(
+                DomainErrorCode.ERROR_UPDATING,
                 "L'abonnement est déjà annulé",
             );
         }

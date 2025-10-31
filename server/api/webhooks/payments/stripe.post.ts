@@ -48,6 +48,9 @@ export default defineEventHandler(async (event) => {
         );
 
         switch (stripeEvent.type) {
+            /**
+             * CREATE SUBSCRIPTION
+             */
             case "checkout.session.completed": {
                 const session = eventData as Stripe.Checkout.Session;
                 const subscriptionId = fromSessionToSubscription(session);
@@ -71,6 +74,9 @@ export default defineEventHandler(async (event) => {
                 );
                 break;
             }
+            /**
+             * UPDATE SUBSCRIPTION END DATE
+             */
             case "invoice.payment_succeeded": {
                 // Update le status de la souscription
                 const invoicePaymentData = eventData as Stripe.Invoice;
@@ -91,12 +97,18 @@ export default defineEventHandler(async (event) => {
                 }
                 await handlePaymentEventsUsecase.handleInvoicePaymentSucceeded(
                     {
+                        periodEndAt: new Date(
+                            invoicePaymentData.period_end * 1000,
+                        ),
                         subscriptionId,
                         provider: "stripe",
                     },
                 );
                 break;
             }
+            /**
+             * UPDATE SUBSCRIPTION STATUS
+             */
             case "customer.subscription.updated": {
                 const subscriptionUpdatedData =
                     eventData as Stripe.Subscription;
@@ -109,11 +121,17 @@ export default defineEventHandler(async (event) => {
                 );
                 break;
             }
+            /**
+             * DELETE SUBSCRIPTION
+             */
             case "customer.subscription.deleted": {
                 const { id } = eventData as Stripe.Subscription;
                 await handlePaymentEventsUsecase.handleSubscriptionDeleted(id);
                 break;
             }
+            /**
+             * UPDATE STATUS TO PAST_DUE ON PAYMENT FAILURE
+             */
             case "invoice.payment_failed": {
                 const paymentFailedData = eventData as Stripe.Invoice;
                 const subscriptionId = fromInvoiceToSubscription(

@@ -49,7 +49,6 @@ export class StripeEventAdapter {
     ): SubscriptionUpdatedDto {
         return {
             subscriptionId: subscription.id,
-            currentPeriodEnd: new Date(subscription.ended_at! * 1000),
             status: this.toSubscriptionStatus(subscription.status),
         };
     }

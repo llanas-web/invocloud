@@ -82,9 +82,7 @@ export default class HandlePaymentEventsUsecase {
         );
 
         if (dto.status === SubscriptionStatus.ACTIVE) {
-            const updatedEstablishment = establishment.activateSubscription(
-                dto.currentPeriodEnd,
-            );
+            const updatedEstablishment = establishment.activateSubscription();
             await this.repos.establishmentsRepo.update(updatedEstablishment);
         }
     }
