@@ -24,6 +24,10 @@ class PaymentStripeRepository implements PaymentRepository {
             CreateCheckoutSessionDto,
     ): Promise<string> {
         try {
+            const metadata = {
+                userId,
+                establishmentId,
+            };
             const session = await this.stripeInstance.checkout.sessions.create(
                 {
                     mode: "subscription",
@@ -38,15 +42,13 @@ class PaymentStripeRepository implements PaymentRepository {
                     ],
                     subscription_data: {
                         trial_period_days: 7,
+                        metadata,
                     },
                     success_url:
                         `${this.baseUrl}/app?subscription_success=true`,
                     cancel_url:
                         `${this.baseUrl}/app/settings/establishments?cancel=true`,
-                    metadata: {
-                        userId,
-                        establishmentId,
-                    },
+                    metadata,
                 },
             );
 

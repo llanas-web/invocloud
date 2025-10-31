@@ -46,30 +46,46 @@ export default class HandlePaymentEventsUsecase {
     async handleInvoicePaymentSucceeded(
         dto: InvoicePaymentSucceededDto,
     ): Promise<void> {
+        const establishmentId = await this.queries.establishmentQuery
+            .getEstablishmentIdByProviderSubscriptionId(
+                dto.subscriptionId,
+            );
+        if (!establishmentId) {
+            throw new ApplicationError(
+                "Établissement non trouvé pour la souscription donnée",
+            );
+        }
         const establishment = await this.repos.establishmentsRepo.getById(
-            dto.establishmentId,
+            establishmentId,
         );
         if (!establishment) {
             throw new ApplicationError("Établissement non trouvé");
         }
 
-        const updatedEstablishment = establishment.renewSubscription(
-            dto.periodEnd,
-        );
+        const updatedEstablishment = establishment.renewSubscription();
         await this.repos.establishmentsRepo.update(updatedEstablishment);
     }
 
     async handleSubscriptionUpdated(
         dto: SubscriptionUpdatedDto,
     ): Promise<void> {
+        const establishmentId = await this.queries.establishmentQuery
+            .getEstablishmentIdByProviderSubscriptionId(
+                dto.subscriptionId,
+            );
+        if (!establishmentId) {
+            throw new ApplicationError(
+                "Établissement non trouvé pour la souscription donnée",
+            );
+        }
         const establishment = await this.repos.establishmentsRepo.getById(
-            dto.establishmentId,
+            establishmentId,
         );
         if (!establishment) {
             throw new ApplicationError("Établissement non trouvé");
         }
 
-        if (dto.status === "active") {
+        if (dto.status === SubscriptionStatus.ACTIVE) {
             const updatedEstablishment = establishment.activateSubscription(
                 dto.currentPeriodEnd,
             );
