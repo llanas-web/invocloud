@@ -265,8 +265,11 @@ export class EstablishmentModel extends PayloadModel {
     /**
      * Annule l'abonnement
      */
-    cancelSubscription(cancelAt: Date): EstablishmentModel {
-        return this.updateSubscription((sub) => sub.cancel(cancelAt));
+    cancelSubscription(): EstablishmentModel {
+        return new EstablishmentModel({
+            ...this.props,
+            subscription: null,
+        });
     }
 
     // ─── Existing methods ───

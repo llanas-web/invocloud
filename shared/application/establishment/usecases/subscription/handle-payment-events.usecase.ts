@@ -19,6 +19,27 @@ export default class HandlePaymentEventsUsecase {
         private readonly queries: Queries,
     ) {}
 
+    private async getEstablishmentBySubscriptionId(
+        subscriptionId: string,
+    ): Promise<EstablishmentModel> {
+        const establishmentId = await this.queries.establishmentQuery
+            .getEstablishmentIdByProviderSubscriptionId(
+                subscriptionId,
+            );
+        if (!establishmentId) {
+            throw new ApplicationError(
+                "Établissement non trouvé pour la souscription donnée",
+            );
+        }
+        const establishment = await this.repos.establishmentsRepo.getById(
+            establishmentId,
+        );
+        if (!establishment) {
+            throw new ApplicationError("Établissement non trouvé");
+        }
+        return establishment;
+    }
+
     async handleCheckoutSucceeded(
         dto: CheckoutSessionCreatedDto,
     ): Promise<void> {
@@ -46,22 +67,9 @@ export default class HandlePaymentEventsUsecase {
     async handleInvoicePaymentSucceeded(
         dto: InvoicePaymentSucceededDto,
     ): Promise<void> {
-        const establishmentId = await this.queries.establishmentQuery
-            .getEstablishmentIdByProviderSubscriptionId(
-                dto.subscriptionId,
-            );
-        if (!establishmentId) {
-            throw new ApplicationError(
-                "Établissement non trouvé pour la souscription donnée",
-            );
-        }
-        const establishment = await this.repos.establishmentsRepo.getById(
-            establishmentId,
+        const establishment = await this.getEstablishmentBySubscriptionId(
+            dto.subscriptionId,
         );
-        if (!establishment) {
-            throw new ApplicationError("Établissement non trouvé");
-        }
-
         const updatedEstablishment = establishment.renewSubscription();
         await this.repos.establishmentsRepo.update(updatedEstablishment);
     }
@@ -69,21 +77,9 @@ export default class HandlePaymentEventsUsecase {
     async handleSubscriptionUpdated(
         dto: SubscriptionUpdatedDto,
     ): Promise<void> {
-        const establishmentId = await this.queries.establishmentQuery
-            .getEstablishmentIdByProviderSubscriptionId(
-                dto.subscriptionId,
-            );
-        if (!establishmentId) {
-            throw new ApplicationError(
-                "Établissement non trouvé pour la souscription donnée",
-            );
-        }
-        const establishment = await this.repos.establishmentsRepo.getById(
-            establishmentId,
+        const establishment = await this.getEstablishmentBySubscriptionId(
+            dto.subscriptionId,
         );
-        if (!establishment) {
-            throw new ApplicationError("Établissement non trouvé");
-        }
 
         if (dto.status === SubscriptionStatus.ACTIVE) {
             const updatedEstablishment = establishment.activateSubscription(
@@ -93,30 +89,18 @@ export default class HandlePaymentEventsUsecase {
         }
     }
 
-    async handleSubscriptionDeleted(
-        dto: SubscriptionDeletedDto,
-    ): Promise<void> {
-        const establishment = await this.repos.establishmentsRepo.getById(
-            dto.establishmentId,
+    async handleSubscriptionDeleted(subscriptionId: string): Promise<void> {
+        const establishment = await this.getEstablishmentBySubscriptionId(
+            subscriptionId,
         );
-        if (!establishment) {
-            throw new ApplicationError("Établissement non trouvé");
-        }
-        const updatedEstablishment = establishment.cancelSubscription(
-            dto.endedAt,
-        );
+        const updatedEstablishment = establishment.cancelSubscription();
         await this.repos.establishmentsRepo.update(updatedEstablishment);
     }
 
-    async handlePaymentFailed(
-        dto: PaymentFailedDto,
-    ): Promise<void> {
-        const establishment = await this.repos.establishmentsRepo.getById(
-            dto.establishmentId,
+    async handlePaymentFailed(subscriptionId: string): Promise<void> {
+        const establishment = await this.getEstablishmentBySubscriptionId(
+            subscriptionId,
         );
-        if (!establishment) {
-            throw new ApplicationError("Établissement non trouvé");
-        }
         const updatedEstablishment = establishment.updateSubscription((sub) =>
             sub.updateStatus(
                 SubscriptionStatus.PAST_DUE,
