@@ -70,7 +70,9 @@ export default class HandlePaymentEventsUsecase {
         const establishment = await this.getEstablishmentBySubscriptionId(
             dto.subscriptionId,
         );
-        const updatedEstablishment = establishment.renewSubscription();
+        const updatedEstablishment = establishment.renewSubscription(
+            dto.periodEndAt,
+        );
         await this.repos.establishmentsRepo.update(updatedEstablishment);
     }
 
