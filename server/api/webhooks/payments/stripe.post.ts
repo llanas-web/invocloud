@@ -94,10 +94,18 @@ export default defineEventHandler(async (event) => {
                         "No subscription ID found in invoice",
                     );
                 }
+                const endDate = invoicePaymentData.lines.data[0]
+                    .period?.end;
+                if (!endDate) {
+                    console.log(
+                        "Skipping invoice payment succeeded event without end date",
+                    );
+                    break;
+                }
                 await handlePaymentEventsUsecase.handleInvoicePaymentSucceeded(
                     {
                         periodEndAt: new Date(
-                            invoicePaymentData.period_end * 1000,
+                            endDate * 1000,
                         ),
                         subscriptionId,
                         provider: "stripe",
