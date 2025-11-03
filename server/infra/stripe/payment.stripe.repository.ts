@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import { PaymentRepository } from "#shared/application/common/providers/payment/payment.repository";
-import { ApplicationError } from "~~/shared/application/common/errors/application.error";
 import { CreateCheckoutSessionDto } from "~~/shared/application/common/providers/payment/dtos/payment-event.dto";
+import { StripeError } from "./stripe.error";
 
 class PaymentStripeRepository implements PaymentRepository {
     public stripeInstance: Stripe;
@@ -22,7 +22,7 @@ class PaymentStripeRepository implements PaymentRepository {
     async createCheckoutSession(
         { email, userId, establishmentId, customerId }:
             CreateCheckoutSessionDto,
-    ): Promise<string> {
+    ) {
         try {
             const metadata = {
                 userId,
@@ -51,17 +51,10 @@ class PaymentStripeRepository implements PaymentRepository {
                     metadata,
                 },
             );
-
-            if (!session.url) {
-                throw new ApplicationError(
-                    "Failed to create checkout session URL",
-                );
-            }
             return session.url;
         } catch (error) {
-            throw new ApplicationError(
-                "Failed to create checkout session",
-                { cause: error },
+            throw StripeError.fromStripeError(
+                error as Stripe.errors.StripeError,
             );
         }
     }

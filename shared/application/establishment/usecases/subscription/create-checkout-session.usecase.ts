@@ -44,6 +44,9 @@ export default class CreateCheckoutSessionUsecase {
                     undefined,
             },
         );
+        if (!checkoutSessionUrl) {
+            throw new ApplicationError("Failed to create checkout session");
+        }
         return checkoutSessionUrl;
     }
 }

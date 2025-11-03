@@ -1,10 +1,7 @@
 import { z } from "zod";
-import {
-    DomainError,
-    DomainErrorCode,
-} from "~~/shared/domain/common/errors/domain.error";
 import type { Queries } from "~~/shared/domain/common/queries.factory";
 import type { Repositories } from "~~/shared/domain/common/repositories.factory";
+import { ApplicationError } from "../../common/errors/application.error";
 
 export const DeleteEstablishmentCommandSchema = z.object({
     establishmentId: z.uuid(),
@@ -26,16 +23,14 @@ export default class DeleteEstablishmentUsecase {
             establishmentId,
         );
         if (!establishment) {
-            throw new DomainError(
-                DomainErrorCode.NO_ESTABLISHMENT,
+            throw new ApplicationError(
                 "Établissement introuvable",
             );
         }
 
         if (!establishment.canBeDeleted()) {
-            throw new DomainError(
-                DomainErrorCode.ERROR_UPDATING,
-                "Cet établissement ne peut pas être supprimé",
+            throw new ApplicationError(
+                "Cet établissement ne peut pas être supprimé car un abonnement est actif",
             );
         }
 
