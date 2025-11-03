@@ -50,6 +50,10 @@ const _useEstablishmentUpdate = () => {
                 });
             await refresh();
         },
+        {
+            successTitle: "Établissement mis à jour avec succès.",
+            errorTitle: "Erreur lors de la mise à jour de l'établissement.",
+        },
     );
 
     const checkEmailPrefixAvailable = useAsyncAction(
@@ -59,6 +63,11 @@ const _useEstablishmentUpdate = () => {
                 selectedId.value ?? undefined,
             );
             return isAvailable;
+        },
+        {
+            showToast: false,
+            errorTitle:
+                "Erreur lors de la vérification de la disponibilité du préfixe.",
         },
     );
 

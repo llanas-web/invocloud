@@ -1,4 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
+import { AppError } from "~/core/errors/app.error";
 
 const _useSuppliers = () => {
     const { $usecases, $queries } = useNuxtApp();
@@ -7,10 +8,14 @@ const _useSuppliers = () => {
     const { data: dtos, error, refresh, pending } = useAsyncData(
         "suppliers",
         async () => {
-            if (!selectedId.value) return [];
-            return await $queries.suppliersQuery.listSuppliers({
-                establishmentIds: [selectedId.value],
-            });
+            try {
+                if (!selectedId.value) return [];
+                return await $queries.suppliersQuery.listSuppliers({
+                    establishmentIds: [selectedId.value],
+                });
+            } catch (err) {
+                throw AppError.fromUnknownError(err);
+            }
         },
         {
             default: () => [],
@@ -34,6 +39,10 @@ const _useSuppliers = () => {
                 id: supplierId,
             });
             await refresh();
+        },
+        {
+            successTitle: "Fournisseur supprimé avec succès.",
+            errorTitle: "Erreur lors de la suppression du fournisseur.",
         },
     );
 

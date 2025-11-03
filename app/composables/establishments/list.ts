@@ -1,4 +1,5 @@
 import { createSharedComposable, useLocalStorage } from "@vueuse/core";
+import { AppError } from "~/core/errors/app.error";
 import type { EstablishmentListItemDTO } from "~~/shared/application/establishment/dto";
 
 const _useEstablishmentsList = () => {
@@ -19,10 +20,14 @@ const _useEstablishmentsList = () => {
         status,
     } = useAsyncData(
         async () => {
-            if (!connectedUser.value?.id) return [];
-            return $queries.establishmentQuery.listEstablishments(
-                { memberIds: [connectedUser.value.id] },
-            );
+            try {
+                if (!connectedUser.value?.id) return [];
+                return $queries.establishmentQuery.listEstablishments(
+                    { memberIds: [connectedUser.value.id] },
+                );
+            } catch (err) {
+                throw AppError.fromUnknownError(err);
+            }
         },
         {
             server: false,

@@ -69,6 +69,10 @@ const _useInvoiceCreate = () => {
             await $usecases.invoices.create.execute(command);
             navigateTo("/app");
         },
+        {
+            successTitle: "Facture créée avec succès.",
+            errorTitle: "Erreur lors de la création de la facture.",
+        },
     );
 
     const createByOcrAction = useAsyncAction(
@@ -89,6 +93,10 @@ const _useInvoiceCreate = () => {
             }
             await $usecases.invoices.create.execute(command);
             navigateTo("/app");
+        },
+        {
+            successTitle: "Facture envoyée en OCR avec succès.",
+            errorTitle: "Erreur lors de l'envoi de la facture en OCR.",
         },
     );
 

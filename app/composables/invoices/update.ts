@@ -68,6 +68,11 @@ const _useInvoiceUpdate = () => {
             );
             navigateTo("/app");
         },
+        {
+            successTitle: "Détails de la facture mis à jour avec succès.",
+            errorTitle:
+                "Erreur lors de la mise à jour des détails de la facture.",
+        },
     );
 
     return {

@@ -13,8 +13,14 @@ const _useUser = () => {
         refresh,
         pending,
     } = useAsyncData(async () => {
-        if (!connectedUser.value?.id) return null;
-        return await $queries.userQuery.getUserDetails(connectedUser.value.id);
+        try {
+            if (!connectedUser.value?.id) return null;
+            return await $queries.userQuery.getUserDetails(
+                connectedUser.value.id,
+            );
+        } catch (err) {
+            throw AppError.fromUnknownError(err);
+        }
     }, {
         deep: true,
         immediate: true,
@@ -35,6 +41,10 @@ const _useUser = () => {
             });
             await logoutAction.execute();
         },
+        {
+            successTitle: "Compte utilisateur supprimé avec succès.",
+            errorTitle: "Erreur lors de la suppression du compte utilisateur.",
+        },
     );
 
     const toggleFavoriteAction = useAsyncAction(
@@ -45,6 +55,11 @@ const _useUser = () => {
                 establishmentId,
             });
             await refresh();
+        },
+        {
+            showToast: false,
+            errorTitle:
+                "Erreur lors de la mise à jour des préférences utilisateur.",
         },
     );
 

@@ -45,6 +45,10 @@ const _useEstablishmentCreate = () => {
             selectEstablishment(newEstablishmentId);
             isOpen.value = false;
         },
+        {
+            successTitle: "Établissement créé avec succès.",
+            errorTitle: "Erreur lors de la création de l'établissement.",
+        },
     );
 
     return {

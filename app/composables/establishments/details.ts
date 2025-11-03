@@ -18,11 +18,15 @@ const _useEstablishmentDetails = () => {
         refresh,
     } = useAsyncData(
         async () => {
-            if (!selectedId.value) return null;
-            return await $queries.establishmentQuery
-                .getEstablishmentDetails(
-                    selectedId.value,
-                );
+            try {
+                if (!selectedId.value) return null;
+                return await $queries.establishmentQuery
+                    .getEstablishmentDetails(
+                        selectedId.value,
+                    );
+            } catch (err) {
+                throw AppError.fromUnknownError(err);
+            }
         },
         {
             server: false,
@@ -105,6 +109,10 @@ const _useEstablishmentDetails = () => {
                 });
             navigateTo(checkoutUrl, { external: true });
         },
+        {
+            showToast: false,
+            errorTitle: "Erreur lors de la création de la session de paiement.",
+        },
     );
 
     const cancelSubscriptionAction = useAsyncAction(
@@ -116,6 +124,10 @@ const _useEstablishmentDetails = () => {
                 establishmentId: selectedId.value,
             });
             await refresh();
+        },
+        {
+            successTitle: "Abonnement annulé avec succès.",
+            errorTitle: "Erreur lors de l'annulation de l'abonnement.",
         },
     );
 
@@ -130,6 +142,10 @@ const _useEstablishmentDetails = () => {
                 invitorId: connectedUser.value!.id,
             });
             await refresh();
+        },
+        {
+            successTitle: "Invitation envoyée avec succès.",
+            errorTitle: "Erreur lors de l'envoi de l'invitation.",
         },
     );
 

@@ -52,6 +52,10 @@ const _useUploadWizard = () => {
             invoiceId.value = uploadId;
             stepIndex.value++;
         },
+        {
+            showToast: false,
+            errorTitle: "Erreur lors de la soumission du formulaire.",
+        },
     );
 
     const submitTokenStep = useAsyncAction(
@@ -65,6 +69,10 @@ const _useUploadWizard = () => {
             }
             possibleEstablishmentIds.value = establishments;
             stepIndex.value++;
+        },
+        {
+            showToast: false,
+            errorTitle: "Erreur lors de la validation du token.",
         },
     );
 
@@ -83,13 +91,11 @@ const _useUploadWizard = () => {
                 uploadUrl.value,
                 formState.invoiceFile!,
             );
-            toast.add({
-                title: "Succès",
-                description: "Upload confirmé avec succès",
-                icon: "check",
-                color: "success",
-            });
             open.value = false;
+        },
+        {
+            showToast: false,
+            errorTitle: "Erreur lors de la confirmation de l'upload.",
         },
     );
 

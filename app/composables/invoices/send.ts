@@ -20,6 +20,9 @@ const _useInvoicesSend = () => {
         });
         resetForm();
         open.value = false;
+    }, {
+        successTitle: "Factures envoyées avec succès.",
+        errorTitle: "Erreur lors de l'envoi des factures.",
     });
 
     return {

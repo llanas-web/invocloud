@@ -17,16 +17,6 @@ export class DomainError extends BaseError {
             },
         });
     }
-
-    override createFrontError(): void {
-        if (import.meta.server || !import.meta.env.SSR) return;
-        useToast().add({
-            title:
-                "Une erreur est survenue lors du traitement de votre demande.",
-            description: this.message,
-            color: "warning",
-        });
-    }
 }
 
 export enum DomainErrorCode {

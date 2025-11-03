@@ -28,6 +28,10 @@ const _useInvoicesDelete = () => {
             await refresh();
             open.value = false;
         },
+        {
+            successTitle: "Factures supprimées avec succès.",
+            errorTitle: "Erreur lors de la suppression des factures.",
+        },
     );
 
     return {

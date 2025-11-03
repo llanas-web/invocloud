@@ -20,13 +20,4 @@ export class ApplicationError extends BaseError {
             },
         });
     }
-
-    override createFrontError(): void {
-        if (import.meta.server || !import.meta.env.SSR) return;
-        useToast().add({
-            title: "Une erreur est survenue dans l'application.",
-            description: this.message,
-            color: "warning",
-        });
-    }
 }
