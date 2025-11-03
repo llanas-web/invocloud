@@ -1,4 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
+import { AppError } from "~/core/errors/app.error";
 import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/types";
 
 const _useInvoiceDetails = () => {
@@ -15,10 +16,14 @@ const _useInvoiceDetails = () => {
     } = useAsyncData(
         "invoice-details",
         async () => {
-            if (!invoiceId.value) return null;
-            return await $queries.invoiceQuery.getInvoiceDetails(
-                invoiceId.value,
-            );
+            try {
+                if (!invoiceId.value) return null;
+                return await $queries.invoiceQuery.getInvoiceDetails(
+                    invoiceId.value,
+                );
+            } catch (err) {
+                throw AppError.fromUnknownError(err);
+            }
         },
         {
             immediate: true,
@@ -58,6 +63,10 @@ const _useInvoiceDetails = () => {
                 dto.value!.filePath,
             );
             return blob;
+        },
+        {
+            showToast: false,
+            errorTitle: "Erreur lors du téléchargement de la facture.",
         },
     );
 

@@ -35,6 +35,10 @@ const _useUserUpdate = () => {
                 });
             await refresh();
         },
+        {
+            successTitle: "Utilisateur mis à jour avec succès.",
+            errorTitle: "Erreur lors de la mise à jour de l'utilisateur.",
+        },
     );
 
     return {

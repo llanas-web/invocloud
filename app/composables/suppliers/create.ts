@@ -53,6 +53,10 @@ const _useSupplierCreate = () => {
             resetForm();
             await refresh();
         },
+        {
+            successTitle: "Fournisseur créé avec succès.",
+            errorTitle: "Erreur lors de la création du fournisseur.",
+        },
     );
 
     return {

@@ -96,6 +96,10 @@ const _useWorker = () => {
       // On peut attendre la fin via progress/running si besoin
       return true;
     },
+    {
+      showToast: false,
+      errorTitle: "Erreur lors du lancement du téléchargement des factures.",
+    },
   );
 
   return {

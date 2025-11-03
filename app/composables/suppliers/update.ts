@@ -62,14 +62,13 @@ const _useSupplierUpdate = () => {
                 ...parsed,
             });
             openModal.value = false;
-            toast.add({
-                title: "Succès",
-                description: "Fournisseur mis à jour avec succès",
-                color: "success",
-            });
             resetForm();
             selectedId.value = null;
             await refresh();
+        },
+        {
+            successTitle: "Fournisseur mis à jour avec succès.",
+            errorTitle: "Erreur lors de la mise à jour du fournisseur.",
         },
     );
 

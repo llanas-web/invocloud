@@ -15,13 +15,4 @@ export class AuthError extends BaseError {
             },
         });
     }
-
-    override createFrontError(): void {
-        if (import.meta.server || !import.meta.env.SSR) return;
-        useToast().add({
-            title: "Vous n'avez pas la permission d'accéder à cette ressource.",
-            description: this.message,
-            color: "warning",
-        });
-    }
 }

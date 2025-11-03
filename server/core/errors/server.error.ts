@@ -12,10 +12,6 @@ class ServerError extends BaseError {
             statusMessage: this.message,
         });
     }
-
-    override createFrontError(): void {
-        throw new Error("Method not implemented.");
-    }
 }
 
 export default ServerError;

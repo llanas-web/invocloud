@@ -1,4 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
+import { AppError } from "~/core/errors/app.error";
 
 const _useSupplierDetails = () => {
     const { $queries } = useNuxtApp();
@@ -7,12 +8,16 @@ const _useSupplierDetails = () => {
 
     const { data: dto, pending, refresh } = useAsyncData(
         async () => {
-            if (!selectedId.value) {
-                throw new Error("No supplier selected.");
+            try {
+                if (!selectedId.value) {
+                    throw new Error("No supplier selected.");
+                }
+                return await $queries.suppliersQuery.getSupplierDetails(
+                    selectedId.value,
+                );
+            } catch (err) {
+                throw AppError.fromUnknownError(err);
             }
-            return await $queries.suppliersQuery.getSupplierDetails(
-                selectedId.value,
-            );
         },
         { immediate: false, watch: [selectedId] },
     );

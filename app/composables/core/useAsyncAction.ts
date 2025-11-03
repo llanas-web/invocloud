@@ -3,13 +3,29 @@ import { AppError } from "~/core/errors/app.error";
 import { FetchError } from "ofetch";
 import { BaseError } from "~~/shared/errors/base.error";
 
+interface AsyncActionsOptions {
+    successTitle?: string;
+    errorTitle?: string;
+    successMessage?: string;
+    errorMessage?: string;
+    showToast?: boolean;
+}
+
 function useAsyncAction<TArgs extends any[], TResult>(
     action: (...args: TArgs) => Promise<TResult>,
+    options: AsyncActionsOptions = {},
 ) {
     const pending = ref(false);
     const { add } = useToast();
     const error = ref<AppError | null>(null);
     const data = ref<TResult | null>(null);
+    const {
+        successTitle = "Succès",
+        errorTitle = "Erreur",
+        successMessage = "Action réalisée avec succès.",
+        errorMessage = "Une erreur est survenue lors de l'opération.",
+        showToast = true,
+    } = options;
 
     async function execute(...args: TArgs) {
         pending.value = true;
@@ -17,6 +33,14 @@ function useAsyncAction<TArgs extends any[], TResult>(
         try {
             const result = await action(...args);
             data.value = result;
+            if (showToast) {
+                add({
+                    title: successTitle,
+                    description: successMessage,
+                    color: "success",
+                    icon: "i-lucide:check-circle",
+                });
+            }
             return result;
         } catch (err) {
             switch (true) {
@@ -40,9 +64,10 @@ function useAsyncAction<TArgs extends any[], TResult>(
                     );
             }
             add({
-                title: error.value.title,
-                description: error.value.message,
+                title: errorTitle ?? error.value.title,
+                description: errorMessage ?? error.value.message,
                 color: error.value.isError ? "error" : "warning",
+                icon: "i-lucide:alert-circle",
             });
             data.value = null;
             throw err;

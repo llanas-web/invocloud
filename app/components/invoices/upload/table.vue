@@ -86,18 +86,6 @@
                         onClick: async () => {
                             selectedInvoices.value = [row.original.id]
                             await onSubmit()
-                            if (deleteInvoiceError.value) {
-                                toast.add({
-                                    title: 'Erreur',
-                                    description: 'Une erreur est survenue lors de la suppression de la facture.',
-                                    color: 'error'
-                                })
-                            }
-                            toast.add({
-                                title: 'Facture supprimée',
-                                description: 'La facture a été supprimée.',
-                                color: 'success'
-                            })
                         }
                     }),
                 ]) : null

@@ -22,6 +22,4 @@ export abstract class BaseError extends Error {
     }
 
     abstract createServerError(): NuxtError;
-
-    abstract createFrontError(): void;
 }

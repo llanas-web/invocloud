@@ -20,13 +20,4 @@ export class InfraError extends BaseError {
             },
         });
     }
-
-    override createFrontError(): void {
-        if (import.meta.server || !import.meta.env.SSR) return;
-        useToast().add({
-            title: "Une erreur est survenue au niveau de l'infrastructure.",
-            description: this.message,
-            color: "error",
-        });
-    }
 }

@@ -49,4 +49,18 @@ export class AppError extends Error {
                 return new AppError("Erreur inconnue", err.message, true);
         }
     }
+
+    static fromUnknownError(err: unknown) {
+        if (err instanceof FetchError) {
+            return AppError.fromFetchError(err);
+        } else if (err instanceof BaseError) {
+            return AppError.fromBaseError(err);
+        } else if (err instanceof Error) {
+            return new AppError(err.message, err.name, true);
+        } else if (typeof err === "string") {
+            return new AppError(err, "Erreur inconnue", true);
+        } else {
+            return new AppError("Erreur inconnue", "Erreur inconnue", true);
+        }
+    }
 }
