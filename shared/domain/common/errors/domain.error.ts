@@ -20,7 +20,6 @@ export class DomainError extends BaseError {
 
     override createFrontError(): void {
         if (import.meta.server || !import.meta.env.SSR) return;
-        console.log(this);
         useToast().add({
             title:
                 "Une erreur est survenue lors du traitement de votre demande.",

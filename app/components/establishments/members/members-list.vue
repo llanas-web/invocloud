@@ -1,23 +1,6 @@
 <script setup lang="ts">
-    import type { DropdownMenuItem } from '@nuxt/ui'
-
     const { members } = useEstablishmentDetails()
     const q = ref('')
-
-    const items = [{
-        label: 'Edit member',
-        onSelect: () => console.log('Edit member')
-    }, {
-        label: 'Remove member',
-        color: 'error' as const,
-        onSelect: () => console.log('Remove member')
-    }] satisfies DropdownMenuItem[]
-
-    const memberStatusLabels = {
-        accepted: { label: 'Accepté', color: 'success' },
-        declined: { label: 'Refusé', color: 'error' },
-        pending: { label: 'En attente', color: 'warning' }
-    } as const
 </script>
 
 <template>

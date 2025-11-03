@@ -93,9 +93,6 @@ export class OcrMindeeRepository implements OcrRepository {
         const sig = getHeader(event, "X-Signature") || "";
         const raw = await readRawBody(event, "utf8");
 
-        console.log("Mindee Webhook received, signature:", sig);
-        console.log("Raw body:", raw);
-
         if (!raw) {
             throw createError({
                 statusCode: 400,

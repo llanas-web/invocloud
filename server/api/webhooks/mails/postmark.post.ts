@@ -68,20 +68,7 @@ export default defineEventHandler(async (event) => {
             throw createError({ status: 400, message: "No attachments found" });
         }
 
-        // TODO: lookup alias -> établissement, stockage, création facture
-        console.log("[INBOUND]", {
-            from: sender.Email,
-            to: recipients.map((t) => t.Email),
-            subject,
-            attachments: attachments.map((a) => ({
-                name: a.Name,
-                type: a.ContentType,
-                size: a.ContentLength,
-            })),
-        });
-
         const recipientEmail = recipients[0].Email.toLowerCase();
-
         const handMailInboundUsecase = new HandleInboundMailUsecase(
             repos,
             queries,

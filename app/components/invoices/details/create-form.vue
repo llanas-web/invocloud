@@ -13,7 +13,6 @@
     ])
 
     const onCreateSupplier = (newSupplierName: string) => {
-        console.log('Creating new supplier:', newSupplierName)
         createFormState.name = newSupplierName || ''
         openCreateModal.value = true
     }
