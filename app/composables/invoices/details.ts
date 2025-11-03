@@ -5,6 +5,7 @@ import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/
 const _useInvoiceDetails = () => {
     const route = useRoute();
     const { $queries, $storageRepository } = useNuxtApp();
+    const toast = useToast();
 
     const invoiceId = computed(() => route.params.id as string);
 
@@ -22,7 +23,9 @@ const _useInvoiceDetails = () => {
                     invoiceId.value,
                 );
             } catch (err) {
-                throw AppError.fromUnknownError(err);
+                const error = AppError.fromUnknownError(err);
+                toast.add(error.toToastOptions());
+                throw error;
             }
         },
         {

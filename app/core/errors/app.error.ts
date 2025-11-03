@@ -12,6 +12,16 @@ export class AppError extends Error {
         super(message ?? title);
     }
 
+    toToastOptions() {
+        return {
+            title: this.title,
+            description: this.message,
+            color: this.isError
+                ? "error"
+                : "warning" as "error" | "warning" | "info" | "success",
+        };
+    }
+
     static fromFetchError(err: FetchError): AppError {
         if (err.data?.data?.kind) {
             return AppError.fromBaseError(
@@ -56,6 +66,7 @@ export class AppError extends Error {
         } else if (err instanceof BaseError) {
             return AppError.fromBaseError(err);
         } else if (err instanceof Error) {
+            console.log(err.stack);
             return new AppError(err.message, err.name, true);
         } else if (typeof err === "string") {
             return new AppError(err, "Erreur inconnue", true);

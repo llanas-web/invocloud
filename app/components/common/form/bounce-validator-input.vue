@@ -155,7 +155,7 @@
         }
         // No sync errors → try async (if provided)
         await debouncedAsyncValidate(next)
-    }, { immediate: true })
+    })
 
     /**
      * Also react if parent updates modelValue externally.
