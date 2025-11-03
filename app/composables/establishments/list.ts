@@ -6,6 +6,7 @@ const _useEstablishmentsList = () => {
     const { $queries } = useNuxtApp();
     const { userSettings } = useUser();
     const { connectedUser } = useAuth();
+    const toast = useToast();
 
     const selectedId = useLocalStorage<string | null>(
         "selectedEstablishmentId",
@@ -26,7 +27,9 @@ const _useEstablishmentsList = () => {
                     { memberIds: [connectedUser.value.id] },
                 );
             } catch (err) {
-                throw AppError.fromUnknownError(err);
+                const error = AppError.fromUnknownError(err);
+                toast.add(error.toToastOptions());
+                throw error;
             }
         },
         {

@@ -6,6 +6,7 @@ const _useUser = () => {
     const { $usecases, $queries } = useNuxtApp();
     const { connectedUser } = useAuth();
     const { actions: { logout: logoutAction } } = useAuth();
+    const toast = useToast();
 
     const {
         data: dto,
@@ -19,7 +20,9 @@ const _useUser = () => {
                 connectedUser.value.id,
             );
         } catch (err) {
-            throw AppError.fromUnknownError(err);
+            const error = AppError.fromUnknownError(err);
+            toast.add(error.toToastOptions());
+            throw error;
         }
     }, {
         deep: true,

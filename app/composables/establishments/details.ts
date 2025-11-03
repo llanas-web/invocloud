@@ -10,6 +10,7 @@ const _useEstablishmentDetails = () => {
     const { selectedId, refresh: refreshListEstablishments } =
         useEstablishmentsList();
     const { connectedUser } = useAuth();
+    const toast = useToast();
 
     const {
         data: dto,
@@ -25,7 +26,9 @@ const _useEstablishmentDetails = () => {
                         selectedId.value,
                     );
             } catch (err) {
-                throw AppError.fromUnknownError(err);
+                const error = AppError.fromUnknownError(err);
+                toast.add(error.toToastOptions());
+                throw error;
             }
         },
         {

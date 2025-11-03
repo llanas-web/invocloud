@@ -3,6 +3,7 @@ import { AppError } from "~/core/errors/app.error";
 
 const _useSupplierDetails = () => {
     const { $queries } = useNuxtApp();
+    const toast = useToast();
 
     const selectedId = ref<string | null>(null);
 
@@ -16,7 +17,9 @@ const _useSupplierDetails = () => {
                     selectedId.value,
                 );
             } catch (err) {
-                throw AppError.fromUnknownError(err);
+                const error = AppError.fromUnknownError(err);
+                toast.add(error.toToastOptions());
+                throw error;
             }
         },
         { immediate: false, watch: [selectedId] },

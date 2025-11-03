@@ -4,6 +4,7 @@ import { AppError } from "~/core/errors/app.error";
 const _useSuppliers = () => {
     const { $usecases, $queries } = useNuxtApp();
     const { selectedId } = useEstablishmentsList();
+    const toast = useToast();
 
     const { data: dtos, error, refresh, pending } = useAsyncData(
         "suppliers",
@@ -14,7 +15,9 @@ const _useSuppliers = () => {
                     establishmentIds: [selectedId.value],
                 });
             } catch (err) {
-                throw AppError.fromUnknownError(err);
+                const error = AppError.fromUnknownError(err);
+                toast.add(error.toToastOptions());
+                throw error;
             }
         },
         {
