@@ -45,7 +45,6 @@ const _useEstablishmentDetails = () => {
     });
 
     const subscription = computed(() => {
-        console.log(dto.value);
         if (!dto.value?.subscription) return null;
         return {
             status: dto.value.subscription.status,

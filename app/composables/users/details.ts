@@ -21,7 +21,6 @@ const _useUser = () => {
     });
 
     const userSettings = computed(() => {
-        console.log("Computing user settings:", dto.value);
         if (!dto.value) return null;
         return {
             favoriteEstablishmentId: dto.value.favoriteEstablishmentId,

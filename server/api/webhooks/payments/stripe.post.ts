@@ -40,7 +40,6 @@ export default defineEventHandler(async (event) => {
                 stripeWebhookSecret,
             );
         const eventData = stripeEvent.data.object;
-        console.log("eventData: ", eventData);
 
         const handlePaymentEventsUsecase = new HandlePaymentEventsUsecase(
             repos,

@@ -29,7 +29,6 @@
 
 
     watch(calendarDate, async (newDate) => {
-        console.log('date-picker: calendarDate changed', newDate)
         // This line returns the date in YYYY-MM-DD with 1 day less because of timezone issues
         const val = newDate
             ? newDate.toDate(getLocalTimeZone())
@@ -37,7 +36,6 @@
 
         // update outer v-model
         modelValue.value = val
-        console.log('date-picker: emitting', val)
 
         // fire events Nuxt UI listens to so it re-validates this field
         emit('input', val)

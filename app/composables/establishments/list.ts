@@ -19,10 +19,6 @@ const _useEstablishmentsList = () => {
         status,
     } = useAsyncData(
         async () => {
-            console.log(
-                "Fetching establishments for user:",
-                connectedUser.value,
-            );
             if (!connectedUser.value?.id) return [];
             return $queries.establishmentQuery.listEstablishments(
                 { memberIds: [connectedUser.value.id] },

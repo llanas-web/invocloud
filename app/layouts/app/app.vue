@@ -84,12 +84,6 @@
                     open.value = false
                 }
             }, {
-                label: 'Notifications',
-                to: '/app/settings/notifications',
-                onSelect: () => {
-                    open.value = false
-                }
-            }, {
                 label: 'Securité',
                 to: '/app/settings/security',
                 onSelect: () => {
