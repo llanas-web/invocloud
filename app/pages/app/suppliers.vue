@@ -2,7 +2,6 @@
     import type { TableColumn } from '@nuxt/ui'
     import { getPaginationRowModel, type Row } from '@tanstack/table-core'
     import { useSupplierDetails } from '~/composables/suppliers/details';
-    import type { SupplierListItemViewModel } from '~/viewmodels/supplier/supplier-list-item.vm';
 
     definePageMeta({
         layout: 'app'
@@ -20,6 +19,7 @@
     const toast = useToast()
     const table = useTemplateRef('table')
     const { suppliers, pending, actions: { delete: deleteSupplierAction } } = useSuppliers()
+    type SupplierListItemViewModel = typeof suppliers.value[number]
     const { openModal: openCreateModal } = useSupplierCreate()
 
     const rowSelection = ref()
