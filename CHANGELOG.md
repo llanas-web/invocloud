@@ -2,6 +2,79 @@
 
 
 
+## 1.4.0 (2025-11-05)
+
+### Added
+- ✨  Adding ocr app upload [[151e905](https://github.com/llanas-web/invocloud/commit/151e905c776b61e420c2373b8b1bf01f4df638de)]
+- ✨  Adding renew canceled subscription [[71db209](https://github.com/llanas-web/invocloud/commit/71db20996fa16c74a72dd8752d4e00ac8083b084)]
+
+### Fixed
+- 🐛  Fixing refacto [[74d6555](https://github.com/llanas-web/invocloud/commit/74d6555f4e0c5f426d53336855bb960ec5b73f6c)]
+- 🐛  Fixing refacto bugs [[a4f380f](https://github.com/llanas-web/invocloud/commit/a4f380f301a66ddb8d86493c37420f7fe68442fb)]
+- 🐛  almost done [[57cce53](https://github.com/llanas-web/invocloud/commit/57cce53f2ca02b14d4330d88ab1017fcb324d108)]
+- 🐛  Fixing establishments loader [[ea21bb2](https://github.com/llanas-web/invocloud/commit/ea21bb25539bff7692518ee1ff6b3a38e036e417)]
+- 🐛  Fixing sendInvoice [[00e9c39](https://github.com/llanas-web/invocloud/commit/00e9c396084b3709b44648d434757ae41fc39ae4)]
+- 🐛  Fixing front [[24b34f6](https://github.com/llanas-web/invocloud/commit/24b34f62932c540d336043112c04a6405dd38843)]
+- 🐛  Fixing all compulator error [[1e6c0ea](https://github.com/llanas-web/invocloud/commit/1e6c0ea9400124b4b555a49c69405b196aa58925)]
+- 🐛  Fixing worker [[b8468c3](https://github.com/llanas-web/invocloud/commit/b8468c3d62f2eba7fe36f0fa404e1cf22d0452c7)]
+- 🐛  Fixing mindee import [[b8f7abd](https://github.com/llanas-web/invocloud/commit/b8f7abdc408f246289a680d98d10fb37c87c0f75)]
+- 🐛  Fixing toggle settings [[4e13d14](https://github.com/llanas-web/invocloud/commit/4e13d1486de22a63197d9a9bbaaf9de82f57ccc4)]
+- 🐛  Fixing every domain object mutation to another variable [[ddf0fc5](https://github.com/llanas-web/invocloud/commit/ddf0fc5d134ef87bcf15a2c823e3e6c845153750)]
+- 🐛  Fixing establishments and middleware DI [[6f87b71](https://github.com/llanas-web/invocloud/commit/6f87b71b69c2adead239c8b99219bf7583e76c7d)]
+- 🐛  Fixing invoices display [[ab6766f](https://github.com/llanas-web/invocloud/commit/ab6766f57d3f0f30d1f2fd7eb58eeb1a730f7c62)]
+- 🐛  fixing columns and establishment selection [[2f92892](https://github.com/llanas-web/invocloud/commit/2f928928f77debf79b28d3b71d8a108c9a4575ec)]
+- 🐛  Passing checkPrefix in the api for serviceKey verif [[2b4b36e](https://github.com/llanas-web/invocloud/commit/2b4b36eb516e4cb178327fa780f0aa7eb5cf157b)]
+- 🐛  Fixing stripe webhook life cycle [[5cfc3a4](https://github.com/llanas-web/invocloud/commit/5cfc3a4ea4bfa6b988a212c937d654e83ac83583)]
+- 🐛  Removing unused subscription status and removing subscription when canceled [[c3f6593](https://github.com/llanas-web/invocloud/commit/c3f659328514dd7c0dd74af051dfba7fb24160c0)]
+- 🐛  Skipping trial payment 0 to subscription status update [[1f82f15](https://github.com/llanas-web/invocloud/commit/1f82f15b4420da351e5b6ead0825d7bb10a2bdf0)]
+- 🐛  Removing subscription only on webhook delete [[18f0587](https://github.com/llanas-web/invocloud/commit/18f0587be38fbf2e4073c050ea2a2dc2c1664d87)]
+- 🐛  Fixing activation subscription [[cd477db](https://github.com/llanas-web/invocloud/commit/cd477db9be236bf397d4a463834436e4ad15c8b9)]
+- 🐛  Fix update subscription on payment end [[73a4c0e](https://github.com/llanas-web/invocloud/commit/73a4c0e1e2d329e01b660d2cd5fd36285c45c0d2)]
+- 🐛  Fixing suppliers [[83bdfed](https://github.com/llanas-web/invocloud/commit/83bdfedb499b9f08cc6877f64aa9d7e02d111c77)]
+
+### Changed
+- ♻️  Creating user repository [[a369255](https://github.com/llanas-web/invocloud/commit/a369255e9c3e0ab25e97665a3434d59a066d3cf0)]
+- ♻️  Creating establishement repository [[6c118a4](https://github.com/llanas-web/invocloud/commit/6c118a4297e0cf98e9ea45cf5aa825a36f9fea66)]
+- ♻️  Adding members repository [[2f9336a](https://github.com/llanas-web/invocloud/commit/2f9336abcf040e2868f0fb7f4c6ee912273c5918)]
+- ♻️  Adding user setting to repository [[bf63ad4](https://github.com/llanas-web/invocloud/commit/bf63ad46a5ecb9908649fa1eeb2f39da62b10dcf)]
+- ♻️  Adding invoice repository [[a525c45](https://github.com/llanas-web/invocloud/commit/a525c452959c3e739a8826c3f791c5137475fbdc)]
+- ♻️  ADding storage repository [[cebe1e1](https://github.com/llanas-web/invocloud/commit/cebe1e13d6de1c33b40a3d7ebc0c18d24395fe8e)]
+- ♻️  Adding suppliers repository [[8d28cd6](https://github.com/llanas-web/invocloud/commit/8d28cd6afcc896ef3b0afd32c8297ae89ce1c66b)]
+- ♻️  Adding uploadValidation repository [[a88864a](https://github.com/llanas-web/invocloud/commit/a88864a93e997d470ca14da5951803c407bbaa32)]
+- ♻️  Adding invoiceTasks repository [[663af8f](https://github.com/llanas-web/invocloud/commit/663af8f5fd12c0e72f36e0350c6c5494cde3cb25)]
+- ♻️  REfactoring api paths [[63c7f43](https://github.com/llanas-web/invocloud/commit/63c7f43a668607a75a31db8933c0aeda094ed1fd)]
+- ♻️  Creating models [[a27197e](https://github.com/llanas-web/invocloud/commit/a27197e345b95ff855c60668fd5bdab37fd2522a)]
+- ♻️  Creating auth provider [[84d66d0](https://github.com/llanas-web/invocloud/commit/84d66d0ba31a8ef326e060820fb1f18df19709ed)]
+- ♻️  Moving database factory to shared folder [[37075e3](https://github.com/llanas-web/invocloud/commit/37075e3fe960a29c629a8d063b5bdcbc6217e047)]
+- ♻️  Migrating storage providers to shared repo [[8cdbe1c](https://github.com/llanas-web/invocloud/commit/8cdbe1ce78d5497a3d56a491bdd2ac814e5258eb)]
+- ♻️  Fixing auth repository and layer [[34c5aa6](https://github.com/llanas-web/invocloud/commit/34c5aa621d386937ab560efa02ee4e3fc7960781)]
+- ♻️  Fixing front [[140577d](https://github.com/llanas-web/invocloud/commit/140577d19d627a8bd89badcc2b178c6ba64fd35f)]
+- ♻️  Ending backend refacto! [[d76e1e0](https://github.com/llanas-web/invocloud/commit/d76e1e095c4488cc96895298d63a78275c79d698)]
+- ♻️  Refacto webhooks [[ae92eee](https://github.com/llanas-web/invocloud/commit/ae92eee4b1d5bac5f411109978ace7abe7d3b20f)]
+- ♻️  Refactoring DTO and model on UI [[64eb0d6](https://github.com/llanas-web/invocloud/commit/64eb0d6db29717527acead9044de0d083bf28444)]
+- ♻️  Moving subscription methods to DDD and usecase [[4e8cc99](https://github.com/llanas-web/invocloud/commit/4e8cc992cbf2f2b9041b428046a74d3a4375296b)]
+- ♻️  Refacto invite member action [[6dec1a1](https://github.com/llanas-web/invocloud/commit/6dec1a1810aa8fa651a6a0a5e534255be397bd10)]
+- ♻️  Adding supplier domain model and usecase [[4f2acfd](https://github.com/llanas-web/invocloud/commit/4f2acfd3539df48c0596ffac7d41db7949266d19)]
+- ♻️  Refacto payment subscription DDD [[dcd7109](https://github.com/llanas-web/invocloud/commit/dcd71090b6235514bbefa5a911341279e649820a)]
+- ♻️  Refacto user domain to DDD [[665207b](https://github.com/llanas-web/invocloud/commit/665207bbf7085e44bcbf3507c2f4e37f2bf6a664)]
+- ♻️  Removing viewModel in favor of composables [[b0ffba3](https://github.com/llanas-web/invocloud/commit/b0ffba367ff471aac7579f5c80790f5cea23f407)]
+- ♻️  Migrating providers [[74a1880](https://github.com/llanas-web/invocloud/commit/74a1880ee0ad9084d0cde72c497d72b16d66c938)]
+- ♻️  Final migration [[9d7f817](https://github.com/llanas-web/invocloud/commit/9d7f81750e69b87d475c08602037e929ec1061a5)]
+- ♻️  Fixing UI [[d39e146](https://github.com/llanas-web/invocloud/commit/d39e146bc6fbc3a0e8f7faf8bdfb06ff8dda9965)]
+- ♻️  Refacto dependecies injection in backend for simplicity and perfromances [[05ec5e5](https://github.com/llanas-web/invocloud/commit/05ec5e56c8d8ff290be6aa3d986c6d4b5bec18b5)]
+- ♻️  Implementing queries inside front in stead of simple query usecases [[8f459cf](https://github.com/llanas-web/invocloud/commit/8f459cfb8367714989afa8612dfeaba7072e8461)]
+- 🚚  Move external calls to providers files [[afdabed](https://github.com/llanas-web/invocloud/commit/afdabed299ce9a04bb6b8e242a6d4ac02c0d830c)]
+- 🚚  Renaming repostirories and interfaces [[3e2a068](https://github.com/llanas-web/invocloud/commit/3e2a068b4b603e14b236d4418ba8a53ad6572b9e)]
+- 🚚  Moving types [[109d786](https://github.com/llanas-web/invocloud/commit/109d786f76871d4590103a39a243457f4079d3bb)]
+
+### UI
+- 💄  Fixing the UI runtime [[53c6868](https://github.com/llanas-web/invocloud/commit/53c68681c95e587e0d89c78a06521832fb2ba7ea)]
+- 💄  Adding toast to useAsyncAction [[7b2a8be](https://github.com/llanas-web/invocloud/commit/7b2a8be8866f8e0724374081f35d5a902dbeb884)]
+
+### Chores
+- 🗑️  Cleaning logs and dead code [[744fb6f](https://github.com/llanas-web/invocloud/commit/744fb6f0ffe2751d8c527e430664892894f21755)]
+- 🗑️  Cleaning errors [[0d3cb0b](https://github.com/llanas-web/invocloud/commit/0d3cb0beae423a1c84b07e19ce3012707064c59c)]
+
 ## 1.3.2 (2025-10-06)
 
 ### Fixed
