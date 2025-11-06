@@ -74,7 +74,7 @@
         </UPageHero>
 
         <UPageSection id="features" :title="page?.sections[0]!.title" :description="page?.sections[0]!.description" :ui="{
-            root: 'bg-muted text-muted pt-[var(--ui-header-height)] md:pt-8',
+            root: 'bg-muted text-muted pt-(--ui-header-height) md:pt-8',
             title: 'max-w-xl mx-auto text-muted',
             description: 'max-w-xl mx-auto text-muted',
         }">
@@ -92,7 +92,7 @@
 
 
         <UPageSection id="pricing" :title="page.pricing.title" :description="page.pricing.description" :ui="{
-            root: 'text-muted pt-[var(--ui-header-height)] md:pt-8',
+            root: 'text-muted pt-(--ui-header-height) md:pt-8',
             title: 'max-w-xl mx-auto text-muted',
         }">
             <UContainer>
@@ -113,7 +113,7 @@
         </UPageSection>
 
         <UPageSection id="trust" title="Ils nous font confiance" :ui="{
-            root: 'bg-muted text-muted pt-[var(--ui-header-height)] md:pt-8',
+            root: 'bg-muted text-muted pt-(--ui-header-height) md:pt-8',
             title: 'max-w-xl mx-auto text-muted',
         }">
             <template #description>
