@@ -1,20 +1,16 @@
 <script setup lang="ts">
-    import type { InvoiceStatus } from '~~/shared/domain/invoice/invoice.model';
-
-    const { refresh } = useInvoices();
+    const { refresh, statusFilter } = useInvoices();
 
     const props = defineProps<{
         selectedCount: number;
         isDownloading: boolean;
         downloadProgress?: { done: number; total: number } | null;
-        statusFilter: InvoiceStatus | 'overdue' | undefined;
     }>();
 
     const emit = defineEmits<{
         send: [];
         download: [];
         delete: [];
-        'update:statusFilter': [value: InvoiceStatus | 'overdue' | undefined];
     }>();
 
     const statusItems = [
@@ -60,7 +56,7 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-1.5">
-            <USelect :model-value="statusFilter" :items="statusItems" :ui="{
+            <USelect v-model="statusFilter" :items="statusItems" :ui="{
                 trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200'
             }" placeholder="Filter status" class="min-w-28" />
         </div>

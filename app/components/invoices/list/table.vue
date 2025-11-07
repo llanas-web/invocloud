@@ -11,7 +11,7 @@
     const UDropdownMenu = resolveComponent('UDropdownMenu')
     const UButton = resolveComponent('UButton')
 
-    const { invoices, pending, statusFilter, supplierFilter, actions } = useInvoices();
+    const { invoices, pending, supplierFilter, actions } = useInvoices();
     const { open: isSendModalOpen, selectedInvoices: listInvoicesToSend } = useInvoicesSend();
     const { open: isDeleteModalOpen, selectedInvoices: listInvoicesToDelete } = useInvoicesDelete();
     const { launchDownloadWorker, progress, running } = useWorker();
@@ -99,8 +99,8 @@
     <LazyInvoicesDeleteModal />
 
     <InvoicesListTableToolbar :selected-count="table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0"
-        :is-downloading="running" :download-progress="progress" v-model:status-filter="statusFilter"
-        @send="handleBulkSend" @download="handleBulkDownload" @delete="handleBulkDelete" />
+        :is-downloading="running" :download-progress="progress" @send="handleBulkSend" @download="handleBulkDownload"
+        @delete="handleBulkDelete" />
 
     <UTable ref="invoiceTable" v-model:row-selection="rowSelection" v-model:pagination="pagination"
         :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }" class="shrink-0"
