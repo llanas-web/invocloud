@@ -38,7 +38,7 @@ export default class InvoiceSupabaseQuery implements InvoiceQuery {
     ): Promise<InvoiceListItemDTO[]> {
         const req = this.supabase
             .from("invoices")
-            .select("*, suppliers(name, establishment_id)")
+            .select("*, suppliers!inner(name, establishment_id)")
             .order("created_at", { ascending: false });
 
         if (filters?.overdue) {
