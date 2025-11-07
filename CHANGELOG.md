@@ -2,6 +2,12 @@
 
 
 
+## 1.4.1 (2025-11-07)
+
+### Fixed
+- 🐛  Fixing cookies parser error (temp) [[91822d2](https://github.com/llanas-web/invocloud/commit/91822d2ff7bd42cde6b3ae166c57505cfe1dcc14)]
+- 🚑  Fixing join invoices and supplier as inner for exclude null values [[89d9368](https://github.com/llanas-web/invocloud/commit/89d9368e28f2c9b74679e2b4d71a9efa93c557a1)]
+
 ## 1.4.0 (2025-11-05)
 
 ### Added
