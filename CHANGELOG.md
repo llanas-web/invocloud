@@ -2,6 +2,11 @@
 
 
 
+## 1.4.2 (2025-11-07)
+
+### Fixed
+- 🚑  Fixing filter status on invoices [[75185cc](https://github.com/llanas-web/invocloud/commit/75185cc6b0728f47db06c89f8fc7aa677b69c286)]
+
 ## 1.4.1 (2025-11-07)
 
 ### Fixed
