@@ -27,7 +27,7 @@ export const invoicesApi = {
     send(body: SendInvoicesBody) {
         return $fetch<SendInvoicesResponse>("/api/security/invoice/send", {
             method: "POST",
-            body: parseBody(SendInvoiceUploadSchema, body),
+            body: parseBody(SendInvoicesBodySchema, body),
         });
     },
     requestUploadAnonymous(body: RequestUploadInvoiceBody) {

@@ -8,7 +8,7 @@ import { STORAGE_BUCKETS } from "~~/shared/application/common/providers/storage/
 
 type DownloadMsg = {
     type: "download";
-    invoices: { id: string; filePath: string; invoiceNumber: string }[];
+    invoices: { id: string; filePath: string; number: string }[];
     supabaseUrl: string;
     supabaseAnonKey: string;
     access_token: string;
@@ -56,7 +56,7 @@ self.onmessage = async (e: MessageEvent<string>) => {
                     .downloadFile(STORAGE_BUCKETS.INVOICES, invoice.filePath!);
                 if (error) throw error;
                 await zip.add(
-                    `${invoice.invoiceNumber}.${
+                    `${invoice.number}.${
                         mime.extension(
                             blob.type,
                         ) || "bin"
@@ -65,7 +65,7 @@ self.onmessage = async (e: MessageEvent<string>) => {
                 );
             } catch (e: any) {
                 await zip.add(
-                    `${invoice.invoiceNumber}-ERROR.txt`,
+                    `${invoice.number}-ERROR.txt`,
                     new TextReader(String(e?.message ?? "error")),
                 );
             } finally {
