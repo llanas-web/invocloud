@@ -2,6 +2,11 @@
 
 
 
+## 1.4.3 (2025-11-12)
+
+### Fixed
+- 🚑  htofix download and emails invoices [[4717725](https://github.com/llanas-web/invocloud/commit/4717725fb3fb7cc7850f6cdb0646f77dcb193799)]
+
 ## 1.4.2 (2025-11-07)
 
 ### Fixed
