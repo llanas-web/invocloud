@@ -26,18 +26,33 @@ export default class AuthSupabaseRepository implements AuthRepository {
         if (user != null) {
             this._connectedUser = new AuthUserModel(user.sub, user.email ?? "");
         }
-        this.supabaseClient.auth.onAuthStateChange((event, session) => {
-            const _event = event as AuthEvent;
-            this.onAuthChange(
-                _event,
-                session?.user
-                    ? new AuthUserModel(
-                        session.user.id,
-                        session.user.email ?? "",
-                    )
-                    : null,
-            );
+        this.supabaseClient.auth.onAuthStateChange((event) => {
+            switch (event) {
+                case "INITIAL_SESSION":
+                case "SIGNED_IN":
+                    this.onLogin();
+                    break;
+
+                case "SIGNED_OUT":
+                    this.onLogout();
+                    break;
+            }
         });
+    }
+
+    async onLogin() {
+        const { data, error } = await this.supabaseClient.auth.getUser();
+        if (error) throw SupabaseError.fromPostgrest(error);
+        if (data.user) {
+            this._connectedUser = new AuthUserModel(
+                data.user.id,
+                data.user.email ?? "",
+            );
+        }
+    }
+
+    async onLogout() {
+        this._connectedUser = null;
     }
 
     async getCurrentUser(): Promise<
