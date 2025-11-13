@@ -7,11 +7,8 @@
     }>()
 
     const { establishments, status, pending, selectEstablishment, selectedId } = useEstablishmentsList()
-    const { establishment } = useEstablishmentDetails();
     const { isOpen } = useEstablishmentCreate();
     const { userSettings, actions } = useUser();
-
-    const addModel = useTemplateRef<typeof LazyEstablishmentsAddModal>('addModal')
 
     const items = computed<DropdownMenuItem[][]>(() => {
         return [
@@ -34,6 +31,14 @@
     const establishmentsLoading = computed(() => {
         return status.value === 'idle' || pending.value;
     })
+
+    const selectedEstablishmentLabel = computed(() => {
+        const selected = establishments.value.find(e => e.id === selectedId.value);
+        console.log("establishments ", establishments.value);
+        console.log("selectedId ", selectedId.value);
+        console.log("selected establishment ", selected);
+        return selected ? selected.name : 'Sélectionner une structure';
+    })
 </script>
 
 <template>
@@ -52,10 +57,10 @@
                 </UButton>
             </div>
         </template>
-        <UButton v-bind="establishment" color="neutral" variant="soft" block :square="collapsed"
+        <UButton v-bind="selectedId" color="neutral" variant="soft" block :square="collapsed"
             class="data-[state=open]:bg-elevated" :class="[!collapsed && 'py-2']"
             :ui="{ trailingIcon: 'text-dimmed', leadingIcon: collapsed ? 'hidden' : 'block' }"
-            :label="establishment?.name || 'Sélectionner une structure'" trailing-icon="i-lucide-chevrons-up-down"
+            :label="selectedEstablishmentLabel" trailing-icon="i-lucide-chevrons-up-down"
             leading-icon="i-lucide-building">
         </UButton>
     </UDropdownMenu>
