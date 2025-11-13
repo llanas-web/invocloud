@@ -21,7 +21,7 @@ const _useEstablishmentDetails = () => {
         async () => {
             try {
                 if (!selectedId.value) return null;
-                return await $queries.establishmentQuery
+                return $queries.establishmentQuery
                     .getEstablishmentDetails(
                         selectedId.value,
                     );
@@ -33,7 +33,6 @@ const _useEstablishmentDetails = () => {
         },
         {
             server: false,
-            immediate: true,
             default: () => null,
             watch: [selectedId],
         },

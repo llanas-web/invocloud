@@ -8,6 +8,9 @@ export interface AuthRepository {
         AuthUserModel | AnonymousAuthUserModel | null
     >;
 
+    onLogin(): Promise<void>;
+    onLogout(): Promise<void>;
+
     onAuthChange(
         event: AuthEvent,
         user?: AnonymousAuthUserModel | AuthUserModel | null,
