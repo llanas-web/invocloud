@@ -23,9 +23,10 @@ const _useEstablishmentsList = () => {
         async () => {
             try {
                 if (!connectedUser.value?.id) return [];
-                return $queries.establishmentQuery.listEstablishments(
-                    { memberIds: [connectedUser.value.id] },
-                );
+                return $queries.establishmentQuery
+                    .listEstablishments(
+                        { memberIds: [connectedUser.value.id] },
+                    );
             } catch (err) {
                 const error = AppError.fromUnknownError(err);
                 toast.add(error.toToastOptions());
@@ -33,19 +34,20 @@ const _useEstablishmentsList = () => {
             }
         },
         {
+            immediate: true,
             server: false,
             default: () => [] as EstablishmentListItemDTO[],
             watch: [() => connectedUser.value],
         },
     );
 
-    const establishments = computed(() =>
-        dtos.value.map((dto) => ({
+    const establishments = computed(() => {
+        return dtos.value.map((dto) => ({
             id: dto.id,
             name: dto.name,
             emailPrefix: dto.emailPrefix,
-        }))
-    );
+        }));
+    });
 
     // --- Helpers sélection
     function exists(id?: string | null) {

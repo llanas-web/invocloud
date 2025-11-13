@@ -16,7 +16,7 @@ const _useUser = () => {
     } = useAsyncData(async () => {
         try {
             if (!connectedUser.value?.id) return null;
-            return await $queries.userQuery.getUserDetails(
+            return $queries.userQuery.getUserDetails(
                 connectedUser.value.id,
             );
         } catch (err) {
@@ -25,7 +25,6 @@ const _useUser = () => {
             throw error;
         }
     }, {
-        deep: true,
         immediate: true,
     });
 
