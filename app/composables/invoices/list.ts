@@ -63,6 +63,8 @@ const _useInvoices = () => {
                 rangeFilter,
             ],
             lazy: true,
+            immediate: true,
+            server: false,
         },
     );
 

@@ -28,13 +28,13 @@ export default class AuthSupabaseRepository implements AuthRepository {
         }
         this.supabaseClient.auth.onAuthStateChange((event) => {
             switch (event) {
-                case "INITIAL_SESSION":
                 case "SIGNED_IN":
                     this.onLogin();
                     break;
-
                 case "SIGNED_OUT":
                     this.onLogout();
+                    break;
+                default:
                     break;
             }
         });
@@ -42,6 +42,7 @@ export default class AuthSupabaseRepository implements AuthRepository {
 
     async onLogin() {
         const { data, error } = await this.supabaseClient.auth.getUser();
+        console.log("onLogin user data:", error);
         if (error) throw SupabaseError.fromPostgrest(error);
         if (data.user) {
             this._connectedUser = new AuthUserModel(
@@ -49,10 +50,20 @@ export default class AuthSupabaseRepository implements AuthRepository {
                 data.user.email ?? "",
             );
         }
+        if (import.meta.client) {
+            console.log("User has login in from client, redirect him to /app");
+            await navigateTo("/app");
+        }
     }
 
     async onLogout() {
         this._connectedUser = null;
+        if (import.meta.client) {
+            console.log(
+                "User has logout in from client, redirect him to /auth/login",
+            );
+            await navigateTo("/auth/login");
+        }
     }
 
     async getCurrentUser(): Promise<
