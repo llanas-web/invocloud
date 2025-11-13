@@ -41,6 +41,7 @@ export default class AuthSupabaseRepository implements AuthRepository {
     }
 
     async onLogin() {
+        if (this._connectedUser) return;
         const { data, error } = await this.supabaseClient.auth.getUser();
         console.log("onLogin user data:", error);
         if (error) throw SupabaseError.fromPostgrest(error);
