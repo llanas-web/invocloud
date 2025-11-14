@@ -4,13 +4,20 @@ import {
     AnonymousAuthUserModel,
     AuthUserModel,
 } from "~~/shared/application/common/providers/auth/dto/auth.dto";
-import { AuthEvent } from "~~/shared/application/common/providers/auth/types";
 import type { Database } from "./database.types";
 import { SupabaseError } from "./supabase.error";
+import {
+    AuthEvent,
+    type AuthEventData,
+} from "~~/shared/application/common/providers/auth/auth.event.emitter";
 
 export default class AuthSupabaseRepository implements AuthRepository {
+    private eventCallbacks: Map<AuthEvent, ((data: AuthEventData) => void)[]> =
+        new Map();
+
     private _connectedUser: AuthUserModel | AnonymousAuthUserModel | null =
         null;
+
     private baseUrl: string;
 
     get connectedUser() {
@@ -21,12 +28,13 @@ export default class AuthSupabaseRepository implements AuthRepository {
         private supabaseClient: SupabaseClient<Database>,
         user: JwtPayload | null,
     ) {
-        const { baseUrl } = useRuntimeConfig();
+        const { public: { baseUrl } } = useRuntimeConfig();
         this.baseUrl = baseUrl;
         if (user != null) {
             this._connectedUser = new AuthUserModel(user.sub, user.email ?? "");
         }
         this.supabaseClient.auth.onAuthStateChange((event) => {
+            console.log("Auth state changed:", event);
             switch (event) {
                 case "SIGNED_IN":
                     this.onLogin();
@@ -40,6 +48,28 @@ export default class AuthSupabaseRepository implements AuthRepository {
         });
     }
 
+    on(event: AuthEvent, callback: (data: AuthEventData) => void): void {
+        if (!this.eventCallbacks.has(event)) {
+            this.eventCallbacks.set(event, []);
+        }
+        this.eventCallbacks.get(event)!.push(callback);
+    }
+
+    off(event: AuthEvent, callback: (data: AuthEventData) => void): void {
+        const callbacks = this.eventCallbacks.get(event);
+        if (!callbacks) return;
+        this.eventCallbacks.set(
+            event,
+            callbacks.filter((cb) => cb !== callback),
+        );
+    }
+
+    emit(event: AuthEvent, data: AuthEventData): void {
+        const callbacks = this.eventCallbacks.get(event);
+        if (!callbacks) return;
+        callbacks.forEach((callback) => callback(data));
+    }
+
     async onLogin() {
         if (this._connectedUser) return;
         const { data, error } = await this.supabaseClient.auth.getUser();
@@ -51,20 +81,18 @@ export default class AuthSupabaseRepository implements AuthRepository {
                 data.user.email ?? "",
             );
         }
-        if (import.meta.client) {
-            console.log("User has login in from client, redirect him to /app");
-            await navigateTo("/app");
-        }
+        this.emit(AuthEvent.SIGNED_IN, {
+            user: this._connectedUser,
+            timestamp: new Date(),
+        });
     }
 
     async onLogout() {
         this._connectedUser = null;
-        if (import.meta.client) {
-            console.log(
-                "User has logout in from client, redirect him to /auth/login",
-            );
-            await navigateTo("/auth/login");
-        }
+        this.emit(AuthEvent.SIGNED_OUT, {
+            user: null,
+            timestamp: new Date(),
+        });
     }
 
     async getCurrentUser(): Promise<
@@ -75,21 +103,6 @@ export default class AuthSupabaseRepository implements AuthRepository {
             ? new AuthUserModel(data.user.id, data.user.email ?? "")
             : null;
         return this._connectedUser;
-    }
-
-    onAuthChange(
-        event: AuthEvent,
-        user?: AnonymousAuthUserModel | AuthUserModel | null,
-    ) {
-        switch (event) {
-            case AuthEvent.INITIAL_SESSION:
-            case AuthEvent.SIGNED_IN:
-                this._connectedUser = user || null;
-                break;
-            case AuthEvent.SIGNED_OUT:
-                this._connectedUser = null;
-                break;
-        }
     }
 
     async signInWithPassword(

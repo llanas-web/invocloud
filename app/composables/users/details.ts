@@ -26,6 +26,7 @@ const _useUser = () => {
         }
     }, {
         immediate: true,
+        lazy: true,
     });
 
     const userSettings = computed(() => {

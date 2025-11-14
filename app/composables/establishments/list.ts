@@ -36,6 +36,7 @@ const _useEstablishmentsList = () => {
         {
             immediate: true,
             server: false,
+            lazy: true,
             default: () => [] as EstablishmentListItemDTO[],
             watch: [() => connectedUser.value],
         },
