@@ -1,4 +1,13 @@
-const publicPath = ["/", "/pdc", "/faq", "/cgu"];
+const publicPath = [
+    "/",
+    "/pdc",
+    "/faq",
+    "/cgu",
+];
+
+const connectedAuthPaths = [
+    "/auth/update-password",
+];
 
 export default defineNuxtRouteMiddleware((middleware) => {
     const { $authRepository } = useNuxtApp();
@@ -8,6 +17,9 @@ export default defineNuxtRouteMiddleware((middleware) => {
             return navigateTo("/auth/login");
         }
     } else {
-        if (middleware.path.startsWith("/auth")) return navigateTo("/app");
+        if (
+            middleware.path.startsWith("/auth") &&
+            !connectedAuthPaths.includes(middleware.path)
+        ) return navigateTo("/app");
     }
 });
