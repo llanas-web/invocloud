@@ -1,20 +1,12 @@
+import type { AuthEvent, AuthEventEmitter } from "./auth.event.emitter";
 import type { AnonymousAuthUserModel, AuthUserModel } from "./dto/auth.dto";
-import type { AuthEvent } from "./types";
 
-export interface AuthRepository {
+export interface AuthRepository extends AuthEventEmitter {
     readonly connectedUser: AuthUserModel | AnonymousAuthUserModel | null;
 
     getCurrentUser(): Promise<
         AuthUserModel | AnonymousAuthUserModel | null
     >;
-
-    onLogin(): Promise<void>;
-    onLogout(): Promise<void>;
-
-    onAuthChange(
-        event: AuthEvent,
-        user?: AnonymousAuthUserModel | AuthUserModel | null,
-    ): void;
 
     signInWithPassword(
         email: string,

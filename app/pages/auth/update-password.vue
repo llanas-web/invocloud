@@ -55,7 +55,7 @@
     const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof passwordSchema>>) => {
         const { new: newPassword } = payload.data;
         await resetPassword.execute(newPassword);
-        await navigateTo('/app')
+        await navigateTo('/auth/login');
     }
 </script>
 

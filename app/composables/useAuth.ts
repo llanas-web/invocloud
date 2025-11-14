@@ -1,11 +1,33 @@
 import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "~/composables/core/useAsyncAction";
 import { userApi } from "~/services/api/user.api";
+import { AuthEvent } from "~~/shared/application/common/providers/auth/auth.event.emitter";
 
 const _useAuth = () => {
     const config = useRuntimeConfig();
+    const route = useRoute();
     const authRepository = useNuxtApp().$authRepository;
     const redirectTo = `${config.public.baseUrl}/auth/callback`;
+
+    authRepository.on(AuthEvent.SIGNED_IN, onLogin);
+    authRepository.on(AuthEvent.SIGNED_OUT, onLogout);
+
+    function onLogin() {
+        if (
+            route.path.startsWith("/auth/login") ||
+            route.path.startsWith("/auth/signup")
+        ) {
+            console.log("Redirecting to /app");
+            navigateTo("/app");
+        }
+    }
+
+    function onLogout() {
+        if (route.path.startsWith("/app")) {
+            console.log("Redirecting to /auth/login");
+            navigateTo("/auth/login");
+        }
+    }
 
     const connectedUser = computed(() => authRepository.connectedUser);
 
@@ -24,6 +46,7 @@ const _useAuth = () => {
         {
             showToast: false,
             errorTitle: "Erreur lors de la connexion.",
+            errorMessage: "Vérifiez vos identifiants et réessayez.",
         },
     );
 

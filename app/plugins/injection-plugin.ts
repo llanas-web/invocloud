@@ -1,3 +1,4 @@
+import { AuthEvent } from "~~/shared/application/common/providers/auth/auth.event.emitter";
 import type { AuthRepository } from "~~/shared/application/common/providers/auth/auth.repository";
 import { makeUseCasesClient } from "~~/shared/application/common/usecase.client.factory";
 import type { Queries } from "~~/shared/domain/common/queries.factory";
