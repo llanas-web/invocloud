@@ -2,6 +2,11 @@
 
 
 
+## 1.4.4 (2025-11-18)
+
+### Fixed
+- 🚑  Fixing production email transfert [[695faf2](https://github.com/llanas-web/invocloud/commit/695faf21a7c0735be9578493fcb408eedc40b94a)]
+
 ## 1.4.3 (2025-11-12)
 
 ### Fixed

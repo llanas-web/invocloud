@@ -2,7 +2,7 @@
   "name": "nuxt-app",
   "private": true,
   "type": "module",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev --inspect",
