@@ -1,0 +1,17 @@
+name: enterprise
+title: Enterprise
+description: Pour les grandes entreprises et les cabinets comptables.
+price: "Sur devis"
+establisments: null
+users: null
+monthly-invoices: null
+price-per-extra-invoice: 0.05
+transfert-invoice: true
+email-invoice: true
+pdp: true
+ocr: true
+support: true
+beta: true
+features:
+  - fonctionnalités prémium
+  - Support dédié
