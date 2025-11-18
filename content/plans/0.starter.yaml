@@ -1,0 +1,14 @@
+name: starter
+title: Starter
+description: Pour les petites entreprises et les indépendants.
+price: "29.90 €"
+establisments: 1
+users: 3
+monthly-invoices: 200
+price-per-extra-invoice: 0.05
+transfert-invoice: true
+email-invoice: false
+pdp: true
+ocr: false
+support: false
+beta: false

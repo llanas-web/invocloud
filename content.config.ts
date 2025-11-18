@@ -3,7 +3,7 @@ import { defineCollection, defineContentConfig, z } from "@nuxt/content";
 export const collections = {
     index: defineCollection({
         type: "page",
-        source: "0.index.yaml",
+        source: "index.yaml",
         schema: z.object({
             title: z.string(),
             description: z.string(),
@@ -36,6 +36,59 @@ export const collections = {
                     }),
                 ),
             }),
+        }),
+    }),
+    plans: defineCollection({
+        type: "data",
+        source: "plans/**.yaml",
+        schema: z.object({
+            id: z.string(),
+            name: z.string(),
+            title: z.string(),
+            description: z.string().optional(),
+            price: z.string(),
+            establisments: z.number().nullable(),
+            users: z.number().nullable(),
+            "monthly-invoices": z.number().nullable(),
+            "price-per-extra-invoice": z.number(),
+            pdp: z.boolean(),
+            ocr: z.boolean(),
+            "email-invoice": z.boolean().optional(),
+            "transfert-invoice": z.boolean().optional(),
+            support: z.boolean(),
+            beta: z.boolean(),
+            features: z.array(z.string()).optional(),
+        }),
+    }),
+    tarifs: defineCollection({
+        type: "page",
+        source: "tarifs.yaml",
+        schema: z.object({
+            title: z.string(),
+            description: z.string(),
+            keywords: z.string().optional(),
+            plans: z.array(
+                z.object({
+                    id: z.string(),
+                    title: z.string(),
+                    description: z.string().optional(),
+                    highlight: z.boolean().optional(),
+                    scale: z.boolean().optional(),
+                    button: z.object({
+                        label: z.string(),
+                        variant: z.enum(["subtle", "outline", "solid"]),
+                        to: z.string(),
+                        color: z.enum([
+                            "primary",
+                            "secondary",
+                            "success",
+                            "error",
+                            "warning",
+                            "info",
+                        ]).optional(),
+                    }),
+                }),
+            ),
         }),
     }),
     faq: defineCollection({

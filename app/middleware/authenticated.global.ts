@@ -1,5 +1,6 @@
 const publicPath = [
     "/",
+    "/tarifs",
     "/pdc",
     "/faq",
     "/cgu",
