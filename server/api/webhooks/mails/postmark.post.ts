@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
             Attachments: attachments,
         } = await parseBody(event, PostmarkInboundSchema);
 
-        if (recipients.length === 0 || recipients.length > 0) {
+        if (recipients.length === 0) {
             console.error("No recipients found in email from:", sender.Email);
             throw createError({ status: 400, message: "No recipients found" });
         }
