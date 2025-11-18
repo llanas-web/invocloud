@@ -1,0 +1,17 @@
+name: pro
+title: Pro
+description: Pour les PME et multi PME.
+price: "49.90 €"
+establisments: 3
+users: 15
+monthly-invoices: 500
+price-per-extra-invoice: 0.05
+transfert-invoice: true
+email-invoice: true
+pdp: true
+ocr: true
+support: true
+beta: true
+features:
+  - fonctionnalités prémium
+  - Support prioritaire

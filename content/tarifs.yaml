@@ -1,0 +1,23 @@
+title: Invocloud tarifs et fonctionnalités
+description: Découvrez les plans tarifaires d'Invocloud et choisissez celui qui correspond le mieux à vos besoins en matière de gestion de factures en ligne.
+keywords: tarifs, prix, plans, facturation en ligne, gestion financière, fonctionnalités, Dématérialisation, PDP, sécurité
+hero:
+  title: Choisissez le plan qui vous convient.
+  description: Gérez vos factures en ligne avec Invocloud, que vous soyez un utilisateur occasionnel ou un professionnel exigeant.
+plans:
+  - id: starter
+    button:
+      label: Commencer
+      variant: subtle
+      color: primary
+      to: "/auth/login?plan=starter"
+  - id: pro
+    scale: true
+    highlight: true
+    button:
+      label: Passer à Pro
+      to: "/auth/login?plan=pro"
+  - id: enterprise
+    button:
+      label: Contactez-nous
+      to: "/contact?plan=enterprise"
