@@ -1,23 +1,23 @@
 <script setup lang="ts">
-    import { fr } from '@nuxt/ui/locale'
+import { fr } from '@nuxt/ui/locale'
 
-    const router = useRouter();
-    const currentRoute = router.currentRoute;
-    const { isAuthenticated } = useAuth();
-    const { actions } = useAuth();
+const router = useRouter();
+const currentRoute = router.currentRoute;
+const { isAuthenticated } = useAuth();
+const { actions } = useAuth();
 
-    const buttonLabel = computed(() => {
-        if (isAuthenticated.value) {
-            return 'Déconnexion';
-        }
-        return currentRoute.value.name === 'auth-login' ? 'S\'inscrire' : 'Connexion';
-    });
-    const redirectTo = computed(() => {
-        if (isAuthenticated.value) {
-            return '';
-        }
-        return currentRoute.value.name === 'auth-login' ? '/auth/sign-up' : '/auth/login';
-    });
+const buttonLabel = computed(() => {
+    if (isAuthenticated.value) {
+        return 'Déconnexion';
+    }
+    return currentRoute.value.name === 'auth-login' ? 'S\'inscrire' : 'Connexion';
+});
+const redirectTo = computed(() => {
+    if (isAuthenticated.value) {
+        return '';
+    }
+    return currentRoute.value.name === 'auth-login' ? '/auth/sign-up' : '/auth/login';
+});
 </script>
 
 <template>

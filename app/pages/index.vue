@@ -1,48 +1,81 @@
 <script setup lang="ts">
-    import { z } from 'zod';
-    import type { FormSubmitEvent } from '@nuxt/ui'
+import { z } from 'zod';
+import type { FormSubmitEvent } from '@nuxt/ui'
 
-    const { openModal } = useUploadWizard()
-    const { isAuthenticated, connectedUser } = useAuth();
-    const config = useRuntimeConfig();
+const { openModal } = useUploadWizard()
+const { isAuthenticated, connectedUser } = useAuth();
+const config = useRuntimeConfig();
 
-    const schema = z.object({
-        email: z.string().email('Veuillez entrer un email valide'),
-    });
-    const state = reactive({
-        email: ''
-    });
+const schema = z.object({
+    email: z.string().email('Veuillez entrer un email valide'),
+});
+const state = reactive({
+    email: ''
+});
 
-    type Schema = z.output<typeof schema>
+type Schema = z.output<typeof schema>
 
-    const onSubmit = async (event: FormSubmitEvent<Schema>) => {
-        // Handle form submission logic here
-    };
+const onSubmit = async (event: FormSubmitEvent<Schema>) => {
+    // Handle form submission logic here
+};
 
 
-    const { data: page } = await useAsyncData(() => queryCollection('index').first())
+const { data: page } = await useAsyncData(() => queryCollection('index').first())
 
-    useSeoMeta({
-        title: page.value?.seo.title || page.value?.title,
-        titleTemplate:
-            page.value?.seo.title || page.value?.title,
-        description:
-            page.value?.seo.description || page.value?.description,
-        ogType: 'website',
-        ogLocale: 'fr_FR',
-        ogSiteName: 'Invocloud',
-        ogTitle: page.value?.seo.title || page.value?.title,
-        ogDescription:
-            page.value?.seo.description || page.value?.description,
-        ogUrl: config.public.baseUrl ?? 'https://invocloud.fr',
-        ogImage: `${config.public.baseUrl}/thumbnail_1200.png`,
-        ogImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
-        ogImageHeight: 577,
-        ogImageWidth: 1200,
-        twitterCard: 'summary_large_image',
-        twitterImage: `${config.public.baseUrl}/thumbnail_1200.png`,
-        twitterImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
-    })
+useSeoMeta({
+    title: page.value?.seo.title || page.value?.title,
+    titleTemplate:
+        page.value?.seo.title || page.value?.title,
+    description:
+        page.value?.seo.description || page.value?.description,
+    ogType: 'website',
+    ogLocale: 'fr_FR',
+    ogSiteName: 'Invocloud',
+    ogTitle: page.value?.seo.title || page.value?.title,
+    ogDescription:
+        page.value?.seo.description || page.value?.description,
+    ogUrl: config.public.baseUrl ?? 'https://invocloud.fr',
+    ogImage: `${config.public.baseUrl}/thumbnail_1200.png`,
+    ogImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
+    ogImageHeight: 577,
+    ogImageWidth: 1200,
+    twitterCard: 'summary_large_image',
+    twitterImage: `${config.public.baseUrl}/thumbnail_1200.png`,
+    twitterImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
+})
+
+
+
+const { data: tarifsPage } = useAsyncData(() => queryCollection('tarifs').first())
+const { data: plansData } = useAsyncData(() => queryCollection('plans').all(), {
+    lazy: true,
+})
+
+const plans = computed(() => plansData.value?.map((plan) => {
+    const establishmentLabel = plan.establisments === null ? '∞ Établissements' : `${plan.establisments} Établissement${plan.establisments > 1 ? 's' : ''}`;
+    const usersLabel = plan.users === null ? '∞ Utilisateurs' : `${plan.users} Utilisateur${plan.users > 1 ? 's' : ''}`;
+    const invoicesLabel = plan['monthly-invoices'] === null ? '∞ Factures' : `${plan['monthly-invoices']} factures / mois`;
+    const tarifPlan = tarifsPage.value?.plans.find((p: any) => p.id === plan.name);
+    return {
+        id: plan.name,
+        title: plan.title,
+        description: plan.description,
+        price: plan.price,
+        highlight: tarifPlan?.highlight || false,
+        scale: tarifPlan?.scale || false,
+        features: [
+            establishmentLabel,
+            usersLabel,
+            invoicesLabel,
+            "Interfaçage PDP",
+            ...(plan.features || []),
+        ],
+        button: tarifPlan?.button || {
+            label: 'Choisir',
+            to: '/auth/sign-up'
+        },
+    }
+}) || []);
 </script>
 
 
@@ -96,17 +129,22 @@
             title: 'max-w-xl mx-auto text-muted',
         }">
             <UContainer>
-                <UPricingPlans scale>
-                    <UPricingPlan v-for="(plan, index) in page.pricing.plans" :key="index" v-bind="plan"
-                        variant="subtle" :ui="{
-                            root: 'bg-primary-100/15 text-muted',
-                            title: 'text-muted',
-                            description: 'text-muted',
-                            price: 'text-muted',
-                            footer: 'items-start',
-                            button: 'w-auto',
-                            featureTitle: 'text-xs md:text-sm'
-                        }">
+                <UPricingPlans>
+                    <UPricingPlan v-for="plan in plans" :key="plan.id" v-bind="plan" :ui="{
+                        root: 'bg-card border-border',
+                        title: 'text-lg font-semibold text-muted',
+                        price: 'text-3xl font-extrabold text-muted',
+                        description: 'text-sm text-muted h-12',
+                        feature: 'text-muted',
+                        button: 'w-full',
+                        tagline: 'font-medium text-xs text-muted mt-2',
+                    }">
+                        <template #title>
+                            <div class="flex items-center gap-2">
+                                <UIcon v-if="plan.highlight" name="i-lucide-crown" class="text-amber-500" />
+                                {{ plan.title }}
+                            </div>
+                        </template>
                     </UPricingPlan>
                 </UPricingPlans>
             </UContainer>

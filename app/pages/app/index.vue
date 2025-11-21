@@ -1,34 +1,34 @@
 <script setup lang="ts">
-    import { InvoicesListStats } from '#components';
+import { InvoicesListStats } from '#components';
 
 
-    const { openModal } = useUploadWizard()
+const { openModal } = useUploadWizard()
 
-    definePageMeta({
-        layout: 'app',
-    })
+definePageMeta({
+    layout: 'app',
+})
 
-    const { supplierFilter } = useInvoices();
-    const { suppliers } = useSuppliers();
+const { supplierFilter } = useInvoices();
+const { suppliers } = useSuppliers();
 
-    const items = [[{
-        label: 'Envoyer une facture',
-        icon: 'i-lucide-send',
-        to: '/inbox'
-    }, {
-        label: 'Ajouter une facture',
-        icon: 'i-lucide-file-plus',
-        to: '/customers'
-    },
-    {
-        label: 'Ajouter un fournisseur',
-        icon: 'i-lucide-user-plus',
-        to: '/suppliers'
-    }]]
+const items = [[{
+    label: 'Envoyer une facture',
+    icon: 'i-lucide-send',
+    to: '/inbox'
+}, {
+    label: 'Ajouter une facture',
+    icon: 'i-lucide-file-plus',
+    to: '/customers'
+},
+{
+    label: 'Ajouter un fournisseur',
+    icon: 'i-lucide-user-plus',
+    to: '/suppliers'
+}]]
 
-    const onNewInvoice = () => {
-        navigateTo('/app/invoices/new')
-    }
+const onNewInvoice = () => {
+    navigateTo('/app/invoices/new')
+}
 </script>
 
 <template>
@@ -37,6 +37,10 @@
             <UDashboardNavbar title="Factures" :ui="{ right: 'gap-3' }">
                 <template #leading>
                     <UDashboardSidebarCollapse />
+                </template>
+
+                <template #default>
+                    <span class="text-lg font-semibold">Factures</span>
                 </template>
 
                 <template #right>

@@ -2,7 +2,7 @@ import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "../core/useAsyncAction";
 import { AppError } from "~/core/errors/app.error";
 import { establishmentApi } from "~/services/api/establishment.api";
-import { SubscriptionStatus } from "~~/shared/domain/establishment/subscription.entity";
+import { SubscriptionStatus } from "~~/shared/domain/user/subscription.entity";
 import { fromDate } from "~/utils/date";
 
 const _useEstablishmentDetails = () => {

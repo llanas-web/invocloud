@@ -178,27 +178,6 @@ console.log(sections.value);
         </UPageHero>
 
         <UPageSection>
-            <UPricingPlans>
-                <UPricingPlan v-for="plan in plans" :key="plan.id" v-bind="plan" :ui="{
-                    root: 'bg-card border-border',
-                    title: 'text-lg font-semibold text-muted',
-                    price: 'text-3xl font-extrabold text-muted',
-                    description: 'text-sm text-muted h-12',
-                    feature: 'text-muted',
-                    button: 'w-full',
-                    tagline: 'font-medium text-xs text-muted mt-2',
-                }">
-                    <template #title>
-                        <div class="flex items-center gap-2">
-                            <UIcon v-if="plan.highlight" name="i-lucide-crown" class="text-amber-500" />
-                            {{ plan.title }}
-                        </div>
-                    </template>
-                </UPricingPlan>
-            </UPricingPlans>
-        </UPageSection>
-
-        <UPageSection>
             <UPricingTable :tiers="plans" :sections="sections" :ui="{
                 tierDescription: 'text-sm text-muted h-12',
             }">

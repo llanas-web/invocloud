@@ -12,10 +12,13 @@ const _useAuth = () => {
     authRepository.on(AuthEvent.SIGNED_IN, onLogin);
     authRepository.on(AuthEvent.SIGNED_OUT, onLogout);
 
+    const connectedUser = ref(authRepository.connectedUser);
+
     function onLogin() {
+        connectedUser.value = authRepository.connectedUser;
         if (
             route.path.startsWith("/auth/login") ||
-            route.path.startsWith("/auth/signup")
+            route.path.startsWith("/auth/sign-up")
         ) {
             console.log("Redirecting to /app");
             navigateTo("/app");
@@ -23,16 +26,15 @@ const _useAuth = () => {
     }
 
     function onLogout() {
+        connectedUser.value = null;
         if (route.path.startsWith("/app")) {
             console.log("Redirecting to /auth/login");
             navigateTo("/auth/login");
         }
     }
 
-    const connectedUser = computed(() => authRepository.connectedUser);
-
     const isAuthenticated = computed(() => {
-        return connectedUser.value !== null;
+        return connectedUser.value !== null && !connectedUser.value.isAnonymous;
     });
 
     const loginAction = useAsyncAction(

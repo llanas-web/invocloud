@@ -1,42 +1,43 @@
 <script setup lang="ts">
-  import type { DropdownMenuItem } from '@nuxt/ui'
-  import type { AuthUserModel } from '~~/shared/application/common/providers/auth/dto/auth.dto';
+import type { DropdownMenuItem } from '@nuxt/ui'
+import type { AuthUserModel } from '~~/shared/application/common/providers/auth/dto/auth.dto';
 
-  defineProps<{
-    collapsed?: boolean
-  }>()
+defineProps<{
+  collapsed?: boolean
+}>()
 
-  const router = useRouter();
-  const currentRoute = router.currentRoute;
-  const { connectedUser, actions } = useAuth()
+const router = useRouter();
+const currentRoute = router.currentRoute;
+const { connectedUser, actions } = useAuth()
 
-  const user = computed(() => ({
-    name: (connectedUser.value as AuthUserModel | null)?.email,
-  }))
+const user = computed(() => ({
+  name: (connectedUser.value as AuthUserModel | null)?.email,
+}))
 
-  const items = computed<DropdownMenuItem[][]>(() => ([[{
-    type: 'label',
-    label: user.value.name,
-  }], [{
-    label: 'Profil',
-    icon: 'i-lucide-user'
-  }, {
-    label: 'Paiements',
-    icon: 'i-lucide-credit-card',
-    to: '/app/settings/establishments#billing',
-    active: currentRoute.value.name === 'app-settings-establishments'
-  }, {
-    label: 'Paramètres',
-    icon: 'i-lucide-settings',
-    to: '/app/settings',
-    active: currentRoute.value.name === 'app-settings'
-  }],
-  [{
-    label: 'Déconnexion',
-    icon: 'i-lucide-log-out',
-    onSelect: actions.logout.execute
-  }],
-  ]))
+const items = computed<DropdownMenuItem[][]>(() => ([[{
+  type: 'label',
+  label: user.value.name,
+  slot: 'label' as const,
+}], [{
+  label: 'Profil',
+  icon: 'i-lucide-user'
+}, {
+  label: 'Paiements',
+  icon: 'i-lucide-credit-card',
+  to: '/app/settings/establishments#billing',
+  active: currentRoute.value.name === 'app-settings-establishments'
+}, {
+  label: 'Paramètres',
+  icon: 'i-lucide-settings',
+  to: '/app/settings',
+  active: currentRoute.value.name === 'app-settings'
+}],
+[{
+  label: 'Déconnexion',
+  icon: 'i-lucide-log-out',
+  onSelect: actions.logout.execute
+}],
+]))
 </script>
 
 <template>
@@ -44,11 +45,20 @@
     :ui="{ content: collapsed ? 'w-48' : 'w-(--reka-dropdown-menu-trigger-width)' }">
     <UButton v-bind="{
       ...user,
-      label: collapsed ? undefined : user?.name,
       trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down'
     }" color="neutral" variant="ghost" block :square="collapsed" class="data-[state=open]:bg-elevated" :ui="{
       trailingIcon: 'text-dimmed'
-    }" />
+    }">
+      {{ collapsed ? undefined : user?.name }}
+      <UTooltip text="compte d'essai" placement="bottom">
+        <UBadge color="warning" icon="i-lucide-alert-triangle" />
+      </UTooltip>
+    </UButton>
+
+
+    <template #label-trailing>
+      <UBadge color="warning" icon="i-lucide-alert-triangle" />
+    </template>
 
     <template #chip-leading="{ item }">
       <span :style="{
