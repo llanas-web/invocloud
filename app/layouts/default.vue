@@ -1,9 +1,9 @@
 <script setup lang="ts">
-    import { LazyInvoicesUploadModalContainer } from '#components';
-    import { fr } from '@nuxt/ui/locale'
+import { LazyInvoicesUploadModalContainer } from '#components';
+import { fr } from '@nuxt/ui/locale'
 
-    const { openModal } = useUploadWizard()
-    const { connectedUser } = useAuth();
+const { openModal } = useUploadWizard()
+const { connectedUser, isAuthenticated } = useAuth();
 
 </script>
 
@@ -28,12 +28,12 @@
                     label: 'hidden lg:block'
                 }" />
                 <USeparator orientation="vertical" class="h-6 hidden lg:block" size="sm" />
-                <UButton label="Tarifs" :to="{ path: '/', hash: '#pricing' }" size="md" variant="ghost" :ui="{
+                <UButton label="Tarifs" to="tarifs" size="md" variant="ghost" :ui="{
                     label: 'hidden lg:block'
                 }" />
                 <USeparator orientation="vertical" class="h-6 hidden lg:block" size="sm" />
-                <UButton v-if="connectedUser != null && connectedUser.isAnonymous === false" label="Tableau de bord"
-                    to="/app" trailingIcon="i-lucide-home" size="md" variant="ghost" :ui="{
+                <UButton v-if="isAuthenticated" label="Tableau de bord" to="/app" trailingIcon="i-lucide-home" size="md"
+                    variant="ghost" :ui="{
                         label: 'hidden lg:block'
                     }" />
                 <template v-else>

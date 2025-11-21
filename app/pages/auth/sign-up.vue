@@ -1,111 +1,107 @@
 <script setup lang="ts">
-    import * as z from 'zod'
-    import type { FormSubmitEvent } from '@nuxt/ui'
-    import type { UForm } from '#components'
-    import type { AuthUserModel } from '~~/shared/application/common/providers/auth/dto/auth.dto'
+import * as z from 'zod'
+import type { FormSubmitEvent } from '@nuxt/ui'
+import type { UForm } from '#components'
+import type { AuthUserModel } from '~~/shared/application/common/providers/auth/dto/auth.dto'
 
-    definePageMeta({
-        layout: 'auth',
-    })
-    const config = useRuntimeConfig()
+definePageMeta({
+    layout: 'auth',
+})
+const config = useRuntimeConfig()
 
-    const loading = ref(false)
-    const { actions: { signup } } = useAuth()
-    const { refresh } = useEstablishmentsList()
-    const { actions: { createCheckoutSession } } = useEstablishmentDetails()
-    const { connectedUser } = useAuth()
+const { actions: { signup } } = useAuth()
+const { refresh } = useEstablishmentsList()
+const { actions: { createCheckoutSession } } = useEstablishmentDetails()
+const { connectedUser } = useAuth()
 
-    const fields: Array<{
-        name: keyof Schema
-        type: 'text' | 'email' | 'password'
-        label: string
-        placeholder: string
-        required?: boolean
-    }> = [
-            {
-                name: 'email',
-                type: 'text' as const,
-                label: 'E-mail',
-                placeholder: 'Entrez votre e-mail',
-                required: true,
-            },
-            {
-                name: 'password',
-                label: 'Mot de passe',
-                type: 'password' as const,
-                placeholder: 'Entrez votre mot de passe',
-                required: true,
-            },
-            {
-                name: 'full_name',
-                type: 'text' as const,
-                label: 'Nom complet',
-                placeholder: 'Entrez votre nom complet',
-                required: true,
-            },
-            {
-                name: 'establishment_name',
-                type: 'text' as const,
-                label: 'Nom de la structure',
-                placeholder: 'Entrez le nom de la structure',
-                required: true,
-            },
-        ];
+const fields: Array<{
+    name: keyof Schema
+    type: 'text' | 'email' | 'password'
+    label: string
+    placeholder: string
+    required?: boolean
+}> = [
+        {
+            name: 'email',
+            type: 'text' as const,
+            label: 'E-mail',
+            placeholder: 'Entrez votre e-mail',
+            required: true,
+        },
+        {
+            name: 'password',
+            label: 'Mot de passe',
+            type: 'password' as const,
+            placeholder: 'Entrez votre mot de passe',
+            required: true,
+        },
+        {
+            name: 'full_name',
+            type: 'text' as const,
+            label: 'Nom complet',
+            placeholder: 'Entrez votre nom complet',
+            required: true,
+        },
+        {
+            name: 'establishment_name',
+            type: 'text' as const,
+            label: 'Nom de la structure',
+            placeholder: 'Entrez le nom de la structure',
+            required: true,
+        },
+    ];
 
-    const schema = z.object({
-        full_name: z.string().min(2, 'Nom trop court'),
-        establishment_name: z.string().min(2, 'Nom de structure requis'),
-        email: z.string().email('E-mail invalide'),
-        password: z.string().min(8, 'Doit contenir au moins 8 caractères'),
-    })
+const schema = z.object({
+    full_name: z.string().min(2, 'Nom trop court'),
+    establishment_name: z.string().min(2, 'Nom de structure requis'),
+    email: z.string().email('E-mail invalide'),
+    password: z.string().min(8, 'Doit contenir au moins 8 caractères'),
+})
 
-    type Schema = z.output<typeof schema>
+type Schema = z.output<typeof schema>
 
-    const state = reactive<Schema>({
-        full_name: '',
-        establishment_name: '',
-        email: '',
-        password: '',
-    });
+const state = reactive<Schema>({
+    full_name: '',
+    establishment_name: '',
+    email: '',
+    password: '',
+});
 
-    const show = ref(false)
-    const signUpForm = useTemplateRef('signUpForm')
+const show = ref(false)
+const signUpForm = useTemplateRef('signUpForm')
 
-    async function onSubmit(payload: FormSubmitEvent<Schema>) {
-        loading.value = true
-        const { email, password, full_name, establishment_name } = payload.data
-        await signup.execute(
-            email,
-            password,
-            establishment_name,
-            full_name,
-        )
-        if (signup.data.value) {
-            await refresh()
-            await createCheckoutSession.execute()
-        }
-        loading.value = false
+async function onSubmit(payload: FormSubmitEvent<Schema>) {
+    const { email, password, full_name, establishment_name } = payload.data
+    await signup.execute(
+        email,
+        password,
+        establishment_name,
+        full_name,
+    )
+    if (signup.data.value) {
+        await refresh()
     }
+}
 
 
-    useSeoMeta({
-        title: 'Inscription - Invocloud',
-        titleTemplate: 'Inscription - Invocloud',
-        description: 'Inscrivez-vous à votre compte Invocloud',
-        ogType: 'website',
-        ogLocale: 'fr_FR',
-        ogSiteName: 'Invocloud',
-        ogTitle: 'Inscription - Invocloud',
-        ogDescription: 'Inscrivez-vous à votre compte Invocloud',
-        ogUrl: `${config.public.baseUrl ?? 'https://invocloud.fr'}/auth/sign-up`,
-        ogImage: `${config.public.baseUrl}/thumbnail_1200.png`,
-        ogImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
-        ogImageHeight: 577,
-        ogImageWidth: 1200,
-        twitterCard: 'summary_large_image',
-        twitterImage: `${config.public.baseUrl}/thumbnail_1200.png`,
-        twitterImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
-    })
+useSeoMeta({
+    title: 'Inscription - Invocloud',
+    titleTemplate: 'Inscription - Invocloud',
+    description: 'Inscrivez-vous à votre compte Invocloud',
+    ogType: 'website',
+    ogLocale: 'fr_FR',
+    ogSiteName: 'Invocloud',
+    ogTitle: 'Inscription - Invocloud',
+    ogDescription: 'Inscrivez-vous à votre compte Invocloud',
+    ogUrl: `${config.public.baseUrl ?? 'https://invocloud.fr'}/auth/sign-up`,
+    ogImage: `${config.public.baseUrl}/thumbnail_1200.png`,
+    ogImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
+    ogImageHeight: 577,
+    ogImageWidth: 1200,
+    twitterCard: 'summary_large_image',
+    twitterImage: `${config.public.baseUrl}/thumbnail_1200.png`,
+    twitterImageAlt: 'Invocloud - Gérer vos factures en toute simplicité',
+})
 </script>
 
 <template>
@@ -127,7 +123,8 @@
                         </div>
                     </div>
                 </template>
-                <UForm v-else ref="signUpForm" :schema="schema" :state="state" :disabled="loading" @submit="onSubmit">
+                <UForm v-else ref="signUpForm" :schema="schema" :state="state" :disabled="signup.pending.value"
+                    @submit="onSubmit">
                     <div class="w-full space-y-6">
                         <div>
                             <h2 class="text-left text-4xl font-bold text-muted">
@@ -169,7 +166,7 @@
                 </UCard>
                 <USeparator />
                 <UButton class="w-full justify-center py-3 cursor-pointer" label="Démarrer la période d'essai"
-                    @click="() => signUpForm?.submit()" :loading="loading" />
+                    @click="() => signUpForm?.submit()" :loading="signup.pending.value" />
                 <span class="text-center text-sm text-muted">Si vous n’annulez pas votre essai avant les 7 jours, un
                     montant de
                     29,90€ vous
