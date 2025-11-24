@@ -2,7 +2,9 @@ import type { UserModel } from "~~/shared/domain/user/user.model";
 import type { ModelCommonUpdateProps } from "../common/common.interface";
 import { PayloadModel } from "../common/payload.model";
 import MemberEntity, { MemberStatus } from "./member.entity";
-import SubscriptionEntity, { SubscriptionStatus } from "./subscription.entity";
+import SubscriptionEntity, {
+    SubscriptionStatus,
+} from "../user/subscription.entity";
 import { DomainError, DomainErrorCode } from "../common/errors/domain.error";
 
 export type EstablishmentModelProps =
@@ -20,7 +22,6 @@ export type EstablishmentMutableProps = {
     address?: string | null;
     phone?: string | null;
     members?: MemberEntity[];
-    subscription?: SubscriptionEntity | null;
 };
 
 export type DraftEstablishment = Omit<
@@ -36,7 +37,6 @@ export class EstablishmentModel extends PayloadModel {
         this.props = {
             ...props,
             members: props.members ?? [],
-            subscription: props.subscription ?? null,
         };
     }
 
@@ -87,10 +87,6 @@ export class EstablishmentModel extends PayloadModel {
 
     get members() {
         return this.props.members ?? [];
-    }
-
-    get subscription() {
-        return this.props.subscription ?? null;
     }
 
     // ─── Business Logic: Member Management ───
@@ -202,96 +198,6 @@ export class EstablishmentModel extends PayloadModel {
         return this.members.filter((m) => m.status === MemberStatus.PENDING);
     }
 
-    // ─── Business Logic: Subscription Management ───
-
-    /**
-     * Vérifie si l'établissement a un abonnement actif
-     */
-    hasActiveSubscription(): boolean {
-        return this.props.subscription?.isActive() ?? false;
-    }
-
-    /**
-     * Vérifie si l'établissement peut être supprimé
-     */
-    canBeDeleted(): boolean {
-        return !this.hasActiveSubscription();
-    }
-
-    /**
-     * Ajoute un abonnement à l'établissement
-     */
-    withSubscription(subscription: SubscriptionEntity): EstablishmentModel {
-        if (this.props.subscription !== null) {
-            throw new DomainError(
-                DomainErrorCode.ERROR_UPDATING,
-                "Cet établissement a déjà un abonnement",
-            );
-        }
-        return new EstablishmentModel({
-            ...this.props,
-            subscription,
-        });
-    }
-
-    /**
-     * Met à jour l'abonnement
-     */
-    updateSubscription(
-        updater: (subscription: SubscriptionEntity) => SubscriptionEntity,
-    ): EstablishmentModel {
-        if (!this.props.subscription) {
-            throw new DomainError(
-                DomainErrorCode.ERROR_UPDATING,
-                "Cet établissement n'a pas d'abonnement",
-            );
-        }
-        return new EstablishmentModel({
-            ...this.props,
-            subscription: updater(this.props.subscription),
-        });
-    }
-
-    /**
-     * Active l'abonnement (sortie de période d'essai)
-     */
-    activateSubscription(): EstablishmentModel {
-        return this.updateSubscription((sub) => sub.activate());
-    }
-
-    /**
-     * Renouvelle l'abonnement
-     */
-    renewSubscription(periodEnd?: Date): EstablishmentModel {
-        return this.updateSubscription((sub) => sub.renew(periodEnd));
-    }
-
-    /**
-     * Annule l'abonnement
-     */
-    cancelSubscription(endDate?: Date): EstablishmentModel {
-        if (!this.hasActiveSubscription()) {
-            throw new DomainError(
-                DomainErrorCode.ERROR_UPDATING,
-                "Seul un abonnement actif ou en essai peut être annulé",
-            );
-        }
-        return this.updateSubscription((sub) => sub.cancel(endDate));
-    }
-
-    removeSubscription(): EstablishmentModel {
-        if (this.props.subscription === null) {
-            throw new DomainError(
-                DomainErrorCode.ERROR_UPDATING,
-                "Cet établissement n'a pas d'abonnement à supprimer",
-            );
-        }
-        return new EstablishmentModel({
-            ...this.props,
-            subscription: null,
-        });
-    }
-
     // ─── Existing methods ───
     withDetails(patch: Partial<EstablishmentMutableProps>): EstablishmentModel {
         return new EstablishmentModel({
@@ -316,17 +222,6 @@ export class EstablishmentModel extends PayloadModel {
                 role: m.role,
                 status: m.status,
             })),
-            subscription: this.props.subscription
-                ? {
-                    status: this.props.subscription.status,
-                    startAt: this.props.subscription.startAt,
-                    endAt: this.props.subscription.endAt,
-                    providerSubscriptionId:
-                        this.props.subscription.providerSubscriptionId,
-                    providerCustomerId:
-                        this.props.subscription.providerCustomerId,
-                }
-                : null,
             createdAt: this.props.createdAt,
             updatedAt: this.props.updatedAt,
         };
@@ -342,9 +237,6 @@ export class EstablishmentModel extends PayloadModel {
             phone: data.phone,
             members: data.members?.map((m: any) => MemberEntity.create(m)) ??
                 [],
-            subscription: data.subscription
-                ? SubscriptionEntity.create(data.subscription)
-                : null,
             createdAt: data.createdAt,
             updatedAt: data.updatedAt,
         });

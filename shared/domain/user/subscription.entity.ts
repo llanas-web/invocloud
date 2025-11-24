@@ -1,8 +1,8 @@
 import { DomainError, DomainErrorCode } from "../common/errors/domain.error";
 
 export enum SubscriptionStatus {
-    // inactive, trial, active, canceled
-    TRIALING = "trialing",
+    // inactive, active, canceled
+    FREE = "free",
     ACTIVE = "active",
     PAST_DUE = "past_due",
     CANCELED = "canceled",
@@ -12,6 +12,7 @@ export type SubscriptionEntityProps = {
     status: SubscriptionStatus;
     createdAt: Date;
     startAt: Date;
+    planId: string;
     endAt: Date | null;
     // cancelAt: Date | null;
     // canceledAt: Date | null;
@@ -34,19 +35,21 @@ class SubscriptionEntity {
         return new SubscriptionEntity(props);
     }
 
-    static createTrial(
-        trialEndDate: Date,
-        providerSubscriptionId?: string,
-        providerCustomerId?: string,
-    ): SubscriptionEntity {
+    static createActive(createActiveParam: {
+        endDate: Date;
+        planId: string;
+        providerSubscriptionId?: string;
+        providerCustomerId?: string;
+    }): SubscriptionEntity {
         const now = new Date();
         return new SubscriptionEntity({
-            status: SubscriptionStatus.TRIALING,
+            status: SubscriptionStatus.ACTIVE,
             startAt: now,
             createdAt: now,
-            endAt: trialEndDate,
-            providerSubscriptionId,
-            providerCustomerId,
+            endAt: createActiveParam.endDate,
+            providerSubscriptionId: createActiveParam.providerSubscriptionId,
+            providerCustomerId: createActiveParam.providerCustomerId,
+            planId: createActiveParam.planId,
         });
     }
 
@@ -70,14 +73,17 @@ class SubscriptionEntity {
         return this.props.providerCustomerId;
     }
 
-    // Business logic
-    isActive(): boolean {
-        return this.props.status === SubscriptionStatus.ACTIVE ||
-            this.props.status === SubscriptionStatus.TRIALING;
+    get planId() {
+        return this.props.planId;
     }
 
-    isTrialing(): boolean {
-        return this.props.status === SubscriptionStatus.TRIALING;
+    // Business logic
+    isActive(): boolean {
+        return this.props.status === SubscriptionStatus.ACTIVE;
+    }
+
+    isFree(): boolean {
+        return this.props.status === SubscriptionStatus.FREE;
     }
 
     isCanceled(): boolean {

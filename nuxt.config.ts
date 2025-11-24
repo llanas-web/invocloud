@@ -43,7 +43,7 @@ export default defineNuxtConfig({
     // Stripe
     stripeSecretKey: process.env.STRIPE_SECRET_KEY || "",
     stripePriceId: process.env.STRIPE_PRICE_ID || "",
-    stripeApiVersion: process.env.STRIPE_API_VERSION || "2025-09-30.clover",
+    stripeApiVersion: process.env.STRIPE_API_VERSION || "2025-10-29.clover",
     stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || "",
     // Mindee OCR
     mindeeApiKey: process.env.MINDEE_API_KEY || "",

@@ -1,18 +1,19 @@
-import type { SubscriptionStatus } from "~~/shared/domain/establishment/subscription.entity";
+import type { SubscriptionPlanDTO } from "~~/shared/application/subscription-plan/dto/subscription-plan.dto";
+import type { SubscriptionStatus } from "~~/shared/domain/user/subscription.entity";
 
 export interface CreateCheckoutSessionDto {
     email: string;
     userId: string;
-    establishmentId: string;
+    subscriptionPlan: SubscriptionPlanDTO;
     customerId?: string;
-    subscriptionId?: string;
 }
 
 export interface CheckoutSessionCreatedDto {
-    establishmentId: string;
+    userId: string;
     customerId: string;
     subscriptionId: string;
     trialEndDate: Date;
+    subscriptionPlanId: string;
 }
 
 export interface InvoicePaymentSucceededDto {

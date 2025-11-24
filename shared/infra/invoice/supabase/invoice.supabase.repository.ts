@@ -79,6 +79,7 @@ export class InvoiceSupabaseRepository implements InvoiceRepository {
         if (error) throw SupabaseError.fromPostgrest(error);
         return data.id;
     }
+    
     async update(entity: InvoiceModel): Promise<void> {
         const payload = toUpsert(entity);
         const { error } = await this.supabaseClient.from("invoices")

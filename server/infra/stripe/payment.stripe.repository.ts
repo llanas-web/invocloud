@@ -5,7 +5,6 @@ import { StripeError } from "./stripe.error";
 
 class PaymentStripeRepository implements PaymentRepository {
     public stripeInstance: Stripe;
-    private priceId: string;
     private baseUrl: string;
 
     constructor() {
@@ -13,20 +12,19 @@ class PaymentStripeRepository implements PaymentRepository {
         this.stripeInstance = new Stripe(config.stripeSecretKey!, {
             apiVersion:
                 config.stripeApiVersion as Stripe.StripeConfig["apiVersion"] ??
-                    "2025-09-30.clover",
+                    "2025-10-29.clover",
         });
-        this.priceId = config.stripePriceId!;
         this.baseUrl = config.baseUrl!;
     }
 
     async createCheckoutSession(
-        { email, userId, establishmentId, customerId }:
+        { email, userId, customerId, subscriptionPlan }:
             CreateCheckoutSessionDto,
     ) {
         try {
             const metadata = {
                 userId,
-                establishmentId,
+                subscriptionPlanId: subscriptionPlan.id,
             };
             const session = await this.stripeInstance.checkout.sessions.create(
                 {
@@ -36,14 +34,13 @@ class PaymentStripeRepository implements PaymentRepository {
                     payment_method_types: ["card"],
                     line_items: [
                         {
-                            price: this.priceId,
+                            price: subscriptionPlan.subscriptionPriceId,
                             quantity: 1,
                         },
+                        {
+                            price: subscriptionPlan.metricPriceId,
+                        },
                     ],
-                    subscription_data: {
-                        trial_period_days: 7,
-                        metadata,
-                    },
                     success_url:
                         `${this.baseUrl}/app?subscription_success=true`,
                     cancel_url:
@@ -74,10 +71,6 @@ class PaymentStripeRepository implements PaymentRepository {
             },
         );
         return subscription.cancel_at!;
-    }
-
-    async cancelTrialingPeriod(subscriptionId: string) {
-        await this.stripeInstance.subscriptions.cancel(subscriptionId);
     }
 }
 

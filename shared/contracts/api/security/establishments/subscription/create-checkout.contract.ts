@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const CreateCheckoutSessionBodySchema = z.object({
-    establishmentId: z.uuid(),
     userId: z.uuid(),
+    plan: z.enum(["starter", "pro"]),
 });
 
 export const CreateCheckoutSessionResponseSchema = z.object({

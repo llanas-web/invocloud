@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
-import type { UForm } from '#components'
 import type { AuthUserModel } from '~~/shared/application/common/providers/auth/dto/auth.dto'
 
 definePageMeta({
     layout: 'auth',
 })
 const config = useRuntimeConfig()
+// get plan from query params
+const route = useRoute()
+const plan = route.query.plan as 'starter' | 'pro' | undefined
 
-const { actions: { signup } } = useAuth()
-const { refresh } = useEstablishmentsList()
-const { actions: { createCheckoutSession } } = useEstablishmentDetails()
-const { connectedUser } = useAuth()
+const { connectedUser, isWaitingForCheckout, actions: { signup } } = useAuth()
 
 const fields: Array<{
     name: keyof Schema
@@ -54,7 +53,7 @@ const fields: Array<{
 const schema = z.object({
     full_name: z.string().min(2, 'Nom trop court'),
     establishment_name: z.string().min(2, 'Nom de structure requis'),
-    email: z.string().email('E-mail invalide'),
+    email: z.email('E-mail invalide'),
     password: z.string().min(8, 'Doit contenir au moins 8 caractères'),
 })
 
@@ -67,9 +66,6 @@ const state = reactive<Schema>({
     password: '',
 });
 
-const show = ref(false)
-const signUpForm = useTemplateRef('signUpForm')
-
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
     const { email, password, full_name, establishment_name } = payload.data
     await signup.execute(
@@ -77,10 +73,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         password,
         establishment_name,
         full_name,
+        plan,
     )
-    if (signup.data.value) {
-        await refresh()
-    }
 }
 
 
@@ -120,61 +114,40 @@ useSeoMeta({
                                     Invocloud
                                 </span>
                             </div>
+                            <template v-if="isWaitingForCheckout">
+                                <div class="p-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded">
+                                    <UIcon name="i-lucide-loader" class="inline-block w-5 h-5 mr-2 animate-spin" />
+                                    Création de votre session de paiement...
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </template>
-                <UForm v-else ref="signUpForm" :schema="schema" :state="state" :disabled="signup.pending.value"
-                    @submit="onSubmit">
-                    <div class="w-full space-y-6">
-                        <div>
-                            <h2 class="text-left text-4xl font-bold text-muted">
-                                Inscription à <span class="text-primary">InvoCloud</span>
-                            </h2>
-                            <div class="mt-1 text-left text-muted mb-4 font-sans">
-                                Vous avez déjà un compte ?
-                                <ULink to="/auth/login" class="text-primary font-medium">
-                                    Connectez-vous
-                                </ULink>.
-                            </div>
-                        </div>
-                        <div class="flex flex-col gap-y-6">
-                            <UFormField v-for="input in fields" :key="input.name" :label="input.label"
-                                :name="input.name" :required="input.required" :ui="{ label: 'font-bold' }">
-                                <UInput :type="input.type" :placeholder="input.placeholder" v-model="state[input.name]"
-                                    variant="outline" class="w-full" color="primary">
-                                    <template v-if="input.type === 'password'" #trailing>
-                                        <UButton color="neutral" variant="link" size="sm"
-                                            :icon="show ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-                                            :aria-label="show ? 'Hide password' : 'Show password'" :aria-pressed="show"
-                                            aria-controls="password" @click="show = !show" />
-                                    </template>
-                                </UInput>
-                            </UFormField>
-                        </div>
-                    </div>
-                </UForm>
+                <UAuthForm v-else ref="signUpForm" :schema="schema" :state="state" :fields="fields"
+                    :disabled="signup.pending.value" @submit="onSubmit" :ui="{
+                        title: 'text-left text-4xl font-bold text-muted',
+                        description: 'text-left text-muted mb-4 font-sans',
+                    }">
+                    <template #title>
+                        Inscription à <span class="text-primary">InvoCloud</span>
+                    </template>
+                    <template #description>
+                        Vous avez déjà un compte ?
+                        <ULink to="/auth/login" class="text-primary font-medium">
+                            Connectez-vous
+                        </ULink>.
+                    </template>
+                    <template #footer>
+                        En vous inscrivant, vous acceptez nos
+                        <NuxtLink to="/cgu" class="text-primary font-medium">
+                            Conditions d'utilisation
+                        </NuxtLink>.
+                    </template>
+                </UAuthForm>
             </div>
         </div>
-        <div class="flex-1 flex justify-start items-center mx-auto">
-            <div class="max-w-lg flex flex-col items-center justify-center gap-4">
-                <UCard variant="soft" class="w-full bg-primary-50 lg:rounded-3xl lg:px-16 lg:py-6">
-                    <div class="flex flex-col gap-2 text-muted font-sans font-medium">
-                        Profitez de l'abonnement Invocloud avec
-                        <span class="text-primary font-bold text-2xl lg:text-4xl">7 jours gratuits</span>
-                        <span class="text-primary">Puis 29,90€ / mois</span>
-                    </div>
-                </UCard>
-                <USeparator />
-                <UButton class="w-full justify-center py-3 cursor-pointer" label="Démarrer la période d'essai"
-                    @click="() => signUpForm?.submit()" :loading="signup.pending.value" />
-                <span class="text-center text-sm text-muted">Si vous n’annulez pas votre essai avant les 7 jours, un
-                    montant de
-                    29,90€ vous
-                    sera
-                    facturé par
-                    mois à
-                    compter du {{ new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString() }}</span>
-            </div>
+        <div class="hidden lg:flex flex-1 justify-start items-center mx-auto">
+            <CommonInvocloudLogo />
         </div>
     </div>
 </template>

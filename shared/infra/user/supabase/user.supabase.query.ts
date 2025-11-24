@@ -1,4 +1,5 @@
 import type {
+    SubscriptionDTO,
     UserDetailsDTO,
     UserListItemDTO,
 } from "~~/shared/application/user/dto";
@@ -7,6 +8,7 @@ import type { UserQuery } from "~~/shared/application/user/user.query";
 import { SupabaseError } from "../../common/supabase/supabase.error";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../../common/supabase/database.types";
+import type { SubscriptionStatus } from "~~/shared/domain/user/subscription.entity";
 
 export default class UserSupabaseQuery implements UserQuery {
     constructor(private readonly supabase: SupabaseClient<Database>) {}
@@ -38,10 +40,19 @@ export default class UserSupabaseQuery implements UserQuery {
     async getUserDetails(id: string): Promise<UserDetailsDTO | null> {
         const { data, error } = await this.supabase
             .from("users")
-            .select("*, user_settings(*)")
+            .select("*, user_settings(*), subscriptions(*)")
             .eq("id", id)
             .single();
         if (error) throw SupabaseError.fromPostgrest(error);
+        if (!data) return null;
+
+        const subscription = data.subscriptions === null ? null : {
+            status: data.subscriptions?.status as SubscriptionStatus,
+            endAt: data.subscriptions?.end_at
+                ? new Date(data.subscriptions.end_at)
+                : null,
+        } as SubscriptionDTO;
+
         return {
             id: data.id,
             email: data.email,
@@ -50,6 +61,21 @@ export default class UserSupabaseQuery implements UserQuery {
             updatedAt: fromStringToLocalDate(data.updated_at),
             favoriteEstablishmentId: data.user_settings
                 ?.favorite_establishment_id ?? null,
+            subscription: subscription,
         };
+    }
+
+    async getUserIdByProviderSubscriptionId(
+        providerSubscriptionId: string,
+    ) {
+        const { data, error } = await this.supabase
+            .from("subscriptions")
+            .select("user_id")
+            .eq("provider_subscription_id", providerSubscriptionId)
+            .eq("provider", "stripe")
+            .single();
+        if (error) throw SupabaseError.fromPostgrest(error);
+        if (!data) return null;
+        return data.user_id;
     }
 }

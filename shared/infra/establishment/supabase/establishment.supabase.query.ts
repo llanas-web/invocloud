@@ -4,13 +4,10 @@ import type {
     EstablishmentDetailsDTO,
     EstablishmentListItemDTO,
     MemberDTO,
-    SubscriptionDTO,
 } from "~~/shared/application/establishment/dto";
 import type { EstablishmentQuery } from "~~/shared/application/establishment/establishment.query";
 import type { ListEstablishmentQueryFilter } from "~~/shared/application/establishment/queries";
-import type { SubscriptionStatus } from "~~/shared/domain/establishment/subscription.entity";
 import type { Database } from "../../common/supabase/database.types";
-import type SubscriptionEntity from "~~/shared/domain/establishment/subscription.entity";
 
 export default class EstablishmentSupabaseQuery implements EstablishmentQuery {
     constructor(private readonly supabase: SupabaseClient<Database>) {}
@@ -72,7 +69,6 @@ export default class EstablishmentSupabaseQuery implements EstablishmentQuery {
         const { data, error } = await this.supabase
             .from("establishments")
             .select(`*,
-                subscriptions(*),
                 establishment_members(
                     *,
                     users(*)
@@ -81,12 +77,6 @@ export default class EstablishmentSupabaseQuery implements EstablishmentQuery {
             .single();
         if (error) throw SupabaseError.fromPostgrest(error);
         if (!data) return null;
-        const subscription = data.subscriptions === null ? null : {
-            status: data.subscriptions?.status as SubscriptionStatus,
-            endAt: data.subscriptions?.end_at
-                ? new Date(data.subscriptions.end_at)
-                : null,
-        } as SubscriptionDTO;
 
         const members = data.establishment_members.map((em) => ({
             id: em.user_id,
@@ -104,7 +94,6 @@ export default class EstablishmentSupabaseQuery implements EstablishmentQuery {
             phone: data.phone,
             creatorId: data.creator_id,
             members: members,
-            subscription,
         };
     }
 
@@ -149,19 +138,5 @@ export default class EstablishmentSupabaseQuery implements EstablishmentQuery {
             createdAt: new Date(row.establishment.created_at),
             updatedAt: new Date(row.establishment.updated_at),
         }));
-    }
-
-    async getEstablishmentIdByProviderSubscriptionId(
-        providerSubscriptionId: string,
-    ) {
-        const { data, error } = await this.supabase
-            .from("subscriptions")
-            .select("*")
-            .eq("provider_subscription_id", providerSubscriptionId)
-            .eq("provider", "stripe")
-            .single();
-        if (error) throw SupabaseError.fromPostgrest(error);
-        if (!data) return null;
-        return data.establishment_id;
     }
 }

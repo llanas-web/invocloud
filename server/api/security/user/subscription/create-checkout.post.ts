@@ -1,6 +1,6 @@
 import { useServerDi } from "~~/server/middleware/injection.middleware";
 import { CreateCheckoutSessionBodySchema } from "~~/shared/contracts/api/security/establishments/subscription/create-checkout.contract";
-import CreateCheckoutSessionUsecase from "~~/shared/application/establishment/usecases/subscription/create-checkout-session.usecase";
+import CreateCheckoutSessionUsecase from "~~/shared/application/user/usecases/subscription/create-checkout-session.usecase";
 import { handleError } from "~~/server/core/errors/handling-error";
 
 export default defineEventHandler(async (event) => {
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
                 event,
             );
 
-        const { establishmentId } = await parseBody(
+        const { userId, plan } = await parseBody(
             event,
             CreateCheckoutSessionBodySchema,
         );
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
             paymentRepository,
         );
         const checkoutUrl = await createCheckoutSessionUsecase
-            .execute({ establishmentId });
+            .execute({ userId, plan });
         return checkoutUrl;
     } catch (error) {
         return handleError(error);

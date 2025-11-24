@@ -50,17 +50,6 @@ const _useEstablishmentDetails = () => {
         };
     });
 
-    const subscription = computed(() => {
-        if (!dto.value?.subscription) return null;
-        return {
-            status: dto.value.subscription.status,
-            endDate: dto.value.subscription.endAt,
-            endDateLabel: dto.value.subscription.endAt
-                ? fromDate(dto.value.subscription.endAt)
-                : "N/A",
-        };
-    });
-
     const members = computed(() => {
         if (!dto.value) return [];
         return dto.value.members.map((member) => ({
@@ -78,19 +67,6 @@ const _useEstablishmentDetails = () => {
         return establishment.value?.creatorId === connectedUser.value?.id;
     });
 
-    const isActive = computed(() => {
-        return subscription.value?.status === SubscriptionStatus.ACTIVE;
-    });
-
-    const isTrial = computed(() => {
-        return subscription.value?.status === SubscriptionStatus.TRIALING;
-    });
-
-    const isInactive = computed(() => {
-        return subscription.value === null ||
-            subscription.value?.status === SubscriptionStatus.CANCELED;
-    });
-
     const deleteAction = useAsyncAction(async () => {
         if (!selectedId.value) throw new AppError("No establishment selected");
         await $usecases.establishments.delete.execute({
@@ -98,40 +74,6 @@ const _useEstablishmentDetails = () => {
         });
         await refreshListEstablishments();
     });
-
-    const createCheckoutSessionAction = useAsyncAction(
-        async () => {
-            if (!selectedId.value) {
-                throw new AppError("No establishment selected");
-            }
-            const checkoutUrl = await establishmentApi.subscription
-                .createCheckoutSession({
-                    establishmentId: selectedId.value,
-                    userId: connectedUser.value!.id,
-                });
-            navigateTo(checkoutUrl, { external: true });
-        },
-        {
-            showToast: false,
-            errorTitle: "Erreur lors de la création de la session de paiement.",
-        },
-    );
-
-    const cancelSubscriptionAction = useAsyncAction(
-        async () => {
-            if (!selectedId.value) {
-                throw new AppError("No establishment selected");
-            }
-            await establishmentApi.subscription.cancel({
-                establishmentId: selectedId.value,
-            });
-            await refresh();
-        },
-        {
-            successTitle: "Abonnement annulé avec succès.",
-            errorTitle: "Erreur lors de l'annulation de l'abonnement.",
-        },
-    );
 
     const inviteMemberAction = useAsyncAction(
         async (email: string) => {
@@ -154,19 +96,13 @@ const _useEstablishmentDetails = () => {
     return {
         dto,
         establishment,
-        subscription,
         members,
         isSelected,
         isAdmin,
-        isInactive,
-        isActive,
-        isTrial,
         pending,
         error,
         actions: {
             delete: deleteAction,
-            createCheckoutSession: createCheckoutSessionAction,
-            cancelSubscription: cancelSubscriptionAction,
             inviteMember: inviteMemberAction,
         },
     };

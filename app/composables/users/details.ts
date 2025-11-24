@@ -1,6 +1,8 @@
 import { createSharedComposable } from "@vueuse/core";
 import useAsyncAction from "../core/useAsyncAction";
 import { AppError } from "~/core/errors/app.error";
+import { userApi } from "~/services/api/user.api";
+import { SubscriptionStatus } from "~~/shared/domain/user/subscription.entity";
 
 const _useUser = () => {
     const { $usecases, $queries } = useNuxtApp();
@@ -27,6 +29,26 @@ const _useUser = () => {
     }, {
         immediate: true,
         lazy: true,
+    });
+
+    const subscription = computed(() => {
+        if (!dto.value?.subscription) return null;
+        return {
+            status: dto.value.subscription.status,
+            endDate: dto.value.subscription.endAt,
+            endDateLabel: dto.value.subscription.endAt
+                ? fromDate(dto.value.subscription.endAt)
+                : "N/A",
+        };
+    });
+
+    const isActive = computed(() => {
+        return subscription.value?.status === SubscriptionStatus.ACTIVE;
+    });
+
+    const isInactive = computed(() => {
+        return subscription.value === null ||
+            subscription.value?.status === SubscriptionStatus.CANCELED;
     });
 
     const userSettings = computed(() => {
@@ -66,15 +88,48 @@ const _useUser = () => {
         },
     );
 
+    const createCheckoutSessionAction = useAsyncAction(
+        async (plan: "starter" | "pro") => {
+            const checkoutUrl = await userApi.subscription
+                .createCheckoutSession({
+                    userId: connectedUser.value!.id,
+                    plan,
+                });
+            await navigateTo(checkoutUrl, { external: true });
+        },
+        {
+            showToast: false,
+            errorTitle: "Erreur lors de la création de la session de paiement.",
+        },
+    );
+
+    const cancelSubscriptionAction = useAsyncAction(
+        async () => {
+            await userApi.subscription.cancel({
+                userId: connectedUser.value!.id,
+            });
+            await refresh();
+        },
+        {
+            successTitle: "Abonnement annulé avec succès.",
+            errorTitle: "Erreur lors de l'annulation de l'abonnement.",
+        },
+    );
+
     return {
         currentUser: dto,
         userSettings,
+        subscription,
+        isActive,
+        isInactive,
         error,
         refresh,
         pending,
         actions: {
             delete: deleteAccountAction,
             toggleFavorite: toggleFavoriteAction,
+            createCheckoutSession: createCheckoutSessionAction,
+            cancelSubscription: cancelSubscriptionAction,
         },
     };
 };
