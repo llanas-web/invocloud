@@ -5,24 +5,11 @@ import type { AuthUserModel } from '~~/shared/application/common/providers/auth/
 
 
 const route = useRoute()
-const router = useRouter()
-const { connectedUser } = useAuth();
-const { formState, pending, onSubmit: createEstablishment } = useEstablishmentCreate()
-const { establishments, status } = useEstablishmentsList()
-const { isActive, isTrial, actions } = useEstablishmentDetails()
 
 // get the subscription_success from the query params
 const subscriptionSuccess = route.query.subscription_success === 'true'
 const toast = useToast()
 const open = ref(false)
-
-
-const isEstablishementActive = computed(() => {
-    if (router.currentRoute.value.name?.toString().includes('app-settings')) {
-        return true;
-    }
-    return isActive.value || isTrial.value;
-})
 
 onMounted(() => {
     if (subscriptionSuccess) {

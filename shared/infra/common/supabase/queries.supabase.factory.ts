@@ -8,6 +8,7 @@ import type {
 } from "../../../domain/common/queries.factory";
 import UserSupabaseQuery from "../../user/supabase/user.supabase.query";
 import type { Database } from "./database.types";
+import { SubscriptionPlanSupabaseQuery } from "../../subscription-plan/subscription-plan.supabase.query";
 
 export class QueriesSupabaseFactory implements QueriesFactory {
     readonly queries: Queries;
@@ -17,6 +18,9 @@ export class QueriesSupabaseFactory implements QueriesFactory {
             establishmentQuery: new EstablishmentSupabaseQuery(this.supabase),
             suppliersQuery: new SupplierSupabaseQuery(this.supabase),
             userQuery: new UserSupabaseQuery(this.supabase),
+            subscriptionPlanQuery: new SubscriptionPlanSupabaseQuery(
+                this.supabase,
+            ),
         };
     }
 }

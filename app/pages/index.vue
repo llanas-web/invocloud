@@ -70,12 +70,20 @@ const plans = computed(() => plansData.value?.map((plan) => {
             "Interfaçage PDP",
             ...(plan.features || []),
         ],
-        button: tarifPlan?.button || {
+        button: {
             label: 'Choisir',
-            to: '/auth/sign-up'
+            onClick: () => onPricingClick(plan.name),
         },
     }
 }) || []);
+
+const onPricingClick = (planId: string) => {
+    if (isAuthenticated.value) {
+        navigateTo('/app/settings/establishments#subscriptions')
+    } else {
+        navigateTo('/auth/sign-up?plan=' + planId)
+    }
+};
 </script>
 
 

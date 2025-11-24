@@ -1,12 +1,12 @@
 import { useServerDi } from "~~/server/middleware/injection.middleware";
 import { CancelSubscriptionBodySchema } from "~~/shared/contracts/api/security/establishments/subscription/cancel.contract";
-import CancelSubscriptionUsecase from "#shared/application/establishment/usecases/subscription/cancel-subscription.usecase";
+import CancelSubscriptionUsecase from "~~/shared/application/user/usecases/subscription/cancel-subscription.usecase";
 import { handleError } from "~~/server/core/errors/handling-error";
 
 export default defineEventHandler(async (event) => {
     try {
         const { repos, queries, paymentRepository } = useServerDi(event);
-        const { establishmentId } = await parseBody(
+        const { userId } = await parseBody(
             event,
             CancelSubscriptionBodySchema,
         );
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
         );
 
         await cancelSubscriptionUsecase.execute({
-            establishmentId,
+            userId,
         });
     } catch (error) {
         return handleError(error);

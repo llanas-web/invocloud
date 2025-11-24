@@ -25,8 +25,4 @@ export interface EstablishmentQuery {
     listEstablishmentBySupplierEmail(
         supplierEmail: string,
     ): Promise<EstablishmentListItemDTO[]>;
-
-    getEstablishmentIdByProviderSubscriptionId(
-        providerSubscriptionId: string,
-    ): Promise<string | null>;
 }

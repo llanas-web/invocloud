@@ -6,7 +6,7 @@ const { data: page } = useAsyncData(() => queryCollection('tarifs').first())
 const { data: plansData } = useAsyncData(() => queryCollection('plans').all(), {
     lazy: true,
 })
-console.log(plansData.value);
+const { isAuthenticated } = useAuth();
 
 useSeoMeta({
     title: page.value?.seo.title || page.value?.title,
@@ -49,15 +49,22 @@ const plans = computed(() => plansData.value?.map((plan) => {
             "Interfaçage PDP",
             ...(plan.features || []),
         ],
-        button: tarifPlan?.button || {
+        button: {
             label: 'Choisir',
-            to: '/auth/sign-up'
+            onClick: () => onPricingClick(plan.name)
         },
     }
 }) || []);
 
+const onPricingClick = (planId: string) => {
+    if (isAuthenticated.value) {
+        navigateTo('/app/settings/establishments#subscriptions')
+    } else {
+        navigateTo('/auth/sign-up?plan=' + planId)
+    }
+};
+
 const sections = computed(() => {
-    console.log(plansData.value);
     return [
         {
             title: "Établissements et utilisateurs",
@@ -148,8 +155,6 @@ const sections = computed(() => {
         }
     ]
 });
-console.log(sections.value);
-
 </script>
 
 <template>

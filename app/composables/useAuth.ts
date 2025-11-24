@@ -1,5 +1,7 @@
 import { createSharedComposable } from "@vueuse/core";
+import z from "zod";
 import useAsyncAction from "~/composables/core/useAsyncAction";
+import { AppError } from "~/core/errors/app.error";
 import { userApi } from "~/services/api/user.api";
 import { AuthEvent } from "~~/shared/application/common/providers/auth/auth.event.emitter";
 
@@ -17,8 +19,7 @@ const _useAuth = () => {
     function onLogin() {
         connectedUser.value = authRepository.connectedUser;
         if (
-            route.path.startsWith("/auth/login") ||
-            route.path.startsWith("/auth/sign-up")
+            route.path.startsWith("/auth/login")
         ) {
             console.log("Redirecting to /app");
             navigateTo("/app");
@@ -52,13 +53,39 @@ const _useAuth = () => {
         },
     );
 
+    const createCheckoutSessionAction = useAsyncAction(
+        async (plan: string) => {
+            const parsedPlan = z.enum(["starter", "pro"]).parse(plan);
+            const checkoutUrl = await userApi.subscription
+                .createCheckoutSession({
+                    userId: authRepository.connectedUser!.id,
+                    plan: parsedPlan,
+                });
+            await navigateTo(checkoutUrl, { external: true });
+        },
+        {
+            showToast: false,
+            errorTitle: "Erreur lors de la création de la session de paiement.",
+        },
+    );
+
     const signupAction = useAsyncAction(
         async (
             email: string,
             password: string,
             establishment_name: string,
             full_name: string,
+            plan?: string,
         ) => {
+            // If a plan is specified, set up a listener to create a checkout session after sign-up
+            if (plan) {
+                const onSignUpLogin = async () => {
+                    authRepository.off(AuthEvent.SIGNED_IN, onSignUpLogin);
+                    await createCheckoutSessionAction.execute(plan);
+                };
+                authRepository.on(AuthEvent.SIGNED_IN, onSignUpLogin);
+            }
+
             const response = await authRepository.signUpWithPassword(
                 email,
                 password,
@@ -70,6 +97,7 @@ const _useAuth = () => {
                     },
                 },
             );
+
             return response;
         },
         {
@@ -116,10 +144,12 @@ const _useAuth = () => {
     return {
         connectedUser,
         isAuthenticated,
+        isWaitingForCheckout: createCheckoutSessionAction.pending,
         actions: {
             login: loginAction,
             signup: signupAction,
             sendResetPasswordEmail: sendResetPasswordEmailAction,
+            createCheckoutSession: createCheckoutSessionAction,
             resetPassword: resetPasswordAction,
             logout: logoutAction,
         },

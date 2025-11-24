@@ -15,7 +15,7 @@ import {
     fromSessionToSubscription,
 } from "~~/server/infra/stripe/utils/mapper";
 import { useServerDi } from "~~/server/middleware/injection.middleware";
-import HandlePaymentEventsUsecase from "~~/shared/application/establishment/usecases/subscription/handle-payment-events.usecase";
+import HandlePaymentEventsUsecase from "~~/shared/application/user/usecases/subscription/handle-payment-events.usecase";
 
 export default defineEventHandler(async (event) => {
     try {
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
 
         switch (stripeEvent.type) {
             /**
-             * CREATE SUBSCRIPTION
+             * CREATE SUBSCRIPTION (PAID PLANS)
              */
             case "checkout.session.completed": {
                 const session = eventData as Stripe.Checkout.Session;
@@ -68,6 +68,9 @@ export default defineEventHandler(async (event) => {
                         session,
                         subscription,
                     );
+
+                // Pour les abonnements payants, créer une subscription active
+                // (plus de trial par défaut - tout est directement actif)
                 await handlePaymentEventsUsecase.handleCheckoutSucceeded(
                     checkoutSessionDTO,
                 );
@@ -113,6 +116,7 @@ export default defineEventHandler(async (event) => {
                 );
                 break;
             }
+
             /**
              * UPDATE SUBSCRIPTION STATUS
              */
@@ -128,6 +132,7 @@ export default defineEventHandler(async (event) => {
                 );
                 break;
             }
+
             /**
              * DELETE SUBSCRIPTION
              */

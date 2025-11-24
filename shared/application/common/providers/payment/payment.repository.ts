@@ -5,5 +5,4 @@ export interface PaymentRepository {
         createCheckoutSessionDto: CreateCheckoutSessionDto,
     ): Promise<string | null>;
     cancelSubscription(subscriptionId: string): Promise<number>;
-    cancelTrialingPeriod(subscriptionId: string): Promise<void>;
 }

@@ -2,7 +2,6 @@ import type {
     MemberRole,
     MemberStatus,
 } from "~~/shared/domain/establishment/member.entity";
-import type { SubscriptionStatus } from "~~/shared/domain/establishment/subscription.entity";
 
 export type EstablishmentListItemDTO = {
     id: string;
@@ -21,11 +20,6 @@ export type MemberDTO = {
     status: MemberStatus;
 };
 
-export type SubscriptionDTO = {
-    status: SubscriptionStatus;
-    endAt: Date | null;
-};
-
 export type EstablishmentDetailsDTO = {
     id: string;
     name: string;
@@ -33,6 +27,5 @@ export type EstablishmentDetailsDTO = {
     address: string | null;
     phone: string | null;
     creatorId: string;
-    subscription: SubscriptionDTO | null;
     members: MemberDTO[];
 };

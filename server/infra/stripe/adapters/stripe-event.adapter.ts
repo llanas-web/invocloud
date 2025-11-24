@@ -1,29 +1,25 @@
 import Stripe from "stripe";
 import type {
     CheckoutSessionCreatedDto,
-    InvoicePaymentSucceededDto,
-    PaymentFailedDto,
-    SubscriptionDeletedDto,
     SubscriptionUpdatedDto,
 } from "~~/shared/application/common/providers/payment/dtos/payment-event.dto";
 import { z } from "zod";
-import { fromUnix } from "~/utils/date";
-import { SubscriptionStatus } from "~~/shared/domain/establishment/subscription.entity";
+import { SubscriptionStatus } from "~~/shared/domain/user/subscription.entity";
 
 export const sessionMetadataSchema = z.object({
-    establishmentId: z.uuid(),
     userId: z.uuid(),
+    subscriptionPlanId: z.string(),
 });
 
 export class StripeEventAdapter {
     static toSubscriptionStatus(status: string) {
         switch (status) {
-            case "trialing":
-                return SubscriptionStatus.TRIALING;
             case "active":
                 return SubscriptionStatus.ACTIVE;
             case "past_due":
                 return SubscriptionStatus.PAST_DUE;
+            case "canceled":
+                return SubscriptionStatus.CANCELED;
             default:
                 throw new Error(`Unknown subscription status: ${status}`);
         }
@@ -33,11 +29,12 @@ export class StripeEventAdapter {
         session: Stripe.Checkout.Session,
         subscription: Stripe.Subscription,
     ): CheckoutSessionCreatedDto {
-        const { establishmentId, userId } = sessionMetadataSchema.parse(
+        const { userId, subscriptionPlanId } = sessionMetadataSchema.parse(
             session.metadata,
         );
         return {
-            establishmentId,
+            userId,
+            subscriptionPlanId,
             trialEndDate: new Date(subscription.trial_end! * 1000),
             subscriptionId: session.subscription as string,
             customerId: session.customer as string,

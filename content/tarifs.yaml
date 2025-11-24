@@ -6,18 +6,7 @@ hero:
   description: Gérez vos factures en ligne avec Invocloud, que vous soyez un utilisateur occasionnel ou un professionnel exigeant.
 plans:
   - id: starter
-    button:
-      label: Commencer
-      variant: subtle
-      color: primary
-      to: "/auth/login?plan=starter"
   - id: pro
     scale: true
     highlight: true
-    button:
-      label: Passer à Pro
-      to: "/auth/login?plan=pro"
   - id: enterprise
-    button:
-      label: Contactez-nous
-      to: "/contact?plan=enterprise"

@@ -7,7 +7,8 @@ import type { Repositories } from "~~/shared/domain/common/repositories.factory"
 import type { Queries } from "~~/shared/domain/common/queries.factory";
 
 export const CreateCheckoutSessionCommandSchema = z.object({
-    establishmentId: z.uuid(),
+    userId: z.uuid(),
+    plan: z.enum(["starter", "pro"]),
 });
 export type CreateCheckoutSessionCommand = z.input<
     typeof CreateCheckoutSessionCommandSchema
@@ -24,23 +25,30 @@ export default class CreateCheckoutSessionUsecase {
     async execute(command: CreateCheckoutSessionCommand): Promise<string> {
         const parsed = CreateCheckoutSessionCommandSchema
             .parse(command);
-        const { establishmentId } = parsed;
+        const { userId, plan } = parsed;
         const authenticatedUser = this.authRepo.connectedUser as AuthUserModel;
         if (!authenticatedUser || authenticatedUser.isAnonymous) {
             throw new ApplicationError("User not authenticated");
         }
-        const establishment = await this.repos.establishmentsRepo.getById(
-            establishmentId,
+        const user = await this.repos.userRepo.getById(
+            userId,
         );
-        if (!establishment) {
-            throw new ApplicationError("Establishment not found");
+        if (!user) {
+            throw new ApplicationError("User not found");
+        }
+        const subscriptionPlan = await this.queries.subscriptionPlanQuery
+            .getSubscriptionPlanByName(
+                plan,
+            );
+        if (!subscriptionPlan) {
+            throw new ApplicationError("Subscription plan not found");
         }
         const checkoutSessionUrl = await this.paymentRepo.createCheckoutSession(
             {
                 userId: authenticatedUser.id,
                 email: authenticatedUser.email,
-                establishmentId: establishmentId,
-                customerId: establishment.subscription?.providerCustomerId ??
+                subscriptionPlan,
+                customerId: user.subscription?.providerCustomerId ??
                     undefined,
             },
         );

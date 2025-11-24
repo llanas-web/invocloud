@@ -8,9 +8,6 @@ import MemberEntity, {
     MemberRole,
 } from "~~/shared/domain/establishment/member.entity";
 import { SupabaseError } from "../../common/supabase/supabase.error";
-import SubscriptionEntity, {
-    SubscriptionStatus,
-} from "~~/shared/domain/establishment/subscription.entity";
 import type { Database } from "../../common/supabase/database.types";
 
 export class EstablishmentSupabaseRepository
@@ -30,8 +27,7 @@ export class EstablishmentSupabaseRepository
                     users(
                         id
                     )
-                ),
-                subscription:subscriptions(*)
+                )
             `)
             .eq("id", id)
             .single();
@@ -48,22 +44,6 @@ export class EstablishmentSupabaseRepository
             })
         );
 
-        let subscription: SubscriptionEntity | null = null;
-        if (data.subscription !== null) {
-            subscription = SubscriptionEntity.create({
-                status: data.subscription.status as SubscriptionStatus,
-                createdAt: new Date(data.subscription.created_at),
-                providerCustomerId: data.subscription.provider_customer_id ||
-                    null,
-                providerSubscriptionId:
-                    data.subscription.provider_subscription_id || null,
-                startAt: new Date(data.subscription.started_at),
-                endAt: data.subscription.end_at
-                    ? new Date(data.subscription.end_at)
-                    : null,
-            });
-        }
-
         return EstablishmentModel.create({
             id: data.id,
             creatorId: data.creator_id,
@@ -74,7 +54,6 @@ export class EstablishmentSupabaseRepository
             createdAt: new Date(data.created_at),
             updatedAt: new Date(data.updated_at),
             members,
-            subscription,
         });
     }
 
@@ -113,9 +92,6 @@ export class EstablishmentSupabaseRepository
 
         // 2. Synchroniser les membres de manière différentielle
         await this.syncMembers(entity.id, entity.members);
-
-        // 3. Mettre à jour l'abonnement si nécessaire
-        await this.syncSubscription(entity.id, entity.subscription);
     }
 
     async delete(id: string): Promise<void> {
@@ -182,36 +158,5 @@ export class EstablishmentSupabaseRepository
                     },
                 );
         }
-    }
-
-    private async syncSubscription(
-        establishmentId: string,
-        subscription: SubscriptionEntity | null,
-    ): Promise<void> {
-        if (!subscription) {
-            // Supprimer l'abonnement s'il n'existe pas dans le modèle
-            await this.supabaseClient
-                .from("subscriptions")
-                .delete()
-                .eq("establishment_id", establishmentId);
-            return;
-        }
-
-        // Mettre à jour ou insérer l'abonnement
-        await this.supabaseClient
-            .from("subscriptions")
-            .upsert([{
-                establishment_id: establishmentId,
-                status: subscription.status,
-                provider_customer_id: subscription.providerCustomerId ?? "",
-                provider_subscription_id: subscription.providerSubscriptionId ??
-                    "",
-                started_at: subscription.startAt.toISOString(),
-                end_at: subscription.endAt?.toISOString() ?? null,
-                provider: "stripe",
-            }], {
-                onConflict: "establishment_id",
-                ignoreDuplicates: false,
-            });
     }
 }
