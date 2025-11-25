@@ -25,7 +25,7 @@ onMounted(() => {
                 icon: 'i-lucide-settings',
                 size: 'sm',
                 onClick: () => {
-                    navigateTo('/app/settings/establishments#subscriptions')
+                    navigateTo('/app/settings/billing')
                 }
             }]
         })
@@ -57,9 +57,15 @@ const links = ref<NavigationMenuItem[][]>([[
         defaultOpen: false,
         type: 'trigger',
         children: [{
-            label: 'General',
+            label: 'Profile',
             to: '/app/settings',
             exact: true,
+            onSelect: () => {
+                open.value = false
+            }
+        }, {
+            label: 'Paiements',
+            to: '/app/settings/establishments',
             onSelect: () => {
                 open.value = false
             }

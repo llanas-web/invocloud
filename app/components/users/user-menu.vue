@@ -19,17 +19,14 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   slot: 'label' as const,
 }], [{
   label: 'Profil',
-  icon: 'i-lucide-user'
+  icon: 'i-lucide-user',
+  to: '/app/settings',
+  active: currentRoute.value.name === 'app-settings'
 }, {
   label: 'Paiements',
   icon: 'i-lucide-credit-card',
-  to: '/app/settings/establishments#billing',
-  active: currentRoute.value.name === 'app-settings-establishments'
-}, {
-  label: 'Paramètres',
-  icon: 'i-lucide-settings',
-  to: '/app/settings',
-  active: currentRoute.value.name === 'app-settings'
+  to: '/app/settings/billing',
+  active: currentRoute.value.name === 'app-settings-billing'
 }],
 [{
   label: 'Déconnexion',

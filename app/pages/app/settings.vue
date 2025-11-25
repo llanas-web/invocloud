@@ -8,10 +8,14 @@ definePageMeta({
 })
 
 const links = [[{
-  label: 'Generale',
+  label: 'Profile',
   icon: 'i-lucide-user',
   to: '/app/settings',
   exact: true
+}, {
+  label: 'Paiements',
+  icon: 'i-lucide-credit-card',
+  to: '/app/settings/billing'
 }, {
   label: 'Établissements',
   icon: 'i-lucide-building',
@@ -20,10 +24,6 @@ const links = [[{
   //   label: 'Notifications',
   //   icon: 'i-lucide-bell',
   //   to: '/app/settings/notifications'
-}, {
-  label: 'Sécurité',
-  icon: 'i-lucide-shield',
-  to: '/app/settings/security'
 }]] satisfies NavigationMenuItem[][]
 </script>
 
