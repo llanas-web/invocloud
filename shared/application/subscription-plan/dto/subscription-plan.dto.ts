@@ -9,4 +9,6 @@ export type SubscriptionPlanDTO = {
     createdAt: Date;
     maxEstablishments: number;
     maxMembers: number;
+    hasOcrFeature: boolean;
+    hasInboundFeature: boolean;
 };

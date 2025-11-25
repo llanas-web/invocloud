@@ -56,6 +56,10 @@ const plans = computed(() => plansData.value?.map((plan) => {
     const usersLabel = plan.users === null ? '∞ Utilisateurs' : `${plan.users} Utilisateur${plan.users > 1 ? 's' : ''}`;
     const invoicesLabel = plan['monthly-invoices'] === null ? '∞ Factures' : `${plan['monthly-invoices']} factures / mois`;
     const tarifPlan = tarifsPage.value?.plans.find((p: any) => p.id === plan.name);
+    const customFeatures = [];
+    if (plan.ocr) customFeatures.push('OCR de factures');
+    if (plan['email-invoice']) customFeatures.push('Adresse email customisée');
+
     return {
         id: plan.name,
         title: plan.title,
@@ -68,6 +72,7 @@ const plans = computed(() => plansData.value?.map((plan) => {
             usersLabel,
             invoicesLabel,
             "Interfaçage PDP",
+            ...customFeatures,
             ...(plan.features || []),
         ],
         button: {

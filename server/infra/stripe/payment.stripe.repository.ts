@@ -70,10 +70,17 @@ class PaymentStripeRepository implements PaymentRepository {
         subscriptionId: string,
         subscriptionPlan: SubscriptionPlanDTO,
     ) {
+        const existingSubscription = await this.stripeInstance.subscriptions
+            .retrieve(subscriptionId);
+        const deletedItems = existingSubscription.items.data.map((item) => ({
+            id: item.id,
+            deleted: true,
+        }));
         await this.stripeInstance.subscriptions.update(
             subscriptionId,
             {
                 items: [
+                    ...deletedItems,
                     {
                         price: subscriptionPlan.subscriptionPriceId,
                         quantity: 1,

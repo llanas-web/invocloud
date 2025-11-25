@@ -1,36 +1,14 @@
 <script setup lang="ts">
-
-const toast = useToast();
-const { pending, isActive, isCanceled, subscription, actions: {
+const { pending: userPending, isActive, isCanceled, subscription, actions: {
     activateSubscription,
     cancelSubscription,
 } } = useUser()
 const { actions: { createCheckoutSession } } = useAuth()
+const { subscriptionPlans, pending: plansPending, error: plansError } = useSubscriptionPlan();
 
-const { data: plansData, pending: plansPending } = useAsyncData(async () => {
-    const _planData = await queryCollection('plans').all()
-    return _planData.map((plan) => {
-        const establishmentLabel = plan.establisments === null ? '∞ Établissements' : `${plan.establisments} Établissement${plan.establisments > 1 ? 's' : ''}`;
-        const usersLabel = plan.users === null ? '∞ Utilisateurs' : `${plan.users} Utilisateur${plan.users > 1 ? 's' : ''}`;
-        const invoicesLabel = plan['monthly-invoices'] === null ? '∞ Factures' : `${plan['monthly-invoices']} factures / mois`;
-        const isSubscribedToPlan = subscription.value?.planId === plan.plan_id;
-        const badgeLabel = isSubscribedToPlan ? `Jusqu'au ${subscription.value.endDateLabel}` : undefined;
-        return {
-            id: plan.plan_id,
-            title: plan.title,
-            description: plan.description,
-            price: plan.price,
-            badge: badgeLabel,
-            features: [
-                establishmentLabel,
-                usersLabel,
-                invoicesLabel,
-                "Interfaçage PDP",
-                ...(plan.features || []),
-            ],
-        }
-    })
-})
+const { data: plans, pending } = useAsyncData(async () => {
+    return queryCollection('plans').all();
+}, { immediate: true, watch: [subscriptionPlans] });
 
 const loading = computed(() => pending.value || plansPending.value || createCheckoutSession.pending.value || activateSubscription.pending.value || cancelSubscription.pending.value);
 
@@ -49,12 +27,35 @@ const onReactivate = async () => {
 const onPlanSelect = async (planId: string) => {
     await createCheckoutSession.execute(planId);
 };
+
+const pricingPlans = computed(() => {
+    return plans.value?.map((plan) => {
+        const subscriptionPlan = subscriptionPlans.value?.find((p) => p.id === plan.plan_id);
+        const subscriptionPlanFeatures = [];
+        if (!subscriptionPlan || subscriptionPlan.hasOcrFeature) subscriptionPlanFeatures.push('OCR de factures');
+        if (!subscriptionPlan || subscriptionPlan.hasInboundFeature) subscriptionPlanFeatures.push('Adresse email customisée');
+        return {
+            id: plan.plan_id,
+            title: plan.title,
+            description: plan.description,
+            price: plan.price,
+            features: [
+                !subscriptionPlan?.maxEstablishments ? '∞ Établissements' : `${subscriptionPlan?.maxEstablishments} Établissement${subscriptionPlan?.maxEstablishments! > 1 ? 's' : ''}`,
+                !subscriptionPlan?.maxMembers ? '∞ Utilisateurs' : `${subscriptionPlan?.maxMembers} Utilisateur${subscriptionPlan?.maxMembers! > 1 ? 's' : ''}`,
+                !subscriptionPlan?.includedInvoicesPerMonth ? '∞ Factures' : `${subscriptionPlan?.includedInvoicesPerMonth} factures / mois`,
+                "Interfaçage PDP",
+                ...subscriptionPlanFeatures,
+                ...(plan.features || []),
+            ]
+        };
+    }) || [];
+});
 </script>
 
 <template>
     <UPricingPlans orientation="horizontal" :loading="loading">
-        <UPricingPlan v-for="plan in plansData" :key="plan.id" v-bind="plan" :title="plan.title"
-            :description="plan.description" :highlight="plan.id === subscription?.planId" :ui="{
+        <UPricingPlan v-for="plan in pricingPlans" :key="plan.id" v-bind="plan"
+            :highlight="plan.id === subscription?.planId" :ui="{
                 description: 'text-sm text-muted h-12',
             }">
             <template #button>
