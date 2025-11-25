@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    const { formState, execute } = useUserUpdate();
+const { formState, execute } = useUserUpdate();
 </script>
 
 <template>
@@ -17,4 +17,6 @@
             </UFormField>
         </UPageCard>
     </UForm>
+    <USeparator />
+    <UsersBillingSubscription />
 </template>

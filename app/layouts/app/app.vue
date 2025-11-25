@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
 import { LazyInvoicesUploadModalContainer } from '#components'
-import type { AuthUserModel } from '~~/shared/application/common/providers/auth/dto/auth.dto';
 
 
 const route = useRoute()
@@ -147,7 +146,7 @@ const links = ref<NavigationMenuItem[][]>([[
                     class="mt-auto" />
             </template>
             <template #footer="{ collapsed }">
-                <UserMenu :collapsed="collapsed" />
+                <UsersUserMenu :collapsed="collapsed" />
             </template>
         </UDashboardSidebar>
         <LazyInvoicesUploadModalContainer size="md" variant="ghost" />

@@ -47,6 +47,7 @@ export default class UserSupabaseQuery implements UserQuery {
         if (!data) return null;
 
         const subscription = data.subscriptions === null ? null : {
+            planId: data.subscriptions?.subscription_plan_id,
             status: data.subscriptions?.status as SubscriptionStatus,
             endAt: data.subscriptions?.end_at
                 ? new Date(data.subscriptions.end_at)

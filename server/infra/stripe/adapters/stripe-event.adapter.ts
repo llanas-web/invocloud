@@ -46,7 +46,9 @@ export class StripeEventAdapter {
     ): SubscriptionUpdatedDto {
         return {
             subscriptionId: subscription.id,
-            status: this.toSubscriptionStatus(subscription.status),
+            status: subscription.cancel_at !== null
+                ? SubscriptionStatus.CANCELED
+                : this.toSubscriptionStatus(subscription.status),
         };
     }
 }

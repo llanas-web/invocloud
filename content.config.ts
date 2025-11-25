@@ -42,7 +42,7 @@ export const collections = {
         type: "data",
         source: "plans/**.yaml",
         schema: z.object({
-            id: z.string(),
+            plan_id: z.string(),
             name: z.string(),
             title: z.string(),
             description: z.string().optional(),

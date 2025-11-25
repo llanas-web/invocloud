@@ -8,7 +8,7 @@ import type { Queries } from "~~/shared/domain/common/queries.factory";
 
 export const CreateCheckoutSessionCommandSchema = z.object({
     userId: z.uuid(),
-    plan: z.enum(["starter", "pro"]),
+    subscriptionPlanId: z.uuid(),
 });
 export type CreateCheckoutSessionCommand = z.input<
     typeof CreateCheckoutSessionCommandSchema
@@ -25,7 +25,7 @@ export default class CreateCheckoutSessionUsecase {
     async execute(command: CreateCheckoutSessionCommand): Promise<string> {
         const parsed = CreateCheckoutSessionCommandSchema
             .parse(command);
-        const { userId, plan } = parsed;
+        const { userId, subscriptionPlanId } = parsed;
         const authenticatedUser = this.authRepo.connectedUser as AuthUserModel;
         if (!authenticatedUser || authenticatedUser.isAnonymous) {
             throw new ApplicationError("User not authenticated");
@@ -37,9 +37,8 @@ export default class CreateCheckoutSessionUsecase {
             throw new ApplicationError("User not found");
         }
         const subscriptionPlan = await this.queries.subscriptionPlanQuery
-            .getSubscriptionPlanByName(
-                plan,
-            );
+            .getById(subscriptionPlanId);
+
         if (!subscriptionPlan) {
             throw new ApplicationError("Subscription plan not found");
         }

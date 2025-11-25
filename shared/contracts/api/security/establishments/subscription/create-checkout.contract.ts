@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const CreateCheckoutSessionBodySchema = z.object({
     userId: z.uuid(),
-    plan: z.enum(["starter", "pro"]),
+    subscriptionPlanId: z.uuid(),
 });
 
 export const CreateCheckoutSessionResponseSchema = z.object({

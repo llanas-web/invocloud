@@ -9,6 +9,7 @@ export type UserListItemDTO = {
 };
 
 export type SubscriptionDTO = {
+    planId: string;
     status: SubscriptionStatus;
     endAt: Date | null;
 };

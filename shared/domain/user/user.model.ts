@@ -156,6 +156,18 @@ export class UserModel extends PayloadModel {
         );
     }
 
+    reactivateSubscription(): any {
+        if (this.hasActiveSubscription()) {
+            throw new DomainError(
+                DomainErrorCode.INVALID_OPERATION,
+                "L'utilisateur possède déjà un abonnement actif",
+            );
+        }
+        return this.updateSubscription(
+            (subscription) => subscription.activate(),
+        );
+    }
+
     removeSubscription() {
         if (this.props.subscription === null) {
             throw new DomainError(

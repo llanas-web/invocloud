@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { PaymentRepository } from "#shared/application/common/providers/payment/payment.repository";
 import { CreateCheckoutSessionDto } from "~~/shared/application/common/providers/payment/dtos/payment-event.dto";
 import { StripeError } from "./stripe.error";
+import { SubscriptionPlanDTO } from "~~/shared/application/subscription-plan/dto/subscription-plan.dto";
 
 class PaymentStripeRepository implements PaymentRepository {
     public stripeInstance: Stripe;
@@ -54,6 +55,35 @@ class PaymentStripeRepository implements PaymentRepository {
                 error as Stripe.errors.StripeError,
             );
         }
+    }
+
+    async activateSubscription(subscriptionId: string) {
+        await this.stripeInstance.subscriptions.update(
+            subscriptionId,
+            {
+                cancel_at_period_end: false,
+            },
+        );
+    }
+
+    async updateSubscriptionPlan(
+        subscriptionId: string,
+        subscriptionPlan: SubscriptionPlanDTO,
+    ) {
+        await this.stripeInstance.subscriptions.update(
+            subscriptionId,
+            {
+                items: [
+                    {
+                        price: subscriptionPlan.subscriptionPriceId,
+                        quantity: 1,
+                    },
+                    {
+                        price: subscriptionPlan.metricPriceId,
+                    },
+                ],
+            },
+        );
     }
 
     async retreiveSubscription(subscriptionId: string) {

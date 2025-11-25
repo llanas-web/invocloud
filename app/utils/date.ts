@@ -1,5 +1,6 @@
 import { CalendarDate } from "@internationalized/date";
 import { format, isAfter, isBefore, isEqual, isSameDay } from "date-fns";
+import { fr } from "date-fns/locale";
 
 export const formatDate = (value: Date | string | null) => {
     if (!value) return "";
@@ -44,6 +45,6 @@ export function isDateInRange(
             (isAfter(date, start) || isEqual(date, start));
 }
 
-export function fromDate(date: Date | number | string) {
-    return format(date, "dd/MM/yyyy");
+export function fromDate(date: Date | number | string, _format?: string) {
+    return format(date, _format ?? "dd/MM/yyyy", { locale: fr });
 }

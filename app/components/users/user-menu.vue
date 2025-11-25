@@ -8,15 +8,14 @@ defineProps<{
 
 const router = useRouter();
 const currentRoute = router.currentRoute;
-const { connectedUser, actions } = useAuth()
+const { actions } = useAuth()
+const { currentUser, isActive } = useUser()
 
-const user = computed(() => ({
-  name: (connectedUser.value as AuthUserModel | null)?.email,
-}))
+const userEmail = computed(() => currentUser.value?.email)
 
 const items = computed<DropdownMenuItem[][]>(() => ([[{
   type: 'label',
-  label: user.value.name,
+  label: userEmail.value || 'Utilisateur',
   slot: 'label' as const,
 }], [{
   label: 'Profil',
@@ -44,19 +43,19 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   <UDropdownMenu :items="items" :content="{ align: 'center', collisionPadding: 12 }"
     :ui="{ content: collapsed ? 'w-48' : 'w-(--reka-dropdown-menu-trigger-width)' }">
     <UButton v-bind="{
-      ...user,
+      ...currentUser,
       trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down'
     }" color="neutral" variant="ghost" block :square="collapsed" class="data-[state=open]:bg-elevated" :ui="{
       trailingIcon: 'text-dimmed'
     }">
-      {{ collapsed ? undefined : user?.name }}
-      <UTooltip text="compte d'essai" placement="bottom">
+      {{ collapsed ? undefined : userEmail }}
+      <UTooltip v-if="!isActive" text="compte d'essai" placement="bottom">
         <UBadge color="warning" icon="i-lucide-alert-triangle" />
       </UTooltip>
     </UButton>
 
 
-    <template #label-trailing>
+    <template v-if="!isActive" #label-trailing>
       <UBadge color="warning" icon="i-lucide-alert-triangle" />
     </template>
 
