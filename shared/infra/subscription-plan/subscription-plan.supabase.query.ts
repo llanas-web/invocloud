@@ -7,6 +7,29 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export class SubscriptionPlanSupabaseQuery implements SubscriptionPlanQuery {
     constructor(private supabase: SupabaseClient<Database>) {}
 
+    async getById(id: string): Promise<SubscriptionPlanDTO | null> {
+        const { data, error } = await this.supabase
+            .from("subscription_plans")
+            .select("*")
+            .eq("id", id)
+            .single();
+        if (error) throw SupabaseError.fromPostgrest(error);
+        if (!data) return null;
+
+        return {
+            id: data.id,
+            createdAt: new Date(data.created_at),
+            name: data.name,
+            providerProductId: data.provider_product_id,
+            includedInvoicesPerMonth: data.included_invoices,
+            pricePerMonthCents: data.price,
+            maxEstablishments: data.max_establishments,
+            maxMembers: data.max_members,
+            subscriptionPriceId: data.subscription_price_id,
+            metricPriceId: data.metric_price_id,
+        };
+    }
+
     async getSubscriptionPlanByName(
         planName: string,
     ): Promise<SubscriptionPlanDTO | null> {

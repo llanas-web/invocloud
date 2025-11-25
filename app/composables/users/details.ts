@@ -34,10 +34,11 @@ const _useUser = () => {
     const subscription = computed(() => {
         if (!dto.value?.subscription) return null;
         return {
+            planId: dto.value.subscription.planId,
             status: dto.value.subscription.status,
             endDate: dto.value.subscription.endAt,
             endDateLabel: dto.value.subscription.endAt
-                ? fromDate(dto.value.subscription.endAt)
+                ? fromDate(dto.value.subscription.endAt, "dd MMM")
                 : "N/A",
         };
     });
@@ -46,9 +47,8 @@ const _useUser = () => {
         return subscription.value?.status === SubscriptionStatus.ACTIVE;
     });
 
-    const isInactive = computed(() => {
-        return subscription.value === null ||
-            subscription.value?.status === SubscriptionStatus.CANCELED;
+    const isCanceled = computed(() => {
+        return subscription.value?.status === SubscriptionStatus.CANCELED;
     });
 
     const userSettings = computed(() => {
@@ -89,11 +89,11 @@ const _useUser = () => {
     );
 
     const createCheckoutSessionAction = useAsyncAction(
-        async (plan: "starter" | "pro") => {
+        async ({ subscriptionPlanId }: { subscriptionPlanId: string }) => {
             const checkoutUrl = await userApi.subscription
                 .createCheckoutSession({
                     userId: connectedUser.value!.id,
-                    plan,
+                    subscriptionPlanId: subscriptionPlanId,
                 });
             await navigateTo(checkoutUrl, { external: true });
         },
@@ -116,12 +116,26 @@ const _useUser = () => {
         },
     );
 
+    const activateSubscriptionAction = useAsyncAction(
+        async ({ subscriptionPlanId }: { subscriptionPlanId: string }) => {
+            await userApi.subscription.activate({
+                userId: connectedUser.value!.id,
+                subscriptionPlanId,
+            });
+            await refresh();
+        },
+        {
+            successTitle: "Abonnement activé avec succès.",
+            errorTitle: "Erreur lors de l'activation de l'abonnement.",
+        },
+    );
+
     return {
         currentUser: dto,
         userSettings,
         subscription,
         isActive,
-        isInactive,
+        isCanceled,
         error,
         refresh,
         pending,
@@ -129,6 +143,7 @@ const _useUser = () => {
             delete: deleteAccountAction,
             toggleFavorite: toggleFavoriteAction,
             createCheckoutSession: createCheckoutSessionAction,
+            activateSubscription: activateSubscriptionAction,
             cancelSubscription: cancelSubscriptionAction,
         },
     };

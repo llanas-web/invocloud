@@ -121,11 +121,9 @@ export default defineEventHandler(async (event) => {
              * UPDATE SUBSCRIPTION STATUS
              */
             case "customer.subscription.updated": {
-                const subscriptionUpdatedData =
-                    eventData as Stripe.Subscription;
                 const subscriptionDTO = StripeEventAdapter
                     .toSubscriptionUpdated(
-                        subscriptionUpdatedData,
+                        eventData as Stripe.Subscription,
                     );
                 await handlePaymentEventsUsecase.handleSubscriptionUpdated(
                     subscriptionDTO,

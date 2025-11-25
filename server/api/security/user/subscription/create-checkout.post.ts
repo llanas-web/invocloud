@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
                 event,
             );
 
-        const { userId, plan } = await parseBody(
+        const { userId, subscriptionPlanId } = await parseBody(
             event,
             CreateCheckoutSessionBodySchema,
         );
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
             paymentRepository,
         );
         const checkoutUrl = await createCheckoutSessionUsecase
-            .execute({ userId, plan });
+            .execute({ userId, subscriptionPlanId });
         return checkoutUrl;
     } catch (error) {
         return handleError(error);

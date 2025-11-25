@@ -98,10 +98,10 @@ class SubscriptionEntity {
      * Active l'abonnement (sortie de période d'essai)
      */
     activate(): SubscriptionEntity {
-        if (!this.isActive()) {
+        if (this.isActive()) {
             throw new DomainError(
-                DomainErrorCode.ERROR_UPDATING,
-                "Seul un abonnement en essai, actif ou annulé peut être renouvellé",
+                DomainErrorCode.INVALID_OPERATION,
+                "L'abonnement est déjà actif",
             );
         }
         return this.updateStatus(SubscriptionStatus.ACTIVE);
@@ -121,6 +121,16 @@ class SubscriptionEntity {
             this.props.startAt,
             periodEnd ?? undefined,
         );
+    }
+
+    /**
+     * Met à jour le plan d'abonnement
+     */
+    updateSubscriptionPlan(planId: string): SubscriptionEntity {
+        return new SubscriptionEntity({
+            ...this.props,
+            planId,
+        });
     }
 
     /**

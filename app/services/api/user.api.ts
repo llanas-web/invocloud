@@ -15,10 +15,19 @@ export const userApi = {
     },
     subscription: {
         createCheckoutSession(
-            data: { userId: string; plan: "starter" | "pro" },
+            data: { userId: string; subscriptionPlanId: string },
         ) {
             return $fetch<string>(
                 "/api/security/user/subscription/create-checkout",
+                {
+                    method: "POST",
+                    body: data,
+                },
+            );
+        },
+        activate(data: { userId: string; subscriptionPlanId: string }) {
+            return $fetch<void>(
+                "/api/security/user/subscription/activate",
                 {
                     method: "POST",
                     body: data,
