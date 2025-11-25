@@ -54,12 +54,11 @@ const _useAuth = () => {
     );
 
     const createCheckoutSessionAction = useAsyncAction(
-        async (plan: string) => {
-            const parsedPlan = z.enum(["starter", "pro"]).parse(plan);
+        async (subscriptionPlanId: string) => {
             const checkoutUrl = await userApi.subscription
                 .createCheckoutSession({
                     userId: authRepository.connectedUser!.id,
-                    plan: parsedPlan,
+                    subscriptionPlanId: subscriptionPlanId,
                 });
             await navigateTo(checkoutUrl, { external: true });
         },

@@ -1,7 +1,7 @@
 import { useServerDi } from "~~/server/middleware/injection.middleware";
 import {
     ActivateSubscriptionBodySchema,
-} from "~~/shared/contracts/api/security/establishments/subscription/activate.contract";
+} from "~~/shared/contracts/api/security/users/subscription/activate.contract";
 import ActivateSubscriptionUsecase from "~~/shared/application/user/usecases/subscription/activate-subscription.usecase";
 import { handleError } from "~~/server/core/errors/handling-error";
 

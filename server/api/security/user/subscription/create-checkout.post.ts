@@ -1,5 +1,5 @@
 import { useServerDi } from "~~/server/middleware/injection.middleware";
-import { CreateCheckoutSessionBodySchema } from "~~/shared/contracts/api/security/establishments/subscription/create-checkout.contract";
+import { CreateCheckoutSessionBodySchema } from "~~/shared/contracts/api/security/users/subscription/create-checkout.contract";
 import CreateCheckoutSessionUsecase from "~~/shared/application/user/usecases/subscription/create-checkout-session.usecase";
 import { handleError } from "~~/server/core/errors/handling-error";
 

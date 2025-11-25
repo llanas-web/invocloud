@@ -1,5 +1,5 @@
 import { useServerDi } from "~~/server/middleware/injection.middleware";
-import { CancelSubscriptionBodySchema } from "~~/shared/contracts/api/security/establishments/subscription/cancel.contract";
+import { CancelSubscriptionBodySchema } from "~~/shared/contracts/api/security/users/subscription/cancel.contract";
 import CancelSubscriptionUsecase from "~~/shared/application/user/usecases/subscription/cancel-subscription.usecase";
 import { handleError } from "~~/server/core/errors/handling-error";
 

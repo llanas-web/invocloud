@@ -4,8 +4,8 @@ const toast = useToast();
 const { pending, isActive, isCanceled, subscription, actions: {
     activateSubscription,
     cancelSubscription,
-    createCheckoutSession,
 } } = useUser()
+const { actions: { createCheckoutSession } } = useAuth()
 
 const { data: plansData, pending: plansPending } = useAsyncData(async () => {
     const _planData = await queryCollection('plans').all()
@@ -47,7 +47,7 @@ const onReactivate = async () => {
 };
 
 const onPlanSelect = async (planId: string) => {
-    await createCheckoutSession.execute({ subscriptionPlanId: planId });
+    await createCheckoutSession.execute(planId);
 };
 </script>
 
