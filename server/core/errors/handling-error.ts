@@ -1,6 +1,11 @@
 import { BaseError } from "~~/shared/errors/base.error";
+import { ConstraintError } from "~~/shared/application/common/errors/constraint.error";
 
 export const handleError = (error: unknown) => {
+    if (error instanceof ConstraintError) {
+        console.error("Constraint error occurred:", error.message);
+        return error.createServerError();
+    }
     if (error instanceof BaseError) {
         console.error("Handled error kind: ", error.kind);
         console.error("Handled error code: ", error.code);

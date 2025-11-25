@@ -1,4 +1,8 @@
-import type { EstablishmentDetailsDTO, EstablishmentListItemDTO } from "./dto";
+import type {
+    EstablishmentDetailsDTO,
+    EstablishmentListItemDTO,
+    MemberDTO,
+} from "./dto";
 import type { ListEstablishmentQueryFilter } from "./queries";
 
 export interface EstablishmentQuery {
@@ -25,4 +29,8 @@ export interface EstablishmentQuery {
     listEstablishmentBySupplierEmail(
         supplierEmail: string,
     ): Promise<EstablishmentListItemDTO[]>;
+
+    countMembersOfEstablishmentsFromOwner(
+        ownerId: string,
+    ): Promise<number>;
 }

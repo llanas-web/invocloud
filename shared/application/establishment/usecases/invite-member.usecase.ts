@@ -42,6 +42,34 @@ export default class InviteMemberUsecase {
             );
         }
 
+        console.log(establishment.members);
+        const owner = await this.repos.userRepo.getById(
+            establishment.getOwner().userId,
+        );
+        if (!owner) {
+            throw new ApplicationError(
+                "Propriétaire de l'établissement non trouvé",
+            );
+        }
+
+        const countMembersFromOwnerEstablishment = await this.queries
+            .establishmentQuery.countMembersOfEstablishmentsFromOwner(
+                owner.id,
+            );
+
+        const subscriptionPlan = await this.queries.subscriptionPlanQuery
+            .getById(owner.subscription?.planId!);
+
+        if (
+            subscriptionPlan &&
+            countMembersFromOwnerEstablishment >=
+                subscriptionPlan.maxMembers
+        ) {
+            throw new ApplicationError(
+                "Limite de membres atteinte pour votre plan d'abonnement",
+            );
+        }
+
         let userId: string;
         const users = await this.queries.userQuery.listUsers({
             emails: [parsed.email],

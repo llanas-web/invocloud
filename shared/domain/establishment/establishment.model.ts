@@ -1,7 +1,7 @@
 import type { UserModel } from "~~/shared/domain/user/user.model";
 import type { ModelCommonUpdateProps } from "../common/common.interface";
 import { PayloadModel } from "../common/payload.model";
-import MemberEntity, { MemberStatus } from "./member.entity";
+import MemberEntity, { MemberRole, MemberStatus } from "./member.entity";
 import SubscriptionEntity, {
     SubscriptionStatus,
 } from "../user/subscription.entity";
@@ -90,6 +90,19 @@ export class EstablishmentModel extends PayloadModel {
     }
 
     // ─── Business Logic: Member Management ───
+
+    getOwner(): MemberEntity {
+        const owner = this.members.find(
+            (m) => m.role === MemberRole.OWNER,
+        );
+        if (!owner) {
+            throw new DomainError(
+                DomainErrorCode.ENTITY_NOT_FOUND,
+                "Propriétaire de l'établissement non trouvé",
+            );
+        }
+        return owner;
+    }
 
     /**
      * Invite un nouveau membre (crée un membre en statut PENDING)

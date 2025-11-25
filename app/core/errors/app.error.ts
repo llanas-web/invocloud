@@ -1,4 +1,3 @@
-import type { NuxtError } from "#app";
 import { BaseError } from "#shared/errors/base.error";
 import { FetchError } from "ofetch";
 

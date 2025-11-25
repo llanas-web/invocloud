@@ -8,7 +8,7 @@ export enum MemberStatus {
 }
 
 export enum MemberRole {
-    CREATOR = "creator",
+    OWNER = "owner",
     ADMIN = "admin",
 }
 

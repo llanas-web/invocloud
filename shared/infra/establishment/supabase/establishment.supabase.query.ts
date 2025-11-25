@@ -139,4 +139,17 @@ export default class EstablishmentSupabaseQuery implements EstablishmentQuery {
             updatedAt: new Date(row.establishment.updated_at),
         }));
     }
+
+    async countMembersOfEstablishmentsFromOwner(
+        userId: string,
+    ): Promise<number> {
+        const { data, error } = await this.supabase.rpc(
+            "count_distinct_members_for_owner_role",
+            {
+                p_owner_id: userId,
+            },
+        );
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return data ?? 0;
+    }
 }
