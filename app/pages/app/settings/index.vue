@@ -1,5 +1,61 @@
 <script setup lang="ts">
+import * as z from 'zod'
+import type { FormSubmitEvent, FormError } from '@nuxt/ui'
+
 const { formState, execute } = useUserUpdate();
+const { actions: { resetPassword: resetPasswordAction } } = useAuth()
+const { actions: { delete: deleteUser } } = useUser()
+const { confirm } = useConfirmModal()
+
+const passwordSchema = z.object({
+    new: z.string().min(8, 'Must be at least 8 characters'),
+    newValidation: z.string().min(8, 'Must be at least 8 characters')
+})
+
+type PasswordSchema = z.output<typeof passwordSchema>
+
+const password = reactive<Partial<PasswordSchema>>({
+    new: undefined,
+    newValidation: undefined
+})
+
+const validate = (state: Partial<PasswordSchema>): FormError[] => {
+    const errors: FormError[] = []
+    if (state?.new !== state?.newValidation) {
+        errors.push({ name: 'newValidation', message: 'Passwords must be the same' })
+    }
+    return errors
+}
+
+const onSubmit = async (payload: FormSubmitEvent<z.infer<typeof passwordSchema>>) => {
+    const { new: newPassword } = payload.data;
+    const response = await resetPasswordAction.execute(newPassword);
+}
+
+const onDeleteAccount = async () => {
+    const confirmResult = await confirm({
+        title: 'Suppression du compte',
+        description: 'Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.',
+        validateLabel: 'Supprimer',
+        rejectLabel: 'Annuler',
+        danger: true,
+    });
+    if (!confirmResult) return;
+    await deleteUser.execute();
+    if (!deleteUser.error.value) {
+        useToast().add({
+            title: 'Votre compte a été supprimé avec succès.',
+            color: 'success'
+        });
+        // Redirect to home or login page
+        useRouter().push('/');
+    } else {
+        useToast().add({
+            title: 'Échec de la suppression du compte',
+            color: 'error'
+        });
+    }
+}
 </script>
 
 <template>
@@ -18,5 +74,32 @@ const { formState, execute } = useUserUpdate();
         </UPageCard>
     </UForm>
     <USeparator />
-    <UsersBillingSubscription />
+    <UPageCard title="Mot de passe" description="Confirmez votre mot de passe actuel avant d'en définir un nouveau."
+        variant="subtle">
+        <UForm :schema="passwordSchema" :state="password" :validate="validate" @submit="onSubmit"
+            class="flex flex-col gap-4 max-w-xs">
+            <UFormField name="new">
+                <UInput v-model="password.new" type="password" placeholder="Nouveau mot de passe" class="w-full" />
+            </UFormField>
+
+            <UFormField name="newValidation">
+                <UInput v-model="password.newValidation" type="password" placeholder="Confirmer le nouveau mot de passe"
+                    class="w-full" />
+            </UFormField>
+
+            <UButton label="Mettre à jour" class="w-fit" type="submit" />
+        </UForm>
+    </UPageCard>
+    <USeparator />
+    <UPageCard title="Compte"
+        description="Vous ne souhaitez plus utiliser notre service ? Vous pouvez supprimer votre compte ici. Cette action est irréversible. Toutes les informations liées à ce compte seront définitivement supprimées."
+        class="bg-linear-to-tl from-error/10 from-5% to-default">
+        <template #footer>
+            <UButton label="Supprimer le compte" color="error" @click="onDeleteAccount" />
+        </template>
+    </UPageCard>
+
+    <p class="text-center mt-8 text-sm text-neutral-500">Pour toute question, contactez-nous à l'adresse suivante :
+        <a href="mailto:contact@invocloud.com" class="text-primary underline">contact@invocloud.com</a>
+    </p>
 </template>
