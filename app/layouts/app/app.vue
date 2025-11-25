@@ -65,7 +65,7 @@ const links = ref<NavigationMenuItem[][]>([[
             }
         }, {
             label: 'Paiements',
-            to: '/app/settings/establishments',
+            to: '/app/settings/billing',
             onSelect: () => {
                 open.value = false
             }
@@ -75,13 +75,7 @@ const links = ref<NavigationMenuItem[][]>([[
             onSelect: () => {
                 open.value = false
             }
-        }, {
-            label: 'Securité',
-            to: '/app/settings/security',
-            onSelect: () => {
-                open.value = false
-            }
-        }],
+        },],
     },
 ], [
     {
