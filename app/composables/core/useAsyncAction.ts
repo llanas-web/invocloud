@@ -31,7 +31,7 @@ function useAsyncAction<TArgs extends any[], TResult>(
         successTitle = "Succès",
         errorTitle = "Erreur",
         successMessage = "Action réalisée avec succès.",
-        errorMessage = "Une erreur est survenue lors de l'opération.",
+        errorMessage,
         showToast = true,
         successAction,
         errorAction,
