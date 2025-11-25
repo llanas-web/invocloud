@@ -22,7 +22,9 @@ const _useEstablishmentCreate = () => {
     const { $usecases } = useNuxtApp();
     const { connectedUser } = useAuth();
     const { refresh, selectEstablishment } = useEstablishmentsList();
+    const { canCreateEstablishment } = useSubscriptionPlan();
     const isOpen = ref(false);
+    const toast = useToast();
 
     const formRef = ref();
 
@@ -51,6 +53,26 @@ const _useEstablishmentCreate = () => {
         },
     );
 
+    const openEstablishmentCreate = () => {
+        if (canCreateEstablishment.value) {
+            isOpen.value = true;
+        } else {
+            toast.add({
+                title: "Limite d'établissements atteinte",
+                description:
+                    "Vous avez atteint la limite d'établissements pour votre plan actuel. Veuillez mettre à niveau votre abonnement pour en ajouter plus.",
+                color: "warning",
+                icon: "i-lucide:alert-triangle",
+                actions: [{
+                    label: "Voir les plans",
+                    onClick: () => {
+                        navigateTo("/app/settings/billing");
+                    },
+                }],
+            });
+        }
+    };
+
     return {
         formRef,
         isOpen,
@@ -58,6 +80,7 @@ const _useEstablishmentCreate = () => {
         newEstablishment,
         error,
         pending,
+        openEstablishmentCreate,
         onSubmit: execute,
     };
 };

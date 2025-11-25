@@ -28,12 +28,6 @@ export default class DeleteEstablishmentUsecase {
             );
         }
 
-        if (!establishment.canBeDeleted()) {
-            throw new ApplicationError(
-                "Cet établissement ne peut pas être supprimé car un abonnement est actif",
-            );
-        }
-
         await this.repos.establishmentsRepo.delete(establishmentId);
     }
 }

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { EstablishmentModel } from "~~/shared/domain/establishment/establishment.model";
 import type { Queries } from "~~/shared/domain/common/queries.factory";
 import type { Repositories } from "~~/shared/domain/common/repositories.factory";
+import type { AuthRepository } from "../../common/providers/auth/auth.repository";
 
 export const CreateEstablishmentCommandSchema = z.object({
     creatorId: z.uuid(),

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-    const { isOpen, formState, onSubmit } = useEstablishmentCreate()
+const { isOpen, formState, onSubmit } = useEstablishmentCreate()
+const { canCreateEstablishment } = useSubscriptionPlan() 
 </script>
 
 <template>
@@ -13,7 +14,8 @@
                 </UFormField>
                 <div class="flex justify-end gap-2">
                     <UButton label="Annuler" color="neutral" variant="subtle" @click="isOpen = false" />
-                    <UButton label="Créer" color="primary" variant="solid" type="submit" />
+                    <UButton label="Créer" :disabled="!canCreateEstablishment" color="primary" variant="solid"
+                        type="submit" />
                 </div>
             </UForm>
         </template>
