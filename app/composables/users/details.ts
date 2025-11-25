@@ -98,6 +98,16 @@ const _useUser = () => {
         {
             successTitle: "Abonnement annulé avec succès.",
             errorTitle: "Erreur lors de l'annulation de l'abonnement.",
+            successAction: {
+                label: "Rafraichir",
+                onClick: async () => {
+                    await refresh();
+                },
+            },
+            errorAction: {
+                label: "Réessayer",
+                onClick: () => cancelSubscriptionAction.execute(),
+            },
         },
     );
 
@@ -112,6 +122,12 @@ const _useUser = () => {
         {
             successTitle: "Abonnement activé avec succès.",
             errorTitle: "Erreur lors de l'activation de l'abonnement.",
+            successAction: {
+                label: "Rafraichir",
+                onClick: async () => {
+                    await refresh();
+                },
+            },
         },
     );
 

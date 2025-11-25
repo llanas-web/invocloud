@@ -9,6 +9,14 @@ interface AsyncActionsOptions {
     successMessage?: string;
     errorMessage?: string;
     showToast?: boolean;
+    successAction?: {
+        label: string;
+        onClick: () => void;
+    };
+    errorAction?: {
+        label: string;
+        onClick: () => void;
+    };
 }
 
 function useAsyncAction<TArgs extends any[], TResult>(
@@ -25,6 +33,8 @@ function useAsyncAction<TArgs extends any[], TResult>(
         successMessage = "Action réalisée avec succès.",
         errorMessage = "Une erreur est survenue lors de l'opération.",
         showToast = true,
+        successAction,
+        errorAction,
     } = options;
 
     async function execute(...args: TArgs) {
@@ -39,6 +49,12 @@ function useAsyncAction<TArgs extends any[], TResult>(
                     description: successMessage,
                     color: "success",
                     icon: "i-lucide:check-circle",
+                    actions: successAction
+                        ? [{
+                            label: successAction.label,
+                            onClick: successAction.onClick,
+                        }]
+                        : [],
                 });
             }
             return result;
@@ -68,6 +84,12 @@ function useAsyncAction<TArgs extends any[], TResult>(
                 description: errorMessage ?? error.value.message,
                 color: error.value.isError ? "error" : "warning",
                 icon: "i-lucide:alert-circle",
+                actions: errorAction
+                    ? [{
+                        label: errorAction.label,
+                        onClick: errorAction.onClick,
+                    }]
+                    : [],
             });
             data.value = null;
             throw err;
