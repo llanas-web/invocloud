@@ -6,11 +6,11 @@ import {
 import {
     type CancelSubscriptionBody,
     CancelSubscriptionBodySchema,
-} from "~~/shared/contracts/api/security/establishments/subscription/cancel.contract";
+} from "~~/shared/contracts/api/security/users/subscription/cancel.contract";
 import {
     type CreateCheckoutSessionBody,
     CreateCheckoutSessionBodySchema,
-} from "~~/shared/contracts/api/security/establishments/subscription/create-checkout.contract";
+} from "~~/shared/contracts/api/security/users/subscription/create-checkout.contract";
 
 export const establishmentApi = {
     inviteMember(body: InviteMemberBody) {
@@ -30,25 +30,5 @@ export const establishmentApi = {
                 body: { prefix, excludeEstablishmentId },
             },
         );
-    },
-    subscription: {
-        createCheckoutSession(body: CreateCheckoutSessionBody) {
-            return $fetch<string>(
-                "/api/security/establishment/subscription/create-checkout",
-                {
-                    method: "POST",
-                    body: parseBody(CreateCheckoutSessionBodySchema, body),
-                },
-            );
-        },
-        cancel(body: CancelSubscriptionBody) {
-            return $fetch<string>(
-                "/api/security/establishment/subscription/cancel",
-                {
-                    method: "POST",
-                    body: parseBody(CancelSubscriptionBodySchema, body),
-                },
-            );
-        },
     },
 };

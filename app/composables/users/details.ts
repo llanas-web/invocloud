@@ -88,21 +88,6 @@ const _useUser = () => {
         },
     );
 
-    const createCheckoutSessionAction = useAsyncAction(
-        async ({ subscriptionPlanId }: { subscriptionPlanId: string }) => {
-            const checkoutUrl = await userApi.subscription
-                .createCheckoutSession({
-                    userId: connectedUser.value!.id,
-                    subscriptionPlanId: subscriptionPlanId,
-                });
-            await navigateTo(checkoutUrl, { external: true });
-        },
-        {
-            showToast: false,
-            errorTitle: "Erreur lors de la création de la session de paiement.",
-        },
-    );
-
     const cancelSubscriptionAction = useAsyncAction(
         async () => {
             await userApi.subscription.cancel({
@@ -142,7 +127,6 @@ const _useUser = () => {
         actions: {
             delete: deleteAccountAction,
             toggleFavorite: toggleFavoriteAction,
-            createCheckoutSession: createCheckoutSessionAction,
             activateSubscription: activateSubscriptionAction,
             cancelSubscription: cancelSubscriptionAction,
         },
