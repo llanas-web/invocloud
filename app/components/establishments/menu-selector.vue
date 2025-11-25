@@ -7,7 +7,7 @@ const props = defineProps<{
 }>()
 
 const { establishments, status, pending, selectEstablishment, selectedId } = useEstablishmentsList()
-const { isOpen } = useEstablishmentCreate();
+const { openEstablishmentCreate } = useEstablishmentCreate();
 const { userSettings, actions } = useUser();
 
 const items = computed<DropdownMenuItem[][]>(() => {
@@ -20,7 +20,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
         })), [{
             label: 'Créer une structure',
             icon: 'i-lucide-circle-plus',
-            onSelect: () => isOpen.value = true,
+            onSelect: openEstablishmentCreate,
         }, {
             label: 'Gérer la structure',
             icon: 'i-lucide-cog',
