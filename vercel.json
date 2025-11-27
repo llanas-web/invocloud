@@ -4,6 +4,10 @@
     {
       "path": "/api/jobs/ocr/runner",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/jobs/metrics/runner",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

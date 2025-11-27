@@ -79,4 +79,41 @@ export default class UserSupabaseQuery implements UserQuery {
         if (!data) return null;
         return data.user_id;
     }
+
+    async getUsersDetailsByEstablishmentsIds(
+        establishmentIds: string[],
+    ): Promise<{ establishmentId: string; userDetails: UserDetailsDTO }[]> {
+        const { data, error } = await this.supabase
+            .from("establishment_members")
+            .select("*, users(*, user_settings(*), subscriptions(*))")
+            .eq("role", "owner")
+            .in("establishment_id", establishmentIds);
+        if (error) throw SupabaseError.fromPostgrest(error);
+
+        return data.map((row) => {
+            const user = row.users;
+            const subscription = user.subscriptions === null ? null : {
+                customerId: user.subscriptions?.provider_customer_id,
+                planId: user.subscriptions?.subscription_plan_id,
+                subscriptionId: user.subscriptions?.provider_subscription_id,
+                status: user.subscriptions?.status as SubscriptionStatus,
+                endAt: user.subscriptions?.end_at
+                    ? new Date(user.subscriptions.end_at)
+                    : null,
+            };
+            return {
+                userDetails: {
+                    id: user.id,
+                    email: user.email,
+                    fullName: user.full_name,
+                    createdAt: fromStringToLocalDate(user.created_at),
+                    updatedAt: fromStringToLocalDate(user.updated_at),
+                    favoriteEstablishmentId: user.user_settings
+                        ?.favorite_establishment_id ?? null,
+                    subscription: subscription,
+                },
+                establishmentId: row.establishment_id,
+            };
+        });
+    }
 }

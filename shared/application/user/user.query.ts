@@ -7,4 +7,7 @@ export interface UserQuery {
     getUserIdByProviderSubscriptionId(
         providerSubscriptionId: string,
     ): Promise<string | null>;
+    getUsersDetailsByEstablishmentsIds(
+        establishmentIds: string[],
+    ): Promise<{ establishmentId: string; userDetails: UserDetailsDTO }[]>;
 }
