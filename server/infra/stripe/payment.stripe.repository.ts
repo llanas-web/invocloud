@@ -7,6 +7,7 @@ import { SubscriptionPlanDTO } from "~~/shared/application/subscription-plan/dto
 class PaymentStripeRepository implements PaymentRepository {
     public stripeInstance: Stripe;
     private baseUrl: string;
+    private invoiceUsageMetricName: string;
 
     constructor() {
         const config = useRuntimeConfig();
@@ -16,6 +17,8 @@ class PaymentStripeRepository implements PaymentRepository {
                     "2025-10-29.clover",
         });
         this.baseUrl = config.baseUrl!;
+        this.invoiceUsageMetricName = config.invoiceUsageMetricName ||
+            "invoice_treated";
     }
 
     async createCheckoutSession(
@@ -108,6 +111,16 @@ class PaymentStripeRepository implements PaymentRepository {
             },
         );
         return subscription.cancel_at!;
+    }
+
+    async updateInvoiceUsageMetric(customerId: string, metricValue: number) {
+        await this.stripeInstance.billing.meterEvents.create({
+            event_name: this.invoiceUsageMetricName,
+            payload: {
+                stripe_customer_id: customerId,
+                value: "" + metricValue,
+            },
+        });
     }
 }
 

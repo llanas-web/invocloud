@@ -7,4 +7,10 @@ export interface InvoiceQuery {
     ): Promise<InvoiceListItemDTO[]>;
 
     getInvoiceDetails(id: string): Promise<InvoiceDetailsDTO | null>;
+
+    listUnmeasuredInvoices(
+        filters?: { limit?: number },
+    ): Promise<InvoiceListItemDTO[]>;
+
+    markInvoicesAsMeasured(invoiceIds: string[]): Promise<void>;
 }

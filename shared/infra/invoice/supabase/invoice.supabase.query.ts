@@ -7,9 +7,10 @@ import type {
 } from "~~/shared/application/invoice/dto";
 import type { InvoiceListQuery } from "~~/shared/application/invoice/query";
 import type { Database } from "../../common/supabase/database.types";
+import { InvoiceStatus } from "~~/shared/domain/invoice/invoice.model";
 
 type Row = Database["public"]["Tables"]["invoices"]["Row"] & {
-    suppliers: { name: string };
+    suppliers: { name: string; establishment_id: string };
 };
 
 const fromRow = (row: Row): InvoiceListItemDTO => ({
@@ -28,6 +29,8 @@ const fromRow = (row: Row): InvoiceListItemDTO => ({
     dueDate: row.due_date ? new Date(row.due_date) : null,
     paidAt: row.paid_at ? new Date(row.paid_at) : null,
     comment: row.comment ?? null,
+    establishmentId: row.suppliers.establishment_id,
+    establishmentName: row.suppliers.name ?? null,
 });
 
 export default class InvoiceSupabaseQuery implements InvoiceQuery {
@@ -71,22 +74,37 @@ export default class InvoiceSupabaseQuery implements InvoiceQuery {
             .eq("id", id)
             .single();
         if (error) throw SupabaseError.fromPostgrest(error);
-        return {
-            id: data.id,
-            supplierId: data.supplier_id,
-            supplierName: data.suppliers.name,
-            status: data.status,
-            source: data.source,
-            filePath: data.file_path,
-            createdAt: new Date(data.created_at),
-            updatedAt: new Date(data.updated_at),
-            name: data.name ?? null,
-            number: data.invoice_number ?? null,
-            amount: data.amount ?? null,
-            emitDate: data.emit_date ? new Date(data.emit_date) : null,
-            dueDate: data.due_date ? new Date(data.due_date) : null,
-            paidAt: data.paid_at ? new Date(data.paid_at) : null,
-            comment: data.comment ?? null,
-        };
+        return fromRow(data as Row) as InvoiceDetailsDTO | null;
+    }
+
+    async listUnmeasuredInvoices({
+        limit,
+    }: { limit?: number } = {
+        limit: 200,
+    }): Promise<InvoiceListItemDTO[]> {
+        const { data, error } = await this.supabase
+            .from("invoices")
+            .select("*, suppliers!inner(name, establishment_id)")
+            .eq("has_been_measured", false)
+            .in(
+                "status",
+                [
+                    InvoiceStatus.VALIDATED,
+                    InvoiceStatus.PAID,
+                    InvoiceStatus.ERROR,
+                ],
+            )
+            .limit(limit ?? 200)
+            .order("created_at", { ascending: false });
+        if (error) throw SupabaseError.fromPostgrest(error);
+        return (data as Row[]).map(fromRow);
+    }
+
+    async markInvoicesAsMeasured(invoiceIds: string[]): Promise<void> {
+        const { error } = await this.supabase
+            .from("invoices")
+            .update({ has_been_measured: true })
+            .in("id", invoiceIds);
+        if (error) throw SupabaseError.fromPostgrest(error);
     }
 }

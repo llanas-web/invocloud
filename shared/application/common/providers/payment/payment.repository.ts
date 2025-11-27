@@ -11,4 +11,8 @@ export interface PaymentRepository {
         subscriptionPlan: SubscriptionPlanDTO,
     ): Promise<void>;
     cancelSubscription(subscriptionId: string): Promise<number>;
+    updateInvoiceUsageMetric(
+        subscriptionId: string,
+        metricValue: number,
+    ): Promise<void>;
 }

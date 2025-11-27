@@ -21,6 +21,10 @@ export type InvoiceListItemDTO = {
     dueDate: Date | null;
     paidAt: Date | null;
     comment: string | null;
+
+    // Champ pour filtrages
+    establishmentId: string;
+    establishmentName?: string | null;
 };
 
 export type InvoiceDetailsDTO = {
