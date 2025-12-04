@@ -1,97 +1,98 @@
 <script setup lang="ts">
-    import { getPaginationRowModel, type Row } from '@tanstack/table-core';
-    import { createInvoiceColumns } from './columns';
-    import { createRowActions, type RowAction } from './row-actions';
-    import type { InvoiceDetailsDTO } from '~~/shared/application/invoice/dto';
+import { getPaginationRowModel, type Row } from '@tanstack/table-core';
+import { createInvoiceColumns } from './columns';
+import { createRowActions, type RowAction } from './row-actions';
+import type { InvoiceDetailsDTO } from '~~/shared/application/invoice/dto';
 
-    const acceptedInvoiceStatus = ['validated', 'paid', 'error'];
+const acceptedInvoiceStatus = ['validated', 'paid', 'error'];
 
-    const table = useTemplateRef('invoiceTable');
+const table = useTemplateRef('invoiceTable');
 
-    const UDropdownMenu = resolveComponent('UDropdownMenu')
-    const UButton = resolveComponent('UButton')
+const UDropdownMenu = resolveComponent('UDropdownMenu')
+const UButton = resolveComponent('UButton')
 
-    const { invoices, pending, supplierFilter, actions } = useInvoices();
-    const { open: isSendModalOpen, selectedInvoices: listInvoicesToSend } = useInvoicesSend();
-    const { open: isDeleteModalOpen, selectedInvoices: listInvoicesToDelete } = useInvoicesDelete();
-    const { launchDownloadWorker, progress, running } = useWorker();
+const { invoices, pending, supplierFilter, actions } = useInvoices();
+const { open: isSendModalOpen, selectedInvoices: listInvoicesToSend } = useInvoicesSend();
+const { open: isDeleteModalOpen, selectedInvoices: listInvoicesToDelete } = useInvoicesDelete();
+const { launchDownloadWorker, progress, running } = useWorker();
 
-    const acceptedInvoices = computed(() =>
-        invoices.value.filter((invoice) =>
-            acceptedInvoiceStatus.includes(invoice.status)
-        )
-    );
+const acceptedInvoices = computed(() =>
+    invoices.value.filter((invoice) =>
+        acceptedInvoiceStatus.includes(invoice.status)
+    )
+);
 
-    const rowSelection = ref({});
-    const pagination = ref({
-        pageIndex: 0,
-        pageSize: 10
-    });
+const rowSelection = ref({});
+const pagination = ref({
+    pageIndex: 0,
+    pageSize: 10
+});
 
-    // Actions handlers
-    const rowActions: RowAction = {
-        onSend: (id: string) => {
-            listInvoicesToSend.value = [id];
-            isSendModalOpen.value = true;
-        },
-        onView: (id: string) => {
-            navigateTo(`/app/invoices/${id}`);
-        },
-        onUpdateStatus: async (id: string, status: 'paid' | 'error') => {
-            await actions.updateStatus.execute(id, status, status === 'paid' ? new Date() : null);
-        },
-        onDelete: (id: string) => {
-            listInvoicesToDelete.value = [id];
-            isDeleteModalOpen.value = true;
-        }
-    };
-
-    // Columns avec actions intégrées
-    const columns: any[] = [
-        ...createInvoiceColumns((supplierId) => {
-            supplierFilter.value = [supplierId];
-        }),
-        {
-            id: 'actions',
-            cell: ({ row }: { row: Row<InvoiceDetailsDTO> }) =>
-                h('div', { class: 'text-right' },
-                    h(UDropdownMenu, {
-                        content: { align: 'end' },
-                        items: createRowActions(row.original, rowActions)
-                    }, () =>
-                        h(UButton, {
-                            icon: 'i-lucide-ellipsis-vertical',
-                            color: 'neutral',
-                            variant: 'ghost',
-                            class: 'ml-auto'
-                        })
-                    )
-                )
-        }
-    ];
-
-    const selectedRows = computed(() => {
-        return table.value?.tableApi?.getFilteredSelectedRowModel().rows.map(r => r.original) ?? [];
-    });
-
-    const handleBulkSend = () => {
-        listInvoicesToSend.value = selectedRows.value.map(r => r.id);
+// Actions handlers
+const rowActions: RowAction = {
+    onSend: (id: string) => {
+        listInvoicesToSend.value = [id];
         isSendModalOpen.value = true;
-    };
-
-    const handleBulkDelete = () => {
-        listInvoicesToDelete.value = selectedRows.value.map(r => r.id);
+    },
+    onView: (id: string) => {
+        navigateTo(`/app/invoices/${id}`);
+    },
+    onUpdateStatus: async (id: string, status: 'paid' | 'error') => {
+        await actions.updateStatus.execute(id, status, status === 'paid' ? new Date() : null);
+    },
+    onDelete: (id: string) => {
+        listInvoicesToDelete.value = [id];
         isDeleteModalOpen.value = true;
-    };
+    }
+};
 
-    const handleBulkDownload = () => {
-        if (selectedRows.value.length === 0) return;
-        launchDownloadWorker.execute(selectedRows.value.map(r => ({
-            id: r.id,
-            filePath: r.filePath,
-            number: r.number
-        })));
-    };
+// Columns avec actions intégrées
+const columns: any[] = [
+    ...createInvoiceColumns((supplierId) => {
+        supplierFilter.value = [supplierId];
+    }),
+    {
+        id: 'actions',
+        cell: ({ row }: { row: Row<InvoiceDetailsDTO> }) =>
+            h('div', { class: 'text-right' },
+                h(UDropdownMenu, {
+                    content: { align: 'end' },
+                    items: createRowActions(row.original, rowActions)
+                }, () =>
+                    h(UButton, {
+                        icon: 'i-lucide-ellipsis-vertical',
+                        color: 'neutral',
+                        variant: 'ghost',
+                        class: 'ml-auto'
+                    })
+                )
+            )
+    }
+];
+
+const selectedRows = computed(() => {
+    return table.value?.tableApi?.getFilteredSelectedRowModel().rows.map(r => r.original) ?? [];
+});
+
+const handleBulkSend = () => {
+    listInvoicesToSend.value = selectedRows.value.map(r => r.id);
+    isSendModalOpen.value = true;
+};
+
+const handleBulkDelete = () => {
+    listInvoicesToDelete.value = selectedRows.value.map(r => r.id);
+    isDeleteModalOpen.value = true;
+};
+
+const handleBulkDownload = () => {
+    if (selectedRows.value.length === 0) return;
+    launchDownloadWorker.execute(selectedRows.value.map(r => ({
+        id: r.id,
+        filePath: r.filePath,
+        number: r.number,
+        supplierName: r.supplierName
+    })));
+};
 </script>
 
 <template>
