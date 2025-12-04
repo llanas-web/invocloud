@@ -2,6 +2,11 @@
 
 
 
+## 1.4.5 (2025-12-04)
+
+### Fixed
+- 🐛  Adding supplier name to the downloaded files [[aa808d8](https://github.com/llanas-web/invocloud/commit/aa808d8116c3fb945288ae82d859b465a8790c53)]
+
 ## 1.4.4 (2025-11-18)
 
 ### Fixed
