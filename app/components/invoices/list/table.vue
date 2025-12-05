@@ -29,13 +29,18 @@ const pagination = ref({
 });
 
 // Actions handlers
+const route = useRoute();
+
 const rowActions: RowAction = {
     onSend: (id: string) => {
         listInvoicesToSend.value = [id];
         isSendModalOpen.value = true;
     },
     onView: (id: string) => {
-        navigateTo(`/app/invoices/${id}`);
+        navigateTo({
+            path: `/app/invoices/${id}`,
+            query: route.query
+        });
     },
     onUpdateStatus: async (id: string, status: 'paid' | 'error') => {
         await actions.updateStatus.execute(id, status, status === 'paid' ? new Date() : null);
@@ -53,6 +58,7 @@ const columns: any[] = [
     }),
     {
         id: 'actions',
+        size: 50,
         cell: ({ row }: { row: Row<InvoiceDetailsDTO> }) =>
             h('div', { class: 'text-right' },
                 h(UDropdownMenu, {
@@ -106,7 +112,7 @@ const handleBulkDownload = () => {
     <UTable ref="invoiceTable" v-model:row-selection="rowSelection" v-model:pagination="pagination"
         :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }" class="shrink-0"
         :data="acceptedInvoices" :columns="columns" :loading="pending" :ui="{
-            base: 'table-fixed border-separate border-spacing-0',
+            base: 'border-separate border-spacing-0',
             thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
             tbody: '[&>tr]:last:[&>td]:border-b-0',
             th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',

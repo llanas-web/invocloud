@@ -1,32 +1,33 @@
 <script setup lang="ts">
-    import type { BreadcrumbItem } from '@nuxt/ui'
-    import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
+import type { BreadcrumbItem } from '@nuxt/ui'
+import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 
-    definePageMeta({
-        layout: 'app'
-    })
+definePageMeta({
+    layout: 'app'
+})
 
-    const { invoice, pending: loadingDetails, invoiceId } = useInvoiceDetails()
-    const { formRef, pending: loadingUpdate } = useInvoiceUpdate()
+const route = useRoute()
+const { invoice, pending: loadingDetails, invoiceId } = useInvoiceDetails()
+const { formRef, pending: loadingUpdate } = useInvoiceUpdate()
 
-    const items = ref<BreadcrumbItem[]>([
-        {
-            label: 'Factures',
-            icon: 'i-lucide-files',
-            to: '/app'
-        },
-        {
-            label: `Détails Facture`,
-            icon: 'i-lucide-file-text',
-            to: `/app/invoices/${invoice.value?.id}`
-        }
-    ])
+const items = ref<BreadcrumbItem[]>([
+    {
+        label: 'Factures',
+        icon: 'i-lucide-files',
+        to: { path: '/app', query: route.query }
+    },
+    {
+        label: `Détails Facture`,
+        icon: 'i-lucide-file-text',
+        to: { path: `/app/invoices/${invoice.value?.id}`, query: route.query }
+    }
+])
 
-    const breakpoints = useBreakpoints(breakpointsTailwind)
-    const isMobile = breakpoints.smaller('lg')
-    const isFormOpen = ref(false)
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const isMobile = breakpoints.smaller('lg')
+const isFormOpen = ref(false)
 
-    const isLoading = computed(() => loadingDetails.value || loadingUpdate.value)
+const isLoading = computed(() => loadingDetails.value || loadingUpdate.value)
 </script>
 <template>
     <UDashboardPanel :id="`invoices-${invoiceId}`" :default-size="25" :min-size="20" :max-size="100" resizable>
@@ -53,7 +54,7 @@
             </div>
             <div class="flex justify-end p-4 mt-auto space-x-4">
                 <UButton label="Annuler" color="neutral" variant="subtle" :disabled="!!isLoading"
-                    @click="navigateTo('/app')" />
+                    @click="navigateTo({ path: '/app', query: route.query })" />
                 <UButton label="Sauvegarder" color="success" :loading="isLoading" @click="formRef?.submit()"
                     :disabled="isLoading" />
             </div>

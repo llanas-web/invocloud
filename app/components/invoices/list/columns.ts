@@ -52,11 +52,16 @@ export const createInvoiceColumns = (
     {
         accessorKey: "number",
         header: "N°",
-        cell: ({ row }) =>
-            h(NuxtLink, {
+        cell: ({ row }) => {
+            const route = useRoute();
+            return h(NuxtLink, {
                 class: "font-medium text-highlighted hover:underline",
-                to: `/app/invoices/${row.original.id}`,
-            }, () => row.original.number),
+                to: {
+                    path: `/app/invoices/${row.original.id}`,
+                    query: route.query,
+                },
+            }, () => row.original.number);
+        },
     },
     {
         accessorKey: "supplierName",
@@ -101,12 +106,12 @@ export const createInvoiceColumns = (
         },
     },
     {
-        accessorKey: "createdAt",
+        accessorKey: "emitDate",
         header: ({ column }) => {
             const isSorted = column.getIsSorted();
             return h(UButton, {
                 variant: "ghost",
-                label: "Date de réception",
+                label: "Réception",
                 icon: isSorted
                     ? isSorted === "asc"
                         ? "i-lucide-arrow-up-narrow-wide"
@@ -120,7 +125,7 @@ export const createInvoiceColumns = (
         cell: ({ row }) =>
             h(
                 "div",
-                { class: "text-muted text-center" },
+                { class: "text-muted" },
                 formatDate(row.original.emitDate),
             ),
     },
@@ -130,7 +135,7 @@ export const createInvoiceColumns = (
             const isSorted = column.getIsSorted();
             return h(UButton, {
                 variant: "ghost",
-                label: "Date d'échéance",
+                label: "Échéance",
                 icon: isSorted
                     ? isSorted === "asc"
                         ? "i-lucide-arrow-up-narrow-wide"
@@ -144,7 +149,7 @@ export const createInvoiceColumns = (
         cell: ({ row }) =>
             h(
                 "div",
-                { class: "text-muted text-center" },
+                { class: "text-muted" },
                 formatDate(row.original.dueDate),
             ),
     },
@@ -154,7 +159,7 @@ export const createInvoiceColumns = (
             const isSorted = column.getIsSorted();
             return h(UButton, {
                 variant: "ghost",
-                label: "Date de paiement",
+                label: "Payé le",
                 icon: isSorted
                     ? isSorted === "asc"
                         ? "i-lucide-arrow-up-narrow-wide"
@@ -168,7 +173,7 @@ export const createInvoiceColumns = (
         cell: ({ row }) =>
             h(
                 "div",
-                { class: "text-muted text-center" },
+                { class: "text-muted" },
                 formatDate(row.original.paidAt),
             ),
     },
