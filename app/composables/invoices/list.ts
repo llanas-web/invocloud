@@ -7,16 +7,45 @@ import { AppError } from "~/core/errors/app.error";
 const _useInvoices = () => {
     const { $usecases, $storageRepository, $queries } = useNuxtApp();
     const { selectedId } = useEstablishmentsList();
+    const route = useRoute();
+    const router = useRouter();
 
     const tableRef = useTemplateRef("invoicesTable");
 
-    const searchQuery = ref<string>("");
-    const statusFilter = ref<InvoiceStatus | "overdue" | undefined>(undefined);
-    const supplierFilter = ref<string[]>([]);
-    const rangeFilter = ref<{ start: Date; end: Date }>({
+    // Helper pour parser les query params
+    const getDefaultRange = () => ({
         start: new Date(new Date().setDate(new Date().getDate() - 30)),
         end: new Date(new Date().setDate(new Date().getDate() + 1)),
     });
+
+    const parseQueryParams = () => {
+        const search = route.query.search as string | undefined;
+        const status = route.query.status as
+            | InvoiceStatus
+            | "overdue"
+            | undefined;
+        const suppliers = route.query.suppliers as string | undefined;
+        const dateFrom = route.query.dateFrom as string | undefined;
+        const dateTo = route.query.dateTo as string | undefined;
+
+        return {
+            search: search || "",
+            status: status || undefined,
+            suppliers: suppliers ? suppliers.split(",") : [],
+            range: dateFrom && dateTo
+                ? { start: new Date(dateFrom), end: new Date(dateTo) }
+                : getDefaultRange(),
+        };
+    };
+
+    const initialParams = parseQueryParams();
+
+    const searchQuery = ref<string>(initialParams.search);
+    const statusFilter = ref<InvoiceStatus | "overdue" | undefined>(
+        initialParams.status,
+    );
+    const supplierFilter = ref<string[]>(initialParams.suppliers);
+    const rangeFilter = ref<{ start: Date; end: Date }>(initialParams.range);
 
     const {
         data: dtos,
@@ -134,6 +163,28 @@ const _useInvoices = () => {
             errorTitle: "Erreur lors du téléchargement de la facture.",
         },
     );
+
+    // Synchronisation des filtres avec les query params
+    const updateQueryParams = () => {
+        const query: Record<string, string> = {};
+
+        if (searchQuery.value) query.search = searchQuery.value;
+        if (statusFilter.value) query.status = statusFilter.value;
+        if (supplierFilter.value.length > 0) {
+            query.suppliers = supplierFilter.value.join(",");
+        }
+
+        // Toujours inclure les dates pour éviter de revenir aux défauts
+        query.dateFrom = rangeFilter.value.start.toISOString();
+        query.dateTo = rangeFilter.value.end.toISOString();
+
+        router.replace({ query });
+    };
+
+    // Watchers pour mettre à jour l'URL quand les filtres changent
+    watch([searchQuery, statusFilter, supplierFilter, rangeFilter], () => {
+        updateQueryParams();
+    }, { deep: true });
 
     return {
         invoices,
