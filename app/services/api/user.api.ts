@@ -13,6 +13,14 @@ export const userApi = {
             },
         );
     },
+    deleteAccount() {
+        return $fetch<void>(
+            "/api/security/user/delete",
+            {
+                method: "POST",
+            },
+        );
+    },
     subscription: {
         createCheckoutSession(
             data: { userId: string; subscriptionPlanId: string },

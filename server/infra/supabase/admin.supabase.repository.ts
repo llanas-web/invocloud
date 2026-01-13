@@ -34,4 +34,11 @@ export default class AdminSupabaseRepository implements AdminRepository {
         );
         if (error) throw SupabaseError.fromPostgrest(error);
     }
+
+    async deleteUser(userId: string): Promise<void> {
+        const { error } = await this.supabaseClient.auth.admin.deleteUser(
+            userId,
+        );
+        if (error) throw SupabaseError.fromPostgrest(error);
+    }
 }
