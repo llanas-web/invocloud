@@ -61,9 +61,7 @@ const _useUser = () => {
     const deleteAccountAction = useAsyncAction(
         async () => {
             if (!connectedUser.value?.id) throw new AppError("No user id");
-            await $usecases.users.delete.execute({
-                userId: connectedUser.value.id,
-            });
+            await userApi.deleteAccount();
             await logoutAction.execute();
         },
         {
@@ -71,7 +69,6 @@ const _useUser = () => {
             errorTitle: "Erreur lors de la suppression du compte utilisateur.",
         },
     );
-
     const toggleFavoriteAction = useAsyncAction(
         async (establishmentId: string) => {
             if (!connectedUser.value?.id) throw new AppError("No user id");

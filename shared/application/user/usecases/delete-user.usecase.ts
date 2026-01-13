@@ -2,6 +2,7 @@ import { ApplicationError } from "../../common/errors/application.error";
 import { z } from "zod";
 import type { Repositories } from "~~/shared/domain/common/repositories.factory";
 import type { Queries } from "~~/shared/domain/common/queries.factory";
+import type { AdminRepository } from "../../common/providers/auth/admin.repository";
 
 export const DeleteUserCommandSchema = z.object({
     userId: z.uuid(),
@@ -12,8 +13,8 @@ export type DeleteUserCommand = z.input<
 
 export default class DeleteUserUsecase {
     constructor(
-        private readonly repos: Repositories,
         private readonly queries: Queries,
+        private readonly adminRepository: AdminRepository,
     ) {}
 
     async execute(command: DeleteUserCommand): Promise<void> {
@@ -28,6 +29,6 @@ export default class DeleteUserUsecase {
                 "Impossible de supprimer l'utilisateur car il est créateur d'au moins un établissement",
             );
         }
-        await this.repos.userRepo.delete(userId);
+        await this.adminRepository.deleteUser(userId);
     }
 }

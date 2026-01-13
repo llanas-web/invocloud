@@ -8,4 +8,6 @@ export interface AdminRepository {
     updateUser(userId: string, updates: {
         password?: string;
     }): Promise<void>;
+
+    deleteUser(userId: string): Promise<void>;
 }
