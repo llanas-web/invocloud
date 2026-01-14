@@ -112,21 +112,6 @@ BEGIN
     WHERE s.establishment_id = e.id
       AND s.user_id IS NULL;  -- Ne migrer que les lignes pas encore migrées
 
-    -- 5b. Supprimer les doublons : garder seulement la subscription la plus récente par user_id
-    DELETE FROM "public"."subscriptions"
-    WHERE ctid IN (
-      SELECT s1.ctid
-      FROM "public"."subscriptions" s1
-      WHERE EXISTS (
-        SELECT 1
-        FROM "public"."subscriptions" s2
-        WHERE s2.user_id = s1.user_id
-          AND s2.created_at > s1.created_at
-      )
-    );
-    
-    RAISE NOTICE 'Doublons supprimés. Seule la subscription la plus récente est conservée par utilisateur.';
-
     -- 6. Vérification : afficher les subscriptions non migrées
     RAISE NOTICE 'Migration des subscriptions terminée';
     RAISE NOTICE 'Nombre de subscriptions migrées : %', (
