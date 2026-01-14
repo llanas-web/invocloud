@@ -415,12 +415,14 @@ grant truncate on table "public"."subscription_plans" to "service_role";
 
 grant update on table "public"."subscription_plans" to "service_role";
 
+-- Recréer la policy pour subscriptions
+drop policy if exists "Allow ALL to establishment members" on "public"."subscriptions";
 
-  create policy "Allow ALL to establishment members"
-  on "public"."subscriptions"
-  as permissive
-  for all
-  to authenticated
+create policy "Allow ALL to establishment members"
+on "public"."subscriptions"
+as permissive
+for all
+to authenticated
 using ((auth.uid() = user_id))
 with check ((auth.uid() = user_id));
 
@@ -443,39 +445,37 @@ drop policy if exists "Give users access to own folder aj13hi_2" on "storage"."o
 
 drop policy if exists "Give users access to own folder aj13hi_3" on "storage"."objects";
 
-
-  create policy "Allow CRUD own user aj13hi_0"
-  on "storage"."objects"
-  as permissive
-  for select
-  to authenticated
+-- Recréer les policies storage (DROP IF EXISTS avant CREATE pour éviter les doublons)
+drop policy if exists "Allow CRUD own user aj13hi_0" on "storage"."objects";
+create policy "Allow CRUD own user aj13hi_0"
+on "storage"."objects"
+as permissive
+for select
+to authenticated
 using (((bucket_id = 'invoices'::text) AND ((( SELECT (auth.uid())::text AS uid) = (storage.foldername(name))[1]) OR public.is_auth_user_allowed_establishment(((storage.foldername(name))[1])::uuid))));
 
-
-
-  create policy "Allow CRUD own user aj13hi_1"
-  on "storage"."objects"
-  as permissive
-  for insert
-  to authenticated
+drop policy if exists "Allow CRUD own user aj13hi_1" on "storage"."objects";
+create policy "Allow CRUD own user aj13hi_1"
+on "storage"."objects"
+as permissive
+for insert
+to authenticated
 with check (((bucket_id = 'invoices'::text) AND ((( SELECT (auth.uid())::text AS uid) = (storage.foldername(name))[1]) OR public.is_auth_user_allowed_establishment(((storage.foldername(name))[1])::uuid))));
 
-
-
-  create policy "Allow CRUD own user aj13hi_2"
-  on "storage"."objects"
-  as permissive
-  for update
-  to authenticated
+drop policy if exists "Allow CRUD own user aj13hi_2" on "storage"."objects";
+create policy "Allow CRUD own user aj13hi_2"
+on "storage"."objects"
+as permissive
+for update
+to authenticated
 using (((bucket_id = 'invoices'::text) AND ((( SELECT (auth.uid())::text AS uid) = (storage.foldername(name))[1]) OR public.is_auth_user_allowed_establishment(((storage.foldername(name))[1])::uuid))));
 
-
-
-  create policy "Allow CRUD own user aj13hi_3"
-  on "storage"."objects"
-  as permissive
-  for delete
-  to authenticated
+drop policy if exists "Allow CRUD own user aj13hi_3" on "storage"."objects";
+create policy "Allow CRUD own user aj13hi_3"
+on "storage"."objects"
+as permissive
+for delete
+to authenticated
 using (((bucket_id = 'invoices'::text) AND ((( SELECT (auth.uid())::text AS uid) = (storage.foldername(name))[1]) OR public.is_auth_user_allowed_establishment(((storage.foldername(name))[1])::uuid))));
 
 
