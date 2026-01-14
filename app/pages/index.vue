@@ -3,11 +3,17 @@ import { z } from 'zod';
 import type { FormSubmitEvent } from '@nuxt/ui'
 
 const { openModal } = useUploadWizard()
-const { isAuthenticated, connectedUser } = useAuth();
+const { isAuthenticated, connectedUser, actions: { createCheckoutSession } } = useAuth();
+const { pending, isCanceled, subscription, actions: {
+    activateSubscription,
+    cancelSubscription,
+} } = useUser()
+const { subscriptionPlans, pending: plansPending, error: plansError } = useSubscriptionPlan();
+
 const config = useRuntimeConfig();
 
 const schema = z.object({
-    email: z.string().email('Veuillez entrer un email valide'),
+    email: z.email('Veuillez entrer un email valide'),
 });
 const state = reactive({
     email: ''
@@ -61,7 +67,7 @@ const plans = computed(() => plansData.value?.map((plan) => {
     if (plan['email-invoice']) customFeatures.push('Adresse email customisée');
 
     return {
-        id: plan.name,
+        id: plan.plan_id,
         title: plan.title,
         description: plan.description,
         price: plan.price,
@@ -75,19 +81,25 @@ const plans = computed(() => plansData.value?.map((plan) => {
             ...customFeatures,
             ...(plan.features || []),
         ],
-        button: {
-            label: 'Choisir',
-            onClick: () => onPricingClick(plan.name),
-        },
     }
 }) || []);
 
-const onPricingClick = (planId: string) => {
-    if (isAuthenticated.value) {
-        navigateTo('/app/settings/establishments#subscriptions')
-    } else {
-        navigateTo('/auth/sign-up?plan=' + planId)
-    }
+const loading = computed(() => pending.value || plansPending.value || createCheckoutSession.pending.value || activateSubscription.pending.value || cancelSubscription.pending.value);
+
+const onChangePlan = async (planId: string) => {
+    await activateSubscription.execute({ subscriptionPlanId: planId });
+};
+
+const onCancel = async () => {
+    await cancelSubscription.execute();
+};
+
+const onReactivate = async () => {
+    await activateSubscription.execute({ subscriptionPlanId: subscription.value!.planId });
+};
+
+const onPlanSelect = async (planId: string) => {
+    await createCheckoutSession.execute(planId);
 };
 </script>
 
@@ -157,6 +169,19 @@ const onPricingClick = (planId: string) => {
                                 <UIcon v-if="plan.highlight" name="i-lucide-crown" class="text-amber-500" />
                                 {{ plan.title }}
                             </div>
+                        </template>
+                        <template #button>
+                            <UButton v-if="subscription === null" label="Choisir ce plan" color="primary"
+                                @click="onPlanSelect(plan.id)" :loading="loading" :disabled="loading" />
+
+                            <UButton v-else-if="plan.id === subscription!.planId"
+                                :label="isCanceled ? 'Réactiver' : 'Abonnement en cours'"
+                                :color="isCanceled ? 'success' : 'success'"
+                                @click="isCanceled ? onReactivate() : onCancel()" :loading="loading"
+                                :disabled="loading" />
+
+                            <UButton v-else label="Changer de plan" color="primary" @click="onChangePlan(plan.id)"
+                                :loading="loading" :disabled="loading" />
                         </template>
                     </UPricingPlan>
                 </UPricingPlans>
