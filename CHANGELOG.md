@@ -2,6 +2,32 @@
 
 
 
+## 1.5.0 (2026-01-14)
+
+### Added
+- ✨  Finishing plans cancel and upgrade [[aab0504](https://github.com/llanas-web/invocloud/commit/aab05047c26d57afc3c5c962bd34909df50575e6)]
+- ✨ Adding establishment creation limit [[95235b3](https://github.com/llanas-web/invocloud/commit/95235b33610198be3901197139132bfbd0f96829)]
+- ✨  Adding members limit [[1b16cea](https://github.com/llanas-web/invocloud/commit/1b16ceaf09cd9a7168552afe77dd640e7f5cf0d6)]
+- ✨ Adding invoice metrics sync with stripe usage [[e9bd194](https://github.com/llanas-web/invocloud/commit/e9bd19429b899c9955aad970caf8c01aad0aa4b2)]
+- ✨  Persist invoices filters [[15f76df](https://github.com/llanas-web/invocloud/commit/15f76df5f317154797a8eb7dceed3a4d5938064b)]
+
+### Fixed
+- 🐛 Fixing auth redirection and middleware public paths [[559bd2c](https://github.com/llanas-web/invocloud/commit/559bd2cab62f23709b5472e49b2ff61341a6e7aa)]
+- 🐛 Fixing reset password redirection [[d38b5a0](https://github.com/llanas-web/invocloud/commit/d38b5a009b36f51e79e5b3d762ec85ce38167cf3)]
+- 🐛 Fixing auth bug [[79bda5d](https://github.com/llanas-web/invocloud/commit/79bda5dd23ac7f205a0d3dbee39e7aed56b0f089)]
+- 🐛 Fixing checkout while sign-up [[04cd5bf](https://github.com/llanas-web/invocloud/commit/04cd5bf6bae3299ce1a803e6284cebc552e4f73e)]
+- 🐛  Fixing stripe update subscriptions [[4dc007c](https://github.com/llanas-web/invocloud/commit/4dc007c9206646384a2411bf7de0f2fbaa951cfb)]
+- 🐛 Fixing redirection [[7ea4258](https://github.com/llanas-web/invocloud/commit/7ea4258b5eedac7bb273701ad88e25558de7cd9a)]
+- 🐛 Fixing month range filter [[cc3742d](https://github.com/llanas-web/invocloud/commit/cc3742de1b056339f254a735219d2f967391eefa)]
+- 🐛  Fixing account deletion [[d638cd7](https://github.com/llanas-web/invocloud/commit/d638cd78bfe2aaa0a9d410c6ff479bcd2284557a)]
+- 🐛  Fixing plan selection on index page [[649dcbf](https://github.com/llanas-web/invocloud/commit/649dcbf5b2e5c56fb2ae8d876ce9e602e5884567)]
+
+### Changed
+- ♻️ REfactoring auth services + fixes [[5af33ea](https://github.com/llanas-web/invocloud/commit/5af33ea2e79e317246410f7964a4e22e3366cf2c)]
+
+### UI
+- 💄 Adding billing page [[f8a9124](https://github.com/llanas-web/invocloud/commit/f8a912432b60784d07dc61a39ad72183b4440672)]
+
 ## 1.4.5 (2025-12-04)
 
 ### Fixed
