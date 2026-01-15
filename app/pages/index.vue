@@ -188,6 +188,161 @@ const onPlanSelect = async (planId: string) => {
             </UContainer>
         </UPageSection>
 
+        <UPageSection id="regulation-2026" :ui="{
+            root: 'bg-gradient-to-br from-primary-50 to-blue-50 dark:from-primary-950/30 dark:to-blue-950/30 py-12 md:py-16',
+            container: 'max-w-none px-0',
+        }">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-5 gap-8 lg:gap-12 items-center">
+                    <!-- Image Section -->
+                    <div class="order-2 lg:order-1 lg:col-span-2">
+                        <div class="relative">
+                            <!-- Background decoration -->
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-blue-500/20 rounded-3xl blur-3xl">
+                            </div>
+
+                            <!-- Main illustration container -->
+                            <div
+                                class="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-3xl p-8 lg:p-12 shadow-2xl border border-primary-200 dark:border-primary-800">
+                                <div class="aspect-square flex items-center justify-center">
+                                    <!-- Decorative elements -->
+                                    <div class="relative w-full h-full">
+                                        <!-- Central icon -->
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <div class="relative">
+                                                <div
+                                                    class="absolute inset-0 bg-primary-500/20 rounded-full blur-2xl animate-pulse">
+                                                </div>
+                                                <div
+                                                    class="relative flex items-center justify-center size-32 md:size-40 lg:size-48 rounded-full bg-gradient-to-br from-primary-500 to-blue-600 shadow-xl">
+                                                    <UIcon name="i-lucide-shield-check"
+                                                        class="size-16 md:size-20 lg:size-24 text-white" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Floating documents -->
+                                        <div class="absolute top-8 left-8 animate-bounce"
+                                            style="animation-duration: 3s;">
+                                            <div
+                                                class="flex items-center justify-center size-16 rounded-xl bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700">
+                                                <UIcon name="i-lucide-file-text" class="size-8 text-primary-600" />
+                                            </div>
+                                        </div>
+
+                                        <div class="absolute bottom-8 right-8 animate-bounce"
+                                            style="animation-duration: 4s; animation-delay: 1s;">
+                                            <div
+                                                class="flex items-center justify-center size-16 rounded-xl bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700">
+                                                <UIcon name="i-lucide-file-check-2" class="size-8 text-green-600" />
+                                            </div>
+                                        </div>
+
+                                        <div class="absolute top-1/2 right-4 -translate-y-1/2 animate-bounce"
+                                            style="animation-duration: 3.5s; animation-delay: 0.5s;">
+                                            <div
+                                                class="flex items-center justify-center size-14 rounded-lg bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700">
+                                                <UIcon name="i-lucide-calendar-check" class="size-7 text-blue-600" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Section -->
+                    <div class="order-1 lg:order-2 lg:col-span-3 space-y-6">
+                        <div>
+                            <UBadge size="lg" color="primary" variant="subtle" class="mb-4">
+                                <UIcon name="i-lucide-sparkles" class="mr-2" />
+                                Nouveauté 2026
+                            </UBadge>
+                            <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+                                Conforme à la
+                                <span
+                                    class="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-blue-600">
+                                    réglementation 2026
+                                </span>
+                            </h2>
+                            <p class="text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
+                                Nous travaillons activement à l'intégration du système de gestion des factures conforme
+                                à la nouvelle réglementation de dématérialisation des factures qui entrera en vigueur en
+                                <span class="font-bold text-primary-600 dark:text-primary-400">septembre 2026</span>.
+                            </p>
+                        </div>
+
+                        <div
+                            class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                            <p class="text-base md:text-lg text-gray-700 dark:text-gray-300">
+                                Votre plateforme sera <span
+                                    class="font-semibold text-primary-600 dark:text-primary-400">automatiquement mise à
+                                    jour</span>
+                                pour assurer une conformité totale, sans aucune action de votre part.
+                            </p>
+                        </div>
+
+                        <div class="grid gap-4 pt-4">
+                            <div
+                                class="flex items-start gap-4 p-4 rounded-xl bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
+                                <div class="flex-shrink-0">
+                                    <div
+                                        class="flex items-center justify-center size-12 rounded-full bg-primary-100 dark:bg-primary-900">
+                                        <UIcon name="i-lucide-zap" class="size-6 text-primary-600" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-1">
+                                        Transition automatique
+                                    </h3>
+                                    <p class="text-gray-600 dark:text-gray-400">
+                                        Mise à jour transparente de votre système sans interruption
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="flex items-start gap-4 p-4 rounded-xl bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
+                                <div class="flex-shrink-0">
+                                    <div
+                                        class="flex items-center justify-center size-12 rounded-full bg-green-100 dark:bg-green-900">
+                                        <UIcon name="i-lucide-check-circle-2" class="size-6 text-green-600" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-1">
+                                        100% conforme
+                                    </h3>
+                                    <p class="text-gray-600 dark:text-gray-400">
+                                        Respect total de la réglementation française
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="flex items-start gap-4 p-4 rounded-xl bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
+                                <div class="flex-shrink-0">
+                                    <div
+                                        class="flex items-center justify-center size-12 rounded-full bg-blue-100 dark:bg-blue-900">
+                                        <UIcon name="i-lucide-shield" class="size-6 text-blue-600" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-1">
+                                        Continuité de service
+                                    </h3>
+                                    <p class="text-gray-600 dark:text-gray-400">
+                                        Aucune interruption de votre activité garantie
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </UPageSection>
+
         <UPageSection id="trust" title="Ils nous font confiance" :ui="{
             root: 'bg-muted text-muted pt-(--ui-header-height) md:pt-8',
             title: 'max-w-xl mx-auto text-muted',
