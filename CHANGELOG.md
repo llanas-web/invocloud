@@ -2,6 +2,16 @@
 
 
 
+## 1.6.0 (2026-01-15)
+
+### Added
+- ✨  Adding url filters param on accept pending_invoices [[5309f28](https://github.com/llanas-web/invocloud/commit/5309f28bedc9b856d28786e25f2d73519f30ac85)]
+
+### UI
+- 💄  Adding French septembre 2026 reglementation section [[c7d0b7a](https://github.com/llanas-web/invocloud/commit/c7d0b7a5fc1e5f7e9db2f588660ffb2679867c12)]
+- 💄  Fixing footer and index section UI [[f0a97ba](https://github.com/llanas-web/invocloud/commit/f0a97ba5de5e4fe5edcb1ab3c5fe56383530871a)]
+- 💄  Fixing tarification page [[e9f8912](https://github.com/llanas-web/invocloud/commit/e9f8912bf65f47b9f82946a2f026c2f873f265b5)]
+
 ## 1.5.4 (2026-01-15)
 
 ### Fixed
