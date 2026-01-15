@@ -131,57 +131,128 @@ const onPlanSelect = async (planId: string) => {
             <CommonInvocloudLogo @click="openModal" />
         </UPageHero>
 
-        <UPageSection id="features" :title="page?.sections[0]!.title" :description="page?.sections[0]!.description" :ui="{
-            root: 'bg-muted text-muted pt-(--ui-header-height) md:pt-8',
-            title: 'max-w-xl mx-auto text-muted',
-            description: 'max-w-xl mx-auto text-muted',
+        <UPageSection id="features" :ui="{
+            root: 'bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-900 pt-(--ui-header-height) md:pt-8 py-16 md:py-24',
+            container: 'max-w-7xl',
+            title: 'text-center',
+            description: 'text-center max-w-3xl mx-auto',
         }">
-            <UPageGrid>
-                <UPageCard v-for="(item, index) in page?.sections[0]!.features" :key="index" v-bind="item" spotlight
-                    variant="outline" :ui="{
-                        root: 'rounded-2xl',
-                        container: 'sm:px-12 sm:py-8',
-                        title: 'sm:text-xl',
-                        description: 'sm:text-lg',
-                        leadingIcon: 'sm:size-8'
-                    }" />
+            <template #title>
+                <div class="flex flex-col items-center gap-3 mb-4">
+                    <UBadge size="lg" color="primary" variant="soft">
+                        <UIcon name="i-lucide-zap" class="mr-2" />
+                        Fonctionnalités
+                    </UBadge>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">
+                        {{ page?.sections[0]!.title }}
+                    </h2>
+                </div>
+            </template>
+            <template #description>
+                <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
+                    {{ page?.sections[0]!.description }}
+                </p>
+            </template>
+            <UPageGrid class="mt-12" :ui="{
+                root: 'gap-6 lg:gap-8'
+            }">
+                <UPageCard v-for="(item, index) in page?.sections[0]!.features" :key="index" v-bind="item" :ui="{
+                    root: 'group bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-300 hover:-translate-y-1',
+                    container: 'p-8',
+                    title: 'text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors',
+                    description: 'text-base text-gray-600 dark:text-gray-400 leading-relaxed mt-3',
+                    leadingIcon: 'size-12 mb-4 text-primary-600 dark:text-primary-400 group-hover:scale-110 transition-transform'
+                }">
+                    <template #icon>
+                        <div
+                            class="flex items-center justify-center size-16 rounded-2xl bg-gradient-to-br from-primary-100 to-blue-100 dark:from-primary-900/30 dark:to-blue-900/30 group-hover:from-primary-200 group-hover:to-blue-200 dark:group-hover:from-primary-800/40 dark:group-hover:to-blue-800/40 transition-all duration-300 mb-4">
+                            <UIcon :name="item.icon" class="size-8 text-primary-600 dark:text-primary-400" />
+                        </div>
+                    </template>
+                </UPageCard>
             </UPageGrid>
         </UPageSection>
 
 
-        <UPageSection id="pricing" :title="page.pricing.title" :description="page.pricing.description" :ui="{
-            root: 'text-muted pt-(--ui-header-height) md:pt-8',
-            title: 'max-w-xl mx-auto text-muted',
+        <UPageSection id="pricing" :ui="{
+            root: 'bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 pt-(--ui-header-height) md:pt-8 py-16 md:py-24',
+            container: 'max-w-7xl',
+            title: 'text-center',
+            description: 'text-center max-w-2xl mx-auto',
         }">
-            <UContainer>
-                <UPricingPlans>
+            <template #title>
+                <div class="flex flex-col items-center gap-3 mb-4">
+                    <UBadge size="lg" color="primary" variant="soft">
+                        <UIcon name="i-lucide-sparkles" class="mr-2" />
+                        Tarification
+                    </UBadge>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">
+                        {{ page.pricing.title }}
+                    </h2>
+                </div>
+            </template>
+            <template #description>
+                <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400">
+                    {{ page.pricing.description }}
+                </p>
+            </template>
+            <UContainer class="mt-12">
+                <UPricingPlans :ui="{
+                    root: 'gap-6 lg:gap-8'
+                }">
                     <UPricingPlan v-for="plan in plans" :key="plan.id" v-bind="plan" :ui="{
-                        root: 'bg-card border-border',
-                        title: 'text-lg font-semibold text-muted',
-                        price: 'text-3xl font-extrabold text-muted',
-                        description: 'text-sm text-muted h-12',
-                        feature: 'text-muted',
+                        root: plan.highlight
+                            ? 'bg-gradient-to-b from-primary-50 to-white dark:from-primary-950/50 dark:to-gray-900 border-2 border-primary-500 shadow-xl shadow-primary-500/20 transform lg:scale-105 relative'
+                            : 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-lg transition-all duration-300',
+                        container: 'p-8',
+                        title: 'text-xl font-bold text-gray-900 dark:text-white',
+                        price: 'text-4xl font-extrabold text-gray-900 dark:text-white',
+                        description: 'text-base text-gray-600 dark:text-gray-400 h-14 flex items-center',
+                        feature: 'text-gray-700 dark:text-gray-300 text-sm',
+                        features: 'space-y-3',
                         button: 'w-full',
-                        tagline: 'font-medium text-xs text-muted mt-2',
+                        tagline: 'font-medium text-sm text-primary-600 dark:text-primary-400 mt-3',
                     }">
+                        <template #header>
+                            <div v-if="plan.highlight" class="absolute -top-4 left-1/2 -translate-x-1/2">
+                                <div
+                                    class="bg-gradient-to-r from-primary-600 to-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg flex items-center gap-2">
+                                    <UIcon name="i-lucide-star" class="size-4" />
+                                    Le plus populaire
+                                </div>
+                            </div>
+                        </template>
                         <template #title>
-                            <div class="flex items-center gap-2">
-                                <UIcon v-if="plan.highlight" name="i-lucide-crown" class="text-amber-500" />
-                                {{ plan.title }}
+                            <div class="flex items-center gap-2 mb-2">
+                                <UIcon v-if="plan.highlight" name="i-lucide-crown" class="text-amber-500 size-6" />
+                                <span>{{ plan.title }}</span>
+                            </div>
+                        </template>
+                        <template #price>
+                            <div class="flex items-baseline gap-2">
+                                <span>{{ plan.price }}</span>
+                                <span class="text-lg font-normal text-gray-500 dark:text-gray-500">/mois</span>
                             </div>
                         </template>
                         <template #button>
-                            <UButton v-if="subscription === null" label="Choisir ce plan" color="primary"
-                                @click="onPlanSelect(plan.id)" :loading="loading" :disabled="loading" />
+                            <UButton v-if="subscription === null"
+                                :label="plan.highlight ? 'Commencer maintenant' : 'Choisir ce plan'"
+                                :color="plan.highlight ? 'primary' : 'gray'"
+                                :variant="plan.highlight ? 'solid' : 'solid'" size="lg" @click="onPlanSelect(plan.id)"
+                                :loading="loading" :disabled="loading" class="font-semibold" />
 
                             <UButton v-else-if="plan.id === subscription!.planId"
-                                :label="isCanceled ? 'Réactiver' : 'Abonnement en cours'"
-                                :color="isCanceled ? 'success' : 'success'"
+                                :label="isCanceled ? 'Réactiver' : 'Abonnement actif'" color="success" size="lg"
+                                :variant="isCanceled ? 'solid' : 'soft'"
                                 @click="isCanceled ? onReactivate() : onCancel()" :loading="loading"
-                                :disabled="loading" />
+                                :disabled="loading">
+                                <template #leading>
+                                    <UIcon name="i-lucide-check-circle-2" />
+                                </template>
+                            </UButton>
 
-                            <UButton v-else label="Changer de plan" color="primary" @click="onChangePlan(plan.id)"
-                                :loading="loading" :disabled="loading" />
+                            <UButton v-else label="Changer de plan" color="primary" variant="outline" size="lg"
+                                @click="onChangePlan(plan.id)" :loading="loading" :disabled="loading" />
                         </template>
                     </UPricingPlan>
                 </UPricingPlans>
@@ -378,47 +449,21 @@ const onPlanSelect = async (planId: string) => {
                 </UContainer>
             </template>
             <template #footer>
-                <p class="text-center">Pour toute question, contactez-nous à l'adresse suivante : <a
-                        href="mailto:contact@invocloud.com" class="text-primary font-medium">contact@invocloud.com</a>
-                </p>
+                <div class="mt-16 text-center">
+                    <div
+                        class="inline-flex items-center gap-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl px-6 py-4 shadow-lg">
+                        <div
+                            class="flex items-center justify-center size-10 rounded-full bg-gradient-to-br from-primary-500 to-blue-500">
+                            <UIcon name="i-lucide-mail" class="size-5 text-white" />
+                        </div>
+                        <p class="text-base md:text-lg text-gray-700 dark:text-gray-300">
+                            Une question ?
+                            <a href="mailto:contact@invocloud.com"
+                                class="font-bold text-primary-600 dark:text-primary-400 hover:underline ml-1">contact@invocloud.com</a>
+                        </p>
+                    </div>
+                </div>
             </template>
-        </UPageSection>
-
-        <UPageSection>
-            <template #title>
-                <ul class="font-normal uppercase space-y-2">
-                    <li class="hover:underline">
-                        <NuxtLink to="/faq">FAQ</NuxtLink>
-                    </li>
-                    <li class="hover:underline">
-                        <NuxtLink to="/pdc">Politique de confidentialité</NuxtLink>
-                    </li>
-                    <li class="hover:underline">
-                        <NuxtLink to="/cgu">Condition Générale d'Utilisation</NuxtLink>
-                    </li>
-                </ul>
-            </template>
-            <template #description>
-                <p>Inscrivez-vous à notre newsletter pour découvrir toutes nos nouvelles fonctionnalités en
-                    temps réel!</p>
-            </template>
-            <div class="max-w-md mx-auto">
-                <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-                    <UInput label="Email" type="email" placeholder="Entrez votre email" class="mr-4" />
-                    <UButton type="submit">S'inscrire</UButton>
-                </UForm>
-                <ul class="flex flex-row justify-center items-center gap-6 mt-12 text-primary">
-                    <li>
-                        <UButton icon="i-simple-icons-linkedin" variant="ghost" color="primary" size="lg" />
-                    </li>
-                    <li>
-                        <UButton icon="i-simple-icons-facebook" variant="ghost" color="primary" size="lg" />
-                    </li>
-                    <li>
-                        <UButton icon="i-simple-icons-instagram" variant="ghost" color="primary" size="lg" />
-                    </li>
-                </ul>
-            </div>
         </UPageSection>
     </div>
 </template>
