@@ -56,19 +56,123 @@ const { connectedUser, isAuthenticated } = useAuth();
             <slot></slot>
         </UMain>
 
-        <USeparator class="text-primary-100/15">
-            <UIcon name="i-custom:invocloud-logo" class="text-primary size-10" />
-        </USeparator>
+        <footer class="bg-gray-900 dark:bg-gray-950 border-t border-gray-800 pt-16 pb-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-12">
+                    <!-- Colonne 1: À propos -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-bold text-white mb-4">
+                            Invocloud
+                        </h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">
+                            La solution moderne pour gérer vos factures en toute simplicité. Conforme aux
+                            réglementations
+                            françaises.
+                        </p>
+                        <div class="flex items-center gap-3 pt-2">
+                            <UButton icon="i-simple-icons-linkedin" color="gray" variant="ghost" size="sm" square
+                                class="hover:bg-primary-500/10 hover:text-primary-400 transition-colors" />
+                            <UButton icon="i-simple-icons-facebook" color="gray" variant="ghost" size="sm" square
+                                class="hover:bg-primary-500/10 hover:text-primary-400 transition-colors" />
+                            <UButton icon="i-simple-icons-instagram" color="gray" variant="ghost" size="sm" square
+                                class="hover:bg-primary-500/10 hover:text-primary-400 transition-colors" />
+                        </div>
+                    </div>
 
-        <UFooter>
-            <p class="text-primary">
-                <NuxtLink class="underline" to="/pdc">Politique de confidentialité</NuxtLink>
-                |
-                <NuxtLink class="underline" to="/cgu">
-                    Conditions générales d'utilisation</NuxtLink> © 2025 Invocloud.
-                Tous droits réservés.
-                <a href="mailto:contact@invocloud.com" class="underline">contact@invocloud.com</a>
-            </p>
-        </UFooter>
+                    <!-- Colonne 2: Liens rapides -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-bold text-white mb-4">
+                            Liens rapides
+                        </h3>
+                        <ul class="space-y-3">
+                            <li>
+                                <NuxtLink to="/faq"
+                                    class="group flex items-center gap-2 text-sm text-gray-400 hover:text-primary-400 transition-colors">
+                                    <UIcon name="i-lucide-chevron-right"
+                                        class="size-4 group-hover:translate-x-1 transition-transform" />
+                                    FAQ
+                                </NuxtLink>
+                            </li>
+                            <li>
+                                <NuxtLink to="/tarifs"
+                                    class="group flex items-center gap-2 text-sm text-gray-400 hover:text-primary-400 transition-colors">
+                                    <UIcon name="i-lucide-chevron-right"
+                                        class="size-4 group-hover:translate-x-1 transition-transform" />
+                                    Tarifs
+                                </NuxtLink>
+                            </li>
+                            <li>
+                                <NuxtLink to="/app"
+                                    class="group flex items-center gap-2 text-sm text-gray-400 hover:text-primary-400 transition-colors">
+                                    <UIcon name="i-lucide-chevron-right"
+                                        class="size-4 group-hover:translate-x-1 transition-transform" />
+                                    Tableau de bord
+                                </NuxtLink>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Colonne 3: Légal -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-bold text-white mb-4">
+                            Légal
+                        </h3>
+                        <ul class="space-y-3">
+                            <li>
+                                <NuxtLink to="/pdc"
+                                    class="group flex items-center gap-2 text-sm text-gray-400 hover:text-primary-400 transition-colors">
+                                    <UIcon name="i-lucide-chevron-right"
+                                        class="size-4 group-hover:translate-x-1 transition-transform" />
+                                    Politique de confidentialité
+                                </NuxtLink>
+                            </li>
+                            <li>
+                                <NuxtLink to="/cgu"
+                                    class="group flex items-center gap-2 text-sm text-gray-400 hover:text-primary-400 transition-colors">
+                                    <UIcon name="i-lucide-chevron-right"
+                                        class="size-4 group-hover:translate-x-1 transition-transform" />
+                                    Conditions d'utilisation
+                                </NuxtLink>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Colonne 4: Newsletter -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-bold text-white mb-4">
+                            Newsletter
+                        </h3>
+                        <p class="text-sm text-gray-400 mb-4">
+                            Recevez nos dernières actualités
+                        </p>
+                        <div class="space-y-3">
+                            <input type="email" placeholder="Votre email"
+                                class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm" />
+                            <UButton color="primary" size="md" block>
+                                S'inscrire
+                            </UButton>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ligne de séparation -->
+                <div class="border-t border-gray-800 pt-8">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <p class="text-sm text-gray-500">
+                            © {{ new Date().getFullYear() }} Invocloud. Tous droits réservés.
+                        </p>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <UIcon name="i-lucide-map-pin" class="size-4" />
+                            <span>Made in France</span>
+                            <span class="mx-2">•</span>
+                            <UIcon name="i-lucide-mail" class="size-4" />
+                            <a href="mailto:contact@invocloud.com" class="hover:text-primary-400 transition-colors">
+                                contact@invocloud.com
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </UApp>
 </template>
