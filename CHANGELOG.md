@@ -2,6 +2,11 @@
 
 
 
+## 1.5.4 (2026-01-15)
+
+### Fixed
+- 🐛  Fixing plan id in content [[6e5d5fd](https://github.com/llanas-web/invocloud/commit/6e5d5fdf4a46e86646495ecb4808d2f5ce4cd668)]
+
 ## 1.5.3 (2026-01-15)
 
 ### Fixed
