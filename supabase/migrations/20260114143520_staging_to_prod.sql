@@ -426,6 +426,7 @@ to authenticated
 using ((auth.uid() = user_id))
 with check ((auth.uid() = user_id));
 
+drop trigger if exists "trg_set_email_prefix" on "public"."establishments";
 
 CREATE TRIGGER trg_set_email_prefix BEFORE INSERT ON public.establishments FOR EACH ROW EXECUTE FUNCTION public.set_email_prefix_on_insert();
 
