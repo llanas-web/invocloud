@@ -2,6 +2,11 @@
 
 
 
+## 1.5.3 (2026-01-15)
+
+### Fixed
+- 🐛  fixing migrations [[0757827](https://github.com/llanas-web/invocloud/commit/0757827afda4d678972db931cde098df770f3607)]
+
 ## 1.5.2 (2026-01-14)
 
 ### Fixed
