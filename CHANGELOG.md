@@ -2,6 +2,11 @@
 
 
 
+## 1.6.1 (2026-01-15)
+
+### Fixed
+- 🐛  Fixing social navigation [[33c63d2](https://github.com/llanas-web/invocloud/commit/33c63d2596e5077560ce52032af092dab1c68d02)]
+
 ## 1.6.0 (2026-01-15)
 
 ### Added
