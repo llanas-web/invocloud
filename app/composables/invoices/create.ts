@@ -82,7 +82,7 @@ const _useInvoiceCreate = () => {
                     supplierId: formState.supplierId!,
                     establishmentId: selectedId.value!,
                     file: invoiceFile.value!,
-                    status: InvoiceStatus.DRAFT,
+                    status: InvoiceStatus.DRAFT, // Désigne la facture comme à traiter en OCR
                 });
             if (!success) {
                 formRef.value?.setErrors(error.issues.map((issue) => ({
