@@ -70,12 +70,16 @@ const { connectedUser, isAuthenticated } = useAuth();
                             françaises.
                         </p>
                         <div class="flex items-center gap-3 pt-2">
-                            <UButton icon="i-simple-icons-linkedin" color="gray" variant="ghost" size="sm" square
-                                class="hover:bg-primary-500/10 hover:text-primary-400 transition-colors" />
+                            <!-- <UButton icon="i-simple-icons-linkedin" color="gray" variant="ghost" size="sm" square
+                                class="hover:bg-primary-500/10 hover:text-primary-400 transition-colors" @ />
                             <UButton icon="i-simple-icons-facebook" color="gray" variant="ghost" size="sm" square
-                                class="hover:bg-primary-500/10 hover:text-primary-400 transition-colors" />
+                                class="hover:bg-primary-500/10 hover:text-primary-400 transition-colors" /> -->
                             <UButton icon="i-simple-icons-instagram" color="gray" variant="ghost" size="sm" square
-                                class="hover:bg-primary-500/10 hover:text-primary-400 transition-colors" />
+                                class="hover:bg-primary-500/10 hover:text-primary-400 transition-colors" @click="navigateTo('https://www.instagram.com/invocloud/', {
+                                    external: true, replace: false, open: {
+                                        target: '_blank'
+                                    }
+                                })" />
                         </div>
                     </div>
 
